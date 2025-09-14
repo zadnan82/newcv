@@ -1,0 +1,1510 @@
+{
+    "app": {
+    "title": "CVATI",
+    "theme": {
+      "dark": "Dunkelmodus",
+      "light": "Hellmodus"
+    }
+  },
+  "cards": {
+    "cover_letter": {
+      "title": "KI-Anschreiben",
+      "subtitle": "Erstellen Sie sofort maßgeschneiderte Anschreiben",
+      "features": {
+        "quick_gen": "Schnelle Erstellung",
+        "quick_gen_desc": "In Sekundenschnelle erstellen",
+        "ats_ready": "ATS-kompatibel",
+        "ats_ready_desc": "Besteht KI-Prüfungen"
+      },
+      "actions": {
+        "create": "Anschreiben erstellen",
+        "view_templates": "Vorlagen anzeigen"
+      }
+    },
+    "resume": {
+      "title": "Intelligenter Lebenslauf-Builder",
+      "subtitle": "KI-gestützter Lebenslauf-Builder mit intelligenten Vorschlägen.",
+      "recent_resumes": "Neueste Lebensläufe:",
+      "preview": "Vorschau:",
+      "preview_message": "Klicken Sie auf 'Lebenslauf erstellen', um diese Vorlage zu verwenden",
+      "actions": {
+        "build": "Lebenslauf erstellen",
+        "view_templates": "Vorlagen anzeigen",
+        "hide_templates": "Vorlagen ausblenden"
+      },
+      "validation": {
+        "personal_info_required": "Bitte füllen Sie die erforderlichen persönlichen Informationen aus (vollständiger Name, E-Mail und Mobiltelefonnummer)",
+        "education_required": "Bitte fügen Sie mindestens einen Bildungseintrag mit Institution, Abschluss und Studienfach hinzu",
+        "experience_required": "Bitte fügen Sie mindestens eine Berufserfahrung mit Unternehmen und Position hinzu",
+        "skills_required": "Bitte fügen Sie mindestens eine Fähigkeit hinzu",
+        "languages_required": "Bitte fügen Sie mindestens eine Sprache hinzu"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Startseite",
+    "resumeBuilder": "Lebenslauf-Builder",
+    "coverLetter": "Anschreiben-Generator",
+    "coverLetters": "Anschreiben",
+    "aiEnhancement": "KI-Verbesserung",
+    "register": "Registrieren",
+    "login": "Anmelden",
+    "settings": "Einstellungen",
+    "myCV": "Mein Lebenslauf",
+    "signOut": "Abmelden",
+    "toggleMenu": "Menü umschalten",
+    "hideOptions": "Optionen ausblenden",
+    "showOptions": "Optionen anzeigen",
+    "dashboard": "Dashboard",
+    "account": "Konto",
+    "myResumes": "Meine Lebensläufe"
+  },
+  "home": {
+    "title": "CVATI",
+    "subtitle": "Erstellen Sie professionelle Lebensläufe mit KI-gestützten Erkenntnissen",
+    "features": {
+      "title": "Hauptfunktionen",
+      "ats": "ATS-optimiert",
+      "ai": "KI-gestützt",
+      "industry": "Branchenspezifisch"
+    },
+    "cta": {
+      "title": "Starten Sie noch heute",
+      "subtitle": "Schließen Sie sich Tausenden von Fachleuten an, die ihre Karrieremöglichkeiten verbessert haben.",
+      "button": "Erstellen Sie jetzt Ihren Lebenslauf",
+      "button_aria": "Erstellen Sie jetzt Ihren Lebenslauf"
+    }
+  },
+  "resume": {
+    "title":{
+      "section": "Lebenslauf-Titel",
+      "title": "Lebenslauf-Builder",
+      "description": "Geben Sie Ihrem Lebenslauf einen Namen, um ihn später leichter identifizieren zu können",
+      "placeholder": "z.B. Lebenslauf Softwareentwickler"
+    },
+    "customizer": {
+      "title": "Lebenslauf-Anpasser",
+      "loading": "Lebenslaufdaten werden geladen...",
+      "closeOptions": "Optionen schließen",
+      "goBack": "Zurück",
+      "noResume": "Kein Lebenslauf ",
+      "pleaseCreate": "Bitte erstellen Sie hier Ihren Lebenslauf",
+      "goToBuilder": "Zur Lebenslauf-Builder-Seite gehen",
+      "saveCustomizations": {
+        "title": "Anpassungen speichern", 
+        "description": "Speichern Sie diese Anpassungseinstellungen, um sicherzustellen, dass jeder, der Ihren öffentlichen Lebenslauf ansieht, ihn mit Ihrem gewählten Stil sieht.",
+        "message": "Möchten Sie Ihre Anpassungen speichern, bevor Sie fortfahren?",
+        "success": "Anpassungen erfolgreich gespeichert!",
+        "error": "Beim Speichern Ihrer Anpassungen ist ein Fehler aufgetreten.",
+        "continueAnyway": "Möchten Sie trotzdem fortfahren?",
+        "save": "Speichern & Fortfahren",
+        "continue": "Ohne Speichern fortfahren",
+        "cancel": "Abbrechen"
+      },
+      "templates": {
+        "title": "Lebenslauf-Vorlage",
+        "selectTemplate": "Vorlage auswählen",
+        "templates": "Eine Vorlage auswählen",
+        "styling": "Styling",
+        "sharing": "Teilen",
+        "styles": "Stile", 
+        "selected": "Vorlage ausgewählt",
+        "noTemplatesFound": "Keine Vorlagen gefunden"
+      },
+      "color": {
+        "title": "Akzentfarbe"
+      },
+      "font": {
+        "title": "Schriftfamilie",
+        "samples": {
+          "professional": "Professionell und klar",
+          "modern": "Modern und lesbar",
+          "traditional": "Traditionell und elegant",
+          "refined": "Verfeinert mit besserer Lesbarkeit",
+          "monospaced": "Monospace und markant",
+          "legible": "Modern mit hoher Lesbarkeit",
+          "clean": "Klar und professionell",
+          "contemporary": "Zeitgemäß und markant",
+          "custom": "Benutzerdefinierte Schrift"
+        }
+      },
+      "spacing": {
+        "title": "Zeilenabstand",
+        "compact": "Kompakt",
+        "spacious": "Großzügig"
+      },
+      "headers": {
+        "title": "Überschriftenstil",
+        "normal": "Normaler Fall",
+        "uppercase": "GROSSBUCHSTABEN",
+        "description": "Wählen Sie, wie Abschnittsüberschriften in Ihrem Lebenslauf erscheinen"
+      },
+      "skills": {
+        "title": "Anzeige der Fähigkeitsstufen",
+        "show": "Fähigkeitsstufen anzeigen",
+        "hide": "Fähigkeitsstufen ausblenden",
+        "description": "Schalten Sie ein oder aus, ob Indikatoren für Fähigkeitsstufen in Ihrem Lebenslauf angezeigt werden"
+      },
+      "viewMode": {
+        "title": "Ansichtsmodus",
+        "pdf": "PDF-Ansicht",
+        "html": "HTML-Ansicht",
+        "canvas": "Canvas-Ansicht",
+        "switch": "Wechseln zu"
+      },
+      "export": {
+        "pdf": "Als PDF exportieren",
+        "docx": "Als DOCX exportieren",
+        "word": "Als Word exportieren",
+        "exporting": "Exportieren..."
+      },
+      "zoom": {
+        "zoomIn": "Vergrößern",
+        "zoomOut": "Verkleinern"
+      }
+    },
+    "templateSelector": {
+      "categories": {
+        "all": "Alle",
+        "professional": "Professionell",
+        "creative": "Kreativ",
+        "modern": "Modern",
+        "classic": "Klassisch",
+        "minimalist": "Minimalistisch",
+        "elegant": "Elegant"
+      }
+    },
+    "templateRenderer": {
+      "error": "Vorlage nicht gefunden. Bitte wählen Sie eine andere Vorlage."
+    },
+    "experience": {
+      "title": "Erfahrung",
+      "company": "Firmenname",
+      "company_placeholder": "Firmenname",
+      "position": "Position",
+      "position_placeholder": "Berufsbezeichnung",
+      "current_work": "Ich arbeite derzeit hier",
+      "description_placeholder": "Beschreiben Sie Ihre Verantwortlichkeiten und Erfolge...",
+      "add_button": "Weitere Erfahrung hinzufügen"
+    },
+    "education": {
+      "title": "Bildung",
+      "institution": "Name der Institution",
+      "institution_placeholder": "Name der Universität/Hochschule",
+      "degree": "Abschluss",
+      "degree_placeholder": "z.B. Bachelor, Master",
+      "field": "Studienfach",
+      "field_placeholder": "z.B. Informatik",
+      "currently_studying": "Ich studiere derzeit hier",
+      "gpa": "Notendurchschnitt",
+      "gpa_placeholder": "z.B. 1,7",
+      "add_button": "Weitere Bildung hinzufügen"
+    },
+    "skills": {
+      "title": "Fähigkeiten",
+      "name": "Name der Fähigkeit",
+      "name_placeholder": "Geben Sie eine Fähigkeit ein",
+      "level": "Niveau",
+      "add_button": "Weitere Fähigkeit hinzufügen",
+      "beginner": "Anfänger", 
+      "intermediate": "Fortgeschritten", 
+      "advanced": "Fortgeschritten+", 
+      "expert": "Experte"
+    },
+    "courses": {
+      "title": "Kurse",
+      "name": "Kursname",
+      "name_placeholder": "z.B. Fortgeschrittene Webentwicklung",
+      "institution": "Institution",
+      "institution_placeholder": "Name der Institution oder Plattform",
+      "description_placeholder": "Kurze Beschreibung des Kurses und Ihrer Erfolge...",
+      "add_button": "Weiteren Kurs hinzufügen"
+    },
+    "custom_sections": {
+      "title": "Benutzerdefinierte Abschnitte",
+      "section_title": "Abschnittstitel",
+      "title_placeholder": "z.B. Projekte, Erfolge, Publikationen",
+      "content": "Inhalt",
+      "content_placeholder": "Abschnittsinhalt...",
+      "add_button": "Weiteren Abschnitt hinzufügen"
+    },
+    "extracurricular": {
+      "activity": "Aktivitäten",
+      "name": "Name der Aktivität",
+      "name_placeholder": "z.B. Studentenvertretung, Sportteam",
+      "description_placeholder": "Beschreiben Sie Ihre Rolle und Erfolge...",
+      "add_button": "Weitere Aktivität hinzufügen"
+    },
+    "hobbies": {
+      "title": "Hobbys",
+      "hobby": "Hobby/Interesse",
+      "placeholder": "z.B. Fotografie, Lesen, Wandern",
+      "add_button": "Weiteres Hobby hinzufügen"
+    },
+    "internships": {
+      "title": "Praktika",
+      "position": "Position",
+      "position_placeholder": "Praktikumsposition",
+      "current_work": "Ich arbeite derzeit hier",
+      "description_placeholder": "Beschreiben Sie Ihre Verantwortlichkeiten und Erfolge...",
+      "add_button": "Weiteres Praktikum hinzufügen"
+    },
+    "languages": {
+      "title": "Sprachen",
+      "language": "Sprache",
+      "language_placeholder": "z.B. Englisch, Deutsch",
+      "proficiency": "Kenntnisstand",
+      "add_button": "Weitere Sprache hinzufügen",
+      "levels": {
+        "native": "Muttersprache",
+        "fluent": "Fließend",
+        "advanced": "Fortgeschritten",
+        "intermediate": "Mittelstufe",
+        "beginner": "Anfänger"
+      }
+    },
+    "personal_info": {
+      "title": "Persönliche Informationen",
+      "full_name": "Vollständiger Name",
+      "full_name_placeholder": "Max Mustermann",
+      "email": "E-Mail",
+      "email_placeholder": "max@beispiel.de",
+      "mobile": "Mobil",
+      "mobile_placeholder": "+49 170 1234567",
+      "title_field": "Berufsbezeichnung",
+      "title_placeholder": "Softwareentwickler",
+      "city": "Stadt",
+      "city_placeholder": "Berlin",
+      "address": "Adresse",
+      "address_placeholder": "Hauptstraße 123",
+      "postal_code": "Postleitzahl",
+      "postal_code_placeholder": "10115",
+      "nationality": "Nationalität",
+      "nationality_placeholder": "z.B. Deutsch",
+      "driving_license": "Führerschein",
+      "driving_license_placeholder": "z.B. Klasse B",
+      "place_of_birth": "Geburtsort",
+      "place_of_birth_placeholder": "Stadt, Land",
+      "date_of_birth": "Geburtsdatum",
+      "linkedin": "LinkedIn",
+      "linkedin_placeholder": "linkedin.com/in/maxmustermann",
+      "website": "Website",
+      "website_placeholder": "ihrewebsite.de",
+      "summary": "Professionelles Profil",
+      "summary_placeholder": "Kurzer Überblick über Ihren beruflichen Hintergrund...",
+      "summary_error": "Bitte fügen Sie zuerst Text zu Ihrem Profil hinzu",
+      "ai_error": "KI-Vorschläge konnten nicht abgerufen werden. Bitte versuchen Sie es erneut.",
+      "improve_ai": "Mit KI verbessern",
+      "generating": "Vorschläge werden generiert...",
+      "ai_suggestion": "KI-Verbesserungsvorschlag:",
+      "discard": "Verwerfen",
+      "apply_suggestion": "Vorschlag anwenden"
+    },
+    "photo": {
+      "title": "Profilfoto",
+      "alt": "Profil",
+      "remove_photo": "Foto entfernen",
+      "uploading": "Wird hochgeladen...",
+      "change": "Foto ändern",
+      "upload": "Foto hochladen",
+      "invalid_type": "Bitte laden Sie eine gültige Bilddatei hoch (JPG, PNG oder GIF)",
+      "size_limit": "Die Fotogröße sollte weniger als 2 MB betragen",
+      "process_error": "Fehler bei der Verarbeitung des Fotos. Bitte versuchen Sie es erneut.",
+      "max_size": "Maximale Größe: 2 MB"
+    },
+    "references": {
+      "title": "Referenzen",
+      "provide_upon_request": "Auf Anfrage",
+      "name": "Name",
+      "name_placeholder": "Name der Referenz",
+      "relation": "Beziehung/Position",
+      "relation_placeholder": "z.B. Ehemaliger Manager, Professor",
+      "phone": "Telefon",
+      "phone_placeholder": "Kontaktnummer",
+      "email": "E-Mail",
+      "email_placeholder": "E-Mail-Adresse",
+      "add_button": "Weitere Referenz hinzufügen"
+    },
+    "preview": {
+      "title": "Lebenslauf-Vorschau",
+      "example": "Beispiel-Lebenslauf",
+      "your_resume": "Ihr Lebenslauf"
+    },
+    "shared_view": "Geteilter Lebenslauf",
+    "not_found": {
+      "title": "Lebenslauf nicht gefunden",
+      "message": "Der gesuchte Lebenslauf existiert nicht oder ist nicht öffentlich."
+    }, 
+    "publicStatus": {
+      "title": "Lebenslauf-Datenschutz",
+      "status": "Status",
+      "public": "Öffentlich",
+      "private": "Privat",
+      "public_description": "Ihr Lebenslauf ist derzeit öffentlich. Jeder mit dem Link kann ihn ansehen.",
+      "private_description": "Ihr Lebenslauf ist derzeit privat. Nur Sie können ihn sehen.",
+      "make_public": "Lebenslauf öffentlich machen",
+      "make_private": "Lebenslauf privat machen"
+    },
+    "qrcode": {
+      "title": "Lebenslauf teilen",
+      "description": "Scannen Sie diesen QR-Code, um den Lebenslauf auf jedem Gerät anzuzeigen",
+      "public_link": "Öffentlicher Link",
+      "open_link": "Lebenslauf öffnen",
+      "copy_link": "Link kopieren",
+      "download": "QR herunterladen",
+      "copied": "Link in die Zwischenablage kopiert!"
+    },
+    "actions": {
+          "save_resume": "Lebenslauf speichern",
+          "save_changes": "Änderungen speichern",
+          "customize": "Lebenslauf anpassen",
+          "saving": "Wird gespeichert...",
+          "create_success": "Lebenslauf erfolgreich erstellt!",
+          "update_success": "Lebenslauf erfolgreich aktualisiert!",
+          "already_exists": "Sie haben bereits einen Lebenslauf. Bestehender Lebenslauf wird aktualisiert..."
+        }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Datenschutzrichtlinie",
+      "intro": "Willkommen bei CVATI. Wir respektieren Ihre Privatsphäre und sind bestrebt, Ihre persönlichen Daten zu schützen."
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "intro": "Willkommen bei CVATI. Diese Allgemeinen Geschäftsbedingungen regeln Ihre Nutzung unserer Website und Dienste."
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie",
+      "whatAre": "Was sind Cookies",
+      "howUse": "Wie wir Cookies verwenden",
+      "specific": "Spezifische Cookies, die wir verwenden",
+      "managing": "Verwaltung von Cookies",
+      "consent": "Cookie-Zustimmung",
+      "changes": "Änderungen an dieser Cookie-Richtlinie"
+    },
+    "dataDeletion": {
+      "title": "Anfrage zur Datenlöschung",
+      "intro": "Gemäß verschiedenen Datenschutzbestimmungen haben Sie das Recht, die Löschung Ihrer persönlichen Daten zu beantragen.",
+      "form": {
+        "email": "E-Mail-Adresse",
+        "emailHelp": "Wir verwenden diese E-Mail, um Ihr Konto zu identifizieren und über Ihre Anfrage zu kommunizieren.",
+        "additionalInfo": "Zusätzliche Informationen (Optional)",
+        "submit": "Löschungsantrag einreichen"
+      },
+      "success": "Ihr Antrag auf Datenlöschung wurde eingereicht. Wir werden Ihre Anfrage bearbeiten und Sie innerhalb von 30 Tagen unter {email} kontaktieren.",
+      "whatDeleted": {
+        "title": "Welche Daten gelöscht werden",
+        "intro": "Bei der Bearbeitung Ihrer Anfrage werden wir die folgenden mit Ihrem Konto verknüpften Daten löschen:"
+      }
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "CVATI",
+      "description": "Erstellen Sie professionelle Lebensläufe mit KI-gestützten Erkenntnissen, um Ihre Karrieremöglichkeiten zu verbessern."
+    },
+    "quickLinks": {
+      "title": "Schnelllinks",
+      "home": "Startseite",
+      "resumeBuilder": "Lebenslauf-Builder",
+      "coverLetter": "Anschreiben-Generator",
+      "aiEnhancement": "KI-Verbesserung"
+    },
+    "legal": {
+      "title": "Rechtliches",
+      "terms": "Allgemeine Geschäftsbedingungen",
+      "privacy": "Datenschutzrichtlinie",
+      "cookies": "Cookie-Richtlinie",
+      "dataDeletion": "Datenlöschung"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "contactForm": "Kontaktformular"
+    },
+    "copyright": "CVATI",
+    "rights": "Alle Rechte vorbehalten"
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "forgotPassword": "Passwort vergessen?",
+      "submit": "Anmelden",
+      "noAccount": "Haben Sie noch kein Konto?",
+      "register": "Hier registrieren",
+      "socialLogin": "Oder anmelden mit",
+      "welcome_back": "Willkommen zurück",
+      "sign_in_to_continue": "Melden Sie sich an, um Ihren Lebenslauf weiter zu erstellen",
+      "loading": "Wird geladen..."
+    },
+    "register": {
+      "title": "Registrieren",
+      "create_account": "Konto erstellen",
+      "sign_up_to_start": "Registrieren Sie sich, um mit dem Erstellen Ihres Lebenslaufs zu beginnen",
+      "name": "Vollständiger Name",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "submit": "Registrieren",
+      "sign_up": "Registrieren",
+      "creating_account": "Konto wird erstellt...",
+      "haveAccount": "Haben Sie bereits ein Konto?",
+      "login": "Hier anmelden",
+      "socialRegister": "Oder registrieren mit"
+    },
+    "social": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "error": "Fehler bei der sozialen Authentifizierung",
+      "success": "Authentifizierung erfolgreich",
+      "or_continue_with": "Oder fortfahren mit"
+    },
+    "callback": {
+      "processing": "Anmeldung wird verarbeitet",
+      "please_wait": "Bitte warten...",
+      "auth_error": "Authentifizierungsfehler",
+      "return_to_login": "Zurück zur Anmeldung",
+      "no_token": "Kein Authentifizierungstoken erhalten",
+      "auth_failed": "Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "error": {
+      "title": "Anmeldefehler",
+      "return_to_login": "Zurück zur Anmeldung"
+    }
+  },
+  "language": {
+    "title": "Sprache auswählen",
+    "en": "Englisch",
+    "es": "Spanisch",
+    "fr": "Französisch"
+  },
+  "common": {
+    "remove": "Entfernen",
+    "required_fields": "* Pflichtfelder",
+    "start_date": "Startdatum",
+    "end_date": "Enddatum",
+    "location": "Ort",
+    "location_placeholder": "Stadt, Land",
+    "description": "Beschreibung",
+    "max_chars": "Maximal {{count}} Zeichen",
+    "loading": "Wird geladen...",
+    "tonow" : "Laufend", 
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "apply": "Anwenden",
+    "back": "Zurück",
+    "next": "Weiter",
+    "submit": "Absenden",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sortBy": "Sortieren nach",
+    "actions": "Aktionen",
+    "success": "Erfolg!",
+    "error": "Fehler!",
+    "warning": "Warnung!",
+    "info": "Information",
+    "company": "Unternehmen",
+    "company_placeholder": "Firmenname",
+    "continue": "Fortfahren",
+    "back_to_editor": "Zurück zum Editor",
+    "choose_template": "Vorlage auswählen",
+    "choose_your_templates": "Wählen Sie Ihre Vorlagen",
+    "print": "Drucken",
+    "preparing": "Wird vorbereitet...",
+    "example_resume": "Beispiel-Lebenslauf",
+    "page": "Seite",
+    "of": "von",
+    "dismiss": "Verwerfen",
+    "enhancing": "Wird verbessert...",
+    "enhance": "Verbessern",
+    "enhance_with_ai": "Mit KI verbessern",
+    "generate_tips": "Tipps generieren",
+    "ai_suggestions": "KI-Vorschläge",
+    "apply_suggestion": "Vorschlag anwenden",
+    "reject": "Ablehnen",
+    "ai_tips": "KI-Tipps",
+    "at": "bei",
+    "in": "in",
+    "copy": "Kopieren",
+    "download": "Herunterladen",
+    "untitled": "Unbenannt",
+    "notSpecified": "Nicht angegeben",
+    "view": "Ansehen",
+    "favorite": "Zu Favoriten hinzufügen",
+    "unfavorite": "Aus Favoriten entfernen",
+    "local_draft": "Lokal gespeichert",
+"lastRefresh": "Zuletzt aktualisiert ",
+"refresh": "Aktualisieren",
+"cardView": "Zur Kartenansicht wechseln",
+"loadingCover": "Anschreiben werden geladen...",
+"ai": "KI",
+"ai_enhancement": "KI-Verbesserung",
+"no_summary": "Noch keine Zusammenfassung hinzugefügt",
+"save_changes": "Änderungen speichern und zurück zum Editor",
+"select_file": "Lebenslauf-Datei auswählen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie Ihre Kontoeinstellungen und Präferenzen",
+    "profile_info": "Profilinformationen",
+    "loading_user": "Benutzerinformationen werden geladen...",
+    "data_privacy": "Datenschutz & Kontrollen",
+    "data_portability": "Datenportabilität",
+    "data_portability_desc": "Laden Sie alle Ihre Kontodaten und Informationen in einem portablen Format herunter.",
+    "download_data": "Meine Daten herunterladen",
+    "downloading": "Wird heruntergeladen...",
+    "download": "Herunterladen",
+    "copy": "Kopieren",
+    "data_downloaded": "Ihre Daten wurden erfolgreich heruntergeladen.",
+    "download_failed": "Fehler beim Herunterladen Ihrer Daten. Bitte versuchen Sie es erneut.",
+    "danger_zone": "Gefahrenzone",
+    "delete_account": "Konto löschen",
+    "permanent_warning": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden.",
+    "delete_warning_1": "Alle Ihre persönlichen Informationen werden dauerhaft gelöscht.",
+    "delete_warning_2": "Sie verlieren den Zugriff auf alle Ihre gespeicherten Lebensläufe und Anschreiben.",
+    "delete_warning_3": "Ihr Konto kann nach dem Löschen nicht wiederhergestellt werden.",
+    "download_before_delete": "Wir empfehlen, Ihre Daten herunterzuladen, bevor Sie Ihr Konto löschen.",
+    "deletion_reason": "Warum löschen Sie Ihr Konto? (Optional)",
+    "select_reason": "Wählen Sie einen Grund",
+    "reason_no_longer_needed": "Ich benötige diesen Dienst nicht mehr",
+    "reason_dissatisfied": "Ich bin mit dem Dienst unzufrieden",
+    "reason_privacy": "Datenschutzbedenken",
+    "reason_other": "Anderer Grund",
+    "type_delete": "Geben Sie LÖSCHEN ein, um zu bestätigen",
+    "confirm_delete": "Löschen bestätigen",
+    "deleting": "Wird gelöscht...",
+    "account_deleted": "Konto gelöscht. Weiterleitung...",
+    "delete_failed": "Fehler beim Löschen des Kontos. Versuchen Sie es erneut.",
+    "enter_pass": "Geben Sie Ihr Passwort ein, um zu bestätigen",
+    "your_pass": "Ihr Passwort",
+    "security": "Sicherheit",
+    "change_password": "Passwort ändern",
+    "current_password": "Aktuelles Passwort",
+    "new_password": "Neues Passwort",
+    "confirm_password": "Neues Passwort bestätigen",
+    "password_hint": "Muss mindestens 8 Zeichen lang sein, mit Groß- und Kleinbuchstaben und Zahlen",
+    "password_requirements": "Passwort muss Groß- und Kleinbuchstaben sowie numerische Zeichen enthalten",
+    "password_changed": "Passwort erfolgreich geändert",
+    "change_password_failed": "Passwortänderung fehlgeschlagen",
+    "current_password_required": "Aktuelles Passwort ist erforderlich",
+    "passwords_not_match": "Passwörter stimmen nicht überein",
+    "password_too_short": "Passwort muss mindestens 8 Zeichen lang sein",
+    "not_authenticated": "Sie müssen angemeldet sein",
+  "password_required": "Bitte geben Sie Ihr Passwort zur Bestätigung ein",
+  "logout_all_devices": "Von allen Geräten abmelden",
+  "updating": "Wird aktualisiert...",
+  "update_password": "Passwort aktualisieren",
+  "confirm_delete_prompt": "Geben Sie DELETE ein, um die Kontolöschung zu bestätigen:"
+  },
+  "ai_enhancement": {
+    "title": "KI-verbesserter Lebenslauf",
+    "enhance_all": "Alle Bereiche mit KI verbessern",
+    "enhancing": "Wird verbessert...",
+    "loading": "Wird geladen...",
+    "error_message": "Fehler beim Verbessern des Abschnitts",
+    "create_resume_first": "Bitte erstellen Sie zuerst einen Lebenslauf",
+    "current_content": "Aktueller Inhalt",
+    "no_experiences": "Keine Erfahrungen aufgelistet",
+    "work_experiences": "Berufserfahrungen",
+    "no_recommendations": "Noch keine Empfehlungen generiert",
+    "generate_tips": "Tipps generieren",
+    "enhance": "Verbessern",
+    "no_suggestions": "Noch keine KI-Vorschläge. Klicken Sie auf \"Verbessern\", um Verbesserungen zu generieren.",
+    "ai_suggestions": "KI-Vorschläge",
+    "apply": "Anwenden",
+    "reject": "Ablehnen",
+    "resume_preview": "Aktuelle Lebenslauf-Vorschau",
+    "preview_note": "Hinweis: Dies ist eine vereinfachte Vorschau. Änderungen werden temporär gespeichert und werden angewendet, wenn Sie Ihren Lebenslauf speichern.",
+    "resume_editor": "Lebenslauf-Editor",
+    "resume_preview_title": "Lebenslauf-Vorschau",
+    "tips_on_formatting": "Tipps zur Formatierung und Organisation",
+    "gaps_inconsistencies": "Identifizierung von Lücken oder Inkonsistenzen",
+    "strengthening_narrative": "Vorschläge zur Stärkung der Gesamtdarstellung",
+    "implementation_note": "Durch die Umsetzung dieser Vorschläge wird Ihr Lebenslauf eine klarere, wirkungsvollere Darstellung bieten, die Ihre Qualifikationen und Bereitschaft für anspruchsvolle Positionen effektiv präsentiert.",
+    "cv_recommendations": "Lebenslauf-Empfehlungen",
+    "ai_tips": "KI-Tipps",
+    "suggestions_count": "Vorschlag",
+    "suggestions_plural": "Vorschläge"
+  },
+  "preview": {
+    "canvas": "Leinwand",
+    "pdf": "PDF",
+    "html": "HTML",
+    "view_mode": "Ansichtsmodus",
+    "export_as_pdf": "Als PDF exportieren",
+    "export_as_docx": "Als Word exportieren",
+    "print_resume": "Drucken",
+    "pdf_success": "PDF erfolgreich exportiert!",
+    "pdf_error": "Fehler beim Exportieren des PDFs",
+    "word_success": "Word-Dokument erfolgreich exportiert!",
+    "word_error": "Fehler beim Exportieren des Word-Dokuments. Bitte versuchen Sie es erneut.",
+    "print_error": "Fehler beim Drucken. Bitte versuchen Sie es erneut."
+  },
+  "editor": {
+    "resume_sections": "Lebenslauf-Abschnitte",
+    "preview_resume": "Lebenslauf-Vorschau",
+    "edit_resume": "Lebenslauf bearbeiten"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "intro": "Wir würden gerne von Ihnen hören! Bitte füllen Sie das untenstehende Formular aus, und unser Team wird sich so schnell wie möglich bei Ihnen melden.",
+    "form": {
+      "name": "Name",
+      "name_placeholder": "Ihr Name",
+      "email": "E-Mail",
+      "email_placeholder": "Ihre E-Mail-Adresse",
+      "subject": "Betreff",
+      "subject_placeholder": "Betreff Ihrer Nachricht",
+      "message": "Nachricht",
+      "message_placeholder": "Ihre Nachricht",
+      "submit": "Nachricht senden",
+      "sending": "Wird gesendet...",
+      "success": "Vielen Dank für Ihre Nachricht! Wir werden uns so schnell wie möglich bei Ihnen melden.",
+      "error": "Fehler beim Senden Ihrer Nachricht. Bitte versuchen Sie es später erneut."
+    },
+    "info": {
+      "title": "Kontaktinformationen",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "address": "Adresse",
+      "hours": "Geschäftszeiten"
+    }
+  }, 
+  "CoverLetter": {
+    "title": "Anschreiben-Generator",
+    "viewAll": "Alle Anschreiben anzeigen",
+    "view_saved": "Gespeichertes Anschreiben anzeigen",
+    "form": {
+      "title": "Anschreiben-Titel",
+      "title_prefix": "Anschreiben für",
+      "title_placeholder": "Geben Sie Ihrem Anschreiben einen Titel für einfache Referenz",
+      "full_name": "Vollständiger Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "company_name": "Firmenname",
+      "job_title": "Stellenbezeichnung",
+      "hiring_manager": "Personalverantwortlicher",
+      "hiring_manager_title": "Titel des Personalverantwortlichen",
+      "hiringManagerTitle_placeholder": "z.B. HR-Direktor",
+      "job_description": "Stellenbeschreibung",
+      "upload_cv": "Lebenslauf hochladen",
+      "supported_formats": "Unterstützt: .txt, .doc, .docx, .pdf",
+      "file": "Datei",
+      "enter": "Eingeben",
+      "submit": "Anschreiben generieren",
+      "using_stored_resume": "Wir werden Ihren gespeicherten Lebenslauf verwenden, um Ihr Anschreiben zu generieren.",
+      "generating": "Wird generiert...",
+      "generate_button": "Anschreiben generieren",
+      "fullName_placeholder": "Geben Sie Ihren vollständigen Namen ein",
+      "email_placeholder": "Geben Sie Ihre E-Mail ein",
+      "phone_placeholder": "Geben Sie Ihre Telefonnummer ein",
+      "companyName_placeholder": "Geben Sie den Firmennamen ein",
+      "jobTitle_placeholder": "Geben Sie die Stellenbezeichnung ein",
+      "hiringManager_placeholder": "Geben Sie den Namen des Personalverantwortlichen ein",
+      "jobDescription_placeholder": "Fügen Sie hier die Stellenbeschreibung ein...",
+      "save_to_account": "Dieses Anschreiben in meinem Konto speichern",
+      "resume_source": "Lebenslauf-Quelle auswählen",
+      "select_stored_resume": "Aus Ihren gespeicherten Lebensläufen auswählen",
+      "select_resume": "-- Lebenslauf auswählen --",
+      "resume_required": "Bitte wählen Sie einen Lebenslauf aus oder laden Sie eine Datei hoch",
+      "personal_info": "Ihre Informationen",
+      "job_details": "Stellendetails",
+      "job_description_tip": "Je vollständiger die Stellenbeschreibung ist, desto besser kann Ihr Anschreiben darauf zugeschnitten werden"
+    },
+    "preview": {
+      "title": "Vorschau",
+      "empty_state": "Ihr Anschreiben wird hier angezeigt, sobald es generiert wurde",
+      "generating": "Die KI generiert Ihr Anschreiben...",
+      "generating_note": "Dies kann je nach Komplexität der Stellenbeschreibung bis zu einer Minute dauern.",
+      "company": "Unternehmen",
+      "position": "Position",
+      "updated": "Zuletzt aktualisiert",
+      "no_results": "Keine Anschreiben entsprechen Ihren Suchkriterien"
+    },
+    "success": {
+      "file_uploaded": "Datei erfolgreich hochgeladen!",
+      "letter_generated": "Anschreiben erfolgreich generiert!",
+      "copied": "Anschreiben in die Zwischenablage kopiert!",
+      "downloaded": "Anschreiben erfolgreich heruntergeladen!"
+    },
+    "errors": {
+      "no_cv": "Bitte laden Sie Ihren Lebenslauf hoch",
+      "word_processing": "Fehler beim Verarbeiten des Word-Dokuments. Bitte stellen Sie sicher, dass es sich um eine gültige .doc- oder .docx-Datei handelt.",
+      "pdf_processing": "Fehler beim Verarbeiten der PDF-Datei. Bitte stellen Sie sicher, dass es sich um ein gültiges PDF handelt.",
+      "unsupported_format": "Nicht unterstütztes Dateiformat. Bitte verwenden Sie .txt, .doc, .docx oder .pdf",
+      "no_content": "Kein lesbarer Inhalt in der Datei gefunden",
+      "file_processing": "Fehler beim Verarbeiten der Datei. Bitte versuchen Sie es erneut.",
+      "rate_limit": "Bitte warten Sie {{seconds}} Sekunden, bevor Sie es erneut versuchen.",
+      "model_loading": "Modell wird geladen... Versuch {{attempt}}/{{maxRetries}}",
+      "api_rate_limit": "Ratenlimit überschritten. Warten... Versuch {{attempt}}/{{maxRetries}}",
+      "authentication": "Authentifizierungsfehler. Bitte überprüfen Sie Ihr API-Token.",
+      "server_error": "Serverfehler. Versuche mit kürzerem Input...",
+      "invalid_response": "Ungültiges Antwortformat erhalten. Wiederhole...",
+      "empty_response": "Das Modell hat eine leere Antwort zurückgegeben. Wiederhole...",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+      "generation": "Fehler beim Generieren des Anschreibens",
+      "no_content": "Keine Anschreiben-Daten empfangen",
+      "requiredFields": "Bitte füllen Sie alle erforderlichen Felder aus",
+      "selectResume": "Bitte laden Sie einen Lebenslauf hoch oder wählen Sie einen Lebenslauf aus Ihrem Konto"
+    },
+    "alerts": {
+      "selectResume": "Bitte laden Sie einen Lebenslauf hoch oder wählen Sie einen Lebenslauf aus Ihrem Konto",
+      "requiredFields": "Bitte füllen Sie alle erforderlichen Felder aus"
+    },
+    "prompt": {
+      "task": "Aufgabe: Generieren Sie ein professionelles Anschreiben mit den untenstehenden Informationen.",
+      "context": "Kontext: Dies ist für eine Bewerbung. Erstellen Sie ein formelles, gut strukturiertes Anschreiben, das die relevante Erfahrung des Kandidaten hervorhebt und sein Interesse an der Rolle zeigt.",
+      "format_requirements": "Formatanforderungen",
+      "format_item1": "Beginnen Sie mit einem ordnungsgemäßen Datums- und Adressblock",
+      "format_item2": "Verwenden Sie eine professionelle Anrede",
+      "format_item3": "Fügen Sie 3-4 prägnante Absätze ein",
+      "format_item4": "Enden Sie mit einer professionellen Schlussformel",
+      "format_item5": "Fügen Sie vollständige Kontaktinformationen in der Signatur ein",
+      "candidate_info": "Bewerberinformationen",
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "position_details": "Stellendetails",
+      "company": "Unternehmen",
+      "role": "Position",
+      "hiring_manager": "Personalverantwortlicher",
+      "default_hiring_manager": "Personalverantwortlicher",
+      "cv_highlights": "Lebenslauf-Highlights",
+      "job_description_highlights": "Stellenbeschreibung-Highlights",
+      "important_notes": "Wichtige Hinweise",
+      "note_item1": "Konzentrieren Sie sich auf die Übereinstimmung der Erfahrung des Kandidaten mit den Stellenanforderungen",
+      "note_item2": "Halten Sie einen professionellen, aber enthusiastischen Ton",
+      "note_item3": "Seien Sie konkret bei Beiträgen und Erfolgen",
+      "note_item4": "Zeigen Sie echtes Interesse an der Position und dem Unternehmen",
+      "note_item5": "Halten Sie den Brief prägnant und wirkungsvoll",
+      "final_instruction": "Bitte generieren Sie ein vollständiges Anschreiben mit diesen Informationen.",
+      "instruction_text": "Verwenden Sie Aufzählungspunkte, um den Inhalt zu strukturieren"
+    },
+    "signature": {
+      "closing": "Mit freundlichen Grüßen",
+      "email": "E-Mail",
+      "phone": "Telefon"
+    },
+    "download_prefix": "Anschreiben",
+    "login_notice": "um Ihre Anschreiben zu speichern und Ihre gespeicherten Lebensläufe zu verwenden"
+  },
+  "coverLetterDetail": {
+    "back": "Zurück zu Anschreiben",
+    "errors": {
+      "load": "Fehler beim Laden des Anschreibens",
+      "format": "Fehler beim Formatieren des Anschreibens",
+      "favorite": "Fehler beim Aktualisieren des Favoritenstatus",
+      "delete": "Fehler beim Löschen des Anschreibens",
+      "copy": "Fehler beim Kopieren in die Zwischenablage",
+      "notFound": {
+        "title": "Anschreiben nicht gefunden",
+        "message": "Das gesuchte Anschreiben existiert nicht oder Sie haben keine Berechtigung, es anzusehen."
+      }
+    },
+    "success": {
+      "copied": "Anschreiben in die Zwischenablage kopiert",
+      "downloaded": "Anschreiben heruntergeladen",
+      "deleted": "Anschreiben erfolgreich gelöscht",
+      "addedFavorite": "Zu Favoriten hinzugefügt",
+      "removedFavorite": "Aus Favoriten entfernt"
+    },
+    "delete_confirm": {
+      "title": "Löschen bestätigen",
+      "message": "Sind Sie sicher, dass Sie dieses Anschreiben löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "last_updated": "Zuletzt aktualisiert",
+    "content": "Anschreiben",
+    "no_content": "Kein Inhalt verfügbar",
+    "details": "Details",
+    "company": "Unternehmen",
+    "position": "Position",
+    "recipient": "Empfänger",
+    "created": "Erstellt",
+    "not_specified": "Nicht angegeben",
+    "actions": {
+      "favorite": "Zu Favoriten hinzufügen",
+      "unfavorite": "Aus Favoriten entfernen",
+      "delete": "Anschreiben löschen"
+    }
+  },
+  "coverLetterView": {
+    "untitled": "Unbenanntes Anschreiben",
+    "created": "Erstellt",
+    "updated": "Aktualisiert",
+    "fields": {
+      "company": "Unternehmen",
+      "position": "Position",
+      "recipient": "Empfänger"
+    },
+    "content": {
+      "title": "Anschreiben-Inhalt"
+    },
+    "jobDescription": {
+      "title": "Stellenbeschreibung"
+    },
+    "linkedResume": {
+      "title": "Verknüpfter Lebenslauf",
+      "loading": "Lebenslauf-Informationen werden geladen...",
+      "view": "Lebenslauf anzeigen"
+    },
+    "actions": {
+      "backToDashboard": "Zurück zum Dashboard"
+    },
+    "errors": {
+      "load": "Fehler beim Laden des Anschreibens",
+      "format": "Fehler beim Formatieren des Anschreibens",
+      "favorite": "Fehler beim Aktualisieren des Favoritenstatus",
+      "delete": "Fehler beim Löschen des Anschreibens",
+      "notFound": {
+        "title": "Anschreiben nicht gefunden",
+        "message": "Das gesuchte Anschreiben existiert nicht oder Sie haben keine Berechtigung, es anzusehen."
+      }
+    },
+    "success": {
+      "copied": "Anschreiben in die Zwischenablage kopiert!",
+      "downloaded": "Anschreiben erfolgreich heruntergeladen",
+      "deleted": "Anschreiben erfolgreich gelöscht",
+      "addedFavorite": "Zu Favoriten hinzugefügt",
+      "removedFavorite": "Aus Favoriten entfernt"
+    },
+    "delete_confirm": {
+      "title": "Löschen bestätigen",
+      "message": "Sind Sie sicher, dass Sie dieses Anschreiben löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    }
+  },
+  "coverLetterEditor": {
+    "title": "Anschreiben bearbeiten",
+    "tabs": {
+      "edit": "Bearbeiten",
+      "preview": "Vorschau"
+    },
+    "fields": {
+      "title": "Anschreiben-Titel",
+      "companyName": "Firmenname",
+      "jobTitle": "Stellenbezeichnung",
+      "recipientName": "Name des Empfängers",
+      "recipientTitle": "Titel des Empfängers",
+      "jobDescription": "Stellenbeschreibung",
+      "coverLetterContent": "Anschreiben-Inhalt",
+      "greeting": "Anrede",
+      "introduction": "Einleitung",
+      "bodyParagraphs": "Hauptteil-Absätze",
+      "closing": "Schlussformel",
+      "signature": "Signatur"
+    },
+    "placeholders": {
+      "title": "Anschreiben für [Position] bei [Unternehmen]",
+      "companyName": "Firmenname",
+      "jobTitle": "Stellenbezeichnung",
+      "recipientName": "Name des Personalverantwortlichen",
+      "recipientTitle": "Titel des Personalverantwortlichen",
+      "jobDescription": "Fügen Sie hier die Stellenbeschreibung ein...",
+      "coverLetterContent": "Geben Sie den Anschreiben-Inhalt im JSON-Format ein...",
+      "greeting": "Sehr geehrte/r Personalverantwortliche/r,",
+      "introduction": "Ich möchte hiermit mein Interesse an... ausdrücken",
+      "bodyParagraph": "Beschreiben Sie Ihre relevante Erfahrung...",
+      "closing": "Ich freue mich auf die Gelegenheit, Ihrem Team beizutreten...",
+      "signature": "Mit freundlichen Grüßen, [Ihr Name]"
+    },
+    "buttons": {
+      "switchToRaw": "Zum Roh-Editor wechseln",
+      "switchToRich": "Zum Rich-Editor wechseln",
+      "addParagraph": "+ Absatz hinzufügen",
+      "removeParagraph": "Absatz entfernen",
+      "initializeParagraphs": "Hauptteil-Absätze initialisieren"
+    },
+    "notes": {
+      "rawEditor": "Hinweis: Dies ist der rohe JSON-Inhalt. Stellen Sie sicher, dass Sie eine gültige JSON-Formatierung beibehalten."
+    },
+    "errors": {
+      "load": "Fehler beim Laden des Anschreibens",
+      "save": "Fehler beim Speichern des Anschreibens",
+      "preview": "Fehler beim Generieren der Vorschau",
+      "invalidJson": "Ungültiges JSON-Format im Anschreiben-Inhalt",
+      "parsingError": "Fehler beim Parsen des Inhalts. Wechsle zum Roh-Editor."
+    },
+    "success": {
+      "save": "Anschreiben erfolgreich gespeichert",
+      "copied": "Anschreiben in die Zwischenablage kopiert!",
+      "downloaded": "Anschreiben erfolgreich heruntergeladen"
+    }
+  },
+  "coverLetters": {
+    "title": "Ihre Anschreiben",
+    "description": "Verwalten Sie all Ihre Anschreiben an einem Ort",
+    "actions": {
+      "new": "Neues Anschreiben erstellen"
+    },
+    "empty": {
+      "title": "Noch keine Anschreiben",
+      "message": "Sie haben noch keine Anschreiben erstellt. Beginnen Sie, indem Sie Ihr erstes erstellen.",
+      "action": "Erstellen Sie Ihr erstes Anschreiben"
+    },
+    "search": {
+      "placeholder": "Anschreiben durchsuchen..."
+    },
+    "filter": {
+      "favorites": "Nur Favoriten anzeigen"
+    },
+    "table": {
+      "title": "Titel",
+      "company": "Unternehmen",
+      "position": "Position",
+      "date": "Zuletzt aktualisiert",
+      "actions": "Aktionen"
+    },
+    "no_results": "Keine Anschreiben entsprechen Ihren Suchkriterien",
+    "errors": {
+      "load": "Fehler beim Laden der Anschreiben",
+      "delete": "Fehler beim Löschen des Anschreibens",
+      "favorite": "Fehler beim Aktualisieren des Favoritenstatus",
+      "preview": "Fehler bei der Vorschau des Anschreibens"
+    },
+    "success": {
+      "deleted": "Anschreiben erfolgreich gelöscht",
+      "favorited": "Zu Favoriten hinzugefügt",
+      "unfavorited": "Aus Favoriten entfernt",
+      "copied": "Anschreiben in die Zwischenablage kopiert!",
+      "downloaded": "Anschreiben erfolgreich heruntergeladen"
+    },
+    "delete_confirm": {
+      "title": "Löschen bestätigen",
+      "message": "Sind Sie sicher, dass Sie dieses Anschreiben löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "preview": {
+      "company": "Unternehmen",
+      "position": "Position",
+      "updated": "Zuletzt aktualisiert"
+    }
+  },
+  "resumeDashboard": {
+    "title": "Meine Lebensläufe",
+    "loading": "Ihre Lebensläufe werden geladen...",
+    "noResumes": {
+      "title": "Sie haben noch keine Lebensläufe",
+      "description": "Erstellen Sie Ihren ersten professionellen Lebenslauf und machen Sie den nächsten Schritt in Ihrer Karriere!"
+    },
+    "defaultTitle": "Mein Lebenslauf",
+    "unnamed": "Unbenannter Lebenslauf",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "preview": "Lebenslauf-Vorschau",
+    "confirmDelete": "Sind Sie sicher, dass Sie diesen Lebenslauf löschen möchten?",
+    "errors": {
+      "noResumeId": "Keine Lebenslauf-ID verfügbar"
+    },
+    "buttons": {
+      "startBuilding": "Beginnen Sie mit dem Erstellen Ihres Lebenslaufs",
+      "createNew": "Neuen Lebenslauf erstellen",
+      "view": "Anzeigen",
+      "edit": "Bearbeiten",
+      "customize": "Anpassen",
+      "delete": "Löschen"
+    }
+  },
+  "privacy": {
+    "title": "Datenschutzrichtlinie",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "updateDate": "4. April 2025",
+    "intro": "CVATI (\"wir\", \"unser\" oder \"uns\") verpflichtet sich, Ihre Privatsphäre zu schützen. Diese Datenschutzrichtlinie erläutert, wie wir Ihre Informationen sammeln, verwenden, offenlegen und schützen, wenn Sie unseren Lebenslauf-Erstellungsservice nutzen.",
+    "collection": {
+      "title": "Informationen, die wir sammeln",
+      "desc": "Wir sammeln persönliche Informationen, die Sie uns freiwillig zur Verfügung stellen, wenn Sie unseren Service nutzen, einschließlich:",
+      "personal": "Persönliche Daten (Name, E-Mail-Adresse, Telefonnummer)",
+      "professional": "Berufliche Informationen (Berufserfahrung, Fähigkeiten, Ausbildung)",
+      "optional": "Optionale Informationen (Geburtsdatum, Nationalität, Adresse, Foto)",
+      "account": "Kontoanmeldeinformationen",
+      "usage": "Nutzungsdaten und Interaktionen mit unserem Service"
+    },
+    "use": {
+      "title": "Wie wir Ihre Informationen verwenden",
+      "desc": "Wir verwenden Ihre Informationen für die folgenden Zwecke:",
+      "provide": "Um unseren Service bereitzustellen und zu pflegen",
+      "improve": "Um unseren Service und die Benutzererfahrung zu verbessern",
+      "communicate": "Um mit Ihnen über Service-Updates zu kommunizieren",
+      "ai": "Um KI-verbesserte Erstellung von Lebensläufen und Anschreiben zu ermöglichen",
+      "security": "Um Sicherheit zu gewährleisten und Betrug zu verhindern",
+      "legal": "Um rechtlichen Verpflichtungen nachzukommen"
+    },
+    "sharing": {
+      "title": "Informationsfreigabe und Offenlegung",
+      "desc": "Wir können Ihre Informationen teilen mit:",
+      "service": "Dienstanbietern (Cloud-Speicher, Bild-Hosting, Analysen)",
+      "legal": "Rechtlichen Behörden, wenn gesetzlich vorgeschrieben",
+      "business": "Geschäftspartnern mit Ihrer ausdrücklichen Zustimmung",
+      "note": "Wir verwenden Cloudinary für Bildspeicherung und -verarbeitung. Ihre hochgeladenen Fotos unterliegen auch der Datenschutzrichtlinie von Cloudinary."
+    },
+    "storage": {
+      "title": "Datenspeicherung und Sicherheit",
+      "desc": "Wir implementieren angemessene Sicherheitsmaßnahmen zum Schutz Ihrer persönlichen Daten. Jedoch ist keine Methode der Übertragung über das Internet zu 100% sicher, und wir können keine absolute Sicherheit garantieren.",
+      "retention": "Wir speichern Ihre persönlichen Daten, solange Ihr Konto aktiv ist oder soweit es zur Bereitstellung unserer Dienste erforderlich ist. Sie können jederzeit die Löschung Ihrer Daten beantragen."
+    },
+    "rights": {
+      "title": "Ihre Datenrechte",
+      "desc": "Gemäß der DSGVO und anderen anwendbaren Datenschutzgesetzen haben Sie Rechte bezüglich Ihrer personenbezogenen Daten, darunter:",
+      "access": "Recht auf Zugang zu Ihren personenbezogenen Daten",
+      "rectify": "Recht auf Berichtigung ungenauer Daten",
+      "delete": "Recht auf Löschung (\"Recht auf Vergessenwerden\")",
+      "restrict": "Recht auf Einschränkung der Verarbeitung",
+      "portability": "Recht auf Datenübertragbarkeit",
+      "object": "Recht auf Widerspruch gegen die Verarbeitung",
+      "exercise": "Um diese Rechte auszuüben, können Sie die Kontoeinstellungen in unserer Anwendung verwenden oder uns direkt kontaktieren."
+    },
+    "cookies": {
+      "title": "Cookies und ähnliche Technologien",
+      "desc": "Wir verwenden Cookies und ähnliche Tracking-Technologien, um Ihre Erfahrung auf unserer Website zu verbessern, die Nutzung zu analysieren und bei unseren Marketingbemühungen zu helfen. Sie können Cookies über Ihre Browsereinstellungen kontrollieren."
+    },
+    "ai": {
+      "title": "KI-generierte Inhalte",
+      "desc": "Unser Service nutzt KI, um bei der Erstellung von Lebenslauf-Inhalten und Anschreiben zu helfen. Die von Ihnen bereitgestellten Daten können von unseren KI-Systemen verarbeitet werden, um personalisierte Inhalte zu generieren. Wir implementieren Maßnahmen zum Schutz Ihrer Daten während der KI-Verarbeitung und verwenden Ihre personenbezogenen Daten nicht ohne ausdrückliche Zustimmung zum Training unserer KI-Modelle."
+    },
+    "children": {
+  "title": "Datenschutz für Kinder",
+  "desc": "Unser Dienst richtet sich nicht an Personen unter 16 Jahren. Wenn Sie wissen, dass ein Minderjähriger uns personenbezogene Daten ohne elterliche Zustimmung zur Verfügung gestellt hat, kontaktieren Sie uns bitte."
+},
+"changes": {
+  "title": "Änderungen dieser Datenschutzrichtlinie",
+  "desc": "Wir können unsere Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Wir werden Sie über alle Änderungen informieren, indem wir die neue Datenschutzrichtlinie auf dieser Seite veröffentlichen und das Datum der \"Letzten Aktualisierung\" aktualisieren."
+},
+"contact": {
+  "title": "Kontakt",
+  "desc": "Wenn Sie Fragen zu dieser Datenschutzrichtlinie haben, kontaktieren Sie uns bitte unter:",
+  "email": "privacy@cvati.com"
+}, 
+    "terms": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "updateDate": "4. April 2025",
+    "intro": "Willkommen bei CVATI. Diese Allgemeinen Geschäftsbedingungen regeln Ihre Nutzung unseres Lebenslauf-Erstellungsdienstes und unserer Website. Durch den Zugriff auf oder die Nutzung von CVATI erklären Sie sich mit diesen Bedingungen einverstanden.",
+    "definitions": {
+      "title": "1. Definitionen",
+      "service": "\"Dienst\"",
+      "serviceDesc": "Bezieht sich auf die CVATI-Website und die Lebenslauf-Erstellungsanwendung.",
+      "content": "\"Inhalt\"",
+      "contentDesc": "Bezieht sich auf Lebensläufe, Anschreiben und alle anderen Materialien, die über unseren Dienst erstellt, hochgeladen oder generiert werden.",
+      "user": "\"Benutzer\"",
+      "userDesc": "Jede Person, die auf unseren Dienst zugreift oder ihn nutzt.",
+      "account": "\"Konto\"",
+      "accountDesc": "Ein registriertes Benutzerprofil innerhalb unseres Dienstes."
+    },
+    "accounts": {
+      "title": "2. Benutzerkonten",
+      "registration": "Wenn Sie ein Konto bei uns erstellen, müssen Sie genaue, vollständige und aktuelle Informationen angeben. Sie sind für den Schutz Ihres Passworts und für alle Aktivitäten, die unter Ihrem Konto stattfinden, verantwortlich.",
+      "terminate": "Wir behalten uns das Recht vor, Ihr Konto sofort zu kündigen oder zu sperren, ohne vorherige Ankündigung oder Haftung, aus jedem Grund, einschließlich Verstoß gegen diese Bedingungen."
+    },
+    "use": {
+      "title": "3. Zulässige Nutzung",
+      "desc": "Sie stimmen zu, unseren Dienst nur für rechtmäßige Zwecke und in Übereinstimmung mit diesen Bedingungen zu nutzen. Sie stimmen zu, Folgendes nicht zu tun:",
+      "false": "Falsche oder irreführende Informationen bereitstellen",
+      "impersonate": "Sich als eine andere Person oder Einrichtung ausgeben",
+      "infringe": "Patente, Marken, Geschäftsgeheimnisse, Urheberrechte oder andere Eigentumsrechte verletzen",
+      "harmful": "Viren oder anderen bösartigen Code hochladen",
+      "interfere": "In den Dienst oder die Server eingreifen oder diese stören",
+      "automated": "Automatisierte Methoden verwenden, um auf den Dienst zuzugreifen oder ihn zu nutzen"
+    },
+    "content": {
+      "title": "4. Inhaltseigentum und Lizenz",
+      "ownership": "Sie behalten alle Eigentumsrechte an allen Lebensläufen, Anschreiben oder anderen Inhalten, die Sie über unseren Dienst erstellen. Sie gewähren uns jedoch eine nicht-exklusive, weltweite, gebührenfreie Lizenz zur Nutzung, Reproduktion und Anzeige Ihrer Inhalte ausschließlich zum Zweck der Bereitstellung und Verbesserung unseres Dienstes.",
+      "responsibility": "Sie sind allein verantwortlich für alle Inhalte, die Sie erstellen, hochladen oder anderweitig über den Dienst verfügbar machen. Sie versichern und garantieren, dass Sie das Recht haben, alle in Ihren Lebensläufen enthaltenen Informationen zu verwenden, und dass der Inhalt keine Gesetze oder Rechte Dritter verletzt."
+    },
+    "ai": {
+      "title": "5. KI-generierte Inhalte",
+      "desc": "Unser Dienst verwendet künstliche Intelligenz, um bei der Erstellung von Lebensläufen und Anschreiben zu helfen. Sie erkennen an, dass:",
+      "accuracy": "KI-generierte Inhalte nicht immer genau oder für Ihre spezifischen Bedürfnisse geeignet sein könnten",
+      "review": "Sie sollten alle KI-generierten Inhalte überprüfen und bearbeiten, bevor Sie sie verwenden",
+      "responsibility": "Sie letztendlich für alle Inhalte in Ihrem Lebenslauf oder Anschreiben verantwortlich sind, einschließlich KI-generierter Teile"
+    },
+    "disclaimer": {
+      "title": "6. Haftungsausschluss",
+      "desc": "Unser Dienst wird \"wie besehen\" und \"wie verfügbar\" ohne jegliche Garantien jeglicher Art bereitgestellt, weder ausdrücklich noch implizit, einschließlich, aber nicht beschränkt auf die impliziten Garantien der Marktgängigkeit, Eignung für einen bestimmten Zweck oder Nichtverletzung.",
+      "success": "Wir garantieren nicht, dass unser Dienst Ihnen helfen wird, eine Anstellung oder Vorstellungsgespräche zu sichern. Die Wirksamkeit von Lebensläufen und Anschreiben hängt von vielen Faktoren ab, die außerhalb unserer Kontrolle liegen."
+    },
+    "limitation": {
+      "title": "7. Haftungsbeschränkung",
+      "desc": "In dem nach geltendem Recht maximal zulässigen Umfang haften CVATI, seine Direktoren, Mitarbeiter oder Vertreter in keinem Fall für indirekte, strafende, zufällige, besondere, folgende oder exemplarische Schäden, einschließlich, ohne Einschränkung, Schäden für entgangenen Gewinn, Goodwill, Nutzung, Daten oder andere immaterielle Verluste, die aus der Nutzung oder der Unmöglichkeit der Nutzung dieses Dienstes resultieren."
+    },
+    "privacy": {
+      "title": "8. Datenschutzrichtlinie",
+      "desc": "Ihre Nutzung unseres Dienstes unterliegt auch unserer Datenschutzrichtlinie, die durch Bezugnahme in diese Bedingungen einbezogen ist. Bitte lesen Sie unsere Datenschutzrichtlinie, um unsere Praktiken bezüglich Ihrer persönlichen Informationen zu verstehen."
+    },
+    "termination": {
+      "title": "9. Kündigung",
+      "userRight": "Sie können Ihr Konto jederzeit kündigen, indem Sie den Anweisungen im Dienst folgen. Alle Ihre Daten werden gemäß unserer Datenschutzrichtlinie gelöscht.",
+      "ourRight": "Wir können Ihr Konto sofort kündigen oder sperren, ohne vorherige Ankündigung oder Haftung, aus jedem Grund, einschließlich Verstoß gegen diese Bedingungen. Bei Kündigung erlischt Ihr Recht zur Nutzung des Dienstes sofort."
+    },
+    "changes": {
+      "title": "10. Änderungen der Bedingungen",
+      "desc": "Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern oder zu ersetzen. Wenn eine Überarbeitung wesentlich ist, werden wir mindestens 30 Tage vor Inkrafttreten neuer Bedingungen eine Benachrichtigung bereitstellen. Durch fortgesetzte Nutzung unseres Dienstes nach Inkrafttreten von Überarbeitungen erklären Sie sich mit den überarbeiteten Bedingungen einverstanden."
+    },
+    "governing": {
+      "title": "11. Geltendes Recht",
+      "desc": "Diese Bedingungen unterliegen den Gesetzen von [Ihr Land/Bundesland] und werden in Übereinstimmung mit diesen ausgelegt, ohne Berücksichtigung von Kollisionsnormen."
+    },
+    "contact": {
+      "title": "12. Kontakt",
+      "desc": "Wenn Sie Fragen zu diesen Bedingungen haben, kontaktieren Sie uns bitte unter:",
+      "email": "legal@cvati.com"
+    }
+  },
+  "cookiePolicy": {
+    "title": "Cookie-Richtlinie",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "updateDate": "4. April 2025",
+    "intro": "Diese Cookie-Richtlinie erklärt, wie CVATI (\"wir\", \"unser\" oder \"uns\") Cookies und ähnliche Technologien auf unserer Website und Anwendung verwendet. Durch die Nutzung von CVATI stimmen Sie der Verwendung von Cookies wie in dieser Richtlinie beschrieben zu.",
+    "what": {
+      "title": "Was sind Cookies?",
+      "desc": "Cookies sind kleine Textdateien, die auf Ihrem Gerät (Computer, Tablet oder Mobiltelefon) gespeichert werden, wenn Sie Websites besuchen. Sie werden weithin verwendet, um Websites effizienter zu machen, eine bessere Benutzererfahrung zu bieten und den Website-Betreibern Informationen zu geben. Cookies können Ihr Gerät nicht beschädigen oder auf andere Informationen auf Ihrem Gerät zugreifen."
+    },
+    "types": {
+      "title": "Arten von Cookies, die wir verwenden",
+      "essential": {
+        "title": "Essentielle Cookies",
+        "desc": "Diese Cookies sind für das ordnungsgemäße Funktionieren der Website notwendig. Sie ermöglichen grundlegende Funktionen wie Seitennavigation und Zugang zu geschützten Bereichen der Website. Die Website kann ohne diese Cookies nicht richtig funktionieren.",
+        "examples": "Beispiele: Sitzungscookies, Authentifizierungscookies"
+      },
+      "preferences": {
+        "title": "Präferenz-Cookies",
+        "desc": "Diese Cookies ermöglichen es der Website, sich an von Ihnen getroffene Entscheidungen zu erinnern (wie Ihre Sprachpräferenz oder Ihre Einstellung für den Dunkel-/Hellmodus) und verbesserte, persönlichere Funktionen bereitzustellen.",
+        "examples": "Beispiele: Spracheinstellungen, Thema-Präferenzen"
+      },
+      "analytics": {
+        "title": "Analyse-Cookies",
+        "desc": "Diese Cookies sammeln Informationen darüber, wie Sie unsere Website nutzen, welche Seiten Sie besucht haben und auf welche Links Sie geklickt haben. Alle Daten werden anonymisiert und können nicht zur Identifizierung Ihrer Person verwendet werden.",
+        "examples": "Beispiele: Google Analytics Cookies"
+      },
+      "functional": {
+        "title": "Funktionale Cookies",
+        "desc": "Diese Cookies ermöglichen erweiterte Funktionalität und Personalisierung. Sie können von uns oder von Drittanbietern gesetzt werden, deren Dienste wir unseren Seiten hinzugefügt haben.",
+        "examples": "Beispiele: Chat-Service-Cookies, gespeicherte Formulardaten"
+      }
+    },
+    "specific": {
+      "title": "Spezifische Cookies, die wir verwenden",
+      "name": "Name",
+      "provider": "Anbieter",
+      "purpose": "Zweck",
+      "expiry": "Ablaufzeit",
+      "type": "Typ",
+      "consentPurpose": "Speichert Ihre Cookie-Präferenzen",
+      "themePurpose": "Erinnert sich an Ihre Dunkel-/Hellmodus-Präferenz",
+      "languagePurpose": "Erinnert sich an Ihre Sprachpräferenz",
+      "authPurpose": "Hält Sie angemeldet",
+      "gaPurpose": "Wird verwendet, um Benutzer zu unterscheiden",
+      "essential": "Essentiell",
+      "preference": "Präferenz",
+      "analytics": "Analyse"
+    },
+    "thirdParty": {
+      "title": "Drittanbieter-Cookies",
+      "desc": "Einige Cookies werden von Drittanbieterdiensten platziert, die auf unseren Seiten erscheinen. Wir nutzen Dienste der folgenden Drittanbieter, die möglicherweise Cookies verwenden:",
+      "analytics": "Google Analytics - Für die Analyse der Website-Nutzung",
+      "cloudinary": "Cloudinary - Für Bildspeicherung und -verarbeitung",
+      "oauth": "OAuth-Anbieter (wenn Sie sich über soziale Medien anmelden)"
+    },
+    "manage": {
+      "title": "Verwaltung von Cookies",
+      "desc": "Die meisten Webbrowser ermöglichen es Ihnen, Ihre Cookie-Präferenzen zu verwalten. Sie können Ihren Browser so einstellen, dass er Cookies ablehnt oder Sie benachrichtigt, wenn Cookies gesendet werden. Die Methoden dafür variieren von Browser zu Browser und von Version zu Version.",
+      "links": "Hier sind Links zu Cookie-Verwaltungsanweisungen für gängige Browser:",
+      "note": "Bitte beachten Sie, dass die Einschränkung von Cookies die Funktionalität unserer Website beeinträchtigen kann. Zum Beispiel können Sie möglicherweise nicht alle interaktiven Funktionen unserer Website nutzen oder Ihre Präferenzen zwischen Besuchen speichern."
+    },
+    "similar": {
+      "title": "Ähnliche Technologien",
+      "desc": "Zusätzlich zu Cookies können wir andere ähnliche Technologien verwenden, um Daten auf Ihrem Gerät zu speichern und darauf zuzugreifen:",
+      "storage": "Lokaler Speicher:",
+      "storageDesc": "Wir verwenden den lokalen Speicher des Browsers, um Ihre Präferenzen zu speichern und die Leistung zu verbessern.",
+      "session": "Sitzungsspeicher:",
+      "sessionDesc": "Ähnlich wie lokaler Speicher, wird aber gelöscht, wenn Sie Ihren Browser schließen."
+    },
+    "updates": {
+      "title": "Aktualisierungen dieser Richtlinie",
+      "desc": "Wir können diese Cookie-Richtlinie von Zeit zu Zeit aktualisieren, um Änderungen in der Technologie, Vorschriften oder unseren Geschäftspraktiken widerzuspiegeln. Alle Änderungen werden auf dieser Seite veröffentlicht, und wenn die Änderungen signifikant sind, werden wir einen auffälligeren Hinweis bereitstellen."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "desc": "Wenn Sie Fragen zu unserer Verwendung von Cookies oder dieser Cookie-Richtlinie haben, kontaktieren Sie uns bitte unter:",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "cookies": {
+    "message": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Indem Sie diese Seite weiterhin besuchen, stimmen Sie unserer Verwendung von Cookies zu.",
+    "learnMore": "Mehr erfahren",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen"
+  }
+},
+"prod1": {
+  "hero": {
+    "title": "Finden Sie Ihren Traumjob",
+    "subtitle": "Erstellen Sie beeindruckende Lebensläufe und überzeugende Anschreiben mit KI, die von Arbeitgebern bemerkt wird und ATS-Systeme passiert."
+  },
+  "sections": {
+    "power_job_search": "Stärken Sie Ihre Jobsuche mit KI",
+    "power_job_description": "Unsere leistungsstarken KI-Tools helfen Ihnen, professionelle Lebensläufe und Anschreiben zu erstellen, die auf Ihre Zielrollen zugeschnitten sind.",
+    "job_winning_documents": "Erstellen Sie jobgewinnende Dokumente",
+    "job_winning_description": "Entwickelt, um Ihnen zu helfen, sich abzuheben und einen starken Eindruck bei Arbeitgebern zu hinterlassen.",
+    "everything_to_succeed": "Alles, was Sie zum Erfolg brauchen",
+    "everything_description": "Vollgepackt mit Funktionen, die Ihnen helfen, herausragende Bewerbungsunterlagen zu erstellen.",
+    "how_it_works": "Wie es funktioniert",
+    "how_it_works_description": "Erstellen Sie professionelle Lebensläufe und Anschreiben in Minuten mit drei einfachen Schritten.",
+    "what_users_say": "Was unsere Nutzer sagen",
+    "what_users_description": "Erfolgsgeschichten von Arbeitssuchenden, die CVATI genutzt haben, um ihren Traumjob zu finden.",
+    "current_language": "Aktuelle Sprache",
+    "current_template": "Aktuelle Vorlage",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "features": {
+    "ats_templates": {
+      "title": "ATS-optimierte Vorlagen",
+      "description": "Unsere Lebenslauf-Vorlagen sind darauf ausgelegt, Bewerber-Tracking-Systeme zu passieren und Ihren Lebenslauf zu den Personalverantwortlichen zu bringen."
+    },
+    "ai_content": {
+      "title": "KI-gestützte Inhaltserstellung",
+      "description": "Intelligente Vorschläge für Fähigkeiten, Erfolge und Stellenbeschreibungen, die zu Ihrer Zielposition passen."
+    },
+    "cover_letters": {
+      "title": "Personalisierte Anschreiben",
+      "description": "Generieren Sie maßgeschneiderte Anschreiben, die zur Stellenbeschreibung passen und Ihre relevante Erfahrung hervorheben."
+    },
+    "keyword_optimization": {
+      "title": "Keyword-Optimierung",
+      "description": "Wir analysieren Stellenbeschreibungen, um die richtigen Keywords einzubinden."
+    },
+    "industry_content": {
+      "title": "Branchenspezifische Inhalte",
+      "description": "Maßgeschneiderte Inhalte für Ihre Branche und Erfahrungsstufe."
+    },
+    "resume_analytics": {
+      "title": "Lebenslauf-Analyse",
+      "description": "Sehen Sie, wie Ihr Lebenslauf abschneidet und erhalten Sie Verbesserungsvorschläge."
+    },
+    "expert_advice": {
+      "title": "Expertengestützte Beratung",
+      "description": "Inhalte basierend auf Erkenntnissen von Personalverantwortlichen und Recruitern."
+    }
+  },
+  "steps": {
+    "enter_details": {
+      "title": "Geben Sie Ihre Daten ein",
+      "description": "Füllen Sie Ihre Informationen aus oder laden Sie einen bestehenden Lebenslauf hoch, um schnell zu starten."
+    },
+    "ai_enhancement": {
+      "title": "KI-Verbesserung",
+      "description": "Unsere KI analysiert Ihre Erfahrung und die Jobanforderungen, um Verbesserungen vorzuschlagen."
+    },
+    "download_apply": {
+      "title": "Herunterladen & Bewerben",
+      "description": "Erhalten Sie Ihren perfekt formatierten Lebenslauf oder Anschreiben, bereit um Arbeitgeber zu beeindrucken."
+    }
+  },
+  "cta": {
+    "title": "Bereit für Ihren Traumjob?",
+    "description": "Schließen Sie sich Tausenden von Fachleuten an, die ihre Jobsuche mit unseren KI-gestützten Tools transformiert haben.",
+    "build_resume": "Meinen Lebenslauf erstellen",
+    "create_cover_letter": "Anschreiben erstellen"
+  },
+  "stats": {
+    "resumes_created": "Erstellte Lebensläufe",
+    "cover_letters": "Generierte Anschreiben",
+    "interview_rate": "Erfolgsquote bei Interviews",
+    "job_match": "Jobübereinstimmungsrate"
+  }
+},
+"feedback": {
+    "title": "Teilen Sie Ihr Feedback",
+    "subtitle": "Helfen Sie uns, CVATI zu verbessern, indem Sie Ihre Erfahrung teilen",
+    "rating_label": "Wie würden Sie Ihre Erfahrung bewerten?",
+    "rating_required": "Bitte wählen Sie eine Bewertung",
+    "email_label": "Ihre E-Mail",
+    "email_required": "Bitte geben Sie Ihre E-Mail an",
+    "email_placeholder": "ihre.email@beispiel.com",
+    "comment_label": "Kommentare (optional)",
+    "comment_placeholder": "Erzählen Sie uns von Ihrer Erfahrung...",
+    "submit": "Feedback absenden",
+    "submitting": "Wird gesendet...",
+    "submit_success": "Vielen Dank für Ihr Feedback!",
+    "submit_error": "Fehler beim Senden des Feedbacks"
+  },
+  "revamp": {
+    "needsResumeFirst": "Sie müssen zuerst einen Lebenslauf auswählen",
+    "goToMyResumes": "Bitte gehen Sie zu Meine Lebensläufe und wählen Sie einen Lebenslauf aus, mit dem Sie arbeiten möchten.",
+    "signInFirst": "Sie müssen sich anmelden und einen Lebenslauf erstellen, bevor Sie exportieren können.",
+    "exploreTemplates": "Professionelle Vorlagen entdecken",
+    "exploreTemplatesDescription": "Durchstöbern Sie unsere Sammlung professionell gestalteter Lebenslaufvorlagen. Finden Sie den perfekten Stil, der zu Ihrer Branche und Persönlichkeit passt, um Ihre Bewerbung hervorzuheben.",
+    "exploreTemplatesButton": "Vorlagen entdecken",
+    "atsFriendly": "ATS-freundliche Designs",
+    "modernLayouts": "Moderne und traditionelle Layouts",
+    "customizableDesigns": "Vollständig anpassbare Designs",
+    "browse": "Vorlagen durchsuchen",
+    "accept": "Ich akzeptiere die",
+    "or": "Oder",
+    "offline_mode": "Sie können Ihren Lebenslauf jetzt erstellen. Melden Sie sich an, um zu speichern oder herunterzuladen.",
+    "listView": "Zur Listenansicht wechseln",
+    "testimonials": {
+      "role1": "Softwareingenieur",
+      "content1": "CVATI hat mir geholfen, Vorstellungsgespräche bei drei großen Technologieunternehmen zu bekommen. Die KI-Vorschläge haben meinen Lebenslauf aus der Masse herausstechen lassen!",
+      "role2": "Marketing-Spezialist",
+      "content2": "Der Anschreiben-Generator ist fantastisch! Er hat meine Erfahrung und den Ton, nach dem ich gesucht habe, perfekt erfasst. Hat mir stundenlange Arbeit erspart.",
+      "role3": "Datenanalyst",
+      "content3": "Nachdem ich Schwierigkeiten hatte, Rückmeldungen zu erhalten, habe ich meinen Lebenslauf mit CVATI überarbeitet und innerhalb weniger Tage Anfragen für Vorstellungsgespräche erhalten."
+    }
+},
+"jobMatching": {
+    "jobMatching": "Job Matching",
+    "title": "🎯 Smart Job Match Analyzer",
+    "subtitle": "Erhalten Sie schonungslos ehrliches KI-Feedback zu Ihren Bewerbungschancen. Kein Beschönigen – nur umsetzbare Erkenntnisse, die Ihnen helfen, schneller bessere Jobs zu bekommen.",
+    "socialProof": "Verwendet von über 10.000 Jobsuchenden",
+    
+    "features": {
+      "instantScoring": "🎯 Sofortige Kompatibilitätsbewertung",
+      "beatATS": "🤖 ATS-Systeme überlisten",
+      "personalizedTips": "💡 Personalisierte Tipps",
+      "keywordGaps": "📊 Keyword-Lückenanalyse",
+      "atsOptimization": "🤖 ATS-Optimierungsinsights",
+      "keywordAnalysis": "📊 Detaillierte Keyword-Analyse"
+    },
+
+    "auth": {
+      "unlockPotential": "🎯 Entfesseln Sie Ihr Karrierepotenzial",
+      "joinThousands": "Schließen Sie sich Tausenden von Jobsuchenden an, die unsere KI nutzen, um schneller bessere Jobs zu bekommen. Erhalten Sie sofortiges, ehrliches Feedback zu jeder Bewerbung.",
+      "getStarted": "🚀 Kostenlos starten"
+    },
+
+    "methods": {
+      "crewai": {
+        "title": "KI-Expertenpanel",
+        "subtitle": "Team von spezialisierten Recruiting-Agenten",
+        "badge": "Am beliebtesten",
+        "description": "Mehrere spezialisierte Agenten arbeiten zusammen wie ein Recruiting-Panel, um Ihre Eignung gründlich zu bewerten"
+      },
+      "claude": {
+        "title": "Senior-KI-Recruiter", 
+        "subtitle": "Fortgeschrittene Denkweise wie ein Hiring Manager",
+        "badge": "Am genauesten",
+        "description": "Hochmoderne KI, die denkt wie ein erfahrener Recruiter mit jahrelanger Einstellungserfahrung"
+      },
+      "both": {
+        "title": "Komplette Analyse",
+        "subtitle": "Doppelte Prüfung mit beiden KI-Systemen", 
+        "badge": "Am umfassendsten",
+        "description": "Erhalten Sie Erkenntnisse von beiden Systemen und sehen Sie, wie sie sich vergleichen, für maximale Sicherheit"
+      }
+    },
+
+    "form": {
+      "title": "✨ Analyse einrichten",
+      "chooseAnalysis": "🎯 Wählen Sie Ihre Analyse-Power",
+      "differentApproaches": "Verschiedene KI-Ansätze, dieselben ehrlichen Ergebnisse",
+      "targetPosition": "🎯 Zielposition",
+      "jobTitlePlaceholder": "z.B. Senior Software Engineer, Marketing Manager",
+      "dreamCompany": "🏢 Wunschunternehmen",
+      "companyPlaceholder": "z.B. Google, Microsoft, Tesla (optional)",
+      "howSubmitResume": "📄 Wie möchten Sie Ihren Lebenslauf einreichen?",
+      "savedCVs": "📁 Meine gespeicherten Lebensläufe",
+      "uploadNew": "📤 Neu hochladen", 
+      "copyPaste": "✏️ Kopieren & Einfügen",
+      "selectResume": "Lebenslauf auswählen",
+      "selectResumeOption": "Wählen Sie einen Lebenslauf aus Ihrer Sammlung...",
+      "noResumes": "📝 Noch keine Lebensläufe gespeichert. Erstellen Sie Ihren ersten Lebenslauf oder laden Sie einen hoch, um zu beginnen!",
+      "uploadCV": "📤 Lebenslauf hochladen",
+      "uploadPlaceholder": "📎 Zum Hochladen klicken oder Lebenslauf hierher ziehen",
+      "supportedFormats": "Unterstützte Formate: PDF, DOC, DOCX, TXT (max. 5MB)",
+      "processingFile": "🔄 Datei wird verarbeitet...",
+      "resumeContent": "📝 Ihr Lebenslauf-Inhalt",
+      "resumeContentPlaceholder": "Fügen Sie Ihren Lebenslauftext hier ein. Fügen Sie Erfahrungen, Fähigkeiten und Erfolge ein - je detaillierter, desto besser die Analyse!",
+      "jobPosting": "📋 Stellenanzeige",
+      "jobDescriptionPlaceholder": "Kopieren Sie die vollständige Stellenbeschreibung hierher. Fügen Sie Anforderungen, Verantwortlichkeiten und Qualifikationen für die genaueste Match-Analyse ein.",
+      "analyzeMatch": "🚀 Job-Match analysieren",
+      "takes30Seconds": "(Dauert 30 Sekunden)",
+      "aiAnalyzing": "🧠 KI analysiert Ihr Potenzial...",
+      "usingMethod": "Verwendet",
+      "takesLonger": "⏱️ Dauert doppelt so lange, aber das Vertrauen ist es wert"
+    },
+
+    "progress": {
+      "expertPanel": "🤖 Unser KI-Expertenpanel prüft Ihr Profil...",
+      "deepAnalysis": "🧠 Fortgeschrittene KI führt eine tiefgehende Analyse durch...",
+      "comprehensive": "⚡ Umfassende Analyse mit beiden KI-Systemen läuft...",
+      "bothTakesTime": "Diese umfassende Analyse dauert länger, bietet aber maximale Sicherheit"
+    },
+
+    "scores": {
+      "excellent": "🔥 Ausgezeichnete Übereinstimmung! Sie sind ein Top-Kandidat für diese Rolle.",
+      "good": "👍 Gutes Potenzial! Ein paar Anpassungen könnten Sie deutlich verbessern.", 
+      "improvement": "📈 Verbesserungspotenzial. Hier ist Ihr Fahrplan zum Erfolg.",
+      "levelUp": "💪 Zeit fürs Level-Up! Wir zeigen Ihnen genau, wie."
+    },
+
+    "results": {
+      "intelligenceReport": "📊 Ihr Bewerbungs-Intelligence-Report",
+      "readyToDiscover": "Bereit, Ihre echten Chancen zu entdecken?",
+      "fillFormGetInsights": "Füllen Sie das Formular aus und erhalten Sie sofortige KI-gestützte Erkenntnisse, die ändern könnten, wie Sie sich auf Jobs bewerben.",
+      "aiComparison": "🔬 KI-Systemvergleich",
+      "confidence": "Konfidenzniveau",
+      "lowConfidence": "Gemischte Signale erkannt",
+      "highConfidence": "Beide Systeme stimmen überein",
+      "jobCompatibility": "🎯 Job-Kompatibilitäts-Score",
+      "analyzedBy": "Analysiert von",
+      "atsPassRate": "🤖 ATS-Bestehensrate",
+      "beatRobots": "Werden Sie die Roboter schlagen?",
+      "recommendation": "💡 Sollten Sie sich bewerben?",
+      "goForIt": "Los geht's!",
+      "buildUpFirst": "Erst verbessern",
+      "yourSuperpowers": "🌟 Ihre Superkräfte",
+      "levelUpHere": "🎯 Hier verbessern",
+      "skillsToAdd": "❌ Fähigkeiten zum Hinzufügen",
+      "skillsToAddDesc": "Diese Keywords könnten Ihre Chancen verbessern",
+      "winningKeywords": "✅ Ihre Gewinner-Keywords",
+      "winningKeywordsDesc": "In diesen Bereichen sind Sie bereits stark",
+      "yourActionPlan": "🚀 Ihr Aktionsplan",
+      "strategicMoves": "💡 Strategische Schritte",
+      "applicationHacks": "✨ Bewerbungshacks",
+      "keyStrengths": "🌟 Wichtige Stärken",
+      "improvementAreas": "🎯 Verbesserungsbereiche",
+      "recommendations": "💼 Strategische Empfehlungen",
+      "applicationTips": "🚀 Bewerbungshacks",
+      "missingKeywords": "❌ Fähigkeiten zum Hinzufügen ({count} Lücken gefunden)",
+      "presentKeywords": "✅ Ihre Gewinner-Keywords ({count} Übereinstimmungen)",
+      "applyNow": "Jetzt bewerben!",
+      "improveFirst": "Erst verbessern",
+      "analysisComparison": "📊 KI-Systemvergleich"
+    },
+
+    "fileUpload": {
+      "notImplemented": "Hinweis: Erweiterte Dateianalyse noch nicht implementiert. Bitte fügen Sie Ihren Lebenslauftext manuell ein für die genaueste Analyse."
+    },
+
+    "errors": {
+      "jobDescriptionRequired": "📝 Wir benötigen die Stellenbeschreibung, um Ihre Eignung zu analysieren. Kopieren Sie sie aus der Stellenanzeige des Unternehmens.",
+      "resumeRequired": "📄 Bitte geben Sie Ihren Lebenslauf-Inhalt an, damit wir Ihre Qualifikationen analysieren können.",
+      "needLogin": "🔐 Erstellen Sie ein kostenloses Konto, um die KI-gestützte Job-Match-Analyse freizuschalten.",
+      "invalidFileType": "📎 Bitte laden Sie eine PDF-, Word- oder Textdatei hoch.",
+      "fileTooLarge": "📦 Datei zu groß. Bitte verwenden Sie Dateien unter 5MB.",
+      "fileProcessingFailed": "⚠️ Datei konnte nicht verarbeitet werden. Versuchen Sie, den Text stattdessen zu kopieren und einzufügen.",
+      "analysisFailed": "🔄 Analyse fehlgeschlagen (Status: {status}). Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.",
+      "analysisFailedGeneric": "❌ Etwas ist schiefgelaufen. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut."
+    }
+  },
+  "ai": {
+    "limit_reached": "Sie haben {{used}} von {{limit}} täglichen KI-Anfragen verbraucht. Bitte versuchen Sie es in {{hours}} Stunden erneut.",
+    "limit_reached_simple": "Tägliches KI-Limit erreicht. Bitte versuchen Sie es morgen erneut.",
+    "limit_info": "Verbleibende KI-Anfragen: {{remaining}} von {{limit}}"
+  },
+  "newresume": {
+    "personal_info": {
+      "ai_error": "KI-Vorschläge konnten nicht abgerufen werden. Bitte versuchen Sie es erneut.",
+      "summary_error": "Bitte fügen Sie zuerst etwas Text zu Ihrer Zusammenfassung hinzu",
+      "improve_ai": "Mit KI verbessern",
+      "generating": "Vorschläge werden generiert...",
+      "ai_suggestion": "KI-Vorschlag zur Verbesserung:",
+      "apply_suggestion": "Vorschlag anwenden",
+      "discard": "Verwerfen"
+    }
+  }
+}

@@ -1,0 +1,1510 @@
+{
+  "app": {
+    "title": "CVATI",
+    "theme": {
+      "dark": "Modo Oscuro",
+      "light": "Modo Claro"
+    }
+  },
+  "cards": {
+    "cover_letter": {
+      "title": "IA de Carta de Presentación",
+      "subtitle": "Genera cartas de presentación personalizadas instantáneamente",
+      "features": {
+        "quick_gen": "Generación Rápida",
+        "quick_gen_desc": "Crear en segundos",
+        "ats_ready": "Listo para ATS",
+        "ats_ready_desc": "Pasa verificaciones de IA"
+      },
+      "actions": {
+        "create": "Crear Carta de Presentación",
+        "view_templates": "Ver Plantillas"
+      }
+    },
+    "resume": {
+      "title": "Constructor Inteligente de Currículum",
+      "subtitle": "Constructor de currículum potenciado por IA con sugerencias inteligentes.",
+      "recent_resumes": "Currículums Recientes:",
+      "preview": "Vista previa:",
+      "preview_message": "Haz clic en 'Construir Currículum' para usar esta plantilla",
+      "actions": {
+        "build": "Construir Currículum",
+        "view_templates": "Ver Plantillas",
+        "hide_templates": "Ocultar Plantillas"
+      },
+      "validation": {
+        "personal_info_required": "Por favor completa la información personal requerida (nombre completo, correo electrónico y número de móvil)",
+        "education_required": "Por favor añade al menos una entrada de educación con institución, título y campo de estudio",
+        "experience_required": "Por favor añade al menos una experiencia laboral con empresa y puesto",
+        "skills_required": "Por favor añade al menos una habilidad",
+        "languages_required": "Por favor añade al menos un idioma"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Inicio",
+    "resumeBuilder": "Constructor de Currículum",
+    "coverLetter": "Generador de Carta de Presentación",
+    "coverLetters": "Cartas de Presentación",
+    "aiEnhancement": "Mejora de IA",
+    "register": "Registrarse",
+    "login": "Iniciar Sesión",
+    "settings": "Configuración",
+    "myCV": "Mi CV",
+    "signOut": "Cerrar Sesión",
+    "toggleMenu": "Alternar menú",
+    "hideOptions": "Ocultar opciones",
+    "showOptions": "Mostrar opciones",
+    "dashboard": "Panel de Control",
+    "account": "Cuenta",
+    "myResumes": "Mis Currículums"
+  },
+  "home": {
+    "title": "CVATI",
+    "subtitle": "Crea currículums profesionales con información potenciada por IA",
+    "features": {
+      "title": "Características Principales",
+      "ats": "Optimizado para ATS",
+      "ai": "Potenciado por IA",
+      "industry": "Específico para la Industria"
+    },
+    "cta": {
+      "title": "Comienza Hoy",
+      "subtitle": "Únete a miles de profesionales que han impulsado sus oportunidades laborales.",
+      "button": "Crea Tu Currículum Ahora",
+      "button_aria": "Crea tu currículum ahora"
+    }
+  },
+  "resume": {
+    "title":{
+      "section": "Título del Currículum",
+      "title": "Constructor de Currículum",
+      "description": "Dale un nombre a tu currículum para ayudarte a identificarlo más tarde",
+      "placeholder": "ej. Currículum de Desarrollador de Software"
+    },
+    "customizer": {
+      "title": "Personalizador de Currículum",
+      "loading": "Cargando datos del currículum...",
+      "closeOptions": "Cerrar Opciones",
+      "goBack": "Volver",
+      "noResume": "Sin Currículum ",
+      "pleaseCreate": "Por favor Crea tu Currículum aquí",
+      "goToBuilder": "Ir a la página de Constructor de Currículum",
+      "saveCustomizations": {
+        "title": "Guardar Personalizaciones", 
+        "description": "Guarda estos ajustes de personalización para asegurar que cualquier persona que vea tu currículum público lo vea con tu estilo elegido.",
+        "message": "¿Te gustaría guardar tus personalizaciones antes de continuar?",
+        "success": "¡Personalizaciones guardadas con éxito!",
+        "error": "Hubo un error al guardar tus personalizaciones.",
+        "continueAnyway": "¿Te gustaría continuar de todos modos?",
+        "save": "Guardar y Continuar",
+        "continue": "Continuar Sin Guardar",
+        "cancel": "Cancelar"
+      },
+      "templates": {
+        "title": "Plantilla de Currículum",
+        "selectTemplate": "Seleccionar Plantilla",
+        "templates": "Seleccionar una Plantilla",
+        "styling": "Estilizado",
+        "sharing": "Compartir",
+        "styles": "Estilos", 
+        "selected": "Plantilla Seleccionada",
+        "noTemplatesFound": "No Se Encontraron Plantillas"
+      },
+      "color": {
+        "title": "Color de Acento"
+      },
+      "font": {
+        "title": "Familia de Fuente",
+        "samples": {
+          "professional": "Profesional y limpio",
+          "modern": "Moderno y legible",
+          "traditional": "Tradicional y elegante",
+          "refined": "Refinado con mejor legibilidad",
+          "monospaced": "Monoespaciado y distintivo",
+          "legible": "Moderno con alta legibilidad",
+          "clean": "Limpio y profesional",
+          "contemporary": "Contemporáneo y distintivo",
+          "custom": "Fuente Personalizada"
+        }
+      },
+      "spacing": {
+        "title": "Espaciado de Línea",
+        "compact": "Compacto",
+        "spacious": "Espacioso"
+      },
+      "headers": {
+        "title": "Estilo de Encabezados",
+        "normal": "Caso Normal",
+        "uppercase": "MAYÚSCULAS",
+        "description": "Elige cómo aparecen los encabezados de sección en tu currículum"
+      },
+      "skills": {
+        "title": "Mostrar Nivel de Habilidad",
+        "show": "Mostrar niveles de habilidad",
+        "hide": "Ocultar niveles de habilidad",
+        "description": "Alternar si mostrar o no indicadores de nivel de habilidad en tu currículum"
+      },
+      "viewMode": {
+        "title": "Modo de Vista",
+        "pdf": "Vista PDF",
+        "html": "Vista HTML",
+        "canvas": "Vista de Lienzo",
+        "switch": "Cambiar a"
+      },
+      "export": {
+        "pdf": "Exportar como PDF",
+        "docx": "Exportar como DOCX",
+        "word": "Exportar como Word",
+        "exporting": "Exportando..."
+      },
+      "zoom": {
+        "zoomIn": "Acercar",
+        "zoomOut": "Alejar"
+      }
+    },
+    "templateSelector": {
+      "categories": {
+        "all": "Todos",
+        "professional": "Profesional",
+        "creative": "Creativo",
+        "modern": "Moderno",
+        "classic": "Clásico",
+        "minimalist": "Minimalista",
+        "elegant": "Elegante"
+      }
+    },
+    "templateRenderer": {
+      "error": "Plantilla no encontrada. Por favor selecciona otra plantilla."
+    },
+    "experience": {
+      "title": "Experiencia",
+      "company": "Nombre de la Empresa",
+      "company_placeholder": "Nombre de la Empresa",
+      "position": "Puesto",
+      "position_placeholder": "Título del Puesto",
+      "current_work": "Actualmente trabajo aquí",
+      "description_placeholder": "Describe tus responsabilidades y logros...",
+      "add_button": "Añadir Otra Experiencia"
+    },
+    "education": {
+      "title": "Educación",
+      "institution": "Nombre de la Institución",
+      "institution_placeholder": "Nombre de Universidad/Colegio",
+      "degree": "Título",
+      "degree_placeholder": "ej., Licenciatura, Maestría",
+      "field": "Campo de Estudio",
+      "field_placeholder": "ej., Informática",
+      "currently_studying": "Actualmente estudio aquí",
+      "gpa": "Promedio",
+      "gpa_placeholder": "ej., 3.8/4.0",
+      "add_button": "Añadir Otra Educación"
+    },
+    "skills": {
+      "title": "Habilidades",
+      "name": "Nombre de Habilidad",
+      "name_placeholder": "Introduce una habilidad",
+      "level": "Nivel",
+      "add_button": "Añadir Otra Habilidad",
+      "beginner": "Principiante", 
+      "intermediate": "Intermedio", 
+      "advanced": "Avanzado", 
+      "expert": "Experto"
+    },
+    "courses": {
+      "title": "Cursos",
+      "name": "Nombre del Curso",
+      "name_placeholder": "ej., Desarrollo Web Avanzado",
+      "institution": "Institución",
+      "institution_placeholder": "Nombre de Institución o Plataforma",
+      "description_placeholder": "Breve descripción del curso y tus logros...",
+      "add_button": "Añadir Otro Curso"
+    },
+    "custom_sections": {
+      "title": "Secciones Personalizadas",
+      "section_title": "Título de Sección",
+      "title_placeholder": "ej., Proyectos, Logros, Publicaciones",
+      "content": "Contenido",
+      "content_placeholder": "Contenido de sección...",
+      "add_button": "Añadir Otra Sección"
+    },
+    "extracurricular": {
+      "activity": "Actividades",
+      "name": "Nombre de Actividad",
+      "name_placeholder": "ej., Gobierno Estudiantil, Equipo Deportivo",
+      "description_placeholder": "Describe tu rol y logros...",
+      "add_button": "Añadir Otra Actividad"
+    },
+    "hobbies": {
+      "title": "Pasatiempos",
+      "hobby": "Pasatiempo/Interés",
+      "placeholder": "ej., Fotografía, Lectura, Senderismo",
+      "add_button": "Añadir Otro Pasatiempo"
+    },
+    "internships": {
+      "title": "Prácticas",
+      "position": "Puesto",
+      "position_placeholder": "Puesto de Prácticas",
+      "current_work": "Actualmente estoy trabajando aquí",
+      "description_placeholder": "Describe tus responsabilidades y logros...",
+      "add_button": "Añadir Otras Prácticas"
+    },
+    "languages": {
+      "title": "Idiomas",
+      "language": "Idioma",
+      "language_placeholder": "ej., Inglés, Español",
+      "proficiency": "Nivel de Competencia",
+      "add_button": "Añadir Otro Idioma",
+      "levels": {
+        "native": "Nativo",
+        "fluent": "Fluido",
+        "advanced": "Avanzado",
+        "intermediate": "Intermedio",
+        "beginner": "Principiante"
+      }
+    },
+    "personal_info": {
+      "title": "Información Personal",
+      "full_name": "Nombre Completo",
+      "full_name_placeholder": "John Doe",
+      "email": "Correo Electrónico",
+      "email_placeholder": "john@example.com",
+      "mobile": "Móvil",
+      "mobile_placeholder": "+1 (123) 456-7890",
+      "title_field": "Título Profesional",
+      "title_placeholder": "Ingeniero de Software",
+      "city": "Ciudad",
+      "city_placeholder": "Nueva York",
+      "address": "Dirección",
+      "address_placeholder": "123 Calle Principal",
+      "postal_code": "Código Postal",
+      "postal_code_placeholder": "12345",
+      "nationality": "Nacionalidad",
+      "nationality_placeholder": "ej., Americano",
+      "driving_license": "Licencia de Conducir",
+      "driving_license_placeholder": "ej., Clase B",
+      "place_of_birth": "Lugar de Nacimiento",
+      "place_of_birth_placeholder": "Ciudad, País",
+      "date_of_birth": "Fecha de Nacimiento",
+      "linkedin": "LinkedIn",
+      "linkedin_placeholder": "linkedin.com/in/johndoe",
+      "website": "Sitio Web",
+      "website_placeholder": "tusitioweb.com",
+      "summary": "Resumen Profesional",
+      "summary_placeholder": "Breve descripción de tu experiencia profesional...",
+      "summary_error": "Por favor añade algún texto a tu resumen primero",
+      "ai_error": "Error al obtener sugerencias de IA. Por favor intenta de nuevo.",
+      "improve_ai": "Mejorar con IA",
+      "generating": "Generando sugerencias...",
+      "ai_suggestion": "Mejora Sugerida por IA:",
+      "discard": "Descartar",
+      "apply_suggestion": "Aplicar Sugerencia"
+    },
+    "photo": {
+      "title": "Foto de Perfil",
+      "alt": "Perfil",
+      "remove_photo": "Eliminar foto",
+      "uploading": "Subiendo...",
+      "change": "Cambiar Foto",
+      "upload": "Subir Foto",
+      "invalid_type": "Por favor sube un archivo de imagen válido (JPG, PNG o GIF)",
+      "size_limit": "El tamaño de la foto debe ser menor a 2MB",
+      "process_error": "Error al procesar la foto. Por favor intenta de nuevo.",
+      "max_size": "Tamaño máximo: 2MB"
+    },
+    "references": {
+      "title": "Referencias",
+      "provide_upon_request": "Proporcionar bajo petición",
+      "name": "Nombre",
+      "name_placeholder": "Nombre de Referencia",
+      "relation": "Relación/Posición",
+      "relation_placeholder": "ej., Antiguo Gerente, Profesor",
+      "phone": "Teléfono",
+      "phone_placeholder": "Número de Contacto",
+      "email": "Correo Electrónico",
+      "email_placeholder": "Dirección de Correo Electrónico",
+      "add_button": "Añadir Otra Referencia"
+    },
+    "preview": {
+      "title": "Vista Previa del Currículum",
+      "example": "Currículum de Ejemplo",
+      "your_resume": "Tu Currículum"
+    },
+    "shared_view": "CV Compartido",
+    "not_found": {
+      "title": "Currículum No Encontrado",
+      "message": "El currículum que estás buscando no existe o no es público."
+    }, 
+    "publicStatus": {
+      "title": "Privacidad del Currículum",
+      "status": "Estado",
+      "public": "Público",
+      "private": "Privado",
+      "public_description": "Tu currículum es actualmente público. Cualquiera con el enlace puede verlo.",
+      "private_description": "Tu currículum es actualmente privado. Solo tú puedes verlo.",
+      "make_public": "Hacer Currículum Público",
+      "make_private": "Hacer Currículum Privado"
+    },
+    "qrcode": {
+      "title": "Compartir Currículum",
+      "description": "Escanea este código QR para ver el currículum en cualquier dispositivo",
+      "public_link": "Enlace público",
+      "open_link": "Abrir currículum",
+      "copy_link": "Copiar enlace",
+      "download": "Descargar QR",
+      "copied": "¡Enlace copiado al portapapeles!"
+    },
+    "actions": {
+          "save_resume": "Guardar Currículum",
+          "save_changes": "Guardar Cambios",
+          "customize": "Personalizar Currículum",
+          "saving": "Guardando...",
+          "create_success": "¡Currículum creado exitosamente!",
+          "update_success": "¡Currículum actualizado exitosamente!",
+          "already_exists": "Ya tienes un currículum. Actualizando currículum existente..."
+        }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Política de Privacidad",
+      "intro": "Bienvenido a CVATI. Respetamos tu privacidad y estamos comprometidos a proteger tus datos personales."
+    },
+    "terms": {
+      "title": "Términos y Condiciones",
+      "intro": "Bienvenido a CVATI. Estos Términos y Condiciones regulan tu uso de nuestro sitio web y servicios."
+    },
+    "cookies": {
+      "title": "Política de Cookies",
+      "whatAre": "Qué Son las Cookies",
+      "howUse": "Cómo Usamos las Cookies",
+      "specific": "Cookies Específicas Que Usamos",
+      "managing": "Administrando Cookies",
+      "consent": "Consentimiento de Cookies",
+      "changes": "Cambios a esta Política de Cookies"
+    },
+    "dataDeletion": {
+      "title": "Solicitud de Eliminación de Datos",
+      "intro": "Bajo varias regulaciones de privacidad, tienes el derecho de solicitar la eliminación de tus datos personales.",
+      "form": {
+        "email": "Dirección de Correo Electrónico",
+        "emailHelp": "Usaremos este correo para identificar tu cuenta y comunicarnos sobre tu solicitud.",
+        "additionalInfo": "Información Adicional (Opcional)",
+        "submit": "Enviar Solicitud de Eliminación"
+      },
+      "success": "Tu solicitud de eliminación de datos ha sido enviada. Procesaremos tu solicitud y te contactaremos en {email} dentro de 30 días.",
+      "whatDeleted": {
+        "title": "Qué Datos Serán Eliminados",
+        "intro": "Al procesar tu solicitud, eliminaremos los siguientes datos asociados con tu cuenta:"
+      }
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "CVATI",
+      "description": "Crea currículums profesionales con información potenciada por IA para impulsar tus oportunidades laborales."
+    },
+    "quickLinks": {
+      "title": "Enlaces Rápidos",
+      "home": "Inicio",
+      "resumeBuilder": "Constructor de Currículum",
+      "coverLetter": "Generador de Carta de Presentación",
+      "aiEnhancement": "Mejora de IA"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Términos y Condiciones",
+      "privacy": "Política de Privacidad",
+      "cookies": "Política de Cookies",
+      "dataDeletion": "Eliminación de Datos"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "contactForm": "Formulario de Contacto"
+    },
+    "copyright": "CVATI",
+    "rights": "Todos los derechos reservados"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "forgotPassword": "¿Olvidaste la Contraseña?",
+      "submit": "Iniciar Sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "register": "Regístrate aquí",
+      "socialLogin": "O inicia sesión con",
+      "welcome_back": "Bienvenido de Nuevo",
+      "sign_in_to_continue": "Inicia sesión para continuar construyendo tu currículum",
+      "loading": "Cargando..."
+    },
+    "register": {
+      "title": "Registrarse",
+      "create_account": "Crear Cuenta",
+      "sign_up_to_start": "Regístrate para comenzar a construir tu currículum",
+      "name": "Nombre Completo",
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "submit": "Registrarse",
+      "sign_up": "Registrarse",
+      "creating_account": "Creando Cuenta...",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "login": "Inicia sesión aquí",
+      "socialRegister": "O regístrate con"
+    },
+    "social": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "error": "Error de Autenticación Social",
+      "success": "Autenticación Exitosa",
+      "or_continue_with": "O continúa con"
+    },
+    "callback": {
+      "processing": "Procesando Inicio de Sesión",
+      "please_wait": "Por favor espera...",
+      "auth_error": "Error de Autenticación",
+      "return_to_login": "Volver a Iniciar Sesión",
+      "no_token": "No se recibió token de autenticación",
+      "auth_failed": "Autenticación fallida. Por favor intenta de nuevo."
+    },
+    "error": {
+      "title": "Error de Inicio de Sesión",
+      "return_to_login": "Volver a Iniciar Sesión"
+    }
+  },
+  "language": {
+    "title": "Seleccionar Idioma",
+    "en": "Inglés",
+    "es": "Español",
+    "fr": "Francés"
+  },
+  "common": {
+    "remove": "Eliminar",
+    "required_fields": "* Campos requeridos",
+    "start_date": "Fecha de Inicio",
+    "end_date": "Fecha de Finalización",
+    "location": "Ubicación",
+    "location_placeholder": "Ciudad, País",
+    "description": "Descripción",
+    "max_chars": "Máximo {{count}} caracteres",
+    "loading": "Cargando...",
+    "tonow" : "En curso", 
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "apply": "Aplicar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sortBy": "Ordenar por",
+    "actions": "Acciones",
+    "success": "¡Éxito!",
+    "error": "¡Error!",
+    "warning": "¡Advertencia!",
+    "info": "Información",
+    "company": "Empresa",
+    "company_placeholder": "Nombre de la Empresa",
+    "continue": "Continuar",
+    "back_to_editor": "Volver al Editor",
+    "choose_template": "Elegir Plantilla",
+    "choose_your_templates": "Elige Tus Plantillas",
+    "print": "Imprimir",
+    "preparing": "Preparando...",
+    "example_resume": "Currículum de Ejemplo",
+    "page": "Página",
+    "of": "de",
+    "dismiss": "Descartar",
+    "enhancing": "Mejorando...",
+    "enhance": "Mejorar",
+    "enhance_with_ai": "Mejorar con IA",
+    "generate_tips": "Generar Consejos",
+    "ai_suggestions": "Sugerencias de IA",
+    "apply_suggestion": "Aplicar Sugerencia",
+    "reject": "Rechazar",
+    "ai_tips": "Consejos de IA",
+    "at": "en",
+    "in": "en",
+    "copy": "Copiar",
+    "download": "Descargar",
+    "untitled": "Sin título",
+    "notSpecified": "No especificado",
+    "view": "Ver",
+    "favorite": "Añadir a favoritos",
+    "unfavorite": "Quitar de favoritos",
+    "local_draft": "Guardado localmente",
+"lastRefresh": "Última actualización ",
+"refresh": "Actualizar",
+"cardView": "Cambiar a vista de tarjetas",
+"loadingCover": "Cargando cartas de presentación...",
+"ai": "IA",
+"ai_enhancement": "Mejora con IA",
+"no_summary": "Aún no se ha añadido ningún resumen",
+"save_changes": "Guardar cambios y volver al editor",
+"select_file": "Seleccionar archivo de currículum"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Administra la configuración y preferencias de tu cuenta",
+    "profile_info": "Información de Perfil",
+    "loading_user": "Cargando información de usuario...",
+    "data_privacy": "Privacidad y Controles de Datos",
+    "data_portability": "Portabilidad de Datos",
+    "data_portability_desc": "Descarga todos los datos e información de tu cuenta en un formato portable.",
+    "download_data": "Descargar Mis Datos",
+    "downloading": "Descargando...",
+    "download": "Descargar",
+    "copy": "Copiar",
+    "data_downloaded": "Tus datos han sido descargados exitosamente.",
+    "download_failed": "Error al descargar tus datos. Por favor intenta de nuevo.",
+    "danger_zone": "Zona de Peligro",
+    "delete_account": "Eliminar Cuenta",
+    "permanent_warning": "Esta acción es permanente y no puede deshacerse.",
+    "delete_warning_1": "Toda tu información personal será eliminada permanentemente.",
+    "delete_warning_2": "Perderás acceso a todos tus currículums y cartas de presentación guardados.",
+    "delete_warning_3": "Tu cuenta no puede ser recuperada una vez eliminada.",
+    "download_before_delete": "Recomendamos descargar tus datos antes de eliminar tu cuenta.",
+    "deletion_reason": "¿Por qué estás eliminando tu cuenta? (Opcional)",
+    "select_reason": "Selecciona una razón",
+    "reason_no_longer_needed": "Ya no necesito este servicio",
+    "reason_dissatisfied": "Estoy insatisfecho con el servicio",
+    "reason_privacy": "Preocupaciones de privacidad",
+    "reason_other": "Otra razón",
+    "type_delete": "Escribe ELIMINAR para confirmar",
+    "confirm_delete": "Confirmar Eliminación",
+    "deleting": "Eliminando...",
+    "account_deleted": "Cuenta eliminada. Redirigiendo...",
+    "delete_failed": "Error al eliminar la cuenta. Intenta de nuevo.",
+    "enter_pass": "Introduce tu contraseña para confirmar",
+    "your_pass": "Tu Contraseña",
+    "security": "Seguridad",
+    "change_password": "Cambiar Contraseña",
+    "current_password": "Contraseña actual",
+  "new_password": "Nueva contraseña",
+  "confirm_password": "Confirmar nueva contraseña",
+  "password_hint": "Debe tener al menos 8 caracteres con mayúsculas, minúsculas y números",
+  "password_requirements": "La contraseña debe contener caracteres en mayúsculas, minúsculas y numéricos",
+  "password_changed": "Contraseña cambiada exitosamente",
+  "change_password_failed": "Error al cambiar la contraseña",
+  "current_password_required": "Se requiere la contraseña actual",
+  "passwords_not_match": "Las contraseñas no coinciden",
+  "password_too_short": "La contraseña debe tener al menos 8 caracteres",
+  "not_authenticated": "Debes iniciar sesión",
+  "password_required": "Por favor, ingrese su contraseña para confirmar la eliminación",
+  "logout_all_devices": "Cerrar sesión en todos los dispositivos",
+  "updating": "Actualizando...",
+  "update_password": "Actualizar contraseña",
+  "confirm_delete_prompt": "Escribe DELETE para confirmar la eliminación de la cuenta:"
+  },
+  "ai_enhancement": {
+    "title": "Currículum Mejorado por IA",
+    "enhance_all": "Mejorar Todas las Secciones con IA",
+    "enhancing": "Mejorando...",
+    "loading": "Cargando...",
+    "error_message": "Error al mejorar sección",
+    "create_resume_first": "Por favor crea un currículum primero",
+    "current_content": "Contenido Actual",
+    "no_experiences": "No hay experiencias listadas",
+    "work_experiences": "experiencias laborales",
+    "no_recommendations": "Aún no se han generado recomendaciones",
+    "generate_tips": "Generar Consejos",
+    "enhance": "Mejorar",
+    "no_suggestions": "Aún no hay sugerencias de IA. Haz clic en \"Mejorar\" para generar mejoras.",
+    "ai_suggestions": "Sugerencias de IA",
+    "apply": "Aplicar",
+    "reject": "Rechazar",
+    "resume_preview": "Vista Previa del Currículum Actual",
+    "preview_note": "Nota: Esta es una vista previa simplificada. Los cambios se guardan temporalmente y se aplicarán cuando guardes tu currículum.",
+    "resume_editor": "Editor de Currículum",
+    "resume_preview_title": "Vista Previa del Currículum",
+    "tips_on_formatting": "Consejos sobre Formato y Organización",
+    "gaps_inconsistencies": "Identificación de Cualquier Brecha o Inconsistencia",
+    "strengthening_narrative": "Sugerencias para Fortalecer la Narrativa General",
+    "implementation_note": "Al implementar estas sugerencias, tu CV presentará una narrativa más clara y de mayor impacto que muestre efectivamente tus cualificaciones y preparación para roles avanzados.",
+    "cv_recommendations": "Recomendaciones para el CV",
+    "ai_tips": "Consejos de IA",
+    "suggestions_count": "Sugerencia",
+    "suggestions_plural": "Sugerencias"
+  },
+  "preview": {
+    "canvas": "Lienzo",
+    "pdf": "PDF",
+    "html": "HTML",
+    "view_mode": "Modo de Vista",
+    "export_as_pdf": "Exportar como PDF",
+    "export_as_docx": "Exportar como Word",
+    "print_resume": "Imprimir",
+    "pdf_success": "¡PDF exportado exitosamente!",
+    "pdf_error": "Error al exportar PDF",
+    "word_success": "¡Documento Word exportado exitosamente!",
+    "word_error": "Error al exportar documento Word. Por favor intenta de nuevo.",
+    "print_error": "Error al imprimir. Por favor intenta de nuevo."
+  },
+  "editor": {
+    "resume_sections": "Secciones del Currículum",
+    "preview_resume": "Vista Previa del Currículum",
+    "edit_resume": "Editar Currículum"
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "intro": "¡Nos encantaría saber de ti! Por favor completa el formulario a continuación, y nuestro equipo se pondrá en contacto contigo lo antes posible.",
+    "form": {
+      "name": "Nombre",
+      "name_placeholder": "Tu nombre",
+      "email": "Correo Electrónico",
+      "email_placeholder": "Tu dirección de correo electrónico",
+      "subject": "Asunto",
+      "subject_placeholder": "Asunto de tu mensaje",
+      "message": "Mensaje",
+      "message_placeholder": "Tu mensaje",
+      "submit": "Enviar Mensaje",
+      "sending": "Enviando...",
+      "success": "¡Gracias por tu mensaje! Nos pondremos en contacto contigo lo antes posible.",
+      "error": "Error al enviar tu mensaje. Por favor intenta más tarde."
+    },
+    "info": {
+      "title": "Información de Contacto",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "hours": "Horario Laboral"
+    }
+  }, 
+  "CoverLetter": {
+    "title": "Generador de Carta de Presentación",
+    "viewAll": "Ver Todas las Cartas de Presentación",
+    "view_saved": "Ver Carta Guardada",
+    "form": {
+      "title": "Título de la Carta de Presentación",
+      "title_prefix": "Carta de Presentación para",
+      "title_placeholder": "Da a tu carta de presentación un título para referencia fácil",
+      "full_name": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "company_name": "Nombre de la Empresa",
+      "job_title": "Título del Puesto",
+      "hiring_manager": "Gerente de Contratación",
+      "hiring_manager_title": "Título del Gerente de Contratación",
+      "hiringManagerTitle_placeholder": "ej. Director de RRHH",
+      "job_description": "Descripción del Puesto",
+      "upload_cv": "Subir CV",
+      "supported_formats": "Soportados: .txt, .doc, .docx, .pdf",
+      "file": "Archivo",
+      "enter": "Ingresar",
+      "submit": "Generar Carta de Presentación",
+      "using_stored_resume": "Usaremos tu currículum almacenado para generar tu carta de presentación.",
+      "generating": "Generando...",
+      "generate_button": "Generar Carta de Presentación",
+      "fullName_placeholder": "Ingresa tu nombre completo",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "phone_placeholder": "Ingresa tu número de teléfono",
+      "companyName_placeholder": "Ingresa el nombre de la empresa",
+      "jobTitle_placeholder": "Ingresa el título del puesto",
+      "hiringManager_placeholder": "Ingresa el nombre del gerente de contratación",
+      "jobDescription_placeholder": "Pega aquí la descripción del puesto...",
+      "save_to_account": "Guardar esta carta de presentación en mi cuenta",
+      "resume_source": "Seleccionar Fuente del Currículum",
+      "select_stored_resume": "Selecciona de tus currículums guardados",
+      "select_resume": "-- Selecciona un currículum --",
+      "resume_required": "Por favor selecciona un currículum o sube un archivo",
+      "personal_info": "Tu Información",
+      "job_details": "Detalles del Puesto",
+      "job_description_tip": "Cuanto más completa sea la descripción del puesto, mejor adaptada estará tu carta de presentación"
+    },
+    "preview": {
+      "title": "Vista Previa",
+      "empty_state": "Tu carta de presentación aparecerá aquí una vez generada",
+      "generating": "La IA está generando tu carta de presentación...",
+      "generating_note": "Esto puede tomar hasta un minuto dependiendo de la complejidad de la descripción del puesto.",
+      "company": "Empresa",
+      "position": "Puesto",
+      "updated": "Última Actualización",
+      "no_results": "Ninguna carta de presentación coincide con tus criterios de búsqueda"
+    },
+    "success": {
+      "file_uploaded": "¡Archivo subido exitosamente!",
+      "letter_generated": "¡Carta de presentación generada exitosamente!",
+      "copied": "¡Carta de presentación copiada al portapapeles!",
+      "downloaded": "¡Carta de presentación descargada exitosamente!"
+    },
+    "errors": {
+      "no_cv": "Por favor sube tu CV",
+      "word_processing": "Error al procesar documento Word. Por favor asegúrate de que es un archivo .doc o .docx válido.",
+      "pdf_processing": "Error al procesar archivo PDF. Por favor asegúrate de que es un PDF válido.",
+      "unsupported_format": "Formato de archivo no soportado. Por favor usa .txt, .doc, .docx, o .pdf",
+      "no_content": "No se encontró contenido legible en el archivo",
+      "file_processing": "Error al procesar el archivo. Por favor intenta de nuevo.",
+      "rate_limit": "Por favor espera {{seconds}} segundos antes de intentar de nuevo.",
+      "model_loading": "El modelo está cargando... Intento {{attempt}}/{{maxRetries}}",
+      "api_rate_limit": "Límite de tasa excedido. Esperando... Intento {{attempt}}/{{maxRetries}}",
+      "authentication": "Error de autenticación. Por favor verifica tu token API.",
+      "server_error": "Error del servidor. Intentando con entrada más corta...",
+      "invalid_response": "Se recibió formato de respuesta inválido. Reintentando...",
+      "empty_response": "El modelo devolvió una respuesta vacía. Reintentando...",
+      "unexpected": "Ocurrió un error inesperado. Por favor intenta más tarde.",
+      "generation": "Error al generar carta de presentación",
+      "no_content": "No se recibieron datos de carta de presentación",
+      "requiredFields": "Por favor completa todos los campos requeridos",
+      "selectResume": "Por favor sube un CV o selecciona un currículum de tu cuenta"
+    },
+    "alerts": {
+      "selectResume": "Por favor sube un CV o selecciona un currículum de tu cuenta",
+      "requiredFields": "Por favor completa todos los campos requeridos"
+    },
+    "prompt": {
+      "task": "Tarea: Generar una carta de presentación profesional utilizando la información a continuación.",
+      "context": "Contexto: Esto es para una solicitud de empleo. Crea una carta de presentación formal y bien estructurada que destaque la experiencia relevante del candidato y demuestre su entusiasmo por el puesto.",
+      "format_requirements": "Requisitos de Formato",
+      "format_item1": "Comenzar con un bloque adecuado de fecha y dirección",
+      "format_item2": "Usar un saludo profesional",
+      "format_item3": "Incluir 3-4 párrafos concisos",
+      "format_item4": "Terminar con un cierre profesional",
+      "format_item5": "Incluir información de contacto completa en la firma",
+      "candidate_info": "Información del Candidato",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "position_details": "Detalles del Puesto",
+      "company": "Empresa",
+      "role": "Rol",
+      "hiring_manager": "Gerente de Contratación",
+      "default_hiring_manager": "Gerente de Contratación",
+      "cv_highlights": "Aspectos Destacados del CV",
+      "job_description_highlights": "Aspectos Destacados de la Descripción del Puesto",
+      "important_notes": "Notas Importantes",
+      "note_item1": "Enfocarse en relacionar la experiencia del candidato con los requisitos del trabajo",
+      "note_item2": "Mantener un tono profesional pero entusiasta",
+      "note_item3": "Ser específico sobre contribuciones y logros",
+      "note_item4": "Expresar interés genuino en el puesto y la empresa",
+      "note_item5": "Mantener la carta concisa e impactante",
+      "final_instruction": "Por favor genera una carta de presentación completa usando esta información.",
+      "instruction_text": "Usa viñetas para estructurar el contenido"
+    },
+    "signature": {
+      "closing": "Atentamente",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono"
+    },
+    "download_prefix": "Carta_Presentacion",
+    "login_notice": "para guardar tus cartas de presentación y usar tus currículums almacenados"
+  },
+  "coverLetterDetail": {
+    "back": "Volver a cartas de presentación",
+    "errors": {
+      "load": "Error al cargar carta de presentación",
+      "format": "Error al formatear carta de presentación",
+      "favorite": "Error al actualizar estado de favorito",
+      "delete": "Error al eliminar carta de presentación",
+      "copy": "Error al copiar al portapapeles",
+      "notFound": {
+        "title": "Carta de Presentación No Encontrada",
+        "message": "La carta de presentación que estás buscando no existe o no tienes permiso para verla."
+      }
+    },
+    "success": {
+      "copied": "Carta de presentación copiada al portapapeles",
+      "downloaded": "Carta de presentación descargada",
+      "deleted": "Carta de presentación eliminada exitosamente",
+      "addedFavorite": "Añadida a favoritos",
+      "removedFavorite": "Eliminada de favoritos"
+    },
+    "delete_confirm": {
+      "title": "Confirmar Eliminación",
+      "message": "¿Estás seguro de que quieres eliminar esta carta de presentación? Esta acción no puede deshacerse."
+    },
+    "last_updated": "Última actualización",
+    "content": "Carta de Presentación",
+    "no_content": "No hay contenido disponible",
+    "details": "Detalles",
+    "company": "Empresa",
+    "position": "Puesto",
+    "recipient": "Destinatario",
+    "created": "Creada",
+    "not_specified": "No especificado",
+    "actions": {
+      "favorite": "Añadir a Favoritos",
+      "unfavorite": "Quitar Favorito",
+      "delete": "Eliminar Carta de Presentación"
+    }
+  },
+  "coverLetterView": {
+    "untitled": "Carta de Presentación Sin Título",
+    "created": "Creada",
+    "updated": "Actualizada",
+    "fields": {
+      "company": "Empresa",
+      "position": "Puesto",
+      "recipient": "Destinatario"
+    },
+    "content": {
+      "title": "Contenido de la Carta de Presentación"
+    },
+    "jobDescription": {
+      "title": "Descripción del Puesto"
+    },
+    "linkedResume": {
+      "title": "Currículum Vinculado",
+      "loading": "Cargando información del currículum...",
+      "view": "Ver Currículum"
+    },
+    "actions": {
+      "backToDashboard": "Volver al Panel de Control"
+    },
+    "errors": {
+      "load": "Error al cargar carta de presentación",
+      "format": "Error al formatear carta de presentación",
+      "favorite": "Error al actualizar estado de favorito",
+      "delete": "Error al eliminar carta de presentación",
+      "notFound": {
+        "title": "Carta de Presentación No Encontrada",
+        "message": "La carta de presentación que estás buscando no existe o no tienes permiso para verla."
+      }
+    },
+    "success": {
+      "copied": "¡Carta de presentación copiada al portapapeles!",
+      "downloaded": "Carta de presentación descargada exitosamente",
+      "deleted": "Carta de presentación eliminada exitosamente",
+      "addedFavorite": "Añadida a favoritos",
+      "removedFavorite": "Eliminada de favoritos"
+    },
+    "delete_confirm": {
+      "title": "Confirmar Eliminación",
+      "message": "¿Estás seguro de que quieres eliminar esta carta de presentación? Esta acción no puede deshacerse."
+    }
+  },
+  "coverLetterEditor": {
+    "title": "Editar Carta de Presentación",
+    "tabs": {
+      "edit": "Editar",
+      "preview": "Vista Previa"
+    },
+    "fields": {
+      "title": "Título de la Carta de Presentación",
+      "companyName": "Nombre de la Empresa",
+      "jobTitle": "Título del Puesto",
+      "recipientName": "Nombre del Destinatario",
+      "recipientTitle": "Título del Destinatario",
+      "jobDescription": "Descripción del Puesto",
+      "coverLetterContent": "Contenido de la Carta de Presentación",
+      "greeting": "Saludo",
+      "introduction": "Introducción",
+      "bodyParagraphs": "Párrafos del Cuerpo",
+      "closing": "Cierre",
+      "signature": "Firma"
+    },
+    "placeholders": {
+      "title": "Carta de Presentación para [Puesto] en [Empresa]",
+      "companyName": "Nombre de la Empresa",
+      "jobTitle": "Título del Puesto",
+      "recipientName": "Nombre del Gerente de Contratación",
+      "recipientTitle": "Título del Gerente de Contratación",
+      "jobDescription": "Pega aquí la descripción del puesto...",
+      "coverLetterContent": "Ingresa el contenido de la carta de presentación en formato JSON...",
+      "greeting": "Estimado Gerente de Contratación,",
+      "introduction": "Escribo para expresar mi interés en...",
+      "bodyParagraph": "Describe tu experiencia relevante...",
+      "closing": "Estoy entusiasmado por la oportunidad de unirme a su equipo...",
+      "signature": "Atentamente, [Tu Nombre]"
+    },
+    "buttons": {
+      "switchToRaw": "Cambiar a Editor en Bruto",
+      "switchToRich": "Cambiar a Editor Enriquecido",
+      "addParagraph": "+ Añadir Párrafo",
+      "removeParagraph": "Eliminar Párrafo",
+      "initializeParagraphs": "Inicializar Párrafos del Cuerpo"
+    },
+    "notes": {
+      "rawEditor": "Nota: Este es el contenido JSON en bruto. Asegúrate de mantener un formato JSON válido."
+    },
+    "errors": {
+      "load": "Error al cargar carta de presentación",
+      "save": "Error al guardar carta de presentación",
+      "preview": "Error al generar vista previa",
+      "invalidJson": "Formato JSON inválido en el contenido de la carta de presentación",
+      "parsingError": "Error al analizar contenido. Cambiando a editor en bruto."
+    },
+    "success": {
+      "save": "Carta de presentación guardada exitosamente",
+      "copied": "¡Carta de presentación copiada al portapapeles!",
+      "downloaded": "Carta de presentación descargada exitosamente"
+    }
+  },
+  "coverLetters": {
+    "title": "Tus Cartas de Presentación",
+    "description": "Gestiona todas tus cartas de presentación en un solo lugar",
+    "actions": {
+      "new": "Crear Nueva Carta de Presentación"
+    },
+    "empty": {
+      "title": "Aún No Hay Cartas de Presentación",
+      "message": "Aún no has creado ninguna carta de presentación. Comienza creando tu primera.",
+      "action": "Crea Tu Primera Carta de Presentación"
+    },
+    "search": {
+      "placeholder": "Buscar cartas de presentación..."
+    },
+    "filter": {
+      "favorites": "Mostrar Solo Favoritos"
+    },
+    "table": {
+      "title": "Título",
+      "company": "Empresa",
+      "position": "Puesto",
+      "date": "Última Actualización",
+      "actions": "Acciones"
+    },
+    "no_results": "Ninguna carta de presentación coincide con tus criterios de búsqueda",
+    "errors": {
+      "load": "Error al cargar cartas de presentación",
+      "delete": "Error al eliminar carta de presentación",
+      "favorite": "Error al actualizar estado de favorito",
+      "preview": "Error al previsualizar carta de presentación"
+    },
+    "success": {
+      "deleted": "Carta de presentación eliminada exitosamente",
+      "favorited": "Añadida a favoritos",
+      "unfavorited": "Eliminada de favoritos",
+      "copied": "¡Carta de presentación copiada al portapapeles!",
+      "downloaded": "Carta de presentación descargada exitosamente"
+    },
+    "delete_confirm": {
+      "title": "Confirmar Eliminación",
+      "message": "¿Estás seguro de que quieres eliminar esta carta de presentación? Esta acción no puede deshacerse."
+    },
+    "preview": {
+      "company": "Empresa",
+      "position": "Puesto",
+      "updated": "Última Actualización"
+    }
+  },
+  "resumeDashboard": {
+    "title": "Mis Currículums",
+    "loading": "Cargando tus currículums...",
+    "noResumes": {
+      "title": "Aún no tienes ningún currículum",
+      "description": "¡Crea tu primer currículum profesional y da el siguiente paso en tu trayectoria profesional!"
+    },
+    "defaultTitle": "Mi Currículum",
+    "unnamed": "Currículum Sin Nombre",
+    "lastUpdated": "Última actualización",
+    "preview": "Vista Previa del Currículum",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar este currículum?",
+    "errors": {
+      "noResumeId": "No hay ID de currículum disponible"
+    },
+    "buttons": {
+      "startBuilding": "Empieza a Construir Tu Currículum",
+      "createNew": "Crear Nuevo Currículum",
+      "view": "Ver",
+      "edit": "Editar",
+      "customize": "Personalizar",
+      "delete": "Eliminar"
+    }
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última Actualización",
+    "updateDate": "4 de abril de 2025",
+    "intro": "CVATI (\"nosotros\", \"nuestro\", o \"nos\") está comprometido a proteger tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y protegemos tu información cuando utilizas nuestro servicio de creación de currículum.",
+    "collection": {
+      "title": "Información Que Recopilamos",
+      "desc": "Recopilamos información personal que proporcionas voluntariamente cuando utilizas nuestro servicio, incluyendo:",
+      "personal": "Detalles personales (nombre, dirección de correo electrónico, número de teléfono)",
+      "professional": "Información profesional (experiencia laboral, habilidades, educación)",
+      "optional": "Información opcional (fecha de nacimiento, nacionalidad, dirección, foto)",
+      "account": "Credenciales de cuenta",
+      "usage": "Datos de uso e interacciones con nuestro servicio"
+    },
+    "use": {
+      "title": "Cómo Usamos Tu Información",
+      "desc": "Usamos tu información para los siguientes propósitos:",
+      "provide": "Para proporcionar y mantener nuestro servicio",
+      "improve": "Para mejorar nuestro servicio y experiencia de usuario",
+      "communicate": "Para comunicarnos contigo sobre actualizaciones del servicio",
+      "ai": "Para proporcionar generación de currículum y carta de presentación mejorada por IA",
+      "security": "Para garantizar la seguridad y prevenir fraudes",
+      "legal": "Para cumplir con obligaciones legales"
+    },
+    "sharing": {
+      "title": "Compartir y Divulgar Información",
+      "desc": "Podemos compartir tu información con:",
+      "service": "Proveedores de servicios (almacenamiento en la nube, alojamiento de imágenes, análisis)",
+      "legal": "Autoridades legales cuando lo requiera la ley",
+      "business": "Socios comerciales con tu consentimiento explícito",
+      "note": "Usamos Cloudinary para almacenamiento y procesamiento de imágenes. Tus fotos subidas también están sujetas a la política de privacidad de Cloudinary."
+    },
+    "storage": {
+      "title": "Almacenamiento y Seguridad de Datos",
+      "desc": "Implementamos medidas de seguridad apropiadas para proteger tu información personal. Sin embargo, ningún método de transmisión por Internet es 100% seguro, y no podemos garantizar seguridad absoluta.",
+      "retention": "Conservamos tu información personal mientras tu cuenta esté activa o según sea necesario para proporcionarte servicios. Puedes solicitar la eliminación de tus datos en cualquier momento."
+    },
+    "rights": {
+      "title": "Tus Derechos de Datos",
+      "desc": "Bajo el RGPD y otras leyes de protección de datos aplicables, tienes derechos con respecto a tus datos personales, incluyendo:",
+      "access": "Derecho a acceder a tus datos personales",
+      "rectify": "Derecho a corregir datos inexactos",
+      "delete": "Derecho a la supresión (\"derecho al olvido\")",
+      "restrict": "Derecho a restringir el procesamiento",
+      "portability": "Derecho a la portabilidad de datos",
+      "object": "Derecho a objetar al procesamiento",
+      "exercise": "Para ejercer estos derechos, puedes usar la configuración de cuenta en nuestra aplicación o contactarnos directamente."
+    },
+    "cookies": {
+      "title": "Cookies y Tecnologías Similares",
+      "desc": "Usamos cookies y tecnologías de seguimiento similares para mejorar tu experiencia en nuestro sitio web, analizar el uso y ayudar en nuestros esfuerzos de marketing. Puedes controlar las cookies a través de la configuración de tu navegador."
+    },
+    "ai": {
+      "title": "Contenido Generado por IA",
+      "desc": "Nuestro servicio utiliza IA para ayudar a generar contenido de currículum y cartas de presentación. Los datos que proporcionas pueden ser procesados por nuestros sistemas de IA para generar contenido personalizado. Implementamos medidas para proteger tus datos durante el procesamiento de IA y no usamos tus datos personales para entrenar nuestros modelos de IA sin consentimiento explícito."
+    },
+    "children": {
+      "title": "Privacidad de los Niños",
+      "desc": "Nuestro servicio no está dirigido a personas menores de 16 años. Si tienes conocimiento de que un menor ha proporcionado información personal sin consentimiento parental, por favor contáctanos."
+    },
+    "changes": {
+      "title": "Cambios a Esta Política de Privacidad",
+      "desc": "Podemos actualizar nuestra Política de Privacidad de vez en cuando. Te notificaremos cualquier cambio publicando la nueva Política de Privacidad en esta página y actualizando la fecha de \"Última Actualización\"."
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "desc": "Si tienes alguna pregunta sobre esta Política de Privacidad, por favor contáctanos en:",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "lastUpdated": "Última Actualización",
+    "updateDate": "4 de abril de 2025",
+    "intro": "Bienvenido a CVATI. Estos Términos y Condiciones rigen tu uso de nuestro servicio de creación de currículum y sitio web. Al acceder o utilizar CVATI, aceptas estar vinculado por estos Términos.",
+    "definitions": {
+      "title": "1. Definiciones",
+      "service": "\"Servicio\"",
+      "serviceDesc": "Se refiere al sitio web y aplicación de creación de currículum CVATI.",
+      "content": "\"Contenido\"",
+      "contentDesc": "Se refiere a currículums, cartas de presentación y cualquier otro material creado, subido o generado a través de nuestro Servicio.",
+      "user": "\"Usuario\"",
+      "userDesc": "Cualquier individuo que acceda o utilice nuestro Servicio.",
+      "account": "\"Cuenta\"",
+      "accountDesc": "Un perfil de usuario registrado dentro de nuestro Servicio."
+    },
+    "accounts": {
+      "title": "2. Cuentas de Usuario",
+      "registration": "Cuando creas una cuenta con nosotros, debes proporcionar información precisa, completa y actualizada. Eres responsable de salvaguardar tu contraseña y de todas las actividades que ocurran bajo tu cuenta.",
+      "terminate": "Nos reservamos el derecho de terminar o suspender tu cuenta inmediatamente, sin previo aviso o responsabilidad, por cualquier razón, incluyendo incumplimiento de estos Términos."
+    },
+    "use": {
+      "title": "3. Uso Aceptable",
+      "desc": "Aceptas usar nuestro Servicio solo para fines legales y de acuerdo con estos Términos. Aceptas no:",
+      "false": "Proporcionar información falsa o engañosa",
+      "impersonate": "Suplantar a cualquier persona o entidad",
+      "infringe": "Infringir patentes, marcas, secretos comerciales, derechos de autor u otros derechos de propiedad",
+      "harmful": "Subir virus u otro código malicioso",
+      "interfere": "Interferir o interrumpir el Servicio o servidores",
+      "automated": "Usar métodos automatizados para acceder o utilizar el Servicio"
+    },
+    "content": {
+      "title": "4. Propiedad del Contenido y Licencia",
+      "ownership": "Mantienes todos los derechos de propiedad sobre cualquier currículum, carta de presentación u otro contenido que crees a través de nuestro Servicio. Sin embargo, nos otorgas una licencia no exclusiva, mundial y libre de regalías para usar, reproducir y mostrar tu contenido con el único propósito de proporcionar y mejorar nuestro Servicio.",
+      "responsibility": "Eres el único responsable de todo el contenido que crees, subas o de otra manera pongas a disposición a través del Servicio. Declaras y garantizas que tienes derecho a usar toda la información incluida en tus currículums y que el contenido no viola ninguna ley o derechos de terceros."
+    },
+    "ai": {
+      "title": "5. Contenido Generado por IA",
+      "desc": "Nuestro Servicio utiliza inteligencia artificial para ayudar a crear currículums y cartas de presentación. Reconoces que:",
+      "accuracy": "El contenido generado por IA puede no ser siempre preciso o apropiado para tus necesidades específicas",
+      "review": "Debes revisar y editar todo el contenido generado por IA antes de usarlo",
+      "responsibility": "Eres el responsable final de todo el contenido en tu currículum o carta de presentación, incluidas las partes generadas por IA"
+    },
+    "disclaimer": {
+      "title": "6. Exención de Garantías",
+      "desc": "Nuestro Servicio se proporciona \"tal cual\" y \"según disponibilidad\" sin garantías de ningún tipo, ya sean expresas o implícitas, incluidas, entre otras, las garantías implícitas de comerciabilidad, idoneidad para un propósito particular o no infracción.",
+      "success": "No garantizamos que nuestro Servicio te ayude a conseguir empleo o entrevistas. La efectividad de los currículums y cartas de presentación depende de muchos factores fuera de nuestro control."
+    },
+    "limitation": {
+      "title": "7. Limitación de Responsabilidad",
+      "desc": "En la máxima medida permitida por la ley, en ningún caso CVATI, sus directores, empleados o agentes serán responsables por daños indirectos, punitivos, incidentales, especiales, consecuentes o ejemplares, incluyendo sin limitación daños por pérdida de beneficios, buena voluntad, uso, datos u otras pérdidas intangibles, que resulten del uso o la imposibilidad de usar este Servicio."
+    },
+    "privacy": {
+      "title": "8. Política de Privacidad",
+      "desc": "Tu uso de nuestro Servicio también está regido por nuestra Política de Privacidad, que se incorpora a estos Términos por referencia. Por favor revisa nuestra Política de Privacidad para entender nuestras prácticas con respecto a tu información personal."
+    },
+    "termination": {
+      "title": "9. Terminación",
+      "userRight": "Puedes terminar tu cuenta en cualquier momento siguiendo las instrucciones en el Servicio. Todos tus datos serán eliminados de acuerdo con nuestra Política de Privacidad.",
+      "ourRight": "Podemos terminar o suspender tu cuenta inmediatamente, sin previo aviso o responsabilidad, por cualquier razón, incluyendo incumplimiento de estos Términos. Tras la terminación, tu derecho a usar el Servicio cesará inmediatamente."
+    },
+    "changes": {
+      "title": "10. Cambios a los Términos",
+      "desc": "Nos reservamos el derecho de modificar o reemplazar estos Términos en cualquier momento. Si una revisión es material, proporcionaremos al menos 30 días de aviso antes de que cualquier término nuevo entre en vigor. Al continuar accediendo o utilizando nuestro Servicio después de que las revisiones entren en vigor, aceptas estar obligado por los términos revisados."
+    },
+    "governing": {
+      "title": "11. Ley Aplicable",
+      "desc": "Estos Términos se regirán e interpretarán de acuerdo con las leyes de [Tu País/Estado], sin tener en cuenta sus disposiciones sobre conflictos de leyes."
+    },
+    "contact": {
+      "title": "12. Contáctanos",
+      "desc": "Si tienes alguna pregunta sobre estos Términos, por favor contáctanos en:",
+      "email": "legal@cvati.com"
+    }
+  },
+  "cookiePolicy": {
+    "title": "Política de Cookies",
+    "lastUpdated": "Última Actualización",
+    "updateDate": "4 de abril de 2025",
+    "intro": "Esta Política de Cookies explica cómo CVATI (\"nosotros\", \"nuestro\" o \"nos\") utiliza cookies y tecnologías similares en nuestro sitio web y aplicación. Al utilizar CVATI, consientes el uso de cookies como se describe en esta política.",
+    "what": {
+      "title": "¿Qué Son las Cookies?",
+      "desc": "Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo (computadora, tableta o móvil) cuando visitas sitios web. Se utilizan ampliamente para hacer que los sitios web funcionen de manera más eficiente, proporcionar una mejor experiencia de usuario y dar información a los propietarios del sitio web. Las cookies no pueden dañar tu dispositivo ni acceder a otra información en tu dispositivo."
+    },
+    "types": {
+      "title": "Tipos de Cookies Que Usamos",
+      "essential": {
+        "title": "Cookies Esenciales",
+        "desc": "Estas cookies son necesarias para que el sitio web funcione correctamente. Permiten funciones básicas como navegación de páginas y acceso a áreas seguras del sitio web. El sitio web no puede funcionar correctamente sin estas cookies.",
+        "examples": "Ejemplos: Cookies de sesión, cookies de autenticación"
+      },
+      "preferences": {
+        "title": "Cookies de Preferencias",
+        "desc": "Estas cookies permiten que el sitio web recuerde las elecciones que haces (como tu preferencia de idioma o tu configuración de modo oscuro/claro) y proporcione características mejoradas y más personales.",
+        "examples": "Ejemplos: Configuración de idioma, preferencias de tema"
+      },
+      "analytics": {
+        "title": "Cookies Analíticas",
+        "desc": "Estas cookies recopilan información sobre cómo utilizas nuestro sitio web, qué páginas visitaste y en qué enlaces hiciste clic. Todos los datos son anonimizados y no pueden utilizarse para identificarte.",
+        "examples": "Ejemplos: Cookies de Google Analytics"
+      },
+      "functional": {
+        "title": "Cookies Funcionales",
+        "desc": "Estas cookies permiten funcionalidad y personalización mejoradas. Pueden ser establecidas por nosotros o por proveedores externos cuyos servicios hemos agregado a nuestras páginas.",
+        "examples": "Ejemplos: Cookies de servicio de chat, datos de formularios guardados"
+      }
+    },
+    "specific": {
+      "title": "Cookies Específicas Que Usamos",
+      "name": "Nombre",
+      "provider": "Proveedor",
+      "purpose": "Propósito",
+      "expiry": "Caducidad",
+      "type": "Tipo",
+      "consentPurpose": "Guarda tus preferencias de cookies",
+      "themePurpose": "Recuerda tu preferencia de modo oscuro/claro",
+      "languagePurpose": "Recuerda tu preferencia de idioma",
+      "authPurpose": "Te mantiene conectado",
+      "gaPurpose": "Utilizado para distinguir usuarios",
+      "essential": "Esencial",
+      "preference": "Preferencia",
+      "analytics": "Analítica"
+    },
+    "thirdParty": {
+      "title": "Cookies de Terceros",
+      "desc": "Algunas cookies son colocadas por servicios de terceros que aparecen en nuestras páginas. Utilizamos servicios de los siguientes terceros que pueden usar cookies:",
+      "analytics": "Google Analytics - Para análisis de uso del sitio web",
+      "cloudinary": "Cloudinary - Para almacenamiento y procesamiento de imágenes",
+      "oauth": "Proveedores de OAuth (si utilizas inicio de sesión social)"
+    },
+    "manage": {
+      "title": "Administrando Cookies",
+      "desc": "La mayoría de los navegadores web te permiten administrar tus preferencias de cookies. Puedes configurar tu navegador para rechazar cookies o para alertarte cuando se estén enviando cookies. Los métodos para hacerlo varían de navegador a navegador y de versión a versión.",
+      "links": "Aquí hay enlaces a instrucciones de administración de cookies para navegadores comunes:",
+      "note": "Ten en cuenta que restringir cookies puede afectar la funcionalidad de nuestro sitio web. Por ejemplo, es posible que no puedas usar todas las características interactivas de nuestro sitio o guardar tus preferencias entre visitas."
+    },
+    "similar": {
+      "title": "Tecnologías Similares",
+      "desc": "Además de cookies, podemos usar otras tecnologías similares para almacenar y acceder a datos en tu dispositivo:",
+      "storage": "Almacenamiento Local:",
+      "storageDesc": "Utilizamos el almacenamiento local del navegador para guardar tus preferencias y mejorar el rendimiento.",
+      "session": "Almacenamiento de Sesión:",
+      "sessionDesc": "Similar al almacenamiento local pero se borra cuando cierras el navegador."
+    },
+    "updates": {
+      "title": "Actualizaciones a Esta Política",
+      "desc": "Podemos actualizar esta Política de Cookies de vez en cuando para reflejar cambios en tecnología, regulación o nuestras prácticas comerciales. Cualquier cambio será publicado en esta página y, si los cambios son significativos, proporcionaremos un aviso más prominente."
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "desc": "Si tienes alguna pregunta sobre nuestro uso de cookies o esta Política de Cookies, por favor contáctanos en:",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "cookies": {
+    "message": "Utilizamos cookies para mejorar tu experiencia. Al continuar visitando este sitio, aceptas nuestro uso de cookies.",
+    "learnMore": "Saber más",
+    "accept": "Aceptar",
+    "decline": "Rechazar"
+  },
+  "prod1": {
+    "hero": {
+      "title": "Consigue el Trabajo de tus Sueños",
+      "subtitle": "Crea currículums impresionantes y cartas de presentación convincentes con IA que te hace destacar entre los empleadores y supera los sistemas ATS."
+    },
+    "sections": {
+      "power_job_search": "Potencia tu Búsqueda de Empleo con IA",
+      "power_job_description": "Nuestras potentes herramientas de IA te ayudan a crear currículums y cartas de presentación de calidad profesional adaptados a tus roles objetivo.",
+      "job_winning_documents": "Crea Documentos Ganadores",
+      "job_winning_description": "Diseñados para ayudarte a destacar y causar una fuerte impresión en los empleadores.",
+      "everything_to_succeed": "Todo lo que Necesitas para Triunfar",
+      "everything_description": "Repleto de características para ayudarte a crear materiales de solicitud sobresalientes.",
+      "how_it_works": "Cómo Funciona",
+      "how_it_works_description": "Crea currículums profesionales y cartas de presentación en minutos con tres sencillos pasos.",
+      "what_users_say": "Lo que Dicen Nuestros Usuarios",
+      "what_users_description": "Historias de éxito de personas que usaron CVATI para conseguir el trabajo de sus sueños.",
+      "current_language": "Idioma Actual",
+      "current_template": "Plantilla Actual",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "features": {
+      "ats_templates": {
+        "title": "Plantillas Optimizadas para ATS",
+        "description": "Nuestras plantillas de currículum están diseñadas para superar los Sistemas de Seguimiento de Candidatos y hacer que tu currículum llegue a los responsables de contratación."
+      },
+      "ai_content": {
+        "title": "Generación de Contenido con IA",
+        "description": "Sugerencias inteligentes para habilidades, logros y descripciones de trabajo que coinciden con tu rol objetivo."
+      },
+      "cover_letters": {
+        "title": "Cartas de Presentación Personalizadas",
+        "description": "Genera cartas de presentación adaptadas que coincidan con la descripción del trabajo y destaquen tu experiencia relevante."
+      },
+      "keyword_optimization": {
+        "title": "Optimización de Palabras Clave",
+        "description": "Analizamos las descripciones de trabajo para incluir las palabras clave adecuadas."
+      },
+      "industry_content": {
+        "title": "Contenido Específico por Industria",
+        "description": "Contenido adaptado para tu industria y nivel de experiencia."
+      },
+      "resume_analytics": {
+        "title": "Análisis de Currículum",
+        "description": "Observa cómo rinde tu currículum y obtén sugerencias para mejorarlo."
+      },
+      "expert_advice": {
+        "title": "Consejos de Expertos",
+        "description": "Contenido basado en ideas de gerentes de contratación y reclutadores."
+      }
+    },
+    "steps": {
+      "enter_details": {
+        "title": "Introduce tus Datos",
+        "description": "Completa tu información o sube un currículum existente para comenzar rápidamente."
+      },
+      "ai_enhancement": {
+        "title": "Mejora con IA",
+        "description": "Nuestra IA analiza tu experiencia y los requisitos del trabajo para sugerir mejoras."
+      },
+      "download_apply": {
+        "title": "Descarga y Solicita",
+        "description": "Obtén tu currículum o carta de presentación perfectamente formateados y listos para impresionar a los empleadores."
+      }
+    },
+    "cta": {
+      "title": "¿Listo para Conseguir el Trabajo de tus Sueños?",
+      "description": "Únete a miles de profesionales que han transformado su búsqueda de empleo con nuestras herramientas potenciadas por IA.",
+      "build_resume": "Crear Mi Currículum",
+      "create_cover_letter": "Crear Carta de Presentación"
+    },
+    "stats": {
+      "resumes_created": "Currículums Creados",
+      "cover_letters": "Cartas de Presentación Generadas",
+      "interview_rate": "Tasa de Éxito en Entrevistas",
+      "job_match": "Tasa de Coincidencia Laboral"
+    }
+  },
+  "feedback": {
+    "title": "Comparte Tu Opinión",
+    "subtitle": "Ayúdanos a mejorar CVATI compartiendo tu experiencia",
+    "rating_label": "¿Cómo calificarías tu experiencia?",
+    "rating_required": "Por favor, selecciona una calificación",
+    "email_label": "Tu Correo Electrónico",
+    "email_required": "Por favor, proporciona tu correo electrónico",
+    "email_placeholder": "tu.correo@ejemplo.com",
+    "comment_label": "Comentarios (opcional)",
+    "comment_placeholder": "Cuéntanos sobre tu experiencia...",
+    "submit": "Enviar Opinión",
+    "submitting": "Enviando...",
+    "submit_success": "¡Gracias por tu opinión!",
+    "submit_error": "No se pudo enviar la opinión"
+  },
+  "revamp": {
+    "needsResumeFirst": "Primero debes seleccionar un currículum",
+    "goToMyResumes": "Por favor, ve a Mis Currículums y selecciona uno para trabajar.",
+    "signInFirst": "Debes iniciar sesión y crear un currículum antes de exportar.",
+    "exploreTemplates": "Explora Plantillas Profesionales",
+    "exploreTemplatesDescription": "Navega por nuestra colección de plantillas de currículum diseñadas profesionalmente. Encuentra el estilo perfecto que coincida con tu industria y personalidad para destacar tu solicitud.",
+    "exploreTemplatesButton": "Explorar Plantillas",
+    "atsFriendly": "Diseños compatibles con ATS",
+    "modernLayouts": "Diseños modernos y tradicionales",
+    "customizableDesigns": "Diseños totalmente personalizables",
+    "browse": "Ver plantillas",
+    "accept": "Acepto los",
+    "or": "O",
+    "offline_mode": "Puedes crear tu currículum ahora. Inicia sesión para guardar o descargar.",
+    "listView": "Cambiar a vista de lista",
+    "testimonials": {
+      "role1": "Ingeniero de Software",
+      "content1": "CVATI me ayudó a conseguir entrevistas en tres grandes empresas tecnológicas. ¡Las sugerencias de IA hicieron que mi currículum destacara entre la multitud!",
+      "role2": "Especialista en Marketing",
+      "content2": "¡El generador de cartas de presentación es increíble! Capturó perfectamente mi experiencia y el tono que estaba buscando. Me ahorró horas de trabajo.",
+      "role3": "Analista de Datos",
+      "content3": "Después de luchar por recibir respuestas, renoví mi currículum con CVATI y comencé a recibir solicitudes de entrevistas en cuestión de días."
+    }
+},
+"jobMatching": {
+    "jobMatching": "Coincidencia de Empleo",
+    "title": "🎯 Analizador Inteligente de Coincidencia Laboral",
+    "subtitle": "Obtén comentarios honestos de IA sobre tus posibilidades en aplicaciones de empleo. Sin edulcorantes, solo insights accionables que te ayuden a conseguir mejores roles más rápido.",
+    "socialProof": "Usado por más de 10,000 buscadores de empleo",
+    
+    "features": {
+      "instantScoring": "🎯 Puntuación de compatibilidad instantánea",
+      "beatATS": "🤖 Supera sistemas ATS",
+      "personalizedTips": "💡 Consejos personalizados",
+      "keywordGaps": "📊 Análisis de brechas de palabras clave",
+      "atsOptimization": "🤖 Insights para optimización ATS",
+      "keywordAnalysis": "📊 Análisis detallado de palabras clave"
+    },
+
+    "auth": {
+      "unlockPotential": "🎯 Libera tu Potencial Profesional",
+      "joinThousands": "Únete a miles de buscadores de empleo que usan nuestra IA para conseguir mejores roles más rápido. Obtén feedback instantáneo y honesto en cualquier aplicación.",
+      "getStarted": "🚀 Comienza Gratis"
+    },
+
+    "methods": {
+      "crewai": {
+        "title": "Panel de Expertos en IA",
+        "subtitle": "Equipo de agentes de reclutamiento especializados",
+        "badge": "Más Popular",
+        "description": "Múltiples agentes especializados trabajan juntos como un panel de reclutamiento para evaluar tu compatibilidad"
+      },
+      "claude": {
+        "title": "Reclutador Senior en IA", 
+        "subtitle": "Razonamiento avanzado como un gerente de contratación",
+        "badge": "Más Preciso",
+        "description": "IA de vanguardia que piensa como un reclutador senior con años de experiencia"
+      },
+      "both": {
+        "title": "Análisis Completo",
+        "subtitle": "Doble verificación con ambos sistemas de IA", 
+        "badge": "Más Exhaustivo",
+        "description": "Obtén insights de ambos sistemas y compara para máxima confianza"
+      }
+    },
+
+    "form": {
+      "title": "✨ Configura tu Análisis",
+      "chooseAnalysis": "🎯 Elige tu Potencia de Análisis",
+      "differentApproaches": "Diferentes enfoques de IA, mismos resultados honestos",
+      "targetPosition": "🎯 Posición Objetivo",
+      "jobTitlePlaceholder": "ej. Ingeniero Senior de Software, Gerente de Marketing",
+      "dreamCompany": "🏢 Empresa Soñada",
+      "companyPlaceholder": "ej. Google, Microsoft, Tesla (opcional)",
+      "howSubmitResume": "📄 ¿Cómo deseas enviar tu currículum?",
+      "savedCVs": "📁 Mis CV Guardados",
+      "uploadNew": "📤 Subir Nuevo", 
+      "copyPaste": "✏️ Copiar y Pegar",
+      "selectResume": "Seleccionar Currículum",
+      "selectResumeOption": "Elige un currículum de tu colección...",
+      "noResumes": "📝 Aún no tienes currículums guardados. ¡Crea tu primer CV o sube uno para comenzar!",
+      "uploadCV": "📤 Sube tu CV",
+      "uploadPlaceholder": "📎 Haz clic para subir o arrastra tu currículum",
+      "supportedFormats": "Formatos soportados: PDF, DOC, DOCX, TXT (máx. 5MB)",
+      "processingFile": "🔄 Procesando tu archivo...",
+      "resumeContent": "📝 Contenido de tu Currículum",
+      "resumeContentPlaceholder": "Pega el texto de tu currículum aquí. Incluye experiencia, habilidades y logros - ¡cuanto más detalle, mejor el análisis!",
+      "jobPosting": "📋 Descripción del Puesto",
+      "jobDescriptionPlaceholder": "Copia la descripción completa del trabajo aquí. Incluye requisitos, responsabilidades y calificaciones para el análisis más preciso.",
+      "analyzeMatch": "🚀 Analizar mi Coincidencia Laboral",
+      "takes30Seconds": "(Toma 30 segundos)",
+      "aiAnalyzing": "🧠 IA analizando tu potencial...",
+      "usingMethod": "Usando",
+      "takesLonger": "⏱️ Toma el doble de tiempo pero vale la pena"
+    },
+
+    "progress": {
+      "expertPanel": "🤖 Nuestro panel de expertos en IA está revisando tu perfil...",
+      "deepAnalysis": "🧠 IA avanzada está realizando análisis profundo...",
+      "comprehensive": "⚡ Ejecutando análisis exhaustivo con ambos sistemas de IA...",
+      "bothTakesTime": "Este análisis completo toma más tiempo pero brinda máxima confianza"
+    },
+
+    "scores": {
+      "excellent": "🔥 ¡Excelente coincidencia! Eres un candidato ideal para este rol.",
+      "good": "👍 ¡Buen potencial! Algunos ajustes podrían impulsarte significativamente.", 
+      "improvement": "📈 Espacio para mejorar. Aquí está tu hoja de ruta al éxito.",
+      "levelUp": "💪 ¡Hora de subir de nivel! Te mostraremos exactamente cómo."
+    },
+
+    "results": {
+      "intelligenceReport": "📊 Tu Informe de Inteligencia de Aplicación",
+      "readyToDiscover": "¿Listo para descubrir tus verdaderas posibilidades?",
+      "fillFormGetInsights": "Completa el formulario y obtén insights instantáneos con IA que podrían cambiar cómo aplicas a empleos.",
+      "aiComparison": "🔬 Comparación de Sistemas de IA",
+      "confidence": "Nivel de Confianza",
+      "lowConfidence": "Se detectaron señales mixtas",
+      "highConfidence": "Ambos sistemas coinciden",
+      "jobCompatibility": "🎯 Puntuación de Compatibilidad Laboral",
+      "analyzedBy": "Analizado por",
+      "atsPassRate": "🤖 Tasa de Aprobación ATS",
+      "beatRobots": "¿Superarás a los robots?",
+      "recommendation": "💡 ¿Deberías Aplicar?",
+      "goForIt": "¡Adelante!",
+      "buildUpFirst": "Prepárate primero",
+      "yourSuperpowers": "🌟 Tus Superpoderes",
+      "levelUpHere": "🎯 Mejora Aquí",
+      "skillsToAdd": "❌ Habilidades para Añadir",
+      "skillsToAddDesc": "Estas palabras clave podrían aumentar tus posibilidades",
+      "winningKeywords": "✅ Tus Palabras Clave Ganadoras",
+      "winningKeywordsDesc": "Ya eres fuerte en estas áreas",
+      "yourActionPlan": "🚀 Tu Plan de Acción",
+      "strategicMoves": "💡 Movimientos Estratégicos",
+      "applicationHacks": "✨ Trucos para Aplicaciones",
+      "keyStrengths": "🌟 Fortalezas Clave",
+      "improvementAreas": "🎯 Oportunidades de Mejora",
+      "recommendations": "💼 Recomendaciones Estratégicas",
+      "applicationTips": "🚀 Trucos para Aplicaciones",
+      "missingKeywords": "❌ Habilidades para Añadir ({count} brechas encontradas)",
+      "presentKeywords": "✅ Tus Palabras Clave Ganadoras ({count} coincidencias)",
+      "applyNow": "¡Adelante!",
+      "improveFirst": "Prepárate primero",
+      "analysisComparison": "📊 Comparación de Análisis de IA"
+    },
+
+    "fileUpload": {
+      "notImplemented": "Nota: El análisis avanzado de archivos aún no está implementado. Por favor copia y pega el texto de tu currículum manualmente para el análisis más preciso."
+    },
+
+    "errors": {
+      "jobDescriptionRequired": "📝 Necesitamos la descripción del trabajo para analizar tu coincidencia. Pégala de la publicación de empleo.",
+      "resumeRequired": "📄 Proporciona el contenido de tu currículum para que podamos analizar tus calificaciones.",
+      "needLogin": "🔐 Crea una cuenta gratuita para desbloquear el análisis de coincidencia laboral con IA.",
+      "invalidFileType": "📎 Sube un archivo PDF, Word o de texto.",
+      "fileTooLarge": "📦 Archivo muy grande. Usa archivos menores a 5MB.",
+      "fileProcessingFailed": "⚠️ No se pudo procesar tu archivo. Intenta copiar y pegar el texto.",
+      "analysisFailed": "🔄 Falló el análisis (Estado: {status}). Intenta nuevamente o contacta soporte.",
+      "analysisFailedGeneric": "❌ Algo salió mal. Verifica tus entradas e inténtalo nuevamente."
+    }
+  },
+  "ai": {
+    "limit_reached": "Has usado {{used}} de {{limit}} solicitudes diarias de IA. Intenta nuevamente en {{hours}} horas.",
+    "limit_reached_simple": "Límite diario de IA alcanzado. Intenta mañana.",
+    "limit_info": "Solicitudes de IA restantes: {{remaining}} de {{limit}}"
+  },
+  "newresume": {
+    "personal_info": {
+      "ai_error": "Error al obtener sugerencias de IA. Intenta nuevamente.",
+      "summary_error": "Por favor añade texto a tu resumen primero",
+      "improve_ai": "Mejorar con IA",
+      "generating": "Generando sugerencias...",
+      "ai_suggestion": "Sugerencia de IA:",
+      "apply_suggestion": "Aplicar Sugerencia",
+      "discard": "Descartar"
+    }
+  }
+}

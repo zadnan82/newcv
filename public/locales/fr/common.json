@@ -1,0 +1,1510 @@
+{
+  "app": {
+    "title": "CVATI",
+    "theme": {
+      "dark": "Mode Sombre",
+      "light": "Mode Clair"
+    }
+  },
+  "cards": {
+    "cover_letter": {
+      "title": "IA de Lettre de Motivation",
+      "subtitle": "Générez des lettres de motivation personnalisées instantanément",
+      "features": {
+        "quick_gen": "Génération Rapide",
+        "quick_gen_desc": "Créez en quelques secondes",
+        "ats_ready": "Compatible ATS",
+        "ats_ready_desc": "Passe les vérifications IA"
+      },
+      "actions": {
+        "create": "Créer une Lettre de Motivation",
+        "view_templates": "Voir les Modèles"
+      }
+    },
+    "resume": {
+      "title": "Créateur de CV Intelligent",
+      "subtitle": "Créateur de CV alimenté par l'IA avec des suggestions intelligentes.",
+      "recent_resumes": "CV Récents :",
+      "preview": "Aperçu :",
+      "preview_message": "Cliquez sur 'Créer un CV' pour utiliser ce modèle",
+      "actions": {
+        "build": "Créer un CV",
+        "view_templates": "Voir les Modèles",
+        "hide_templates": "Masquer les Modèles"
+      },
+      "validation": {
+        "personal_info_required": "Veuillez remplir les informations personnelles requises (nom complet, email et numéro de mobile)",
+        "education_required": "Veuillez ajouter au moins une entrée d'éducation avec l'institution, le diplôme et le domaine d'étude",
+        "experience_required": "Veuillez ajouter au moins une expérience professionnelle avec l'entreprise et le poste",
+        "skills_required": "Veuillez ajouter au moins une compétence",
+        "languages_required": "Veuillez ajouter au moins une langue"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Accueil",
+    "resumeBuilder": "Créateur de CV",
+    "coverLetter": "Générateur de Lettre de Motivation",
+    "coverLetters": "Lettres de Motivation",
+    "aiEnhancement": "Amélioration par IA",
+    "register": "S'inscrire",
+    "login": "Se Connecter",
+    "settings": "Paramètres",
+    "myCV": "Mon CV",
+    "signOut": "Se Déconnecter",
+    "toggleMenu": "Basculer le menu",
+    "hideOptions": "Masquer les options",
+    "showOptions": "Afficher les options",
+    "dashboard": "Tableau de Bord",
+    "account": "Compte",
+    "myResumes": "Mes CV"
+  },
+  "home": {
+    "title": "CVATI",
+    "subtitle": "Créez des CV professionnels avec des insights alimentés par l'IA",
+    "features": {
+      "title": "Fonctionnalités Clés",
+      "ats": "Optimisé pour ATS",
+      "ai": "Alimenté par l'IA",
+      "industry": "Spécifique à l'Industrie"
+    },
+    "cta": {
+      "title": "Commencez Aujourd'hui",
+      "subtitle": "Rejoignez des milliers de professionnels qui ont boosté leurs opportunités de carrière.",
+      "button": "Créez Votre CV Maintenant",
+      "button_aria": "Créez votre CV maintenant"
+    }
+  },
+  "resume": {
+    "title":{
+      "section": "Titre du CV",
+      "title": "Créateur de CV",
+      "description": "Donnez un nom à votre CV pour vous aider à l'identifier ultérieurement",
+      "placeholder": "ex. CV de Développeur Logiciel"
+    },
+    "customizer": {
+      "title": "Personnalisateur de CV",
+      "loading": "Chargement des données du CV...",
+      "closeOptions": "Fermer les Options",
+      "goBack": "Retour",
+      "noResume": "Pas de CV ",
+      "pleaseCreate": "Veuillez Créer votre CV ici",
+      "goToBuilder": "Aller à la page Créateur de CV",
+      "saveCustomizations": {
+        "title": "Enregistrer les Personnalisations", 
+        "description": "Enregistrez ces paramètres de personnalisation pour vous assurer que toute personne consultant votre CV public le voit avec le style que vous avez choisi.",
+        "message": "Souhaitez-vous enregistrer vos personnalisations avant de continuer ?",
+        "success": "Personnalisations enregistrées avec succès !",
+        "error": "Une erreur s'est produite lors de l'enregistrement de vos personnalisations.",
+        "continueAnyway": "Souhaitez-vous continuer quand même ?",
+        "save": "Enregistrer et Continuer",
+        "continue": "Continuer Sans Enregistrer",
+        "cancel": "Annuler"
+      },
+      "templates": {
+        "title": "Modèle de CV",
+        "selectTemplate": "Sélectionner un Modèle",
+        "templates": "Sélectionner un Modèle",
+        "styling": "Style",
+        "sharing": "Partage",
+        "styles": "Styles", 
+        "selected": "Modèle Sélectionné",
+        "noTemplatesFound": "Aucun Modèle Trouvé"
+      },
+      "color": {
+        "title": "Couleur d'Accent"
+      },
+      "font": {
+        "title": "Famille de Police",
+        "samples": {
+          "professional": "Professionnel et net",
+          "modern": "Moderne et lisible",
+          "traditional": "Traditionnel et élégant",
+          "refined": "Raffiné avec une meilleure lisibilité",
+          "monospaced": "Monospace et distinctif",
+          "legible": "Moderne avec haute lisibilité",
+          "clean": "Net et professionnel",
+          "contemporary": "Contemporain et distinctif",
+          "custom": "Police Personnalisée"
+        }
+      },
+      "spacing": {
+        "title": "Espacement des Lignes",
+        "compact": "Compact",
+        "spacious": "Spacieux"
+      },
+      "headers": {
+        "title": "Style des En-têtes",
+        "normal": "Casse Normale",
+        "uppercase": "MAJUSCULES",
+        "description": "Choisissez comment les en-têtes de section apparaissent dans votre CV"
+      },
+      "skills": {
+        "title": "Affichage du Niveau de Compétence",
+        "show": "Afficher les niveaux de compétence",
+        "hide": "Masquer les niveaux de compétence",
+        "description": "Activer ou désactiver l'affichage des indicateurs de niveau de compétence dans votre CV"
+      },
+      "viewMode": {
+        "title": "Mode d'Affichage",
+        "pdf": "Vue PDF",
+        "html": "Vue HTML",
+        "canvas": "Vue Canvas",
+        "switch": "Passer à"
+      },
+      "export": {
+        "pdf": "Exporter en PDF",
+        "docx": "Exporter en DOCX",
+        "word": "Exporter en Word",
+        "exporting": "Exportation..."
+      },
+      "zoom": {
+        "zoomIn": "Zoom avant",
+        "zoomOut": "Zoom arrière"
+      }
+    },
+    "templateSelector": {
+      "categories": {
+        "all": "Tous",
+        "professional": "Professionnel",
+        "creative": "Créatif",
+        "modern": "Moderne",
+        "classic": "Classique",
+        "minimalist": "Minimaliste",
+        "elegant": "Élégant"
+      }
+    },
+    "templateRenderer": {
+      "error": "Modèle non trouvé. Veuillez sélectionner un autre modèle."
+    },
+    "experience": {
+      "title": "Expérience",
+      "company": "Nom de l'Entreprise",
+      "company_placeholder": "Nom de l'Entreprise",
+      "position": "Poste",
+      "position_placeholder": "Titre du Poste",
+      "current_work": "Je travaille actuellement ici",
+      "description_placeholder": "Décrivez vos responsabilités et réalisations...",
+      "add_button": "Ajouter une Autre Expérience"
+    },
+    "education": {
+      "title": "Éducation",
+      "institution": "Nom de l'Institution",
+      "institution_placeholder": "Nom de l'Université/École",
+      "degree": "Diplôme",
+      "degree_placeholder": "ex., Licence, Master",
+      "field": "Domaine d'Étude",
+      "field_placeholder": "ex., Informatique",
+      "currently_studying": "J'étudie actuellement ici",
+      "gpa": "Moyenne",
+      "gpa_placeholder": "ex., 3.8/4.0",
+      "add_button": "Ajouter une Autre Éducation"
+    },
+    "skills": {
+      "title": "Compétences",
+      "name": "Nom de la Compétence",
+      "name_placeholder": "Saisissez une compétence",
+      "level": "Niveau",
+      "add_button": "Ajouter une Autre Compétence",
+      "beginner": "Débutant", 
+      "intermediate": "Intermédiaire", 
+      "advanced": "Avancé", 
+      "expert": "Expert"
+    },
+    "courses": {
+      "title": "Cours",
+      "name": "Nom du Cours",
+      "name_placeholder": "ex., Développement Web Avancé",
+      "institution": "Institution",
+      "institution_placeholder": "Nom de l'Institution ou de la Plateforme",
+      "description_placeholder": "Brève description du cours et de vos réalisations...",
+      "add_button": "Ajouter un Autre Cours"
+    },
+    "custom_sections": {
+      "title": "Sections Personnalisées",
+      "section_title": "Titre de la Section",
+      "title_placeholder": "ex., Projets, Réalisations, Publications",
+      "content": "Contenu",
+      "content_placeholder": "Contenu de la section...",
+      "add_button": "Ajouter une Autre Section"
+    },
+    "extracurricular": {
+      "activity": "Activités",
+      "name": "Nom de l'Activité",
+      "name_placeholder": "ex., Gouvernement Étudiant, Équipe Sportive",
+      "description_placeholder": "Décrivez votre rôle et vos réalisations...",
+      "add_button": "Ajouter une Autre Activité"
+    },
+    "hobbies": {
+      "title": "Loisirs",
+      "hobby": "Loisir/Intérêt",
+      "placeholder": "ex., Photographie, Lecture, Randonnée",
+      "add_button": "Ajouter un Autre Loisir"
+    },
+    "internships": {
+      "title": "Stages",
+      "position": "Poste",
+      "position_placeholder": "Poste de Stage",
+      "current_work": "Je travaille actuellement ici",
+      "description_placeholder": "Décrivez vos responsabilités et réalisations...",
+      "add_button": "Ajouter un Autre Stage"
+    },
+    "languages": {
+      "title": "Langues",
+      "language": "Langue",
+      "language_placeholder": "ex., Anglais, Français",
+      "proficiency": "Niveau de Compétence",
+      "add_button": "Ajouter une Autre Langue",
+      "levels": {
+        "native": "Natif",
+        "fluent": "Courant",
+        "advanced": "Avancé",
+        "intermediate": "Intermédiaire",
+        "beginner": "Débutant"
+      }
+    },
+    "personal_info": {
+      "title": "Informations Personnelles",
+      "full_name": "Nom Complet",
+      "full_name_placeholder": "Jean Dupont",
+      "email": "Email",
+      "email_placeholder": "jean@exemple.com",
+      "mobile": "Mobile",
+      "mobile_placeholder": "+33 6 12 34 56 78",
+      "title_field": "Titre Professionnel",
+      "title_placeholder": "Ingénieur Logiciel",
+      "city": "Ville",
+      "city_placeholder": "Paris",
+      "address": "Adresse",
+      "address_placeholder": "123 Rue Principale",
+      "postal_code": "Code Postal",
+      "postal_code_placeholder": "75001",
+      "nationality": "Nationalité",
+      "nationality_placeholder": "ex., Français",
+      "driving_license": "Permis de Conduire",
+      "driving_license_placeholder": "ex., Permis B",
+      "place_of_birth": "Lieu de Naissance",
+      "place_of_birth_placeholder": "Ville, Pays",
+      "date_of_birth": "Date de Naissance",
+      "linkedin": "LinkedIn",
+      "linkedin_placeholder": "linkedin.com/in/jeandupont",
+      "website": "Site Web",
+      "website_placeholder": "votresiteweb.com",
+      "summary": "Résumé Professionnel",
+      "summary_placeholder": "Bref aperçu de votre parcours professionnel...",
+      "summary_error": "Veuillez d'abord ajouter du texte à votre résumé",
+      "ai_error": "Échec de l'obtention des suggestions IA. Veuillez réessayer.",
+      "improve_ai": "Améliorer avec l'IA",
+      "generating": "Génération de suggestions...",
+      "ai_suggestion": "Amélioration Suggérée par l'IA :",
+      "discard": "Rejeter",
+      "apply_suggestion": "Appliquer la Suggestion"
+    },
+    "photo": {
+      "title": "Photo de Profil",
+      "alt": "Profil",
+      "remove_photo": "Supprimer la photo",
+      "uploading": "Téléchargement...",
+      "change": "Changer la Photo",
+      "upload": "Télécharger une Photo",
+      "invalid_type": "Veuillez télécharger un fichier image valide (JPG, PNG ou GIF)",
+      "size_limit": "La taille de la photo doit être inférieure à 2 Mo",
+      "process_error": "Erreur lors du traitement de la photo. Veuillez réessayer.",
+      "max_size": "Taille maximale : 2 Mo"
+    },
+    "references": {
+      "title": "Références",
+      "provide_upon_request": "Fournies sur demande",
+      "name": "Nom",
+      "name_placeholder": "Nom de la Référence",
+      "relation": "Relation/Position",
+      "relation_placeholder": "ex., Ancien Manager, Professeur",
+      "phone": "Téléphone",
+      "phone_placeholder": "Numéro de Contact",
+      "email": "Email",
+      "email_placeholder": "Adresse Email",
+      "add_button": "Ajouter une Autre Référence"
+    },
+    "preview": {
+      "title": "Aperçu du CV",
+      "example": "CV Exemple",
+      "your_resume": "Votre CV"
+    },
+    "shared_view": "CV Partagé",
+    "not_found": {
+      "title": "CV Non Trouvé",
+      "message": "Le CV que vous recherchez n'existe pas ou n'est pas public."
+    }, 
+    "publicStatus": {
+      "title": "Confidentialité du CV",
+      "status": "Statut",
+      "public": "Public",
+      "private": "Privé",
+      "public_description": "Votre CV est actuellement public. Toute personne ayant le lien peut le consulter.",
+      "private_description": "Votre CV est actuellement privé. Seul vous pouvez le consulter.",
+      "make_public": "Rendre le CV Public",
+      "make_private": "Rendre le CV Privé"
+    },
+    "qrcode": {
+      "title": "Partager le CV",
+      "description": "Scannez ce code QR pour voir le CV sur n'importe quel appareil",
+      "public_link": "Lien public",
+      "open_link": "Ouvrir le CV",
+      "copy_link": "Copier le lien",
+      "download": "Télécharger le QR",
+      "copied": "Lien copié dans le presse-papiers !"
+    },
+    "actions": {
+          "save_resume": "Enregistrer le CV",
+          "save_changes": "Enregistrer les Modifications",
+          "customize": "Personnaliser le CV",
+          "saving": "Enregistrement...",
+          "create_success": "CV créé avec succès !",
+          "update_success": "CV mis à jour avec succès !",
+          "already_exists": "Vous avez déjà un CV. Mise à jour du CV existant..."
+        }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Politique de Confidentialité",
+      "intro": "Bienvenue chez CVATI. Nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles."
+    },
+    "terms": {
+      "title": "Conditions Générales",
+      "intro": "Bienvenue chez CVATI. Ces Conditions Générales régissent votre utilisation de notre site web et de nos services."
+    },
+    "cookies": {
+      "title": "Politique des Cookies",
+      "whatAre": "Que Sont les Cookies",
+      "howUse": "Comment Nous Utilisons les Cookies",
+      "specific": "Cookies Spécifiques Que Nous Utilisons",
+      "managing": "Gestion des Cookies",
+      "consent": "Consentement aux Cookies",
+      "changes": "Modifications de cette Politique des Cookies"
+    },
+    "dataDeletion": {
+      "title": "Demande de Suppression de Données",
+      "intro": "En vertu de diverses réglementations sur la protection de la vie privée, vous avez le droit de demander la suppression de vos données personnelles.",
+      "form": {
+        "email": "Adresse Email",
+        "emailHelp": "Nous utiliserons cet email pour identifier votre compte et communiquer au sujet de votre demande.",
+        "additionalInfo": "Informations Supplémentaires (Optionnel)",
+        "submit": "Soumettre la Demande de Suppression"
+      },
+      "success": "Votre demande de suppression de données a été soumise. Nous traiterons votre demande et vous contacterons à {email} dans les 30 jours.",
+      "whatDeleted": {
+        "title": "Quelles Données Seront Supprimées",
+        "intro": "Lors du traitement de votre demande, nous supprimerons les données suivantes associées à votre compte :"
+      }
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "CVATI",
+      "description": "Créez des CV professionnels avec des insights alimentés par l'IA pour booster vos opportunités de carrière."
+    },
+    "quickLinks": {
+      "title": "Liens Rapides",
+      "home": "Accueil",
+      "resumeBuilder": "Créateur de CV",
+      "coverLetter": "Générateur de Lettre de Motivation",
+      "aiEnhancement": "Amélioration par IA"
+    },
+    "legal": {
+      "title": "Mentions Légales",
+      "terms": "Conditions Générales",
+      "privacy": "Politique de Confidentialité",
+      "cookies": "Politique des Cookies",
+      "dataDeletion": "Suppression de Données"
+    },
+    "contact": {
+      "title": "Contactez-nous",
+      "contactForm": "Formulaire de Contact"
+    },
+    "copyright": "CVATI",
+    "rights": "Tous droits réservés"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "Email",
+      "password": "Mot de Passe",
+      "forgotPassword": "Mot de Passe Oublié ?",
+      "submit": "Se Connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "register": "Inscrivez-vous ici",
+      "socialLogin": "Ou connectez-vous avec",
+      "welcome_back": "Bienvenue",
+      "sign_in_to_continue": "Connectez-vous pour continuer à créer votre CV",
+      "loading": "Chargement..."
+    },
+    "register": {
+      "title": "Inscription",
+      "create_account": "Créer un Compte",
+      "sign_up_to_start": "Inscrivez-vous pour commencer à créer votre CV",
+      "name": "Nom Complet",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "email": "Email",
+      "password": "Mot de Passe",
+      "confirmPassword": "Confirmer le Mot de Passe",
+      "submit": "S'inscrire",
+      "sign_up": "S'inscrire",
+      "creating_account": "Création du Compte...",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "login": "Connectez-vous ici",
+      "socialRegister": "Ou inscrivez-vous avec"
+    },
+    "social": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "error": "Erreur d'Authentification Sociale",
+      "success": "Authentification Réussie",
+      "or_continue_with": "Ou continuez avec"
+    },
+    "callback": {
+      "processing": "Traitement de la Connexion",
+      "please_wait": "Veuillez patienter...",
+      "auth_error": "Erreur d'Authentification",
+      "return_to_login": "Retour à la Connexion",
+      "no_token": "Aucun jeton d'authentification reçu",
+      "auth_failed": "L'authentification a échoué. Veuillez réessayer."
+    },
+    "error": {
+      "title": "Erreur de Connexion",
+      "return_to_login": "Retour à la Connexion"
+    }
+  },
+  "language": {
+    "title": "Sélectionner la Langue",
+    "en": "Anglais",
+    "es": "Espagnol",
+    "fr": "Français"
+  },
+  "common": {
+    "remove": "Supprimer",
+    "required_fields": "* Champs obligatoires",
+    "start_date": "Date de Début",
+    "end_date": "Date de Fin",
+    "location": "Lieu",
+    "location_placeholder": "Ville, Pays",
+    "description": "Description",
+    "max_chars": "Maximum {{count}} caractères",
+    "loading": "Chargement...",
+    "tonow" : "En cours", 
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "apply": "Appliquer",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sortBy": "Trier par",
+    "actions": "Actions",
+    "success": "Succès !",
+    "error": "Erreur !",
+    "warning": "Avertissement !",
+    "info": "Information",
+    "company": "Entreprise",
+    "company_placeholder": "Nom de l'Entreprise",
+    "continue": "Continuer",
+    "back_to_editor": "Retour à l'Éditeur",
+    "choose_template": "Choisir un Modèle",
+    "choose_your_templates": "Choisissez Vos Modèles",
+    "print": "Imprimer",
+    "preparing": "Préparation...",
+    "example_resume": "CV Exemple",
+    "page": "Page",
+    "of": "sur",
+    "dismiss": "Ignorer",
+    "enhancing": "Amélioration...",
+    "enhance": "Améliorer",
+    "enhance_with_ai": "Améliorer avec l'IA",
+    "generate_tips": "Générer des Conseils",
+    "ai_suggestions": "Suggestions IA",
+    "apply_suggestion": "Appliquer la Suggestion",
+    "reject": "Rejeter",
+    "ai_tips": "Conseils IA",
+    "at": "à",
+    "in": "dans",
+    "copy": "Copier",
+    "download": "Télécharger",
+    "untitled": "Sans titre",
+    "notSpecified": "Non spécifié",
+    "view": "Voir",
+    "favorite": "Ajouter aux favoris",
+    "unfavorite": "Retirer des favoris",
+    "local_draft": "Enregistré localement",
+"lastRefresh": "Dernière actualisation ",
+"refresh": "Actualiser",
+"cardView": "Passer à la vue carte",
+"loadingCover": "Chargement des lettres de motivation...",
+"ai": "IA",
+"ai_enhancement": "Amélioration par IA",
+"no_summary": "Aucun résumé ajouté pour l'instant",
+"save_changes": "Enregistrer les modifications et revenir à l'éditeur",
+"select_file": "Sélectionner un fichier de CV"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez les paramètres et préférences de votre compte",
+    "profile_info": "Informations de Profil",
+    "loading_user": "Chargement des informations utilisateur...",
+    "data_privacy": "Confidentialité et Contrôles des Données",
+    "data_portability": "Portabilité des Données",
+    "data_portability_desc": "Téléchargez toutes les données et informations de votre compte dans un format portable.",
+    "download_data": "Télécharger Mes Données",
+    "downloading": "Téléchargement...",
+    "download": "Télécharger",
+    "copy": "Copier",
+    "data_downloaded": "Vos données ont été téléchargées avec succès.",
+    "download_failed": "Échec du téléchargement de vos données. Veuillez réessayer.",
+    "danger_zone": "Zone Dangereuse",
+    "delete_account": "Supprimer le Compte",
+    "permanent_warning": "Cette action est permanente et ne peut pas être annulée.",
+    "delete_warning_1": "Toutes vos informations personnelles seront définitivement supprimées.",
+    "delete_warning_2": "Vous perdrez l'accès à tous vos CV et lettres de motivation enregistrés.",
+    "delete_warning_3": "Votre compte ne peut pas être récupéré une fois supprimé.",
+    "download_before_delete": "Nous vous recommandons de télécharger vos données avant de supprimer votre compte.",
+    "deletion_reason": "Pourquoi supprimez-vous votre compte ? (Optionnel)",
+    "select_reason": "Sélectionnez une raison",
+    "reason_no_longer_needed": "Je n'ai plus besoin de ce service",
+    "reason_dissatisfied": "Je suis insatisfait du service",
+    "reason_privacy": "Préoccupations de confidentialité",
+    "reason_other": "Autre raison",
+    "type_delete": "Tapez SUPPRIMER pour confirmer",
+    "confirm_delete": "Confirmer la Suppression",
+    "deleting": "Suppression...",
+    "account_deleted": "Compte supprimé. Redirection...",
+    "delete_failed": "Échec de la suppression du compte. Réessayez.",
+    "enter_pass": "Entrez votre mot de passe pour confirmer",
+    "your_pass": "Votre Mot de Passe",
+    "security": "Sécurité",
+    "change_password": "Changer de Mot de Passe",
+    "current_password": "Mot de passe actuel",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le nouveau mot de passe",
+    "password_hint": "Doit contenir au moins 8 caractères avec des majuscules, des minuscules et des chiffres",
+    "password_requirements": "Le mot de passe doit contenir des majuscules, des minuscules et des caractères numériques",
+    "password_changed": "Mot de passe modifié avec succès",
+    "change_password_failed": "Échec de la modification du mot de passe",
+    "current_password_required": "Le mot de passe actuel est requis",
+    "passwords_not_match": "Les mots de passe ne correspondent pas",
+    "password_too_short": "Le mot de passe doit comporter au moins 8 caractères",
+    "not_authenticated": "Vous devez être connecté",
+  "password_required": "Veuillez saisir votre mot de passe pour confirmer la suppression",
+  "logout_all_devices": "Se déconnecter de tous les appareils",
+  "updating": "Mise à jour en cours...",
+  "update_password": "Mettre à jour le mot de passe",
+  "confirm_delete_prompt": "Tapez DELETE pour confirmer la suppression du compte :"
+  },
+  "ai_enhancement": {
+    "title": "CV Amélioré par l'IA",
+    "enhance_all": "Améliorer Toutes les Sections avec l'IA",
+    "enhancing": "Amélioration en cours...",
+    "loading": "Chargement...",
+    "error_message": "Erreur lors de l'amélioration de la section",
+    "create_resume_first": "Veuillez d'abord créer un CV",
+    "current_content": "Contenu Actuel",
+    "no_experiences": "Aucune expérience listée",
+    "work_experiences": "expériences professionnelles",
+    "no_recommendations": "Aucune recommandation générée pour l'instant",
+    "generate_tips": "Générer des Conseils",
+    "enhance": "Améliorer",
+    "no_suggestions": "Pas encore de suggestions IA. Cliquez sur \"Améliorer\" pour générer des améliorations.",
+    "ai_suggestions": "Suggestions de l'IA",
+    "apply": "Appliquer",
+    "reject": "Rejeter",
+    "resume_preview": "Aperçu du CV Actuel",
+    "preview_note": "Note : Ceci est un aperçu simplifié. Les modifications sont enregistrées temporairement et seront appliquées lorsque vous sauvegarderez votre CV.",
+    "resume_editor": "Éditeur de CV",
+    "resume_preview_title": "Aperçu du CV",
+    "tips_on_formatting": "Conseils sur la Mise en Forme et l'Organisation",
+    "gaps_inconsistencies": "Identification des Lacunes ou Incohérences",
+    "strengthening_narrative": "Suggestions pour Renforcer la Narration Globale",
+    "implementation_note": "En mettant en œuvre ces suggestions, votre CV présentera une narration plus claire et plus percutante qui met efficacement en valeur vos qualifications et votre préparation pour des rôles avancés.",
+    "cv_recommendations": "Recommandations pour le CV",
+    "ai_tips": "Conseils IA",
+    "suggestions_count": "Suggestion",
+    "suggestions_plural": "Suggestions"
+  },
+  "preview": {
+    "canvas": "Canevas",
+    "pdf": "PDF",
+    "html": "HTML",
+    "view_mode": "Mode d'Affichage",
+    "export_as_pdf": "Exporter en PDF",
+    "export_as_docx": "Exporter en Word",
+    "print_resume": "Imprimer",
+    "pdf_success": "PDF exporté avec succès !",
+    "pdf_error": "Échec de l'exportation du PDF",
+    "word_success": "Document Word exporté avec succès !",
+    "word_error": "Échec de l'exportation du document Word. Veuillez réessayer.",
+    "print_error": "Échec de l'impression. Veuillez réessayer."
+  },
+  "editor": {
+    "resume_sections": "Sections du CV",
+    "preview_resume": "Aperçu du CV",
+    "edit_resume": "Modifier le CV"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "intro": "Nous aimerions avoir de vos nouvelles ! Veuillez remplir le formulaire ci-dessous, et notre équipe vous répondra dès que possible.",
+    "form": {
+      "name": "Nom",
+      "name_placeholder": "Votre nom",
+      "email": "Email",
+      "email_placeholder": "Votre adresse email",
+      "subject": "Sujet",
+      "subject_placeholder": "Sujet de votre message",
+      "message": "Message",
+      "message_placeholder": "Votre message",
+      "submit": "Envoyer le Message",
+      "sending": "Envoi en cours...",
+      "success": "Merci pour votre message ! Nous vous répondrons dès que possible.",
+      "error": "Échec de l'envoi de votre message. Veuillez réessayer plus tard."
+    },
+    "info": {
+      "title": "Informations de Contact",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "hours": "Heures d'Ouverture"
+    }
+  }, 
+  "CoverLetter": {
+    "title": "Générateur de Lettre de Motivation",
+    "viewAll": "Voir Toutes les Lettres de Motivation",
+    "view_saved": "Voir la Lettre Enregistrée",
+    "form": {
+      "title": "Titre de la Lettre de Motivation",
+      "title_prefix": "Lettre de Motivation pour",
+      "title_placeholder": "Donnez un titre à votre lettre de motivation pour une référence facile",
+      "full_name": "Nom Complet",
+      "email": "Email",
+      "phone": "Téléphone",
+      "company_name": "Nom de l'Entreprise",
+      "job_title": "Titre du Poste",
+      "hiring_manager": "Responsable du Recrutement",
+      "hiring_manager_title": "Titre du Responsable du Recrutement",
+      "hiringManagerTitle_placeholder": "ex. Directeur RH",
+      "job_description": "Description du Poste",
+      "upload_cv": "Télécharger CV",
+      "supported_formats": "Formats supportés : .txt, .doc, .docx, .pdf",
+      "file": "Fichier",
+      "enter": "Entrer",
+      "submit": "Générer une Lettre de Motivation",
+      "using_stored_resume": "Nous utiliserons votre CV enregistré pour générer votre lettre de motivation.",
+      "generating": "Génération en cours...",
+      "generate_button": "Générer une Lettre de Motivation",
+      "fullName_placeholder": "Entrez votre nom complet",
+      "email_placeholder": "Entrez votre email",
+      "phone_placeholder": "Entrez votre numéro de téléphone",
+      "companyName_placeholder": "Entrez le nom de l'entreprise",
+      "jobTitle_placeholder": "Entrez le titre du poste",
+      "hiringManager_placeholder": "Entrez le nom du responsable du recrutement",
+      "jobDescription_placeholder": "Collez ici la description du poste...",
+      "save_to_account": "Enregistrer cette lettre de motivation dans mon compte",
+      "resume_source": "Sélectionner la Source du CV",
+      "select_stored_resume": "Sélectionnez parmi vos CV enregistrés",
+      "select_resume": "-- Sélectionnez un CV --",
+      "resume_required": "Veuillez sélectionner un CV ou télécharger un fichier",
+      "personal_info": "Vos Informations",
+      "job_details": "Détails du Poste",
+      "job_description_tip": "Plus la description du poste est complète, mieux votre lettre de motivation sera adaptée"
+    },
+    "preview": {
+      "title": "Aperçu",
+      "empty_state": "Votre lettre de motivation apparaîtra ici une fois générée",
+      "generating": "L'IA génère votre lettre de motivation...",
+      "generating_note": "Cela peut prendre jusqu'à une minute selon la complexité de la description du poste.",
+      "company": "Entreprise",
+      "position": "Poste",
+      "updated": "Dernière Mise à Jour",
+      "no_results": "Aucune lettre de motivation ne correspond à vos critères de recherche"
+    },
+    "success": {
+      "file_uploaded": "Fichier téléchargé avec succès !",
+      "letter_generated": "Lettre de motivation générée avec succès !",
+      "copied": "Lettre de motivation copiée dans le presse-papiers !",
+      "downloaded": "Lettre de motivation téléchargée avec succès !"
+    },
+    "errors": {
+      "no_cv": "Veuillez télécharger votre CV",
+      "word_processing": "Échec du traitement du document Word. Veuillez vous assurer qu'il s'agit d'un fichier .doc ou .docx valide.",
+      "pdf_processing": "Échec du traitement du fichier PDF. Veuillez vous assurer qu'il s'agit d'un PDF valide.",
+      "unsupported_format": "Format de fichier non pris en charge. Veuillez utiliser .txt, .doc, .docx ou .pdf",
+      "no_content": "Aucun contenu lisible trouvé dans le fichier",
+      "file_processing": "Échec du traitement du fichier. Veuillez réessayer.",
+      "rate_limit": "Veuillez attendre {{seconds}} secondes avant de réessayer.",
+      "model_loading": "Le modèle est en cours de chargement... Tentative {{attempt}}/{{maxRetries}}",
+      "api_rate_limit": "Limite de taux dépassée. En attente... Tentative {{attempt}}/{{maxRetries}}",
+      "authentication": "Erreur d'authentification. Veuillez vérifier votre jeton API.",
+      "server_error": "Erreur de serveur. Essai avec une entrée plus courte...",
+      "invalid_response": "Format de réponse invalide reçu. Nouvelle tentative...",
+      "empty_response": "Le modèle a renvoyé une réponse vide. Nouvelle tentative...",
+      "unexpected": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
+      "generation": "Échec de la génération de la lettre de motivation",
+      "no_content": "Aucune donnée de lettre de motivation reçue",
+      "requiredFields": "Veuillez remplir tous les champs obligatoires",
+      "selectResume": "Veuillez télécharger un CV ou sélectionner un CV depuis votre compte"
+    },
+    "alerts": {
+      "selectResume": "Veuillez télécharger un CV ou sélectionner un CV depuis votre compte",
+      "requiredFields": "Veuillez remplir tous les champs obligatoires"
+    },
+    "prompt": {
+      "task": "Tâche : Générer une lettre de motivation professionnelle en utilisant les informations ci-dessous.",
+      "context": "Contexte : Ceci est pour une candidature à un emploi. Créez une lettre de motivation formelle et bien structurée qui met en valeur l'expérience pertinente du candidat et démontre son enthousiasme pour le rôle.",
+      "format_requirements": "Exigences de Format",
+      "format_item1": "Commencer par un bloc de date et d'adresse approprié",
+      "format_item2": "Utiliser une formule de salutation professionnelle",
+      "format_item3": "Inclure 3-4 paragraphes concis",
+      "format_item4": "Terminer par une formule de politesse professionnelle",
+      "format_item5": "Inclure les coordonnées complètes dans la signature",
+      "candidate_info": "Informations sur le Candidat",
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "position_details": "Détails du Poste",
+      "company": "Entreprise",
+      "role": "Rôle",
+      "hiring_manager": "Responsable du Recrutement",
+      "default_hiring_manager": "Responsable du Recrutement",
+      "cv_highlights": "Points Forts du CV",
+      "job_description_highlights": "Points Forts de la Description du Poste",
+      "important_notes": "Notes Importantes",
+      "note_item1": "Se concentrer sur la correspondance entre l'expérience du candidat et les exigences du poste",
+      "note_item2": "Maintenir un ton professionnel mais enthousiaste",
+      "note_item3": "Être précis sur les contributions et réalisations",
+      "note_item4": "Exprimer un intérêt sincère pour le rôle et l'entreprise",
+      "note_item5": "Garder la lettre concise et percutante",
+      "final_instruction": "Veuillez générer une lettre de motivation complète en utilisant ces informations.",
+      "instruction_text": "Utilisez des puces pour structurer le contenu"
+    },
+    "signature": {
+      "closing": "Cordialement",
+      "email": "Email",
+      "phone": "Téléphone"
+    },
+    "download_prefix": "Lettre_Motivation",
+    "login_notice": "pour enregistrer vos lettres de motivation et utiliser vos CV stockés"
+  },
+  "coverLetterDetail": {
+    "back": "Retour aux lettres de motivation",
+    "errors": {
+      "load": "Échec du chargement de la lettre de motivation",
+      "format": "Échec du formatage de la lettre de motivation",
+      "favorite": "Échec de la mise à jour du statut de favori",
+      "delete": "Échec de la suppression de la lettre de motivation",
+      "copy": "Échec de la copie dans le presse-papiers",
+      "notFound": {
+        "title": "Lettre de Motivation Non Trouvée",
+        "message": "La lettre de motivation que vous recherchez n'existe pas ou vous n'avez pas la permission de la consulter."
+      }
+    },
+    "success": {
+      "copied": "Lettre de motivation copiée dans le presse-papiers",
+      "downloaded": "Lettre de motivation téléchargée",
+      "deleted": "Lettre de motivation supprimée avec succès",
+      "addedFavorite": "Ajoutée aux favoris",
+      "removedFavorite": "Retirée des favoris"
+    },
+    "delete_confirm": {
+      "title": "Confirmer la Suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer cette lettre de motivation ? Cette action ne peut pas être annulée."
+    },
+    "last_updated": "Dernière mise à jour",
+    "content": "Lettre de Motivation",
+    "no_content": "Aucun contenu disponible",
+    "details": "Détails",
+    "company": "Entreprise",
+    "position": "Poste",
+    "recipient": "Destinataire",
+    "created": "Créée",
+    "not_specified": "Non spécifié",
+    "actions": {
+      "favorite": "Ajouter aux Favoris",
+      "unfavorite": "Retirer des Favoris",
+      "delete": "Supprimer la Lettre de Motivation"
+    }
+  },
+  "coverLetterView": {
+    "untitled": "Lettre de Motivation Sans Titre",
+    "created": "Créée",
+    "updated": "Mise à jour",
+    "fields": {
+      "company": "Entreprise",
+      "position": "Poste",
+      "recipient": "Destinataire"
+    },
+    "content": {
+      "title": "Contenu de la Lettre de Motivation"
+    },
+    "jobDescription": {
+      "title": "Description du Poste"
+    },
+    "linkedResume": {
+      "title": "CV Lié",
+      "loading": "Chargement des informations du CV...",
+      "view": "Voir le CV"
+    },
+    "actions": {
+      "backToDashboard": "Retour au Tableau de Bord"
+    },
+    "errors": {
+      "load": "Échec du chargement de la lettre de motivation",
+      "format": "Échec du formatage de la lettre de motivation",
+      "favorite": "Échec de la mise à jour du statut de favori",
+      "delete": "Échec de la suppression de la lettre de motivation",
+      "notFound": {
+        "title": "Lettre de Motivation Non Trouvée",
+        "message": "La lettre de motivation que vous recherchez n'existe pas ou vous n'avez pas la permission de la consulter."
+      }
+    },
+    "success": {
+      "copied": "Lettre de motivation copiée dans le presse-papiers !",
+      "downloaded": "Lettre de motivation téléchargée avec succès",
+      "deleted": "Lettre de motivation supprimée avec succès",
+      "addedFavorite": "Ajoutée aux favoris",
+      "removedFavorite": "Retirée des favoris"
+    },
+    "delete_confirm": {
+      "title": "Confirmer la Suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer cette lettre de motivation ? Cette action ne peut pas être annulée."
+    }
+  },
+  "coverLetterEditor": {
+    "title": "Modifier la Lettre de Motivation",
+    "tabs": {
+      "edit": "Modifier",
+      "preview": "Aperçu"
+    },
+    "fields": {
+      "title": "Titre de la Lettre de Motivation",
+      "companyName": "Nom de l'Entreprise",
+      "jobTitle": "Titre du Poste",
+      "recipientName": "Nom du Destinataire",
+      "recipientTitle": "Titre du Destinataire",
+      "jobDescription": "Description du Poste",
+      "coverLetterContent": "Contenu de la Lettre de Motivation",
+      "greeting": "Formule de Salutation",
+      "introduction": "Introduction",
+      "bodyParagraphs": "Paragraphes du Corps",
+      "closing": "Conclusion",
+      "signature": "Signature"
+    },
+    "placeholders": {
+      "title": "Lettre de Motivation pour [Poste] chez [Entreprise]",
+      "companyName": "Nom de l'Entreprise",
+      "jobTitle": "Titre du Poste",
+      "recipientName": "Nom du Responsable du Recrutement",
+      "recipientTitle": "Titre du Responsable du Recrutement",
+      "jobDescription": "Collez ici la description du poste...",
+      "coverLetterContent": "Entrez le contenu de la lettre de motivation au format JSON...",
+      "greeting": "Cher Responsable du Recrutement,",
+      "introduction": "Je vous écris pour exprimer mon intérêt pour...",
+      "bodyParagraph": "Décrivez votre expérience pertinente...",
+      "closing": "Je suis enthousiaste à l'idée de rejoindre votre équipe...",
+      "signature": "Cordialement, [Votre Nom]"
+    },
+    "buttons": {
+      "switchToRaw": "Passer à l'Éditeur Brut",
+      "switchToRich": "Passer à l'Éditeur Riche",
+      "addParagraph": "+ Ajouter un Paragraphe",
+      "removeParagraph": "Supprimer le Paragraphe",
+      "initializeParagraphs": "Initialiser les Paragraphes du Corps"
+    },
+    "notes": {
+      "rawEditor": "Note : Ceci est le contenu JSON brut. Assurez-vous de maintenir un formatage JSON valide."
+    },
+    "errors": {
+      "load": "Échec du chargement de la lettre de motivation",
+      "save": "Échec de l'enregistrement de la lettre de motivation",
+      "preview": "Échec de la génération de l'aperçu",
+      "invalidJson": "Format JSON invalide dans le contenu de la lettre de motivation",
+      "parsingError": "Erreur d'analyse du contenu. Passage à l'éditeur brut."
+    },
+    "success": {
+      "save": "Lettre de motivation enregistrée avec succès",
+      "copied": "Lettre de motivation copiée dans le presse-papiers !",
+      "downloaded": "Lettre de motivation téléchargée avec succès"
+    }
+  },
+  "coverLetters": {
+    "title": "Vos Lettres de Motivation",
+    "description": "Gérez toutes vos lettres de motivation en un seul endroit",
+    "actions": {
+      "new": "Créer une Nouvelle Lettre de Motivation"
+    },
+    "empty": {
+      "title": "Pas Encore de Lettres de Motivation",
+      "message": "Vous n'avez pas encore créé de lettres de motivation. Commencez par créer votre première.",
+      "action": "Créez Votre Première Lettre de Motivation"
+    },
+    "search": {
+      "placeholder": "Rechercher des lettres de motivation..."
+    },
+    "filter": {
+      "favorites": "Afficher Uniquement les Favoris"
+    },
+    "table": {
+      "title": "Titre",
+      "company": "Entreprise",
+      "position": "Poste",
+      "date": "Dernière Mise à Jour",
+      "actions": "Actions"
+    },
+    "no_results": "Aucune lettre de motivation ne correspond à vos critères de recherche",
+    "errors": {
+      "load": "Échec du chargement des lettres de motivation",
+      "delete": "Échec de la suppression de la lettre de motivation",
+      "favorite": "Échec de la mise à jour du statut de favori",
+      "preview": "Échec de l'aperçu de la lettre de motivation"
+    },
+    "success": {
+      "deleted": "Lettre de motivation supprimée avec succès",
+      "favorited": "Ajoutée aux favoris",
+      "unfavorited": "Retirée des favoris",
+      "copied": "Lettre de motivation copiée dans le presse-papiers !",
+      "downloaded": "Lettre de motivation téléchargée avec succès"
+    },
+    "delete_confirm": {
+      "title": "Confirmer la Suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer cette lettre de motivation ? Cette action ne peut pas être annulée."
+    },
+    "preview": {
+      "company": "Entreprise",
+      "position": "Poste",
+      "updated": "Dernière Mise à Jour"
+    }
+  },
+  "resumeDashboard": {
+    "title": "Mes CV",
+    "loading": "Chargement de vos CV...",
+    "noResumes": {
+      "title": "Vous n'avez pas encore de CV",
+      "description": "Créez votre premier CV professionnel et franchissez la prochaine étape de votre parcours professionnel !"
+    },
+    "defaultTitle": "Mon CV",
+    "unnamed": "CV Sans Nom",
+    "lastUpdated": "Dernière mise à jour",
+    "preview": "Aperçu du CV",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce CV ?",
+    "errors": {
+      "noResumeId": "Aucun ID de CV disponible"
+    },
+    "buttons": {
+      "startBuilding": "Commencer à Créer Votre CV",
+      "createNew": "Créer un Nouveau CV",
+      "view": "Voir",
+      "edit": "Modifier",
+      "customize": "Personnaliser",
+      "delete": "Supprimer"
+    }
+  },
+  "privacy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière Mise à Jour",
+    "updateDate": "4 avril 2025",
+    "intro": "CVATI (\"nous\", \"notre\" ou \"nos\") s'engage à protéger votre vie privée. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre service de création de CV.",
+    "collection": {
+      "title": "Informations Que Nous Collectons",
+      "desc": "Nous collectons des informations personnelles que vous nous fournissez volontairement lorsque vous utilisez notre service, notamment :",
+      "personal": "Détails personnels (nom, adresse email, numéro de téléphone)",
+      "professional": "Informations professionnelles (expérience professionnelle, compétences, formation)",
+      "optional": "Informations facultatives (date de naissance, nationalité, adresse, photo)",
+      "account": "Identifiants de compte",
+      "usage": "Données d'utilisation et interactions avec notre service"
+    },
+    "use": {
+      "title": "Comment Nous Utilisons Vos Informations",
+      "desc": "Nous utilisons vos informations aux fins suivantes :",
+      "provide": "Pour fournir et maintenir notre service",
+      "improve": "Pour améliorer notre service et l'expérience utilisateur",
+      "communicate": "Pour communiquer avec vous concernant les mises à jour du service",
+      "ai": "Pour fournir la génération de CV et de lettres de motivation améliorée par l'IA",
+      "security": "Pour assurer la sécurité et prévenir la fraude",
+      "legal": "Pour nous conformer aux obligations légales"
+    },
+    "sharing": {
+      "title": "Partage et Divulgation d'Informations",
+      "desc": "Nous pouvons partager vos informations avec :",
+      "service": "Fournisseurs de services (stockage cloud, hébergement d'images, analyses)",
+      "legal": "Autorités légales lorsque requis par la loi",
+      "business": "Partenaires commerciaux avec votre consentement explicite",
+      "note": "Nous utilisons Cloudinary pour le stockage et le traitement des images. Vos photos téléchargées sont également soumises à la politique de confidentialité de Cloudinary."
+    },
+    "storage": {
+      "title": "Stockage et Sécurité des Données",
+      "desc": "Nous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles. Cependant, aucune méthode de transmission sur Internet n'est 100% sécurisée, et nous ne pouvons garantir une sécurité absolue.",
+      "retention": "Nous conservons vos informations personnelles aussi longtemps que votre compte est actif ou selon les besoins pour vous fournir des services. Vous pouvez demander la suppression de vos données à tout moment."
+    },
+    "rights": {
+      "title": "Vos Droits sur les Données",
+      "desc": "En vertu du RGPD et d'autres lois applicables sur la protection des données, vous disposez de droits concernant vos données personnelles, notamment :",
+      "access": "Droit d'accès à vos données personnelles",
+      "rectify": "Droit de rectification des données inexactes",
+      "delete": "Droit à l'effacement (\"droit à l'oubli\")",
+      "restrict": "Droit de limitation du traitement",
+      "portability": "Droit à la portabilité des données",
+      "object": "Droit d'opposition au traitement",
+      "exercise": "Pour exercer ces droits, vous pouvez utiliser les paramètres du compte dans notre application ou nous contacter directement."
+    },
+    "cookies": {
+      "title": "Cookies et Technologies Similaires",
+      "desc": "Nous utilisons des cookies et des technologies de suivi similaires pour améliorer votre expérience sur notre site web, analyser l'utilisation et aider dans nos efforts de marketing. Vous pouvez contrôler les cookies via les paramètres de votre navigateur."
+    },
+    "ai": {
+      "title": "Contenu Généré par l'IA",
+      "desc": "Notre service utilise l'IA pour aider à générer du contenu de CV et de lettres de motivation. Les données que vous fournissez peuvent être traitées par nos systèmes d'IA pour générer du contenu personnalisé. Nous mettons en œuvre des mesures pour protéger vos données pendant le traitement par l'IA et n'utilisons pas vos données personnelles pour entraîner nos modèles d'IA sans consentement explicite."
+    },
+    "children": {
+      "title": "Confidentialité des Enfants",
+      "desc": "Notre service n'est pas destiné aux personnes de moins de 16 ans. Si vous savez qu'un mineur nous a fourni des informations personnelles sans le consentement parental, veuillez nous contacter."
+    },
+    "changes": {
+      "title": "Modifications de Cette Politique de Confidentialité",
+      "desc": "Nous pouvons mettre à jour notre Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle Politique de Confidentialité sur cette page et en mettant à jour la date de \"Dernière Mise à Jour\"."
+    },
+    "contact": {
+      "title": "Contactez-nous",
+      "desc": "Si vous avez des questions concernant cette Politique de Confidentialité, veuillez nous contacter à :",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "terms": {
+    "title": "Conditions Générales",
+    "lastUpdated": "Dernière Mise à Jour",
+    "updateDate": "4 avril 2025",
+    "intro": "Bienvenue chez CVATI. Ces Conditions Générales régissent votre utilisation de notre service de création de CV et de notre site web. En accédant à ou en utilisant CVATI, vous acceptez d'être lié par ces Conditions.",
+    "definitions": {
+      "title": "1. Définitions",
+      "service": "\"Service\"",
+      "serviceDesc": "Fait référence au site web et à l'application de création de CV CVATI.",
+      "content": "\"Contenu\"",
+      "contentDesc": "Fait référence aux CV, lettres de motivation et tout autre matériel créé, téléchargé ou généré via notre Service.",
+      "user": "\"Utilisateur\"",
+      "userDesc": "Toute personne qui accède à ou utilise notre Service.",
+      "account": "\"Compte\"",
+      "accountDesc": "Un profil d'utilisateur enregistré dans notre Service."
+    },
+    "accounts": {
+      "title": "2. Comptes Utilisateurs",
+      "registration": "Lorsque vous créez un compte chez nous, vous devez fournir des informations précises, complètes et à jour. Vous êtes responsable de la protection de votre mot de passe et de toutes les activités qui se produisent sous votre compte.",
+      "terminate": "Nous nous réservons le droit de résilier ou de suspendre votre compte immédiatement, sans préavis ni responsabilité, pour quelque raison que ce soit, y compris la violation de ces Conditions."
+    },
+    "use": {
+      "title": "3. Utilisation Acceptable",
+      "desc": "Vous acceptez d'utiliser notre Service uniquement à des fins légales et conformément à ces Conditions. Vous acceptez de ne pas :",
+      "false": "Fournir des informations fausses ou trompeuses",
+      "impersonate": "Usurper l'identité d'une personne ou d'une entité",
+      "infringe": "Porter atteinte à des brevets, marques, secrets commerciaux, droits d'auteur ou autres droits de propriété",
+      "harmful": "Télécharger des virus ou autres codes malveillants",
+      "interfere": "Interférer avec ou perturber le Service ou les serveurs",
+      "automated": "Utiliser des méthodes automatisées pour accéder à ou utiliser le Service"
+    },
+    "content": {
+      "title": "4. Propriété du Contenu et Licence",
+      "ownership": "Vous conservez tous les droits de propriété sur les CV, lettres de motivation ou autre contenu que vous créez via notre Service. Cependant, vous nous accordez une licence non exclusive, mondiale et libre de redevances pour utiliser, reproduire et afficher votre contenu uniquement dans le but de fournir et d'améliorer notre Service.",
+      "responsibility": "Vous êtes seul responsable de tout le contenu que vous créez, téléchargez ou rendez disponible via le Service. Vous déclarez et garantissez que vous avez le droit d'utiliser toutes les informations incluses dans vos CV et que le contenu ne viole aucune loi ou droit de tiers."
+    },
+    "ai": {
+      "title": "5. Contenu Généré par l'IA",
+      "desc": "Notre Service utilise l'intelligence artificielle pour aider à créer des CV et des lettres de motivation. Vous reconnaissez que :",
+      "accuracy": "Le contenu généré par l'IA peut ne pas toujours être précis ou approprié à vos besoins spécifiques",
+      "review": "Vous devriez examiner et modifier tout contenu généré par l'IA avant de l'utiliser",
+      "responsibility": "Vous êtes en fin de compte responsable de tout le contenu de votre CV ou lettre de motivation, y compris les parties générées par l'IA"
+    },
+    "disclaimer": {
+      "title": "6. Avis de Non-responsabilité",
+      "desc": "Notre Service est fourni \"tel quel\" et \"selon disponibilité\" sans garanties d'aucune sorte, explicites ou implicites, y compris, mais sans s'y limiter, les garanties implicites de qualité marchande, d'adéquation à un usage particulier ou de non-contrefaçon.",
+      "success": "Nous ne garantissons pas que notre Service vous aidera à obtenir un emploi ou des entretiens. L'efficacité des CV et des lettres de motivation dépend de nombreux facteurs hors de notre contrôle."
+    },
+    "limitation": {
+      "title": "7. Limitation de Responsabilité",
+      "desc": "Dans toute la mesure permise par la loi, CVATI, ses directeurs, employés ou agents ne seront en aucun cas responsables des dommages indirects, punitifs, accessoires, spéciaux, consécutifs ou exemplaires, y compris, sans limitation, les dommages pour perte de profits, de clientèle, d'utilisation, de données ou d'autres pertes intangibles, résultant de l'utilisation ou de l'impossibilité d'utiliser ce Service."
+    },
+    "privacy": {
+      "title": "8. Politique de Confidentialité",
+      "desc": "Votre utilisation de notre Service est également régie par notre Politique de Confidentialité, qui est incorporée à ces Conditions par référence. Veuillez consulter notre Politique de Confidentialité pour comprendre nos pratiques concernant vos informations personnelles."
+    },
+    "termination": {
+      "title": "9. Résiliation",
+      "userRight": "Vous pouvez résilier votre compte à tout moment en suivant les instructions dans le Service. Toutes vos données seront supprimées conformément à notre Politique de Confidentialité.",
+      "ourRight": "Nous pouvons résilier ou suspendre votre compte immédiatement, sans préavis ni responsabilité, pour quelque raison que ce soit, y compris la violation de ces Conditions. À la résiliation, votre droit d'utiliser le Service cessera immédiatement."
+    },
+    "changes": {
+      "title": "10. Modifications des Conditions",
+      "desc": "Nous nous réservons le droit de modifier ou de remplacer ces Conditions à tout moment. Si une révision est substantielle, nous fournirons un préavis d'au moins 30 jours avant que de nouvelles conditions ne prennent effet. En continuant à accéder à ou à utiliser notre Service après que les révisions sont entrées en vigueur, vous acceptez d'être lié par les conditions révisées."
+    },
+    "governing": {
+      "title": "11. Loi Applicable",
+      "desc": "Ces Conditions seront régies et interprétées conformément aux lois de [Votre Pays/État], sans égard à ses dispositions relatives aux conflits de lois."
+    },
+    "contact": {
+      "title": "12. Contactez-nous",
+      "desc": "Si vous avez des questions concernant ces Conditions, veuillez nous contacter à :",
+      "email": "legal@cvati.com"
+    }
+  },
+  "cookiePolicy": {
+    "title": "Politique de Cookies",
+    "lastUpdated": "Dernière Mise à Jour",
+    "updateDate": "4 avril 2025",
+    "intro": "Cette Politique de Cookies explique comment CVATI (\"nous\", \"notre\" ou \"nos\") utilise les cookies et technologies similaires sur notre site web et application. En utilisant CVATI, vous consentez à l'utilisation de cookies comme décrit dans cette politique.",
+    "what": {
+      "title": "Que Sont les Cookies ?",
+      "desc": "Les cookies sont de petits fichiers texte qui sont stockés sur votre appareil (ordinateur, tablette ou mobile) lorsque vous visitez des sites web. Ils sont largement utilisés pour faire fonctionner les sites web plus efficacement, offrir une meilleure expérience utilisateur, et donner des informations aux propriétaires du site web. Les cookies ne peuvent pas endommager votre appareil ni accéder à d'autres informations sur votre appareil."
+    },
+    "types": {
+      "title": "Types de Cookies Que Nous Utilisons",
+      "essential": {
+        "title": "Cookies Essentiels",
+        "desc": "Ces cookies sont nécessaires au bon fonctionnement du site web. Ils permettent des fonctions de base comme la navigation sur les pages et l'accès aux zones sécurisées du site web. Le site web ne peut pas fonctionner correctement sans ces cookies.",
+        "examples": "Exemples : Cookies de session, cookies d'authentification"
+      },
+      "preferences": {
+        "title": "Cookies de Préférences",
+        "desc": "Ces cookies permettent au site web de se souvenir des choix que vous faites (comme votre préférence de langue ou votre paramètre de mode sombre/clair) et fournissent des fonctionnalités améliorées et plus personnelles.",
+        "examples": "Exemples : Paramètres de langue, préférences de thème"
+      },
+      "analytics": {
+        "title": "Cookies d'Analyse",
+        "desc": "Ces cookies collectent des informations sur la façon dont vous utilisez notre site web, quelles pages vous avez visitées et sur quels liens vous avez cliqué. Toutes les données sont anonymisées et ne peuvent pas être utilisées pour vous identifier.",
+        "examples": "Exemples : Cookies Google Analytics"
+      },
+      "functional": {
+        "title": "Cookies Fonctionnels",
+        "desc": "Ces cookies permettent une fonctionnalité et une personnalisation améliorées. Ils peuvent être définis par nous ou par des fournisseurs tiers dont les services ont été ajoutés à nos pages.",
+        "examples": "Exemples : Cookies de service de chat, données de formulaire enregistrées"
+      }
+    },
+    "specific": {
+      "title": "Cookies Spécifiques Que Nous Utilisons",
+      "name": "Nom",
+      "provider": "Fournisseur",
+      "purpose": "Objectif",
+      "expiry": "Expiration",
+      "type": "Type",
+      "consentPurpose": "Enregistre vos préférences de cookies",
+      "themePurpose": "Mémorise votre préférence de mode sombre/clair",
+      "languagePurpose": "Mémorise votre préférence de langue",
+      "authPurpose": "Vous maintient connecté",
+      "gaPurpose": "Utilisé pour distinguer les utilisateurs",
+      "essential": "Essentiel",
+      "preference": "Préférence",
+      "analytics": "Analytique"
+    },
+    "thirdParty": {
+      "title": "Cookies Tiers",
+      "desc": "Certains cookies sont placés par des services tiers qui apparaissent sur nos pages. Nous utilisons des services des tiers suivants qui peuvent utiliser des cookies :",
+      "analytics": "Google Analytics - Pour l'analyse d'utilisation du site web",
+      "cloudinary": "Cloudinary - Pour le stockage et le traitement d'images",
+      "oauth": "Fournisseurs OAuth (si vous utilisez la connexion sociale)"
+    },
+    "manage": {
+      "title": "Gestion des Cookies",
+      "desc": "La plupart des navigateurs web vous permettent de gérer vos préférences de cookies. Vous pouvez configurer votre navigateur pour refuser les cookies, ou pour vous alerter lorsque des cookies sont envoyés. Les méthodes pour ce faire varient d'un navigateur à l'autre et d'une version à l'autre.",
+      "links": "Voici des liens vers les instructions de gestion des cookies pour les navigateurs courants :",
+      "note": "Veuillez noter que la restriction des cookies peut affecter la fonctionnalité de notre site web. Par exemple, vous pourriez ne pas être en mesure d'utiliser toutes les fonctionnalités interactives de notre site ou de sauvegarder vos préférences entre les visites."
+    },
+    "similar": {
+      "title": "Technologies Similaires",
+      "desc": "En plus des cookies, nous pouvons utiliser d'autres technologies similaires pour stocker et accéder à des données sur votre appareil :",
+      "storage": "Stockage Local :",
+      "storageDesc": "Nous utilisons le stockage local du navigateur pour sauvegarder vos préférences et améliorer les performances.",
+      "session": "Stockage de Session :",
+      "sessionDesc": "Similaire au stockage local mais s'efface lorsque vous fermez votre navigateur."
+    },
+    "updates": {
+      "title": "Mises à Jour de Cette Politique",
+      "desc": "Nous pouvons mettre à jour cette Politique de Cookies de temps à autre pour refléter les changements dans la technologie, la réglementation ou nos pratiques commerciales. Tout changement sera publié sur cette page et, si les changements sont significatifs, nous fournirons un avis plus visible."
+    },
+    "contact": {
+      "title": "Contactez-nous",
+      "desc": "Si vous avez des questions concernant notre utilisation des cookies ou cette Politique de Cookies, veuillez nous contacter à :",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "cookies": {
+    "message": "Nous utilisons des cookies pour améliorer votre expérience. En continuant à visiter ce site, vous acceptez notre utilisation des cookies.",
+    "learnMore": "En savoir plus",
+    "accept": "Accepter",
+    "decline": "Refuser"
+  },
+  "prod1": {
+      "hero": {
+        "title": "Décrochez le Job de Vos Rêves",
+        "subtitle": "Créez des CV impressionnants et des lettres de motivation convaincantes avec l'IA qui vous fait remarquer par les employeurs et passe les systèmes ATS."
+      },
+      "sections": {
+        "power_job_search": "Boostez Votre Recherche d'Emploi avec l'IA",
+        "power_job_description": "Nos puissants outils d'IA vous aident à créer des CV et des lettres de motivation de qualité professionnelle adaptés à vos rôles cibles.",
+        "job_winning_documents": "Créez des Documents Gagnants",
+        "job_winning_description": "Conçus pour vous aider à vous démarquer et à faire forte impression auprès des employeurs.",
+        "everything_to_succeed": "Tout ce Dont Vous Avez Besoin pour Réussir",
+        "everything_description": "Rempli de fonctionnalités pour vous aider à créer des documents de candidature exceptionnels.",
+        "how_it_works": "Comment Ça Marche",
+        "how_it_works_description": "Créez des CV professionnels et des lettres de motivation en quelques minutes avec trois étapes simples.",
+        "what_users_say": "Ce que Disent Nos Utilisateurs",
+        "what_users_description": "Témoignages de réussite de chercheurs d'emploi qui ont utilisé CVATI pour décrocher leur emploi de rêve.",
+        "current_language": "Langue Actuelle",
+        "current_template": "Modèle Actuel",
+        "previous": "Précédent",
+        "next": "Suivant"
+      },
+      "features": {
+        "ats_templates": {
+          "title": "Modèles Optimisés pour ATS",
+          "description": "Nos modèles de CV sont conçus pour passer les systèmes de suivi des candidatures et faire parvenir votre CV aux recruteurs."
+        },
+        "ai_content": {
+          "title": "Génération de Contenu par IA",
+          "description": "Suggestions intelligentes pour les compétences, réalisations et descriptions de poste qui correspondent à votre rôle cible."
+        },
+        "cover_letters": {
+          "title": "Lettres de Motivation Personnalisées",
+          "description": "Générez des lettres de motivation adaptées qui correspondent à la description du poste et mettent en valeur votre expérience pertinente."
+        },
+        "keyword_optimization": {
+          "title": "Optimisation des Mots-clés",
+          "description": "Nous analysons les descriptions de poste pour inclure les bons mots-clés."
+        },
+        "industry_content": {
+          "title": "Contenu Spécifique à l'Industrie",
+          "description": "Contenu adapté à votre secteur et à votre niveau d'expérience."
+        },
+        "resume_analytics": {
+          "title": "Analyse de CV",
+          "description": "Voyez comment votre CV performe et obtenez des suggestions pour l'améliorer."
+        },
+        "expert_advice": {
+          "title": "Conseils d'Experts",
+          "description": "Contenu basé sur les idées des recruteurs et des responsables du recrutement."
+        }
+      },
+      "steps": {
+        "enter_details": {
+          "title": "Entrez Vos Détails",
+          "description": "Remplissez vos informations ou téléchargez un CV existant pour commencer rapidement."
+        },
+        "ai_enhancement": {
+          "title": "Amélioration par IA",
+          "description": "Notre IA analyse votre expérience et les exigences du poste pour suggérer des améliorations."
+        },
+        "download_apply": {
+          "title": "Téléchargez et Postulez",
+          "description": "Obtenez votre CV ou lettre de motivation parfaitement formaté et prêt à impressionner les employeurs."
+        }
+      },
+      "cta": {
+        "title": "Prêt à Décrocher l'Emploi de Vos Rêves ?",
+        "description": "Rejoignez des milliers de professionnels qui ont transformé leur recherche d'emploi avec nos outils alimentés par l'IA.",
+        "build_resume": "Créer Mon CV",
+        "create_cover_letter": "Créer une Lettre de Motivation"
+      },
+      "stats": {
+        "resumes_created": "CV Créés",
+        "cover_letters": "Lettres de Motivation Générées",
+        "interview_rate": "Taux de Réussite aux Entretiens",
+        "job_match": "Taux de Correspondance d'Emploi"
+      }
+    },
+    "feedback": {
+      "title": "Partagez Votre Avis",
+      "subtitle": "Aidez-nous à améliorer CVATI en partageant votre expérience",
+      "rating_label": "Comment évalueriez-vous votre expérience ?",
+      "rating_required": "Veuillez sélectionner une note",
+      "email_label": "Votre E-mail",
+      "email_required": "Veuillez fournir votre e-mail",
+      "email_placeholder": "votre.email@exemple.com",
+      "comment_label": "Commentaires (facultatif)",
+      "comment_placeholder": "Racontez-nous votre expérience...",
+      "submit": "Envoyer un Avis",
+      "submitting": "Envoi en cours...",
+      "submit_success": "Merci pour votre avis !",
+      "submit_error": "Échec de l'envoi de l'avis"
+    },
+    "revamp": {
+    "needsResumeFirst": "Vous devez d'abord sélectionner un CV",
+    "goToMyResumes": "Veuillez aller dans Mes CV et sélectionner un CV avec lequel travailler.",
+    "signInFirst": "Vous devez vous connecter et créer un CV avant de l'exporter.",
+    "exploreTemplates": "Explorer les Modèles Professionnels",
+    "exploreTemplatesDescription": "Parcourez notre collection de modèles de CV conçus par des professionnels. Trouvez le style parfait qui correspond à votre secteur d'activité et à votre personnalité pour faire ressortir votre candidature.",
+    "exploreTemplatesButton": "Explorer les Modèles",
+    "atsFriendly": "Conceptions compatibles ATS",
+    "modernLayouts": "Mises en page modernes et traditionnelles",
+    "customizableDesigns": "Designs entièrement personnalisables",
+    "browse": "Parcourir les modèles",
+    "accept": "J'accepte les",
+    "or": "Ou",
+    "offline_mode": "Vous pouvez créer votre CV maintenant. Connectez-vous pour sauvegarder ou télécharger.",
+    "listView": "Passer à la vue liste",
+    "testimonials": {
+      "role1": "Ingénieur Logiciel",
+      "content1": "CVATI m'a aidé à décrocher des entretiens dans trois grandes entreprises technologiques. Les suggestions de l'IA ont fait ressortir mon CV de la masse !",
+      "role2": "Spécialiste Marketing",
+      "content2": "Le générateur de lettres de motivation est incroyable ! Il a parfaitement capturé mon expérience et le ton que je recherchais. M'a économisé des heures de travail.",
+      "role3": "Analyste de Données",
+      "content3": "Après avoir lutté pour obtenir des rappels, j'ai remanié mon CV avec CVATI et j'ai commencé à recevoir des demandes d'entretien en quelques jours."
+    }
+},
+  "jobMatching": {
+    "jobMatching": "Correspondance d'emploi",
+    "title": "🎯 Analyseur Intelligent de Correspondance d'Emploi",
+    "subtitle": "Obtenez des retours d'IA brutalement honnêtes sur vos chances de candidature. Sans fioritures - juste des insights actionnables qui vous aident à décrocher de meilleurs postes plus rapidement.",
+    "socialProof": "Utilisé par plus de 10 000 chercheurs d'emploi",
+    
+    "features": {
+      "instantScoring": "🎯 Évaluation instantanée de compatibilité",
+      "beatATS": "🤖 Battre les systèmes ATS",
+      "personalizedTips": "💡 Conseils personnalisés",
+      "keywordGaps": "📊 Analyse des lacunes en mots-clés",
+      "atsOptimization": "🤖 Insights d'optimisation ATS",
+      "keywordAnalysis": "📊 Analyse détaillée des mots-clés"
+    },
+
+    "auth": {
+      "unlockPotential": "🎯 Libérez votre potentiel professionnel",
+      "joinThousands": "Rejoignez des milliers de chercheurs d'emploi qui utilisent notre IA pour décrocher de meilleurs postes plus rapidement. Obtenez des retours instantanés et honnêtes sur toute candidature.",
+      "getStarted": "🚀 Commencez gratuitement"
+    },
+
+    "methods": {
+      "crewai": {
+        "title": "Panel d'experts en IA",
+        "subtitle": "Équipe d'agents de recrutement spécialisés",
+        "badge": "Le plus populaire",
+        "description": "Plusieurs agents spécialisés travaillent ensemble comme un panel de recrutement pour évaluer minutieusement votre adéquation"
+      },
+      "claude": {
+        "title": "Recruteur IA senior", 
+        "subtitle": "Raisonnement avancé comme un responsable du recrutement",
+        "badge": "Le plus précis",
+        "description": "IA de pointe qui pense comme un recruteur senior avec des années d'expérience en embauche"
+      },
+      "both": {
+        "title": "Analyse complète",
+        "subtitle": "Vérification double avec les deux systèmes d'IA", 
+        "badge": "Le plus complet",
+        "description": "Obtenez des insights des deux systèmes et comparez-les pour une confiance maximale"
+      }
+    },
+
+    "form": {
+      "title": "✨ Configurez votre analyse",
+      "chooseAnalysis": "🎯 Choisissez votre puissance d'analyse",
+      "differentApproaches": "Différentes approches d'IA, mêmes résultats honnêtes",
+      "targetPosition": "🎯 Poste cible",
+      "jobTitlePlaceholder": "ex : Ingénieur logiciel senior, Responsable marketing",
+      "dreamCompany": "🏢 Entreprise rêvée",
+      "companyPlaceholder": "ex : Google, Microsoft, Tesla (optionnel)",
+      "howSubmitResume": "📄 Comment souhaitez-vous soumettre votre CV ?",
+      "savedCVs": "📁 Mes CV sauvegardés",
+      "uploadNew": "📤 Téléverser un nouveau", 
+      "copyPaste": "✏️ Copier & Coller",
+      "selectResume": "Sélectionner un CV",
+      "selectResumeOption": "Choisissez un CV dans votre collection...",
+      "noResumes": "📝 Aucun CV sauvegardé pour le moment. Créez votre premier CV ou téléversez-en un pour commencer !",
+      "uploadCV": "📤 Téléversez votre CV",
+      "uploadPlaceholder": "📎 Cliquez pour téléverser ou glissez-déposez votre CV",
+      "supportedFormats": "Formats supportés : PDF, DOC, DOCX, TXT (max 5Mo)",
+      "processingFile": "🔄 Traitement de votre fichier...",
+      "resumeContent": "📝 Contenu de votre CV",
+      "resumeContentPlaceholder": "Collez le texte de votre CV ici. Incluez votre expérience, compétences et réalisations - plus il y a de détails, meilleure est l'analyse !",
+      "jobPosting": "📋 Offre d'emploi",
+      "jobDescriptionPlaceholder": "Copiez la description complète du poste ici. Incluez les exigences, responsabilités et qualifications pour l'analyse de correspondance la plus précise.",
+      "analyzeMatch": "🚀 Analyser ma correspondance d'emploi",
+      "takes30Seconds": "(Prend 30 secondes)",
+      "aiAnalyzing": "🧠 L'IA analyse votre potentiel...",
+      "usingMethod": "Utilisation",
+      "takesLonger": "⏱️ Prend 2x plus de temps mais vaut la confiance"
+    },
+
+    "progress": {
+      "expertPanel": "🤖 Notre panel d'experts en IA examine votre profil...",
+      "deepAnalysis": "🧠 L'IA avancée effectue une analyse approfondie...",
+      "comprehensive": "⚡ Exécution d'une analyse complète avec les deux systèmes d'IA...",
+      "bothTakesTime": "Cette analyse complète prend plus de temps mais offre une confiance maximale"
+    },
+
+    "scores": {
+      "excellent": "🔥 Correspondance excellente ! Vous êtes un candidat idéal pour ce poste.",
+      "good": "👍 Bon potentiel ! Quelques ajustements pourraient vous booster significativement.", 
+      "improvement": "📈 Marge d'amélioration. Voici votre feuille de route vers le succès.",
+      "levelUp": "💪 Il est temps de passer au niveau supérieur ! Nous vous montrerons exactement comment."
+    },
+
+    "results": {
+      "intelligenceReport": "📊 Votre rapport d'intelligence de candidature",
+      "readyToDiscover": "Prêt à découvrir vos vraies chances ?",
+      "fillFormGetInsights": "Remplissez le formulaire et obtenez des insights instantanés alimentés par l'IA qui pourraient changer votre façon de postuler.",
+      "aiComparison": "🔬 Comparaison des systèmes d'IA",
+      "confidence": "Niveau de confiance",
+      "lowConfidence": "Signaux mitigés détectés",
+      "highConfidence": "Les deux systèmes sont d'accord",
+      "jobCompatibility": "🎯 Score de compatibilité d'emploi",
+      "analyzedBy": "Analysé par",
+      "atsPassRate": "🤖 Taux de réussite ATS",
+      "beatRobots": "Allez-vous battre les robots ?",
+      "recommendation": "💡 Devriez-vous postuler ?",
+      "goForIt": "Foncez !",
+      "buildUpFirst": "Renforcez d'abord",
+      "yourSuperpowers": "🌟 Vos superpouvoirs",
+      "levelUpHere": "🎯 Passez au niveau ici",
+      "skillsToAdd": "❌ Compétences à ajouter",
+      "skillsToAddDesc": "Ces mots-clés pourraient booster vos chances",
+      "winningKeywords": "✅ Vos mots-clés gagnants",
+      "winningKeywordsDesc": "Vous êtes déjà fort sur ces points",
+      "yourActionPlan": "🚀 Votre plan d'action",
+      "strategicMoves": "💡 Mouvements stratégiques",
+      "applicationHacks": "✨ Astuces de candidature",
+      "keyStrengths": "🌟 Points forts clés",
+      "improvementAreas": "🎯 Opportunités d'amélioration",
+      "recommendations": "💼 Recommandations stratégiques",
+      "applicationTips": "🚀 Astuces de candidature",
+      "missingKeywords": "❌ Compétences à ajouter ({count} lacunes trouvées)",
+      "presentKeywords": "✅ Vos mots-clés gagnants ({count} correspondances)",
+      "applyNow": "Foncez !",
+      "improveFirst": "Renforcez d'abord",
+      "analysisComparison": "📊 Comparaison des analyses d'IA"
+    },
+
+    "fileUpload": {
+      "notImplemented": "Note : L'analyse avancée de fichiers n'est pas encore implémentée. Veuillez copier-coller manuellement le texte de votre CV pour l'analyse la plus précise."
+    },
+
+    "errors": {
+      "jobDescriptionRequired": "📝 Nous avons besoin de la description du poste pour analyser votre correspondance. Copiez-la à partir de l'offre d'emploi de l'entreprise.",
+      "resumeRequired": "📄 Veuillez fournir le contenu de votre CV pour que nous puissions analyser vos qualifications.",
+      "needLogin": "🔐 Créez un compte gratuit pour débloquer l'analyse de correspondance d'emploi alimentée par l'IA.",
+      "invalidFileType": "📎 Veuillez téléverser un PDF, document Word ou fichier texte.",
+      "fileTooLarge": "📦 Fichier trop volumineux. Veuillez utiliser des fichiers de moins de 5Mo.",
+      "fileProcessingFailed": "⚠️ Impossible de traiter votre fichier. Essayez de copier-coller le texte à la place.",
+      "analysisFailed": "🔄 Échec de l'analyse (Statut : {status}). Veuillez réessayer ou contacter le support.",
+      "analysisFailedGeneric": "❌ Quelque chose s'est mal passé. Veuillez vérifier vos entrées et réessayer."
+    }
+  },
+  "ai": {
+    "limit_reached": "Vous avez utilisé {{used}} sur {{limit}} requêtes quotidiennes d'IA. Veuillez réessayer dans {{hours}} heures.",
+    "limit_reached_simple": "Limite quotidienne d'IA atteinte. Veuillez réessayer demain.",
+    "limit_info": "Requêtes d'IA restantes : {{remaining}} sur {{limit}}"
+  },
+  "newresume": {
+    "personal_info": {
+      "ai_error": "Échec de l'obtention des suggestions d'IA. Veuillez réessayer.",
+      "summary_error": "Veuillez d'abord ajouter du texte à votre résumé",
+      "improve_ai": "Améliorer avec l'IA",
+      "generating": "Génération de suggestions...",
+      "ai_suggestion": "Suggestion d'amélioration par l'IA :",
+      "apply_suggestion": "Appliquer la suggestion",
+      "discard": "Rejeter"
+    }
+  }
+}

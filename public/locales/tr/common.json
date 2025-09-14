@@ -1,0 +1,1510 @@
+{
+    "app": {
+      "title": "CVATI",
+      "theme": {
+        "dark": "Karanlık Mod",
+        "light": "Açık Mod"
+      }
+    },
+    "cards": {
+      "cover_letter": {
+        "title": "Kapak Mektubu AI",
+        "subtitle": "Anında özel kapak mektupları oluşturun",
+        "features": {
+          "quick_gen": "Hızlı Oluşturma",
+          "quick_gen_desc": "Saniyeler içinde oluştur",
+          "ats_ready": "ATS Uyumlu",
+          "ats_ready_desc": "AI kontrollerinden geç"
+        },
+        "actions": {
+          "create": "Kapak Mektubu Oluştur",
+          "view_templates": "Şablonları Görüntüle"
+        }
+      },
+      "resume": {
+        "title": "Akıllı Özgeçmiş Oluşturucu",
+        "subtitle": "Akıllı önerilerle AI destekli özgeçmiş oluşturucu.",
+        "recent_resumes": "Son Özgeçmişler:",
+        "preview": "Önizleme:",
+        "preview_message": "Bu şablonu kullanmak için 'Özgeçmiş Oluştur'a tıklayın",
+        "actions": {
+          "build": "Özgeçmiş Oluştur",
+          "view_templates": "Şablonları Görüntüle",
+          "hide_templates": "Şablonları Gizle"
+        },
+        "validation": {
+          "personal_info_required": "Lütfen gerekli kişisel bilgileri doldurun (tam ad, e-posta ve cep telefonu)",
+          "education_required": "Lütfen en az bir eğitim girişi ekleyin (kurum, derece ve çalışma alanı)",
+          "experience_required": "Lütfen en az bir iş deneyimi ekleyin (şirket ve pozisyon)",
+          "skills_required": "Lütfen en az bir beceri ekleyin",
+          "languages_required": "Lütfen en az bir dil ekleyin"
+        }
+      }
+    },
+    "navigation": {
+      "home": "Ana Sayfa",
+      "resumeBuilder": "Özgeçmiş Oluşturucu",
+      "coverLetter": "Kapak Mektubu Oluşturucu",
+      "coverLetters": "Kapak Mektupları",
+      "aiEnhancement": "AI Geliştirme",
+      "register": "Kayıt Ol",
+      "login": "Giriş Yap",
+      "settings": "Ayarlar",
+      "myCV": "Özgeçmişim",
+      "signOut": "Çıkış Yap",
+      "toggleMenu": "Menüyü Aç/Kapat",
+      "hideOptions": "Seçenekleri Gizle",
+      "showOptions": "Seçenekleri Göster",
+      "dashboard": "Kontrol Paneli",
+      "account": "Hesap",
+      "myResumes": "Özgeçmişlerim"
+    },
+    "home": {
+      "title": "CVATI",
+      "subtitle": "AI destekli öngörülerle profesyonel özgeçmişler oluşturun",
+      "features": {
+        "title": "Temel Özellikler",
+        "ats": "ATS Optimize Edilmiş",
+        "ai": "AI Destekli",
+        "industry": "Sektöre Özel"
+      },
+      "cta": {
+        "title": "Bugün Başlayın",
+        "subtitle": "Kariyer fırsatlarını artıran binlerce profesyonele katılın.",
+        "button": "Özgeçmişinizi Şimdi Oluşturun",
+        "button_aria": "Özgeçmişinizi şimdi oluşturun"
+      }
+    },
+    "resume": {
+      "title":{
+        "section": "Özgeçmiş Başlığı",
+        "title": "Özgeçmiş Oluşturucu",
+        "description": "Daha sonra tanımanıza yardımcı olacak bir ad verin",
+        "placeholder": "ör. Yazılım Geliştirici Özgeçmişi"
+      },
+      "customizer": {
+        "title": "Özgeçmiş Özelleştirici",
+        "loading": "Özgeçmiş verileri yükleniyor...",
+        "closeOptions": "Seçenekleri Kapat",
+        "goBack": "Geri Dön",
+        "noResume": "Özgeçmiş Yok",
+        "pleaseCreate": "Lütfen Özgeçmişinizi burada oluşturun",
+        "goToBuilder": "Özgeçmiş Oluşturucu sayfasına gidin",
+        "saveCustomizations": {
+          "title": "Özelleştirmeleri Kaydet", 
+          "description": "Bu özelleştirme ayarlarını kaydedin ki, herkese açık özgeçmişinizi görüntüleyenler seçtiğiniz stili görsün.",
+          "message": "Devam etmeden önce özelleştirmelerinizi kaydetmek ister misiniz?",
+          "success": "Özelleştirmeler başarıyla kaydedildi!",
+          "error": "Özelleştirmeler kaydedilirken bir hata oluştu.",
+          "continueAnyway": "Yine de devam etmek ister misiniz?",
+          "save": "Kaydet ve Devam Et",
+          "continue": "Kaydetmeden Devam Et",
+          "cancel": "İptal"
+        },
+        "templates": {
+          "title": "Özgeçmiş Şablonu",
+          "selectTemplate": "Şablon Seç",
+          "templates": "Bir Şablon Seçin",
+          "styling": "Stil",
+          "sharing": "Paylaşım",
+          "styles": "Stiller", 
+          "selected": "Şablon Seçildi",
+          "noTemplatesFound": "Hiç Şablon Bulunamadı"
+        },
+        "color": {
+          "title": "Vurgu Rengi"
+        },
+        "font": {
+          "title": "Font Ailesi",
+          "samples": {
+            "professional": "Profesyonel ve net",
+            "modern": "Modern ve okunabilir",
+            "traditional": "Geleneksel ve zarif",
+            "refined": "Daha iyi okunabilirlikle gelişmiş",
+            "monospaced": "Tek aralıklı ve ayırt edici",
+            "legible": "Yüksek okunabilirlikte modern",
+            "clean": "Net ve profesyonel",
+            "contemporary": "Çağdaş ve ayırt edici",
+            "custom": "Özel Font"
+          }
+        },
+        "spacing": {
+          "title": "Satır Aralığı",
+          "compact": "Sıkı",
+          "spacious": "Geniş"
+        },
+        "headers": {
+          "title": "Başlık Stili",
+          "normal": "Normal Yazım",
+          "uppercase": "BÜYÜK HARF",
+          "description": "Özgeçmişinizdeki bölüm başlıklarının görünümünü seçin"
+        },
+        "skills": {
+          "title": "Beceri Seviyesi Görünümü",
+          "show": "Beceri seviyelerini göster",
+          "hide": "Beceri seviyelerini gizle",
+          "description": "Özgeçmişinizde beceri seviye göstergelerinin görüntülenmesini değiştirin"
+        },
+        "viewMode": {
+          "title": "Görünüm Modu",
+          "pdf": "PDF Görünümü",
+          "html": "HTML Görünümü",
+          "canvas": "Tuval Görünümü",
+          "switch": "Geçiş Yap"
+        },
+        "export": {
+          "pdf": "PDF olarak dışa aktar",
+          "docx": "DOCX olarak dışa aktar",
+          "word": "Word olarak dışa aktar",
+          "exporting": "Dışa aktarılıyor..."
+        },
+        "zoom": {
+          "zoomIn": "Yakınlaştır",
+          "zoomOut": "Uzaklaştır"
+        }
+      },
+      "templateSelector": {
+        "categories": {
+          "all": "Tümü",
+          "professional": "Profesyonel",
+          "creative": "Yaratıcı",
+          "modern": "Modern",
+          "classic": "Klasik",
+          "minimalist": "Minimalist",
+          "elegant": "Zarif"
+        }
+      },
+      "templateRenderer": {
+        "error": "Şablon bulunamadı. Lütfen başka bir şablon seçin."
+      },
+      "experience": {
+        "title": "Deneyim",
+        "company": "Şirket Adı",
+        "company_placeholder": "Şirket Adı",
+        "position": "Pozisyon",
+        "position_placeholder": "İş Unvanı",
+        "current_work": "Halen burada çalışıyorum",
+        "description_placeholder": "Sorumluluklarınızı ve başarılarınızı açıklayın...",
+        "add_button": "Başka Bir Deneyim Ekle"
+      },
+      "education": {
+        "title": "Eğitim",
+        "institution": "Kurum Adı",
+        "institution_placeholder": "Üniversite/Okul Adı",
+        "degree": "Derece",
+        "degree_placeholder": "ör., Lisans, Yüksek Lisans",
+        "field": "Çalışma Alanı",
+        "field_placeholder": "ör., Bilgisayar Mühendisliği",
+        "currently_studying": "Halen burada öğrenim görüyorum",
+        "gpa": "Not Ortalaması",
+        "gpa_placeholder": "ör., 3.8/4.0",
+        "add_button": "Başka Bir Eğitim Ekle"
+      },
+      "skills": {
+        "title": "Beceriler",
+        "name": "Beceri Adı",
+        "name_placeholder": "Bir beceri girin",
+        "level": "Seviye",
+        "add_button": "Başka Bir Beceri Ekle",
+        "beginner": "Başlangıç", 
+        "intermediate": "Orta", 
+        "advanced": "İleri", 
+        "expert": "Uzman"
+      },
+      "courses": {
+        "title": "Kurslar",
+        "name": "Kurs Adı",
+        "name_placeholder": "ör., Gelişmiş Web Geliştirme",
+        "institution": "Kurum",
+        "institution_placeholder": "Kurum veya Platform Adı",
+        "description_placeholder": "Kurs ve başarılarınızın kısa açıklaması...",
+        "add_button": "Başka Bir Kurs Ekle"
+      },
+      "custom_sections": {
+        "title": "Özel Bölümler",
+        "section_title": "Bölüm Başlığı",
+        "title_placeholder": "ör., Projeler, Başarılar, Yayınlar",
+        "content": "İçerik",
+        "content_placeholder": "Bölüm içeriği...",
+        "add_button": "Başka Bir Bölüm Ekle"
+      },
+      "extracurricular": {
+        "activity": "Etkinlikler",
+        "name": "Etkinlik Adı",
+        "name_placeholder": "ör., Öğrenci Meclisi, Spor Takımı",
+        "description_placeholder": "Rolünüzü ve başarılarınızı açıklayın...",
+        "add_button": "Başka Bir Etkinlik Ekle"
+      },
+      "hobbies": {
+        "title": "Hobiler",
+        "hobby": "Hobi/İlgi Alanı",
+        "placeholder": "ör., Fotoğrafçılık, Okuma, Yürüyüş",
+        "add_button": "Başka Bir Hobi Ekle"
+      },
+      "internships": {
+        "title": "Stajlar",
+        "position": "Pozisyon",
+        "position_placeholder": "Staj Pozisyonu",
+        "current_work": "Halen burada staj yapıyorum",
+        "description_placeholder": "Sorumluluklarınızı ve başarılarınızı açıklayın...",
+        "add_button": "Başka Bir Staj Ekle"
+      },
+      "languages": {
+        "title": "Diller",
+        "language": "Dil",
+        "language_placeholder": "ör., İngilizce, İspanyolca",
+        "proficiency": "Yeterlilik Seviyesi",
+        "add_button": "Başka Bir Dil Ekle",
+        "levels": {
+          "native": "Anadil",
+          "fluent": "Akıcı",
+          "advanced": "İleri",
+          "intermediate": "Orta",
+          "beginner": "Başlangıç"
+        }
+      },
+      "personal_info": {
+        "title": "Kişisel Bilgiler",
+        "full_name": "Tam Ad",
+        "full_name_placeholder": "Ahmet Yılmaz",
+        "email": "E-posta",
+        "email_placeholder": "ahmet@ornek.com",
+        "mobile": "Cep Telefonu",
+        "mobile_placeholder": "+90 (555) 123 45 67",
+        "title_field": "Profesyonel Ünvan",
+        "title_placeholder": "Yazılım Mühendisi",
+        "city": "Şehir",
+        "city_placeholder": "İstanbul",
+        "address": "Adres",
+        "address_placeholder": "Örnek Mahallesi 123 Sokak",
+        "postal_code": "Posta Kodu",
+        "postal_code_placeholder": "34000",
+        "nationality": "Milliyet",
+        "nationality_placeholder": "ör., Türk",
+        "driving_license": "Sürücü Belgesi",
+        "driving_license_placeholder": "ör., B Sınıfı",
+        "place_of_birth": "Doğum Yeri",
+        "place_of_birth_placeholder": "Şehir, Ülke",
+        "date_of_birth": "Doğum Tarihi",
+        "linkedin": "LinkedIn",
+        "linkedin_placeholder": "linkedin.com/in/ahmetyilmaz",
+        "website": "Web Sitesi",
+        "website_placeholder": "websitem.com",
+        "summary": "Profesyonel Özet",
+        "summary_placeholder": "Mesleki geçmişinizin kısa bir özeti...",
+        "summary_error": "Lütfen önce özet metnini ekleyin",
+        "ai_error": "AI önerileri alınamadı. Lütfen tekrar deneyin.",
+        "improve_ai": "AI ile Geliştir",
+        "generating": "Öneriler oluşturuluyor...",
+        "ai_suggestion": "AI Tarafından Önerilen İyileştirme:",
+        "discard": "Reddet",
+        "apply_suggestion": "Öneriyi Uygula"
+      },
+      "photo": {
+        "title": "Profil Fotoğrafı",
+        "alt": "Profil",
+        "remove_photo": "Fotoğrafı kaldır",
+        "uploading": "Yükleniyor...",
+        "change": "Fotoğrafı Değiştir",
+        "upload": "Fotoğraf Yükle",
+        "invalid_type": "Lütfen geçerli bir resim dosyası yükleyin (JPG, PNG veya GIF)",
+        "size_limit": "Fotoğraf boyutu 2MB'den küçük olmalıdır",
+        "process_error": "Fotoğraf işlenirken hata oluştu. Lütfen tekrar deneyin.",
+        "max_size": "Maksimum boyut: 2MB"
+      },
+      "references": {
+        "title": "Referanslar",
+        "provide_upon_request": "Talep üzerine sağlanacak",
+        "name": "Ad",
+        "name_placeholder": "Referans Adı",
+        "relation": "İlişki/Pozisyon",
+        "relation_placeholder": "ör., Eski Yönetici, Profesör",
+        "phone": "Telefon",
+        "phone_placeholder": "İletişim Numarası",
+        "email": "E-posta",
+        "email_placeholder": "E-posta Adresi",
+        "add_button": "Başka Bir Referans Ekle"
+      },
+      "preview": {
+        "title": "Özgeçmiş Önizlemesi",
+        "example": "Örnek Özgeçmiş",
+        "your_resume": "Özgeçmişiniz"
+      },
+      "shared_view": "Paylaşılan Özgeçmiş",
+      "not_found": {
+        "title": "Özgeçmiş Bulunamadı",
+        "message": "Aradığınız özgeçmiş mevcut değil veya herkese açık değil."
+      }, 
+      "publicStatus": {
+        "title": "Özgeçmiş Gizliliği",
+        "status": "Durum",
+        "public": "Herkese Açık",
+        "private": "Özel",
+        "public_description": "Özgeçmişiniz şu anda herkeseye açık. Bağlantıya sahip herkes görüntüleyebilir.",
+        "private_description": "Özgeçmişiniz şu anda özel. Yalnızca siz görüntüleyebilirsiniz.",
+        "make_public": "Özgeçmişi Herkese Açık Yap",
+        "make_private": "Özgeçmişi Özel Yap"
+      },
+      "qrcode": {
+        "title": "Özgeçmişi Paylaş",
+        "description": "Herhangi bir cihazda özgeçmişi görüntülemek için bu QR kodu tarayın",
+        "public_link": "Herkese açık bağlantı",
+        "open_link": "Özgeçmişi aç",
+        "copy_link": "Bağlantıyı kopyala",
+        "download": "QR'ı İndir",
+        "copied": "Bağlantı panoya kopyalandı!"
+      },
+      "actions": {
+        "save_resume": "Özgeçmişi Kaydet",
+        "save_changes": "Değişiklikleri Kaydet",
+        "customize": "Özgeçmişi Özelleştir",
+        "saving": "Kaydediliyor...",
+        "create_success": "Özgeçmiş başarıyla oluşturuldu!",
+        "update_success": "Özgeçmiş başarıyla güncellendi!",
+        "already_exists": "Zaten bir özgeçmişiniz var. Mevcut özgeçmiş güncelleniyor..."
+      }
+    },
+    "legal": {
+        "privacy": {
+          "title": "Gizlilik Politikası",
+          "intro": "CVATI'ye hoş geldiniz. Gizliliğinize saygı duyuyoruz ve kişisel verilerinizi korumaya kararlıyız."
+        },
+        "terms": {
+          "title": "Kullanım Şartları",
+          "intro": "CVATI'ye hoş geldiniz. Bu Kullanım Şartları web sitemiz ve hizmetlerimizin kullanımını düzenler."
+        },
+        "cookies": {
+          "title": "Çerez Politikası",
+          "whatAre": "Çerezler Nedir",
+          "howUse": "Çerezleri Nasıl Kullanıyoruz",
+          "specific": "Kullandığımız Spesifik Çerezler",
+          "managing": "Çerezleri Yönetme",
+          "consent": "Çerez Onayı",
+          "changes": "Bu Çerez Politikasındaki Değişiklikler"
+        },
+        "dataDeletion": {
+          "title": "Veri Silme Talebi",
+          "intro": "Çeşitli gizlilik düzenlemeleri kapsamında, kişisel verilerinizin silinmesini talep etme hakkına sahipsiniz.",
+          "form": {
+            "email": "E-posta Adresi",
+            "emailHelp": "Hesabınızı tanımlamak ve talep hakkında iletişim kurmak için bu e-postayı kullanacağız.",
+            "additionalInfo": "Ek Bilgiler (İsteğe Bağlı)",
+            "submit": "Silme Talebini Gönder"
+          },
+          "success": "Veri silme talebiniz gönderildi. Talebinizi 30 gün içinde işleyecek ve {email} adresine iletişim kuracağız.",
+          "whatDeleted": {
+            "title": "Silinecek Veriler",
+            "intro": "Talebiniz işlendiğinde, hesabınızla ilişkili aşağıdaki veriler silinecektir:"
+          }
+        }
+      },
+      "footer": {
+        "about": {
+          "title": "CVATI",
+          "description": "Kariyer fırsatlarınızı artırmak için AI destekli öngörülerle profesyonel özgeçmişler oluşturun."
+        },
+        "quickLinks": {
+          "title": "Hızlı Bağlantılar",
+          "home": "Ana Sayfa",
+          "resumeBuilder": "Özgeçmiş Oluşturucu",
+          "coverLetter": "Kapak Mektubu Oluşturucu",
+          "aiEnhancement": "AI Geliştirme"
+        },
+        "legal": {
+          "title": "Yasal",
+          "terms": "Kullanım Şartları",
+          "privacy": "Gizlilik Politikası",
+          "cookies": "Çerez Politikası",
+          "dataDeletion": "Veri Silme"
+        },
+        "contact": {
+          "title": "Bize Ulaşın",
+          "contactForm": "İletişim Formu"
+        },
+        "copyright": "CVATI",
+        "rights": "Tüm hakları saklıdır"
+      },
+      "auth": {
+        "login": {
+          "title": "Giriş Yap",
+          "email": "E-posta",
+          "password": "Şifre",
+          "forgotPassword": "Şifremi Unuttum?",
+          "submit": "Giriş Yap",
+          "noAccount": "Hesabınız yok mu?",
+          "register": "Buradan kayıt olun",
+          "socialLogin": "Veya ile giriş yapın",
+          "welcome_back": "Tekrar Hoş Geldiniz",
+          "sign_in_to_continue": "Özgeçmişinizi oluşturmaya devam etmek için giriş yapın",
+          "loading": "Yükleniyor..."
+        },
+        "register": {
+          "title": "Kayıt Ol",
+          "create_account": "Hesap Oluştur",
+          "sign_up_to_start": "Özgeçmişinizi oluşturmaya başlamak için kayıt olun",
+          "name": "Tam Ad",
+          "first_name": "Ad",
+          "last_name": "Soyad",
+          "email": "E-posta",
+          "password": "Şifre",
+          "confirmPassword": "Şifreyi Onayla",
+          "submit": "Kayıt Ol",
+          "sign_up": "Kayıt Ol",
+          "creating_account": "Hesap Oluşturuluyor...",
+          "haveAccount": "Zaten bir hesabınız var mı?",
+          "login": "Buradan giriş yapın",
+          "socialRegister": "Veya ile kayıt olun"
+        },
+        "social": {
+          "google": "Google",
+          "facebook": "Facebook",
+          "github": "GitHub",
+          "linkedin": "LinkedIn",
+          "error": "Sosyal Kimlik Doğrulama Hatası",
+          "success": "Kimlik Doğrulama Başarılı",
+          "or_continue_with": "Veya şununla devam edin"
+        },
+        "callback": {
+          "processing": "Giriş İşleniyor",
+          "please_wait": "Lütfen bekleyin...",
+          "auth_error": "Kimlik Doğrulama Hatası",
+          "return_to_login": "Giriş Sayfasına Dön",
+          "no_token": "Kimlik doğrulama jetonu alınamadı",
+          "auth_failed": "Kimlik doğrulama başarısız. Lütfen tekrar deneyin."
+        },
+        "error": {
+          "title": "Giriş Hatası",
+          "return_to_login": "Giriş Sayfasına Dön"
+        }
+      },
+      "language": {
+        "title": "Dil Seçin",
+        "en": "İngilizce",
+        "es": "İspanyolca",
+        "fr": "Fransızca"
+      },
+      "common": {
+        "remove": "Kaldır",
+        "required_fields": "* Zorunlu alanlar",
+        "start_date": "Başlangıç Tarihi",
+        "end_date": "Bitiş Tarihi",
+        "location": "Konum",
+        "location_placeholder": "Şehir, Ülke",
+        "description": "Açıklama",
+        "max_chars": "Maksimum {{count}} karakter",
+        "loading": "Yükleniyor...",
+        "tonow": "Devam Ediyor",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "apply": "Uygula",
+        "back": "Geri",
+        "next": "İleri",
+        "submit": "Gönder",
+        "search": "Ara",
+        "filter": "Filtrele",
+        "sortBy": "Sırala",
+        "actions": "İşlemler",
+        "success": "Başarılı!",
+        "error": "Hata!",
+        "warning": "Uyarı!",
+        "info": "Bilgi",
+        "company": "Şirket",
+        "company_placeholder": "Şirket Adı",
+        "continue": "Devam Et",
+        "back_to_editor": "Editöre Geri Dön",
+        "choose_template": "Şablon Seç",
+        "choose_your_templates": "Şablonlarınızı Seçin",
+        "print": "Yazdır",
+        "preparing": "Hazırlanıyor...",
+        "example_resume": "Örnek Özgeçmiş",
+        "page": "Sayfa",
+        "of": "/",
+        "dismiss": "Kapat",
+        "enhancing": "Geliştiriliyor...",
+        "enhance": "Geliştir",
+        "enhance_with_ai": "Yapay Zeka ile Geliştir",
+        "generate_tips": "İpuçları Oluştur",
+        "ai_suggestions": "Yapay Zeka Önerileri",
+        "apply_suggestion": "Öneriyi Uygula",
+        "reject": "Reddet",
+        "ai_tips": "Yapay Zeka İpuçları",
+        "at": "de/da",
+        "in": "içinde",
+        "copy": "Kopyala",
+        "download": "İndir",
+        "untitled": "Başlıksız",
+        "notSpecified": "Belirtilmemiş",
+        "view": "Görüntüle",
+        "favorite": "Favorilere Ekle",
+        "unfavorite": "Favorilerden Çıkar",
+        "local_draft": "Yerel olarak kaydedildi",
+"lastRefresh": "Son Yenileme ",
+"refresh": "Yenile",
+"cardView": "Kart Görünümüne Geç",
+"loadingCover": "Ön yazılar yükleniyor...",
+"ai": "Yapay Zeka",
+"ai_enhancement": "Yapay Zeka İyileştirmesi",
+"no_summary": "Henüz özet eklenmedi",
+"save_changes": "Değişiklikleri Kaydet ve Düzenleyiciye Dön",
+"select_file": "Özgeçmiş Dosyasını Seç"
+      },
+      "settings": {
+        "title": "Ayarlar",
+        "subtitle": "Hesap ayarlarınızı ve tercihlerinizi yönetin",
+        "profile_info": "Profil Bilgileri",
+        "loading_user": "Kullanıcı bilgileri yükleniyor...",
+        "data_privacy": "Veri Gizliliği ve Kontrolleri",
+        "data_portability": "Veri Taşınabilirliği",
+        "data_portability_desc": "Tüm hesap verilerinizi ve bilgilerinizi taşınabilir bir formatta indirin.",
+        "download_data": "Verilerimi İndir",
+        "downloading": "İndiriliyor...",
+        "download": "İndir",
+        "copy": "Kopyala",
+        "data_downloaded": "Verileriniz başarıyla indirildi.",
+        "download_failed": "Veriler indirilemedi. Lütfen tekrar deneyin.",
+        "danger_zone": "Tehlike Bölgesi",
+        "delete_account": "Hesabı Sil",
+        "permanent_warning": "Bu işlem kalıcıdır ve geri alınamaz.",
+        "delete_warning_1": "Tüm kişisel bilgileriniz kalıcı olarak silinecektir.",
+        "delete_warning_2": "Kayıtlı özgeçmiş ve başvuru mektuplarınıza erişimi kaybedeceksiniz.",
+        "delete_warning_3": "Hesabınız silindikten sonra geri kurtarılamaz.",
+        "download_before_delete": "Hesabınızı silmeden önce verilerinizi indirmenizi öneririz.",
+        "deletion_reason": "Hesabınızı neden siliyorsunuz? (İsteğe bağlı)",
+        "select_reason": "Bir neden seçin",
+        "reason_no_longer_needed": "Bu hizmete artık ihtiyacım yok",
+        "reason_dissatisfied": "Hizmetten memnun değilim",
+        "reason_privacy": "Gizlilik endişeleri",
+        "reason_other": "Başka bir neden",
+        "type_delete": "Onaylamak için SİL yazın",
+        "confirm_delete": "Silmeyi Onayla",
+        "deleting": "Siliniyor...",
+        "account_deleted": "Hesap silindi. Yönlendiriliyorsunuz...",
+        "delete_failed": "Hesap silinemedi. Tekrar deneyin.",
+        "enter_pass": "Onaylamak için şifrenizi girin",
+        "your_pass": "Şifreniz",
+        "security": "Güvenlik",
+        "change_password": "Şifreyi Değiştir",
+        "current_password": "Mevcut Şifre",
+        "new_password": "Yeni Şifre",
+        "confirm_password": "Yeni Şifreyi Onayla",
+        "password_hint": "En az 8 karakterden oluşmalı, büyük harf, küçük harf ve rakamlar içermelidir",
+        "password_requirements": "Şifre büyük harf, küçük harf ve sayısal karakterler içermelidir",
+        "password_changed": "Şifre başarıyla değiştirildi",
+        "change_password_failed": "Şifre değiştirilemedi",
+        "current_password_required": "Mevcut şifre gereklidir",
+        "passwords_not_match": "Şifreler eşleşmiyor",
+        "password_too_short": "Şifre en az 8 karakter uzunluğunda olmalıdır",
+        "not_authenticated": "Giriş yapmanız gerekiyor",
+        "password_required": "Silmeyi onaylamak için lütfen şifrenizi girin",
+        "logout_all_devices": "Tüm cihazlardan çıkış yap",
+        "updating": "Güncelleniyor...",
+        "update_password": "Şifreyi Güncelle",
+        "confirm_delete_prompt": "Hesap silmeyi onaylamak için DELETE yazın:"
+      },
+      "ai_enhancement": {
+        "title": "Yapay Zeka ile Geliştirilmiş Özgeçmiş",
+        "enhance_all": "Tüm Bölümleri Yapay Zeka ile Geliştir",
+        "enhancing": "Geliştiriliyor...",
+        "loading": "Yükleniyor...",
+        "error_message": "Bölüm geliştirilemedi",
+        "create_resume_first": "Lütfen önce bir özgeçmiş oluşturun",
+        "current_content": "Mevcut İçerik",
+        "no_experiences": "Listelenen deneyim yok",
+        "work_experiences": "iş deneyimleri",
+        "no_recommendations": "Henüz öneri oluşturulmadı",
+        "generate_tips": "İpuçları Oluştur",
+        "enhance": "Geliştir",
+        "no_suggestions": "Henüz Yapay Zeka önerisi yok. Geliştirmeler için \"Geliştir\"e tıklayın.",
+        "ai_suggestions": "Yapay Zeka Önerileri",
+        "apply": "Uygula",
+        "reject": "Reddet",
+        "resume_preview": "Mevcut Özgeçmiş Önizlemesi",
+        "preview_note": "Not: Bu basitleştirilmiş bir önizlemedir. Değişiklikler geçici olarak kaydedilir ve özgeçmişinizi kaydettiğinizde uygulanacaktır.",
+        "resume_editor": "Özgeçmiş Düzenleyicisi",
+        "resume_preview_title": "Özgeçmiş Önizlemesi",
+        "tips_on_formatting": "Biçimlendirme ve Organizasyon Hakkında İpuçları",
+        "gaps_inconsistencies": "Boşlukların ve Tutarsızlıkların Tespiti",
+        "strengthening_narrative": "Genel Anlatıyı Güçlendirme Önerileri",
+        "implementation_note": "Bu önerileri uygulayarak, CV'niz niteliklerinizi ve gelişmiş roller için hazır olduğunuzu daha net ve etkileyici bir şekilde sergileyecektir.",
+        "cv_recommendations": "CV Önerileri",
+        "ai_tips": "Yapay Zeka İpuçları",
+        "suggestions_count": "Öneri",
+        "suggestions_plural": "Öneriler"
+      },
+      "preview": {
+        "canvas": "Tuval",
+        "pdf": "PDF",
+        "html": "HTML",
+        "view_mode": "Görünüm Modu",
+        "export_as_pdf": "PDF olarak Dışa Aktar",
+        "export_as_docx": "Word olarak Dışa Aktar",
+        "print_resume": "Yazdır",
+        "pdf_success": "PDF başarıyla dışa aktarıldı!",
+        "pdf_error": "PDF dışa aktarılamadı",
+        "word_success": "Word belgesi başarıyla dışa aktarıldı!",
+        "word_error": "Word belgesi dışa aktarılamadı. Lütfen tekrar deneyin.",
+        "print_error": "Yazdırma başarısız oldu. Lütfen tekrar deneyin."
+      },
+      "editor": {
+        "resume_sections": "Özgeçmiş Bölümleri",
+        "preview_resume": "Özgeçmiş Önizlemesi",
+        "edit_resume": "Özgeçmiş Düzenle"
+      },
+      "contact": {
+        "title": "Bize Ulaşın",
+        "intro": "Sizden duymak için can atıyoruz! Lütfen aşağıdaki formu doldurun, ekibimiz mümkün olan en kısa sürede size geri dönecektir.",
+        "form": {
+          "name": "Ad Soyad",
+          "name_placeholder": "Adınız",
+          "email": "E-posta",
+          "email_placeholder": "E-posta adresiniz",
+          "subject": "Konu",
+          "subject_placeholder": "Mesajınızın konusu",
+          "message": "Mesaj",
+          "message_placeholder": "Mesajınız",
+          "submit": "Mesaj Gönder",
+          "sending": "Gönderiliyor...",
+          "success": "Mesajınız için teşekkür ederiz! En kısa sürede size geri dönüş yapacağız.",
+          "error": "Mesajınız gönderilemedi. Lütfen daha sonra tekrar deneyin."
+        },
+        "info": {
+          "title": "İletişim Bilgileri",
+          "email": "E-posta",
+          "phone": "Telefon",
+          "address": "Adres",
+          "hours": "Çalışma Saatleri"
+        }
+      },
+      "CoverLetter": {
+    "title": "Ön Yazı Oluşturucu",
+    "viewAll": "Tüm Ön Yazıları Görüntüle",
+    "view_saved": "Kaydedilen Yazıyı Görüntüle",
+    "form": {
+      "title": "Ön Yazı Başlığı",
+      "title_prefix": "İçin Ön Yazı",
+      "title_placeholder": "Kolay referans için ön yazınıza bir başlık verin",
+      "full_name": "Ad Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "company_name": "Şirket Adı",
+      "job_title": "İş Unvanı",
+      "hiring_manager": "İşe Alım Yöneticisi",
+      "hiring_manager_title": "İşe Alım Yöneticisi Unvanı",
+      "hiringManagerTitle_placeholder": "Örn. İK Direktörü",
+      "job_description": "İş Tanımı",
+      "upload_cv": "Özgeçmiş Yükle",
+      "supported_formats": "Desteklenen Formatlar: .txt, .doc, .docx, .pdf",
+      "file": "Dosya",
+      "enter": "Gir",
+      "submit": "Ön Yazı Oluştur",
+      "using_stored_resume": "Ön yazınızı oluşturmak için kayıtlı özgeçmişinizi kullanacağız.",
+      "generating": "Oluşturuluyor...",
+      "generate_button": "Ön Yazı Oluştur",
+      "fullName_placeholder": "Tam adınızı girin",
+      "email_placeholder": "E-posta adresinizi girin",
+      "phone_placeholder": "Telefon numaranızı girin",
+      "companyName_placeholder": "Şirket adını girin",
+      "jobTitle_placeholder": "İş unvanını girin",
+      "hiringManager_placeholder": "İşe alım yöneticisinin adını girin",
+      "jobDescription_placeholder": "İş tanımını buraya yapıştırın...",
+      "save_to_account": "Bu ön yazıyı hesabıma kaydet",
+      "resume_source": "Özgeçmiş Kaynağını Seçin",
+      "select_stored_resume": "Kayıtlı özgeçmişlerden seçin",
+      "select_resume": "-- Bir özgeçmiş seçin --",
+      "resume_required": "Lütfen bir özgeçmiş seçin veya dosya yükleyin",
+      "personal_info": "Kişisel Bilgileriniz",
+      "job_details": "İş Detayları",
+      "job_description_tip": "İş tanımı ne kadar kapsamlı olursa, ön yazınız o kadar özel hazırlanacaktır"
+    },
+    "preview": {
+      "title": "Önizleme",
+      "empty_state": "Oluşturulduktan sonra ön yazınız burada görünecektir",
+      "generating": "Yapay Zeka ön yazınızı oluşturuyor...",
+      "generating_note": "İş tanımının karmaşıklığına bağlı olarak bu bir dakikaya kadar sürebilir.",
+      "company": "Şirket",
+      "position": "Pozisyon",
+      "updated": "Son Güncelleme",
+      "no_results": "Arama kriterlerinize uyan ön yazı bulunamadı"
+    },
+    "success": {
+      "file_uploaded": "Dosya başarıyla yüklendi!",
+      "letter_generated": "Ön yazı başarıyla oluşturuldu!",
+      "copied": "Ön yazı panoya kopyalandı!",
+      "downloaded": "Ön yazı başarıyla indirildi!"
+    },
+    "errors": {
+      "no_cv": "Lütfen özgeçmişinizi yükleyin",
+      "word_processing": "Word belgesi işlenemedi. Lütfen geçerli bir .doc veya .docx dosyası olduğundan emin olun.",
+      "pdf_processing": "PDF dosyası işlenemedi. Lütfen geçerli bir PDF olduğundan emin olun.",
+      "unsupported_format": "Desteklenmeyen dosya formatı. Lütfen .txt, .doc, .docx veya .pdf kullanın",
+      "no_content": "Dosyada okunabilir içerik bulunamadı",
+      "file_processing": "Dosya işlenemedi. Lütfen tekrar deneyin.",
+      "rate_limit": "Lütfen tekrar denemeden önce {{seconds}} saniye bekleyin.",
+      "model_loading": "Model yükleniyor... Deneme {{attempt}}/{{maxRetries}}",
+      "api_rate_limit": "Hız sınırı aşıldı. Bekleniyor... Deneme {{attempt}}/{{maxRetries}}",
+      "authentication": "Kimlik doğrulama hatası. Lütfen API token'ınızı kontrol edin.",
+      "server_error": "Sunucu hatası. Daha kısa girdi ile deneniyor...",
+      "invalid_response": "Geçersiz yanıt formatı alındı. Yeniden deneniyor...",
+      "empty_response": "Model boş yanıt verdi. Yeniden deneniyor...",
+      "unexpected": "Beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+      "generation": "Ön yazı oluşturulamadı",
+      "no_content": "Ön yazı verisi alınamadı",
+      "requiredFields": "Lütfen tüm zorunlu alanları doldurun",
+      "selectResume": "Lütfen bir özgeçmiş yükleyin veya hesabınızdan bir özgeçmiş seçin"
+    },
+    "alerts": {
+      "selectResume": "Lütfen bir özgeçmiş yükleyin veya hesabınızdan bir özgeçmiş seçin",
+      "requiredFields": "Lütfen tüm zorunlu alanları doldurun"
+    },
+    "prompt": {
+      "task": "Görev: Aşağıdaki bilgileri kullanarak profesyonel bir ön yazı oluşturun.",
+      "context": "Bağlam: Bu bir iş başvurusu içindir. Adayın ilgili deneyimini vurgulayan ve rol için heyecanını gösteren resmi, iyi yapılandırılmış bir ön yazı oluşturun.",
+      "format_requirements": "Format Gereksinimleri",
+      "format_item1": "Uygun tarih ve adres bloğu ile başlayın",
+      "format_item2": "Profesyonel bir selamla başlayın",
+      "format_item3": "3-4 özlü paragraf ekleyin",
+      "format_item4": "Profesyonel bir kapanışla bitirin",
+      "format_item5": "İmzada tam iletişim bilgilerini ekleyin",
+      "candidate_info": "Aday Bilgileri",
+      "name": "Ad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "position_details": "Pozisyon Detayları",
+      "company": "Şirket",
+      "role": "Rol",
+      "hiring_manager": "İşe Alım Yöneticisi",
+      "default_hiring_manager": "İşe Alım Yöneticisi",
+      "cv_highlights": "Özgeçmiş Öne Çıkanları",
+      "job_description_highlights": "İş Tanımı Öne Çıkanları",
+      "important_notes": "Önemli Notlar",
+      "note_item1": "Adayın deneyimini iş gereksinimleriyle eşleştirmeye odaklanın",
+      "note_item2": "Profesyonel ve heyecanlı bir ton koruyun",
+      "note_item3": "Katkılar ve başarılar hakkında spesifik olun",
+      "note_item4": "Rol ve şirkete karşı gerçek ilgiyi ifade edin",
+      "note_item5": "Ön yazıyı özlü ve etkileyici tutun",
+      "final_instruction": "Lütfen bu bilgileri kullanarak eksiksiz bir ön yazı oluşturun.",
+      "instruction_text": "İçeriği yapılandırmak için madde işaretlerini kullanın"
+    },
+    "signature": {
+      "closing": "Saygılarımla",
+      "email": "E-posta",
+      "phone": "Telefon"
+    },
+    "download_prefix": "Ön_Yazı",
+    "login_notice": "ön yazılarınızı kaydetmek ve kayıtlı özgeçmişlerinizi kullanmak için"
+  },
+  "coverLetterDetail": {
+    "back": "Ön yazılara geri dön",
+    "errors": {
+      "load": "Ön yazı yüklenemedi",
+      "format": "Ön yazı biçimlendirilemedi",
+      "favorite": "Favori durumu güncellenemedi",
+      "delete": "Ön yazı silinemedi",
+      "copy": "Panoya kopyalanamadı",
+      "notFound": {
+        "title": "Ön Yazı Bulunamadı",
+        "message": "Aradığınız ön yazı mevcut değil veya görüntüleme izniniz yok."
+      }
+    },
+    "success": {
+      "copied": "Ön yazı panoya kopyalandı",
+      "downloaded": "Ön yazı indirildi",
+      "deleted": "Ön yazı başarıyla silindi",
+      "addedFavorite": "Favorilere eklendi",
+      "removedFavorite": "Favorilerden çıkarıldı"
+    },
+    "delete_confirm": {
+      "title": "Silmeyi Onayla",
+      "message": "Bu ön yazıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+    },
+    "last_updated": "Son güncelleme",
+    "content": "Ön Yazı",
+    "no_content": "İçerik mevcut değil",
+    "details": "Detaylar",
+    "company": "Şirket",
+    "position": "Pozisyon",
+    "recipient": "Alıcı",
+    "created": "Oluşturulma",
+    "not_specified": "Belirtilmemiş",
+    "actions": {
+      "favorite": "Favorilere Ekle",
+      "unfavorite": "Favorilerden Çıkar",
+      "delete": "Ön Yazıyı Sil"
+    }
+  },
+  "coverLetterView": {
+    "untitled": "Başlıksız Ön Yazı",
+    "created": "Oluşturulma",
+    "updated": "Güncelleme",
+    "fields": {
+      "company": "Şirket",
+      "position": "Pozisyon",
+      "recipient": "Alıcı"
+    },
+    "content": {
+      "title": "Ön Yazı İçeriği"
+    },
+    "jobDescription": {
+      "title": "İş Tanımı"
+    },
+    "linkedResume": {
+      "title": "Bağlantılı Özgeçmiş",
+      "loading": "Özgeçmiş bilgileri yükleniyor...",
+      "view": "Özgeçmişi Görüntüle"
+    },
+    "actions": {
+      "backToDashboard": "Panoya Geri Dön"
+    },
+    "errors": {
+      "load": "Ön yazı yüklenemedi",
+      "format": "Ön yazı biçimlendirilemedi",
+      "favorite": "Favori durumu güncellenemedi",
+      "delete": "Ön yazı silinemedi",
+      "notFound": {
+        "title": "Ön Yazı Bulunamadı",
+        "message": "Aradığınız ön yazı mevcut değil veya görüntüleme izniniz yok."
+      }
+    },
+    "success": {
+      "copied": "Ön yazı panoya kopyalandı!",
+      "downloaded": "Ön yazı başarıyla indirildi",
+      "deleted": "Ön yazı başarıyla silindi",
+      "addedFavorite": "Favorilere eklendi",
+      "removedFavorite": "Favorilerden çıkarıldı"
+    },
+    "delete_confirm": {
+      "title": "Silmeyi Onayla",
+      "message": "Bu ön yazıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+    }
+  },
+  "coverLetterEditor": {
+    "title": "Ön Yazıyı Düzenle",
+    "tabs": {
+      "edit": "Düzenle",
+      "preview": "Önizleme"
+    },
+    "fields": {
+      "title": "Ön Yazı Başlığı",
+      "companyName": "Şirket Adı",
+      "jobTitle": "İş Unvanı",
+      "recipientName": "Alıcı Adı",
+      "recipientTitle": "Alıcı Unvanı",
+      "jobDescription": "İş Tanımı",
+      "coverLetterContent": "Ön Yazı İçeriği",
+      "greeting": "Selamlama",
+      "introduction": "Giriş",
+      "bodyParagraphs": "Ana Paragraflar",
+      "closing": "Kapanış",
+      "signature": "İmza"
+    },
+    "placeholders": {
+      "title": "[Şirket]'te [Pozisyon] için Ön Yazı",
+      "companyName": "Şirket Adı",
+      "jobTitle": "Pozisyon Unvanı",
+      "recipientName": "İşe Alım Yöneticisi Adı",
+      "recipientTitle": "İşe Alım Yöneticisi Unvanı",
+      "jobDescription": "İş tanımını buraya yapıştırın...",
+      "coverLetterContent": "Ön yazı içeriğini JSON formatında girin...",
+      "greeting": "Sayın İşe Alım Yöneticisi,",
+      "introduction": "İlgili pozisyon için ilgi duyduğumu belirtmek için yazıyorum...",
+      "bodyParagraph": "İlgili deneyimlerinizi açıklayın...",
+      "closing": "Ekibinize katılma fırsatı için heyecanlıyım...",
+      "signature": "Saygılarımla, [Adınız]"
+    },
+    "buttons": {
+      "switchToRaw": "Ham Editöre Geç",
+      "switchToRich": "Zengin Editöre Geç",
+      "addParagraph": "+ Paragraf Ekle",
+      "removeParagraph": "Paragrafı Kaldır",
+      "initializeParagraphs": "Ana Paragrafları Başlat"
+    },
+    "notes": {
+      "rawEditor": "Not: Bu ham JSON içeriktir. Geçerli JSON biçimlendirmesini koruduğunuzdan emin olun."
+    },
+    "errors": {
+      "load": "Ön yazı yüklenemedi",
+      "save": "Ön yazı kaydedilemedi",
+      "preview": "Önizleme oluşturulamadı",
+      "invalidJson": "Ön yazı içeriğinde geçersiz JSON formatı",
+      "parsingError": "İçerik ayrıştırılırken hata oluştu. Ham editöre geçiliyor."
+    },
+    "success": {
+      "save": "Ön yazı başarıyla kaydedildi",
+      "copied": "Ön yazı panoya kopyalandı!",
+      "downloaded": "Ön yazı başarıyla indirildi"
+    }
+  },
+  "coverLetters": {
+    "title": "Ön Yazılarınız",
+    "description": "Tüm ön yazılarınızı tek bir yerden yönetin",
+    "actions": {
+      "new": "Yeni Ön Yazı Oluştur"
+    },
+    "empty": {
+      "title": "Henüz Ön Yazı Yok",
+      "message": "Henüz hiç ön yazı oluşturmadınız. İlk ön yazınızı oluşturarak başlayın.",
+      "action": "İlk Ön Yazınızı Oluşturun"
+    },
+    "search": {
+      "placeholder": "Ön yazılarda ara..."
+    },
+    "filter": {
+      "favorites": "Yalnızca Favorileri Göster"
+    },
+    "table": {
+      "title": "Başlık",
+      "company": "Şirket",
+      "position": "Pozisyon",
+      "date": "Son Güncelleme",
+      "actions": "İşlemler"
+    },
+    "no_results": "Arama kriterlerinize uyan ön yazı bulunamadı",
+    "errors": {
+      "load": "Ön yazılar yüklenemedi",
+      "delete": "Ön yazı silinemedi",
+      "favorite": "Favori durumu güncellenemedi",
+      "preview": "Ön yazı önizlemesi oluşturulamadı"
+    },
+    "success": {
+      "deleted": "Ön yazı başarıyla silindi",
+      "favorited": "Favorilere eklendi",
+      "unfavorited": "Favorilerden çıkarıldı",
+      "copied": "Ön yazı panoya kopyalandı!",
+      "downloaded": "Ön yazı başarıyla indirildi"
+    },
+    "delete_confirm": {
+      "title": "Silmeyi Onayla",
+      "message": "Bu ön yazıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+    },
+    "preview": {
+      "company": "Şirket",
+      "position": "Pozisyon",
+      "updated": "Son Güncelleme"
+    }
+  },
+  "resumeDashboard": {
+    "title": "Özgeçmişlerim",
+    "loading": "Özgeçmişleriniz yükleniyor...",
+    "noResumes": {
+      "title": "Henüz hiç özgeçmişiniz yok",
+      "description": "İlk profesyonel özgeçmişinizi oluşturun ve kariyer yolculuğunuzda bir sonraki adımı atın!"
+    },
+    "defaultTitle": "Özgeçmişim",
+    "unnamed": "İsimsiz Özgeçmiş",
+    "lastUpdated": "Son güncelleme",
+    "preview": "Özgeçmiş Önizlemesi",
+    "confirmDelete": "Bu özgeçmişi silmek istediğinizden emin misiniz?",
+    "errors": {
+      "noResumeId": "Özgeçmiş ID'si mevcut değil"
+    },
+    "buttons": {
+      "startBuilding": "Özgeçmişinizi Oluşturmaya Başlayın",
+      "createNew": "Yeni Özgeçmiş Oluştur",
+      "view": "Görüntüle",
+      "edit": "Düzenle",
+      "customize": "Özelleştir",
+      "delete": "Sil"
+    }
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "lastUpdated": "Son Güncelleme",
+    "updateDate": "4 Nisan 2025",
+    "intro": "CVATI (\"biz\", \"bizim\" veya \"bize\") gizliliğinizi korumaya kararlıdır. Bu Gizlilik Politikası, özgeçmiş oluşturma hizmetimizi kullandığınızda bilgilerinizi nasıl topladığımızı, kullandığımızı, açıkladığımızı ve koruduğumuzu açıklar.",
+    "collection": {
+      "title": "Topladığımız Bilgiler",
+      "desc": "Hizmetimizi kullanırken gönüllü olarak bize sağladığınız kişisel bilgileri topluyoruz, bunlar şunları içerir:",
+      "personal": "Kişisel detaylar (ad, e-posta adresi, telefon numarası)",
+      "professional": "Profesyonel bilgiler (iş deneyimi, beceriler, eğitim)",
+      "optional": "İsteğe bağlı bilgiler (doğum tarihi, milliyet, adres, fotoğraf)",
+      "account": "Hesap kimlik bilgileri",
+      "usage": "Kullanım verileri ve hizmetle etkileşimler"
+    },
+    "use": {
+      "title": "Bilgilerinizi Nasıl Kullanıyoruz",
+      "desc": "Bilgilerinizi aşağıdaki amaçlarla kullanıyoruz:",
+      "provide": "Hizmetimizi sağlamak ve sürdürmek",
+      "improve": "Hizmetimizi ve kullanıcı deneyimini iyileştirmek",
+      "communicate": "Hizmet güncellemeleri hakkında sizinle iletişim kurmak",
+      "ai": "Yapay Zeka destekli özgeçmiş ve ön yazı oluşturmak",
+      "security": "Güvenliği sağlamak ve dolandırıcılığı önlemek",
+      "legal": "Yasal yükümlülüklere uymak"
+    },
+    "sharing": {
+      "title": "Bilgi Paylaşımı ve Açıklaması",
+      "desc": "Bilgilerinizi şunlarla paylaşabiliriz:",
+      "service": "Hizmet sağlayıcılar (bulut depolama, görüntü barındırma, analitik)",
+      "legal": "Kanun gerektirdiğinde yasal makamlar",
+      "business": "Açık rızanız ile iş ortakları",
+      "note": "Görüntü depolamak için Cloudinary kullanıyoruz. Yüklediğiniz fotoğraflar Cloudinary'nin gizlilik politikasına tabidir."
+    },
+    "storage": {
+      "title": "Veri Depolama ve Güvenlik",
+      "desc": "Kişisel bilgilerinizi korumak için uygun güvenlik önlemleri uyguluyoruz. Ancak, İnternet üzerinden hiçbir iletim yöntemi %100 güvenli değildir ve mutlak güvenliği garanti edemeyiz.",
+      "retention": "Kişisel bilgilerinizi hesabınız aktif olduğu sürece veya size hizmet sağlamak için gerekli olduğu sürece saklıyoruz. Verilerinizin silinmesini her zaman talep edebilirsiniz."
+    },
+    "rights": {
+      "title": "Veri Haklarınız",
+      "desc": "GDPR ve diğer geçerli veri koruma yasaları kapsamında, kişisel verilerinizle ilgili aşağıdaki haklara sahipsiniz:",
+      "access": "Kişisel verilerinize erişim hakkı",
+      "rectify": "Yanlış verileri düzeltme hakkı",
+      "delete": "Silinme hakkı (\"unutulma hakkı\")",
+      "restrict": "İşlemeyi kısıtlama hakkı",
+      "portability": "Veri taşınabilirliği hakkı",
+      "object": "İşlemeye itiraz etme hakkı",
+      "exercise": "Bu hakları kullanmak için uygulamamızdaki hesap ayarlarını kullanabilir veya doğrudan bizimle iletişime geçebilirsiniz."
+    },
+    "cookies": {
+      "title": "Çerezler ve Benzer Teknolojiler",
+      "desc": "Web sitemizde deneyiminizi geliştirmek, kullanımı analiz etmek ve pazarlama çabalarımıza yardımcı olmak için çerezler ve benzer izleme teknolojileri kullanıyoruz. Tarayıcı ayarlarınız aracılığıyla çerezleri kontrol edebilirsiniz."
+    },
+    "ai": {
+      "title": "Yapay Zeka ile Oluşturulan İçerik",
+      "desc": "Hizmetimiz, özgeçmiş içeriği ve ön yazı oluşturmak için Yapay Zeka kullanır. Sağladığınız veriler, kişiselleştirilmiş içerik oluşturmak için Yapay Zeka sistemlerimiz tarafından işlenebilir. Veri işleme sırasında verilerinizi korumak için önlemler alıyoruz ve açık izniniz olmadan kişisel verilerinizi Yapay Zeka modellerini eğitmek için kullanmıyoruz."
+    },
+    "children": {
+      "title": "Çocukların Gizliliği",
+      "desc": "Hizmetimiz 16 yaşın altındaki kişilere yönelik değildir. Ebeveyn izni olmadan bir çocuğun bize kişisel bilgiler sağladığını fark ederseniz, lütfen bizimle iletişime geçin."
+    },
+    "changes": {
+      "title": "Bu Gizlilik Politikasında Yapılan Değişiklikler",
+      "desc": "Gizlilik Politikamızı zaman zaman güncelleyebiliriz. Herhangi bir değişikliği bu sayfada yeni Gizlilik Politikasını yayınlayarak ve \"Son Güncelleme\" tarihini güncelleyerek size bildireceğiz."
+    },
+    "contact": {
+      "title": "Bize Ulaşın",
+      "desc": "Bu Gizlilik Politikası hakkında herhangi bir sorunuz varsa, lütfen bizimle şu adresten iletişime geçin:",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "terms": {
+    "title": "Kullanım Şartları ve Koşulları",
+    "lastUpdated": "Son Güncelleme",
+    "updateDate": "4 Nisan 2025",
+    "intro": "CVATI'ye hoş geldiniz. Bu Kullanım Şartları ve Koşulları, özgeçmiş oluşturma hizmetimiz ve web sitemizin kullanımını düzenler. CVATI'ye erişerek veya kullanarak, bu Şartları kabul etmiş olursunuz.",
+    "definitions": {
+      "title": "1. Tanımlar",
+      "service": "\"Hizmet\"",
+      "serviceDesc": "CVATI web sitesi ve özgeçmiş oluşturma uygulamasını ifade eder.",
+      "content": "\"İçerik\"",
+      "contentDesc": "Hizmetimiz aracılığıyla oluşturulan, yüklenen veya üretilen özgeçmişler, ön yazılar ve diğer materyalleri ifade eder.",
+      "user": "\"Kullanıcı\"",
+      "userDesc": "Hizmetimize erişen veya kullanan herhangi bir birey.",
+      "account": "\"Hesap\"",
+      "accountDesc": "Hizmetimiz içindeki kayıtlı kullanıcı profili."
+    },
+    "accounts": {
+      "title": "2. Kullanıcı Hesapları",
+      "registration": "Bizimle bir hesap oluştururken, doğru, eksiksiz ve güncel bilgiler sağlamanız gerekir. Şifrenizi korumaktan ve hesabınız altında gerçekleşen tüm faaliyetlerden siz sorumlusunuz.",
+      "terminate": "Bu Şartların ihlali de dahil olmak üzere herhangi bir nedenle, hesabınızı derhal, önceden bildirimde bulunmaksızın sonlandırma veya askıya alma hakkını saklı tutarız."
+    },
+    "use": {
+      "title": "3. Kabul Edilebilir Kullanım",
+      "desc": "Hizmetimizi yalnızca yasal amaçlar için ve bu Şartlara uygun olarak kullanmayı kabul edersiniz. Aşağıdakileri yapmamayı kabul edersiniz:",
+      "false": "Herhangi bir yanlış veya yanıltıcı bilgi sağlamak",
+      "impersonate": "Herhangi bir kişi veya kuruluşun kimliğine bürünmek",
+      "infringe": "Herhangi bir patent, ticari marka, ticari sır, telif hakkı veya diğer mülkiyet haklarını ihlal etmek",
+      "harmful": "Virüs veya diğer zararlı kodları yüklemek",
+      "interfere": "Hizmeti veya sunucuları engellemek veya bozmak",
+      "automated": "Hizmete erişmek veya onu kullanmak için otomatik yöntemler kullanmak"
+    },
+    "content": {
+      "title": "4. İçerik Sahipliği ve Lisans",
+      "ownership": "Hizmetimiz aracılığıyla oluşturduğunuz herhangi bir özgeçmiş, ön yazı veya diğer içeriklerin tüm sahiplik haklarını saklı tutarsınız. Ancak, yalnızca Hizmetimizi sağlamak ve geliştirmek amacıyla içeriğinizi kullanmak, çoğaltmak ve görüntülemek için münhasır olmayan, dünya çapında, telif ücretsiz bir lisans verirsiniz.",
+      "responsibility": "Hizmet aracılığıyla oluşturduğunuz, yüklediğiniz veya erişilebilir hale getirdiğiniz tüm içeriklerden yalnızca siz sorumlusunuz. Özgeçmişlerinizde yer alan tüm bilgileri kullanma hakkınız olduğunu ve içeriğin herhangi bir yasayı veya üçüncü taraf haklarını ihlal etmediğini beyan ve garanti edersiniz."
+    },
+    "ai": {
+      "title": "5. Yapay Zeka ile Oluşturulan İçerik",
+      "desc": "Hizmetimiz, özgeçmiş ve ön yazı oluşturmada yapay zekadan yardım alır. Şunları kabul edersiniz ki:",
+      "accuracy": "Yapay zeka ile oluşturulan içerik her zaman doğru veya özel ihtiyaçlarınıza uygun olmayabilir",
+      "review": "Kullanmadan önce tüm yapay zeka ile oluşturulan içerikleri gözden geçirmeli ve düzenlemelisiniz",
+      "responsibility": "Özgeçmiş veya ön yazınızdaki tüm içeriklerden, yapay zeka ile oluşturulan bölümler dahil, nihai olarak siz sorumlusunuz"
+    },
+    "disclaimer": {
+      "title": "6. Garanti Reddi",
+      "desc": "Hizmetimiz \"olduğu gibi\" ve \"mevcut olduğu şekliyle\" sağlanır, açık veya zımni herhangi bir garanti içermez, bunlar arasında ancak bunlarla sınırlı olmamak üzere, pazarlanabilirlik, belirli bir amaca uygunluk veya ihlal olmama zımni garantileri de bulunur.",
+      "success": "Hizmetimizin size istihdam veya mülakat sağlayacağını garanti etmeyiz. Özgeçmiş ve ön yazıların etkinliği, kontrolümüz dışındaki birçok faktöre bağlıdır."
+    },
+    "limitation": {
+      "title": "7. Sorumluluk Sınırlaması",
+      "desc": "Kanunların izin verdiği azami ölçüde, CVATI, yöneticileri, çalışanları veya acenteleri hiçbir durumda dolaylı, cezai, arızi, özel, dolaylı veya örnek niteliğinde zararlardan, kar kaybı, iyi niyet, kullanım, veri veya diğer maddi olmayan kayıplar dahil, bu Hizmetin kullanımından veya kullanamamasından kaynaklanan zararlardan sorumlu tutulamaz."
+    },
+    "privacy": {
+      "title": "8. Gizlilik Politikası",
+      "desc": "Hizmetimizin kullanımı ayrıca Gizlilik Politikamıza tabidir ve bu politika atıf yoluyla bu Şartlara dahil edilmiştir. Kişisel bilgilerinize ilişkin uygulamalarımızı anlamak için Gizlilik Politikamızı incelemenizi rica ederiz."
+    },
+    "termination": {
+      "title": "9. Sonlandırma",
+      "userRight": "Hizmetteki talimatları izleyerek hesabınızı her zaman sonlandırabilirsiniz. Tüm verileriniz Gizlilik Politikamıza uygun olarak silinecektir.",
+      "ourRight": "Bu Şartların ihlali de dahil olmak üzere herhangi bir nedenle hesabınızı derhal, önceden bildirimde bulunmaksızın ve herhangi bir yükümlülük altına girmeksizin sonlandırma veya askıya alma hakkını saklı tutarız. Sonlandırma üzerine, Hizmeti kullanma hakkınız derhal sona erecektir."
+    },
+    "changes": {
+      "title": "10. Şartlarda Değişiklikler",
+      "desc": "İşbu Şartları her zaman değiştirme veya yenileme hakkını saklı tutarız. Revizyonun önemli olması durumunda, yeni şartların yürürlüğe girmesinden en az 30 gün önce bildirimde bulunacağız. Herhangi bir revizyonun yürürlüğe girmesinden sonra Hizmetimize erişmeye veya onu kullanmaya devam ederek, revize edilmiş şartları kabul etmiş olursunuz."
+    },
+    "governing": {
+      "title": "11. Yönetici Hukuk",
+      "desc": "İşbu Şartlar, çatışan hukuk hükümleri dikkate alınmaksızın, [Ülkeniz/Eyaletiniz] kanunlarına göre yorumlanacak ve düzenlenecektir."
+    },
+    "contact": {
+      "title": "12. Bize Ulaşın",
+      "desc": "Bu Şartlar hakkında herhangi bir sorunuz varsa, lütfen bizimle şu adresten iletişime geçin:",
+      "email": "legal@cvati.com"
+    }
+  }, 
+  "cookiePolicy": {
+      "title": "Çerez Politikası",
+      "lastUpdated": "Son Güncelleme",
+      "updateDate": "4 Nisan 2025",
+      "intro": "Bu Çerez Politikası, CVATI'nin (\"biz\", \"bizim\" veya \"bize\") web sitesi ve uygulamasında çerezleri ve benzer teknolojileri nasıl kullandığını açıklar. CVATI'yi kullanarak, bu politikada açıklandığı şekilde çerezlerin kullanımına onay vermiş olursunuz.",
+      "what": {
+        "title": "Çerezler Nedir?",
+        "desc": "Çerezler, web sitelerini ziyaret ettiğinizde cihazınızda (bilgisayar, tablet veya mobil) depolanan küçük metin dosyalarıdır. Web sitelerinin daha verimli çalışmasını, daha iyi bir kullanıcı deneyimi sunmasını ve site sahiplerine bilgi vermesini sağlamak için yaygın olarak kullanılırlar. Çerezler cihazınıza zarar veremez veya cihazınızdaki diğer bilgilere erişemezler."
+      },
+      "types": {
+        "title": "Kullandığımız Çerez Türleri",
+        "essential": {
+          "title": "Zorunlu Çerezler",
+          "desc": "Bu çerezler, web sitesinin düzgün çalışması için gereklidir. Sayfa gezintisi ve web sitesinin güvenli alanlarına erişim gibi temel işlevleri etkinleştirir. Web sitesi bu çerezler olmadan düzgün çalışamaz.",
+          "examples": "Örnekler: Oturum çerezleri, kimlik doğrulama çerezleri"
+        },
+        "preferences": {
+          "title": "Tercih Çerezleri",
+          "desc": "Bu çerezler, web sitesinin yaptığınız seçimleri (dil tercihiniz veya karanlık/açık mod ayarınız gibi) hatırlamasına ve gelişmiş, daha kişisel özellikler sunmasına olanak tanır.",
+          "examples": "Örnekler: Dil ayarları, tema tercihleri"
+        },
+        "analytics": {
+          "title": "Analitik Çerezler",
+          "desc": "Bu çerezler, web sitemizi nasıl kullandığınız, hangi sayfaları ziyaret ettiğiniz ve hangi bağlantılara tıkladığınız hakkında bilgi toplar. Tüm veriler anonimleştirilir ve sizi tanımlamak için kullanılamaz.",
+          "examples": "Örnekler: Google Analytics çerezleri"
+        },
+        "functional": {
+          "title": "İşlevsel Çerezler",
+          "desc": "Bu çerezler gelişmiş işlevsellik ve kişiselleştirmeyi sağlar. Bizim tarafımızdan veya sayfalarımıza eklediğimiz üçüncü taraf sağlayıcılar tarafından ayarlanabilirler.",
+          "examples": "Örnekler: Sohbet servisi çerezleri, kaydedilmiş form verileri"
+        }
+      },
+      "specific": {
+        "title": "Kullandığımız Özel Çerezler",
+        "name": "Ad",
+        "provider": "Sağlayıcı",
+        "purpose": "Amaç",
+        "expiry": "Süre Sonu",
+        "type": "Tür",
+        "consentPurpose": "Çerez tercihlerinizi kaydeder",
+        "themePurpose": "Karanlık/açık mod tercihinizi hatırlar",
+        "languagePurpose": "Dil tercihinizi hatırlar",
+        "authPurpose": "Oturumunuzu açık tutar",
+        "gaPurpose": "Kullanıcıları ayırt etmek için kullanılır",
+        "essential": "Zorunlu",
+        "preference": "Tercih",
+        "analytics": "Analitik"
+      },
+      "thirdParty": {
+        "title": "Üçüncü Taraf Çerezleri",
+        "desc": "Bazı çerezler sayfalarımızda görünen üçüncü taraf hizmetler tarafından yerleştirilir. Çerez kullanabilen aşağıdaki üçüncü taraf hizmetleri kullanıyoruz:",
+        "analytics": "Google Analytics - Web sitesi kullanım analizi için",
+        "cloudinary": "Cloudinary - Görüntü depolama ve işleme için",
+        "oauth": "OAuth sağlayıcıları (sosyal girişi kullanırsanız)"
+      },
+      "manage": {
+        "title": "Çerezleri Yönetme",
+        "desc": "Çoğu web tarayıcısı çerez tercihlerinizi yönetmenize izin verir. Tarayıcınızı çerezleri reddetmek veya çerez gönderildiğinde sizi uyarmak üzere ayarlayabilirsiniz. Bunu yapma yöntemleri tarayıcıdan tarayıcıya ve sürümden sürüme değişir.",
+        "links": "Yaygın tarayıcılar için çerez yönetimi talimatlarının bağlantıları şunlardır:",
+        "note": "Lütfen çerezleri kısıtlamanın web sitemizin işlevselliğini etkileyebileceğini unutmayın. Örneğin, sitemizin tüm etkileşimli özelliklerini kullanamayabilir veya ziyaretler arasında tercihlerinizi kaydedemeyebilirsiniz."
+      },
+      "similar": {
+        "title": "Benzer Teknolojiler",
+        "desc": "Çerezlere ek olarak, cihazınızda veri depolamak ve erişmek için benzer teknolojiler de kullanabiliriz:",
+        "storage": "Yerel Depolama:",
+        "storageDesc": "Tercihlerinizi kaydetmek ve performansı artırmak için tarayıcı yerel depolamasını kullanıyoruz.",
+        "session": "Oturum Depolaması:",
+        "sessionDesc": "Yerel depolamaya benzer, ancak tarayıcınızı kapattığınızda silinir."
+      },
+      "updates": {
+        "title": "Bu Politikada Güncellemeler",
+        "desc": "Teknoloji, düzenleme veya iş uygulamalarımızdaki değişiklikleri yansıtmak için bu Çerez Politikasını zaman zaman güncelleyebiliriz. Herhangi bir değişiklik bu sayfada yayınlanacak ve değişiklikler önemliyse daha belirgin bir bildirim sağlayacağız."
+      },
+      "contact": {
+        "title": "Bize Ulaşın",
+        "desc": "Çerezlerin kullanımı veya bu Çerez Politikası hakkında herhangi bir sorunuz varsa, lütfen bizimle şu adresten iletişime geçin:",
+        "email": "privacy@cvati.com"
+      }
+    },
+    "cookies": {
+      "message": "Deneyiminizi geliştirmek için çerezler kullanıyoruz. Bu siteyi ziyarete devam ederek çerezlerin kullanımını kabul etmiş olursunuz.",
+      "learnMore": "Daha fazla bilgi",
+      "accept": "Kabul Et",
+      "decline": "Reddet"
+    },
+    "prod1": {
+      "hero": {
+        "title": "Hayalinizdeki İşi Bulun",
+        "subtitle": "İşverenlerin dikkatini çeken ve ATS sistemlerini geçen yapay zeka ile etkileyici özgeçmişler ve ikna edici ön yazılar oluşturun."
+      },
+      "sections": {
+        "power_job_search": "Yapay Zeka ile İş Aramanızı Güçlendirin",
+        "power_job_description": "Güçlü yapay zeka araçlarımız, hedef rollerinize uygun profesyonel kalitede özgeçmişler ve ön yazılar oluşturmanıza yardımcı olur.",
+        "job_winning_documents": "İş Kazandıran Belgeler Oluşturun",
+        "job_winning_description": "Öne çıkmanıza ve işverenlerde güçlü bir izlenim bırakmanıza yardımcı olmak için tasarlanmıştır.",
+        "everything_to_succeed": "Başarı için İhtiyacınız Olan Her Şey",
+        "everything_description": "Öne çıkan başvuru materyalleri oluşturmanıza yardımcı olacak özelliklerle dolu.",
+        "how_it_works": "Nasıl Çalışır",
+        "how_it_works_description": "Üç basit adımla dakikalar içinde profesyonel özgeçmişler ve ön yazılar oluşturun.",
+        "what_users_say": "Kullanıcılarımız Ne Diyor",
+        "what_users_description": "Hayallerindeki işi bulmak için CVATI'yi kullanan iş arayanlardan başarı hikayeleri.",
+        "current_language": "Mevcut Dil",
+        "current_template": "Mevcut Şablon",
+        "previous": "Önceki",
+        "next": "Sonraki"
+      },
+      "features": {
+        "ats_templates": {
+          "title": "ATS Optimize Edilmiş Şablonlar",
+          "description": "Özgeçmiş şablonlarımız, Başvuru Takip Sistemlerini geçmek ve özgeçmişinizi işe alım yöneticilerinin önüne çıkarmak için tasarlanmıştır."
+        },
+        "ai_content": {
+          "title": "Yapay Zeka Destekli İçerik Oluşturma",
+          "description": "Hedef rolünüzle eşleşen beceriler, başarılar ve iş tanımları için akıllı öneriler."
+        },
+        "cover_letters": {
+          "title": "Kişiselleştirilmiş Ön Yazılar",
+          "description": "İş tanımıyla eşleşen ve ilgili deneyiminizi vurgulayan özel ön yazılar oluşturun."
+        },
+        "keyword_optimization": {
+          "title": "Anahtar Kelime Optimizasyonu",
+          "description": "Doğru anahtar kelimeleri dahil etmek için iş tanımlarını analiz ediyoruz."
+        },
+        "industry_content": {
+          "title": "Sektöre Özel İçerik",
+          "description": "Sektörünüz ve deneyim seviyeniz için özel içerik."
+        },
+        "resume_analytics": {
+          "title": "Özgeçmiş Analitiği",
+          "description": "Özgeçmişinizin nasıl performans gösterdiğini görün ve iyileştirmek için öneriler alın."
+        },
+        "expert_advice": {
+          "title": "Uzman Destekli Tavsiyeler",
+          "description": "İşe alım yöneticileri ve işe alım uzmanlarından elde edilen bilgilere dayalı içerik."
+        }
+      },
+      "steps": {
+        "enter_details": {
+          "title": "Bilgilerinizi Girin",
+          "description": "Hızlı başlamak için bilgilerinizi doldurun veya mevcut bir özgeçmiş yükleyin."
+        },
+        "ai_enhancement": {
+          "title": "Yapay Zeka İyileştirmesi",
+          "description": "Yapay zekamız, iyileştirmeler önermek için deneyiminizi ve iş gereksinimlerini analiz eder."
+        },
+        "download_apply": {
+          "title": "İndirin ve Başvurun",
+          "description": "İşverenleri etkilemeye hazır, mükemmel biçimlendirilmiş özgeçmişinizi veya ön yazınızı alın."
+        }
+      },
+      "cta": {
+        "title": "Hayalinizdeki İşi Bulmaya Hazır mısınız?",
+        "description": "Yapay zeka destekli araçlarımızla iş arama süreçlerini dönüştüren binlerce profesyonele katılın.",
+        "build_resume": "Özgeçmişimi Oluştur",
+        "create_cover_letter": "Ön Yazı Oluştur"
+      },
+      "stats": {
+        "resumes_created": "Oluşturulan Özgeçmişler",
+        "cover_letters": "Oluşturulan Ön Yazılar",
+        "interview_rate": "Mülakat Başarı Oranı",
+        "job_match": "İş Eşleşme Oranı"
+      }
+    },
+    "feedback": {
+      "title": "Geri Bildiriminizi Paylaşın",
+      "subtitle": "Deneyiminizi paylaşarak CVATI'yi geliştirmemize yardımcı olun",
+      "rating_label": "Deneyiminizi nasıl değerlendirirsiniz?",
+      "rating_required": "Lütfen bir değerlendirme seçin",
+      "email_label": "E-Posta Adresiniz",
+      "email_required": "Lütfen e-posta adresinizi girin",
+      "email_placeholder": "eposta@ornek.com",
+      "comment_label": "Yorumlar (isteğe bağlı)",
+      "comment_placeholder": "Deneyiminiz hakkında bize anlatın...",
+      "submit": "Geri Bildirim Gönder",
+      "submitting": "Gönderiliyor...",
+      "submit_success": "Geri bildiriminiz için teşekkür ederiz!",
+      "submit_error": "Geri bildirim gönderilemedi"
+    },
+    "revamp": {
+    "needsResumeFirst": "Önce bir özgeçmiş seçmelisiniz",
+    "goToMyResumes": "Lütfen Özgeçmişlerim'e gidin ve çalışmak istediğiniz bir özgeçmiş seçin.",
+    "signInFirst": "Dışa aktarmadan önce oturum açıp bir özgeçmiş oluşturmalısınız.",
+    "exploreTemplates": "Profesyonel Şablonları Keşfedin",
+    "exploreTemplatesDescription": "Profesyonelce tasarlanmış özgeçmiş şablonları koleksiyonumuzu gözden geçirin. Başvurunuzu öne çıkarmak için sektörünüze ve kişiliğinize uygun mükemmel stili bulun.",
+    "exploreTemplatesButton": "Şablonları Keşfet",
+    "atsFriendly": "ATS uyumlu tasarımlar",
+    "modernLayouts": "Modern ve geleneksel düzenler",
+    "customizableDesigns": "Tamamen özelleştirilebilir tasarımlar",
+    "browse": "Şablonlara göz at",
+    "accept": "Kabul ediyorum",
+    "or": "Veya",
+    "offline_mode": "Özgeçmişinizi şimdi oluşturabilirsiniz. Kaydetmek veya indirmek için giriş yapın.",
+    "listView": "Liste görünümüne geç",
+    "testimonials": {
+      "role1": "Yazılım Mühendisi",
+      "content1": "CVATI, üç büyük teknoloji şirketinde mülakat almamı sağladı. Yapay zeka önerileri, özgeçmişimin kalabalığın arasından sıyrılmasını sağladı!",
+      "role2": "Pazarlama Uzmanı",
+      "content2": "Ön yazı oluşturucu harika! Deneyimimi ve aradığım tonu mükemmel bir şekilde yakaladı. Bana saatlerce iş kazandırdı.",
+      "role3": "Veri Analisti",
+      "content3": "Geri dönüş almakta zorlandıktan sonra, özgeçmişimi CVATI ile yeniledim ve birkaç gün içinde mülakat talepleri almaya başladım."
+    }
+},
+"jobMatching": {
+    "jobMatching": "İş Eşleştirme",
+    "title": "🎯 Akıllı İş Eşleştirme Analizcisi",
+    "subtitle": "İş başvurunuzun şansı hakkında acımasızca dürüst AI geri bildirimi alın. Şeker kaplama yok - sadece daha iyi işleri daha hızlı bulmanıza yardımcı olacak eyleme dönüştürülebilir içgörüler.",
+    "socialProof": "10.000'den fazla iş arayan tarafından kullanılıyor",
+    
+    "features": {
+      "instantScoring": "🎯 Anlık uyum skoru",
+      "beatATS": "🤖 ATS sistemlerini yenin",
+      "personalizedTips": "💡 Kişiselleştirilmiş ipuçları",
+      "keywordGaps": "📊 Anahtar kelime boşluk analizi",
+      "atsOptimization": "🤖 ATS optimizasyon içgörüleri",
+      "keywordAnalysis": "📊 Detaylı anahtar kelime analizi"
+    },
+
+    "auth": {
+      "unlockPotential": "🎯 Kariyer Potansiyelinizi Açığa Çıkarın",
+      "joinThousands": "Daha iyi işler bulmak için AI'mızı kullanan binlerce iş arayana katılın. Herhangi bir iş başvurusu hakkında anında, dürüst geri bildirim alın.",
+      "getStarted": "🚀 Ücretsiz Başlayın"
+    },
+
+    "methods": {
+      "crewai": {
+        "title": "AI Uzman Paneli",
+        "subtitle": "Uzmanlaşmış işe alım ajanları ekibi",
+        "badge": "En Popüler",
+        "description": "Birden fazla uzman ajan, bir işe alım paneli gibi birlikte çalışarak uygunluğunuzu detaylıca değerlendirir"
+      },
+      "claude": {
+        "title": "Kıdemli AI İşe Alım Uzmanı", 
+        "subtitle": "Bir işe alım yöneticisi gibi gelişmiş akıl yürütme",
+        "badge": "En Doğru",
+        "description": "Yıllarca işe alım deneyimi olan kıdemli bir işe alım uzmanı gibi düşünen son teknoloji AI"
+      },
+      "both": {
+        "title": "Tam Analiz",
+        "subtitle": "Her iki AI sistemi ile çapraz kontrol", 
+        "badge": "En Kapsamlı",
+        "description": "Her iki sistemden içgörü alın ve maksimum güven için nasıl karşılaştırdıklarını görün"
+      }
+    },
+
+    "form": {
+      "title": "✨ Analizinizi Ayarlayın",
+      "chooseAnalysis": "🎯 Analiz Gücünüzü Seçin",
+      "differentApproaches": "Farklı AI yaklaşımları, aynı dürüst sonuçlar",
+      "targetPosition": "🎯 Hedef Pozisyon",
+      "jobTitlePlaceholder": "Örn: Kıdemli Yazılım Mühendisi, Pazarlama Müdürü",
+      "dreamCompany": "🏢 Hayalindeki Şirket",
+      "companyPlaceholder": "Örn: Google, Microsoft, Tesla (isteğe bağlı)",
+      "howSubmitResume": "📄 Özgeçmişinizi nasıl göndermek istersiniz?",
+      "savedCVs": "📁 Kayıtlı CV'lerim",
+      "uploadNew": "📤 Yeni Yükle", 
+      "copyPaste": "✏️ Kopyala & Yapıştır",
+      "selectResume": "Özgeçmiş Seçin",
+      "selectResumeOption": "Koleksiyonunuzdan bir özgeçmiş seçin...",
+      "noResumes": "📝 Henüz kayıtlı özgeçmiş yok. İlk özgeçmişinizi oluşturun veya başlamak için bir tane yükleyin!",
+      "uploadCV": "📤 CV'nizi Yükleyin",
+      "uploadPlaceholder": "📎 Yüklemek için tıklayın veya özgeçmişinizi sürükleyip bırakın",
+      "supportedFormats": "Desteklenen formatlar: PDF, DOC, DOCX, TXT (maks. 5MB)",
+      "processingFile": "🔄 Dosyanız işleniyor...",
+      "resumeContent": "📝 Özgeçmiş İçeriğiniz",
+      "resumeContentPlaceholder": "Özgeçmiş metninizi buraya yapıştırın. Deneyimlerinizi, becerilerinizi ve başarılarınızı ekleyin - ne kadar detaylı olursa analiz o kadar iyi olur!",
+      "jobPosting": "📋 İş İlanı",
+      "jobDescriptionPlaceholder": "Tam iş tanımını buraya kopyalayın. En doğru eşleştirme analizi için gereksinimleri, sorumlulukları ve nitelikleri ekleyin.",
+      "analyzeMatch": "🚀 İş Eşleştirmemi Analiz Et",
+      "takes30Seconds": "(30 saniye sürer)",
+      "aiAnalyzing": "🧠 AI potansiyelinizi analiz ediyor...",
+      "usingMethod": "Kullanılan yöntem",
+      "takesLonger": "⏱️ 2 kat daha uzun sürer ama güven için değer"
+    },
+
+    "progress": {
+      "expertPanel": "🤖 AI uzman panelimiz profilinizi inceliyor...",
+      "deepAnalysis": "🧠 Gelişmiş AI derin analiz yapıyor...",
+      "comprehensive": "⚡ Her iki AI sistemi ile kapsamlı analiz yapılıyor...",
+      "bothTakesTime": "Bu kapsamlı analiz daha uzun sürer ancak maksimum güven sağlar"
+    },
+
+    "scores": {
+      "excellent": "🔥 Mükemmel uyum! Bu rol için en iyi adaylardan birisiniz.",
+      "good": "👍 İyi potansiyel! Birkaç küçük değişiklik sizi önemli ölçüde yükseltebilir.", 
+      "improvement": "📈 Gelişme alanı. İşte başarınızın yol haritası.",
+      "levelUp": "💪 Seviye atlama zamanı! Size tam olarak nasıl yapılacağını göstereceğiz."
+    },
+
+    "results": {
+      "intelligenceReport": "📊 Başvuru Zeka Raporunuz",
+      "readyToDiscover": "Gerçek şansınızı keşfetmeye hazır mısınız?",
+      "fillFormGetInsights": "Formu doldurun ve iş başvurularınızı nasıl yaptığınızı değiştirebilecek anında AI destekli içgörüler elde edin.",
+      "aiComparison": "🔬 AI Sistemleri Karşılaştırması",
+      "confidence": "Güven Seviyesi",
+      "lowConfidence": "Karışık sinyaller tespit edildi",
+      "highConfidence": "Her iki sistem de hemfikir",
+      "jobCompatibility": "🎯 İş Uyumluluk Puanı",
+      "analyzedBy": "Analiz eden",
+      "atsPassRate": "🤖 ATS Geçme Oranı",
+      "beatRobots": "Robotları yenebilecek misiniz?",
+      "recommendation": "💡 Başvurmalı mısınız?",
+      "goForIt": "Hemen başvurun!",
+      "buildUpFirst": "Önce gelişin",
+      "yourSuperpowers": "🌟 Süper Güçleriniz",
+      "levelUpHere": "🎯 Burada Seviye Atlayın",
+      "skillsToAdd": "❌ Eklenmesi Gereken Beceriler",
+      "skillsToAddDesc": "Bu anahtar kelimeler şansınızı artırabilir",
+      "winningKeywords": "✅ Kazanan Anahtar Kelimeleriniz",
+      "winningKeywordsDesc": "Bu alanlarda zaten güçlüsünüz",
+      "yourActionPlan": "🚀 Eylem Planınız",
+      "strategicMoves": "💡 Stratejik Hamleler",
+      "applicationHacks": "✨ Başvuru Hileleri",
+      "keyStrengths": "🌟 Temel Güçlü Yönler",
+      "improvementAreas": "🎯 Gelişim Alanları",
+      "recommendations": "💼 Stratejik Öneriler",
+      "applicationTips": "🚀 Başvuru İpuçları",
+      "missingKeywords": "❌ Eklenmesi Gereken Beceriler ({count} boşluk bulundu)",
+      "presentKeywords": "✅ Kazanan Anahtar Kelimeleriniz ({count} eşleşme)",
+      "applyNow": "Hemen başvurun!",
+      "improveFirst": "Önce gelişin",
+      "analysisComparison": "📊 AI Sistemleri Karşılaştırması"
+    },
+
+    "fileUpload": {
+      "notImplemented": "Not: Gelişmiş dosya ayrıştırma henüz uygulanmadı. En doğru analiz için lütfen özgeçmiş metninizi manuel olarak kopyalayıp yapıştırın."
+    },
+
+    "errors": {
+      "jobDescriptionRequired": "📝 Eşleştirme analizi yapabilmemiz için iş tanımına ihtiyacımız var. Şirketin iş ilanından kopyalayın.",
+      "resumeRequired": "📄 Lütfen niteliklerinizi analiz edebilmemiz için özgeçmiş içeriğinizi sağlayın.",
+      "needLogin": "🔐 AI destekli iş eşleştirme analizinin kilidini açmak için ücretsiz bir hesap oluşturun.",
+      "invalidFileType": "📎 Lütfen PDF, Word belgesi veya metin dosyası yükleyin.",
+      "fileTooLarge": "📦 Dosya çok büyük. Lütfen 5MB altındaki dosyaları kullanın.",
+      "fileProcessingFailed": "⚠️ Dosyanız işlenemedi. Bunun yerine metni kopyalayıp yapıştırmayı deneyin.",
+      "analysisFailed": "🔄 Analiz başarısız oldu (Durum: {status}). Lütfen tekrar deneyin veya destekle iletişime geçin.",
+      "analysisFailedGeneric": "❌ Bir şeyler yanlış gitti. Lütfen girdilerinizi kontrol edin ve tekrar deneyin."
+    }
+  },
+  "ai": {
+    "limit_reached": "Günlük {{limit}} AI isteği kotanızın {{used}} kadarını kullandınız. Lütfen {{hours}} saat sonra tekrar deneyin.",
+    "limit_reached_simple": "Günlük AI limitine ulaşıldı. Lütfen yarın tekrar deneyin.",
+    "limit_info": "Kalan AI istekleri: {{remaining}} / {{limit}}"
+  },
+  "newresume": {
+    "personal_info": {
+      "ai_error": "AI önerileri alınamadı. Lütfen tekrar deneyin.",
+      "summary_error": "Lütfen önce özetinize biraz metin ekleyin",
+      "improve_ai": "AI ile Geliştir",
+      "generating": "Öneriler oluşturuluyor...",
+      "ai_suggestion": "AI Önerisi:",
+      "apply_suggestion": "Öneriyi Uygula",
+      "discard": "Reddet"
+    }
+  }
+  }

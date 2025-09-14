@@ -1,0 +1,86 @@
+# Enable rewrite engine
+RewriteEngine On
+RewriteBase /
+
+# Set proper MIME types
+<IfModule mod_mime.c>
+  # JavaScript
+  AddType application/javascript .js
+  AddType application/javascript .mjs
+  AddType text/javascript .js
+  AddType text/javascript .mjs
+  
+  # JSON
+  AddType application/json .json
+  
+  # CSS
+  AddType text/css .css
+  
+  # SVG
+  AddType image/svg+xml .svg
+  AddType image/svg+xml .svgz
+  
+  # Fonts
+  AddType font/ttf .ttf
+  AddType font/otf .otf
+  AddType font/woff .woff
+  AddType font/woff2 .woff2
+  AddType application/vnd.ms-fontobject .eot
+</IfModule>
+
+# Serve assets directly from /assets directory
+RewriteCond %{REQUEST_URI} ^/assets
+RewriteRule ^ - [L]
+
+# Serve sw.js file directly
+#RewriteRule ^sw\.js$ - [L]
+
+# Don't rewrite files or directories that exist
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Rewrite everything else to index.html for the Single Page Application
+RewriteRule ^ index.html [L]
+
+# Security Headers
+<IfModule mod_headers.c>
+  # CORS Headers
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font\.css|css|js|mjs|json)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+  
+  # Content Security
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Cache control
+<IfModule mod_expires.c>
+  ExpiresActive On
+  
+  # Cache CSS, JS and media files for 1 week
+  ExpiresByType text/css "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+  ExpiresByType text/javascript "access plus 1 week"
+  ExpiresByType image/webp "access plus 1 week"
+  ExpiresByType image/gif "access plus 1 week"
+  ExpiresByType image/png "access plus 1 week"
+  ExpiresByType image/jpg "access plus 1 week"
+  ExpiresByType image/jpeg "access plus 1 week"
+  ExpiresByType image/svg+xml "access plus 1 week"
+  ExpiresByType font/ttf "access plus 1 week"
+  ExpiresByType font/otf "access plus 1 week"
+  ExpiresByType font/woff "access plus 1 week"
+  ExpiresByType font/woff2 "access plus 1 week"
+  ExpiresByType application/vnd.ms-fontobject "access plus 1 week"
+  
+  # Cache HTML and data files for only 1 hour
+  ExpiresByType text/html "access plus 1 hour"
+  ExpiresByType application/json "access plus 1 hour"
+  ExpiresByType application/xml "access plus 1 hour"
+  
+  # Add a default expiry time for all other files
+  ExpiresDefault "access plus 1 day"
+</IfModule>

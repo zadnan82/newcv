@@ -1,0 +1,1509 @@
+{
+  "app": {
+    "title": "CVATI",
+    "theme": {
+      "dark": "Mörkt läge",
+      "light": "Ljust läge"
+    }
+  },
+  "cards": {
+    "cover_letter": {
+      "title": "AI för personligt brev",
+      "subtitle": "Generera skräddarsydda personliga brev direkt",
+      "features": {
+        "quick_gen": "Snabb generering",
+        "quick_gen_desc": "Skapa på några sekunder",
+        "ats_ready": "ATS-förberedd",
+        "ats_ready_desc": "Klarar AI-kontroller"
+      },
+      "actions": {
+        "create": "Skapa personligt brev",
+        "view_templates": "Visa mallar"
+      }
+    },
+    "resume": {
+      "title": "Smart CV-byggare",
+      "subtitle": "AI-driven CV-byggare med smarta förslag.",
+      "recent_resumes": "Senaste CV:n:",
+      "preview": "Förhandsvisning:",
+      "preview_message": "Klicka på 'Skapa CV' för att använda denna mall",
+      "actions": {
+        "build": "Skapa CV",
+        "view_templates": "Visa mallar",
+        "hide_templates": "Dölj mallar"
+      },
+      "validation": {
+        "personal_info_required": "Vänligen fyll i obligatorisk personlig information (fullständigt namn, e-post och mobilnummer)",
+        "education_required": "Vänligen lägg till minst en utbildning med institution, examen och studieområde",
+        "experience_required": "Vänligen lägg till minst en arbetslivserfarenhet med företag och position",
+        "skills_required": "Vänligen lägg till minst en färdighet",
+        "languages_required": "Vänligen lägg till minst ett språk"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Hem",
+    "resumeBuilder": "CV-byggare",
+    "coverLetter": "Generator för personligt brev",
+    "coverLetters": "Personliga brev",
+    "aiEnhancement": "AI-förbättring",
+    "register": "Registrera",
+    "login": "Logga in",
+    "settings": "Inställningar",
+    "myCV": "Mitt CV",
+    "signOut": "Logga ut",
+    "toggleMenu": "Växla meny",
+    "hideOptions": "Dölj alternativ",
+    "showOptions": "Visa alternativ",
+    "dashboard": "Instrumentpanel",
+    "account": "Konto",
+    "myResumes": "Mina CV:n"
+  },
+  "home": {
+    "title": "CVATI",
+    "subtitle": "Skapa professionella CV:n med AI-drivna insikter",
+    "features": {
+      "title": "Huvudfunktioner",
+      "ats": "ATS-optimerad",
+      "ai": "AI-driven",
+      "industry": "Branschspecifik"
+    },
+    "cta": {
+      "title": "Kom igång idag",
+      "subtitle": "Gå med tusentals yrkesverksamma som har förbättrat sina karriärmöjligheter.",
+      "button": "Skapa ditt CV nu",
+      "button_aria": "Skapa ditt CV nu"
+    }
+  },
+  "resume": {
+    "title":{
+      "section": "CV-titel",
+      "title": "CV-byggare",
+      "description": "Ge ditt CV ett namn som hjälper dig att identifiera det senare",
+      "placeholder": "t.ex. CV för mjukvaruutvecklare"
+    },
+    "customizer": {
+      "title": "CV-anpassare",
+      "loading": "Laddar CV-data...",
+      "closeOptions": "Stäng alternativ",
+      "goBack": "Gå tillbaka",
+      "noResume": "Inget CV ",
+      "pleaseCreate": "Vänligen skapa ditt CV här",
+      "goToBuilder": "Gå till CV-byggaren",
+      "saveCustomizations": {
+        "title": "Spara anpassningar", 
+        "description": "Spara dessa anpassningsinställningar för att säkerställa att alla som ser ditt offentliga CV ser det med din valda stil.",
+        "message": "Vill du spara dina anpassningar innan du fortsätter?",
+        "success": "Anpassningar sparades framgångsrikt!",
+        "error": "Det uppstod ett fel när dina anpassningar skulle sparas.",
+        "continueAnyway": "Vill du fortsätta ändå?",
+        "save": "Spara och fortsätt",
+        "continue": "Fortsätt utan att spara",
+        "cancel": "Avbryt"
+      },
+      "templates": {
+        "title": "CV-mall",
+        "selectTemplate": "Välj mall",
+        "templates": "Välj en mall",
+        "styling": "Styling",
+        "sharing": "Delning",
+        "styles": "Stilar", 
+        "selected": "Mall vald",
+        "noTemplatesFound": "Inga mallar hittades"
+      },
+      "color": {
+        "title": "Accentfärg"
+      },
+      "font": {
+        "title": "Typsnittsfamilj",
+        "samples": {
+          "professional": "Professionell och ren",
+          "modern": "Modern och läsbar",
+          "traditional": "Traditionell och elegant",
+          "refined": "Förfinad med bättre läsbarhet",
+          "monospaced": "Monospace och distinkt",
+          "legible": "Modern med hög läsbarhet",
+          "clean": "Ren och professionell",
+          "contemporary": "Samtida och distinkt",
+          "custom": "Anpassat typsnitt"
+        }
+      },
+      "spacing": {
+        "title": "Radavstånd",
+        "compact": "Kompakt",
+        "spacious": "Rymlig"
+      },
+      "headers": {
+        "title": "Rubrikstil",
+        "normal": "Normal text",
+        "uppercase": "VERSALER",
+        "description": "Välj hur sektionsrubriker visas i ditt CV"
+      },
+      "skills": {
+        "title": "Visning av färdighetsnivå",
+        "show": "Visa färdighetsnivåer",
+        "hide": "Dölj färdighetsnivåer",
+        "description": "Växla om färdighetsnivåindikatorer ska visas i ditt CV"
+      },
+      "viewMode": {
+        "title": "Visningsläge",
+        "pdf": "PDF-vy",
+        "html": "HTML-vy",
+        "canvas": "Canvasvy",
+        "switch": "Växla till"
+      },
+      "export": {
+        "pdf": "Exportera som PDF",
+        "docx": "Exportera som DOCX",
+        "word": "Exportera som Word",
+        "exporting": "Exporterar..."
+      },
+      "zoom": {
+        "zoomIn": "Zooma in",
+        "zoomOut": "Zooma ut"
+      }
+    },
+    "templateSelector": {
+      "categories": {
+        "all": "Alla",
+        "professional": "Professionell",
+        "creative": "Kreativ",
+        "modern": "Modern",
+        "classic": "Klassisk",
+        "minimalist": "Minimalistisk",
+        "elegant": "Elegant"
+      }
+    },
+    "templateRenderer": {
+      "error": "Mall hittades inte. Vänligen välj en annan mall."
+    },
+    "experience": {
+      "title": "Erfarenhet",
+      "company": "Företagsnamn",
+      "company_placeholder": "Företagsnamn",
+      "position": "Position",
+      "position_placeholder": "Jobbtitel",
+      "current_work": "Jag arbetar här för närvarande",
+      "description_placeholder": "Beskriv dina ansvarsområden och prestationer...",
+      "add_button": "Lägg till ytterligare erfarenhet"
+    },
+    "education": {
+      "title": "Utbildning",
+      "institution": "Institutionsnamn",
+      "institution_placeholder": "Universitet/Högskola",
+      "degree": "Examen",
+      "degree_placeholder": "t.ex. Kandidat, Magister",
+      "field": "Studieområde",
+      "field_placeholder": "t.ex. Datavetenskap",
+      "currently_studying": "Studerar här för närvarande",
+      "gpa": "Betygsgenomsnitt",
+      "gpa_placeholder": "t.ex. 4.5/5.0",
+      "add_button": "Lägg till ytterligare utbildning"
+    },
+    "skills": {
+      "title": "Färdigheter",
+      "name": "Färdighetsnamn",
+      "name_placeholder": "Ange en färdighet",
+      "level": "Nivå",
+      "add_button": "Lägg till ytterligare färdighet",
+      "beginner": "Nybörjare", 
+      "intermediate": "Medel", 
+      "advanced": "Avancerad", 
+      "expert": "Expert"
+    },
+    "courses": {
+      "title": "Kurser",
+      "name": "Kursnamn",
+      "name_placeholder": "t.ex. Avancerad webbutveckling",
+      "institution": "Institution",
+      "institution_placeholder": "Institutionens eller plattformens namn",
+      "description_placeholder": "Kort beskrivning av kursen och dina prestationer...",
+      "add_button": "Lägg till ytterligare kurs"
+    },
+    "custom_sections": {
+      "title": "Anpassade sektioner",
+      "section_title": "Sektionstitel",
+      "title_placeholder": "t.ex. Projekt, Prestationer, Publikationer",
+      "content": "Innehåll",
+      "content_placeholder": "Sektionsinnehåll...",
+      "add_button": "Lägg till ytterligare sektion"
+    },
+    "extracurricular": {
+      "activity": "Aktiviteter",
+      "name": "Aktivitetsnamn",
+      "name_placeholder": "t.ex. Studentkår, sportlag",
+      "description_placeholder": "Beskriv din roll och dina prestationer...",
+      "add_button": "Lägg till ytterligare aktivitet"
+    },
+    "hobbies": {
+      "title": "Hobbyer",
+      "hobby": "Hobby/Intresse",
+      "placeholder": "t.ex. Fotografering, Läsning, Vandring",
+      "add_button": "Lägg till ytterligare hobby"
+    },
+    "internships": {
+      "title": "Praktikplatser",
+      "position": "Position",
+      "position_placeholder": "Praktikposition",
+      "current_work": "Jag arbetar här för närvarande",
+      "description_placeholder": "Beskriv dina ansvarsområden och prestationer...",
+      "add_button": "Lägg till ytterligare praktikplats"
+    },
+    "languages": {
+      "title": "Språk",
+      "language": "Språk",
+      "language_placeholder": "t.ex. Engelska, Svenska",
+      "proficiency": "Kunskapsnivå",
+      "add_button": "Lägg till ytterligare språk",
+      "levels": {
+        "native": "Modersmål",
+        "fluent": "Flytande",
+        "advanced": "Avancerad",
+        "intermediate": "Medel",
+        "beginner": "Nybörjare"
+      }
+    },
+    "personal_info": {
+      "title": "Personlig information",
+      "full_name": "Fullständigt namn",
+      "full_name_placeholder": "John Doe",
+      "email": "E-post",
+      "email_placeholder": "john@example.com",
+      "mobile": "Mobil",
+      "mobile_placeholder": "+46 (0)70 123 45 67",
+      "title_field": "Yrkestitel",
+      "title_placeholder": "Mjukvaruingenjör",
+      "city": "Stad",
+      "city_placeholder": "Stockholm",
+      "address": "Adress",
+      "address_placeholder": "Huvudgatan 123",
+      "postal_code": "Postnummer",
+      "postal_code_placeholder": "12345",
+      "nationality": "Nationalitet",
+      "nationality_placeholder": "t.ex. Svensk",
+      "driving_license": "Körkort",
+      "driving_license_placeholder": "t.ex. B-körkort",
+      "place_of_birth": "Födelseort",
+      "place_of_birth_placeholder": "Stad, Land",
+      "date_of_birth": "Födelsedatum",
+      "linkedin": "LinkedIn",
+      "linkedin_placeholder": "linkedin.com/in/johndoe",
+      "website": "Webbplats",
+      "website_placeholder": "dinwebbplats.com",
+      "summary": "Professionell sammanfattning",
+      "summary_placeholder": "Kort översikt över din professionella bakgrund...",
+      "summary_error": "Vänligen lägg till text i din sammanfattning först",
+      "ai_error": "Kunde inte få AI-förslag. Försök igen.",
+      "improve_ai": "Förbättra med AI",
+      "generating": "Genererar förslag...",
+      "ai_suggestion": "AI-förslag på förbättring:",
+      "discard": "Förkasta",
+      "apply_suggestion": "Använd förslag"
+    },
+    "photo": {
+      "title": "Profilbild",
+      "alt": "Profil",
+      "remove_photo": "Ta bort bild",
+      "uploading": "Laddar upp...",
+      "change": "Ändra bild",
+      "upload": "Ladda upp bild",
+      "invalid_type": "Vänligen ladda upp en giltig bildfil (JPG, PNG eller GIF)",
+      "size_limit": "Bildstorleken bör vara mindre än 2MB",
+      "process_error": "Fel vid bearbetning av bild. Försök igen.",
+      "max_size": "Maximal storlek: 2MB"
+    },
+    "references": {
+      "title": "Referenser",
+      "provide_upon_request": "Tillhandahålls på begäran",
+      "name": "Namn",
+      "name_placeholder": "Referensens namn",
+      "relation": "Relation/Position",
+      "relation_placeholder": "t.ex. Tidigare chef, professor",
+      "phone": "Telefon",
+      "phone_placeholder": "Kontaktnummer",
+      "email": "E-post",
+      "email_placeholder": "E-postadress",
+      "add_button": "Lägg till ytterligare referens"
+    },
+    "preview": {
+      "title": "CV-förhandsvisning",
+      "example": "Exempel-CV",
+      "your_resume": "Ditt CV"
+    },
+    "shared_view": "Delat CV",
+    "not_found": {
+      "title": "CV hittades inte",
+      "message": "Det CV du letar efter finns inte eller är inte offentligt."
+    }, 
+    "publicStatus": {
+      "title": "CV-sekretess",
+      "status": "Status",
+      "public": "Offentlig",
+      "private": "Privat",
+      "public_description": "Ditt CV är för närvarande offentligt. Alla med länken kan se det.",
+      "private_description": "Ditt CV är för närvarande privat. Endast du kan se det.",
+      "make_public": "Gör CV offentligt",
+      "make_private": "Gör CV privat"
+    },
+    "qrcode": {
+      "title": "Dela CV",
+      "description": "Skanna denna QR-kod för att visa CV:t på vilken enhet som helst",
+      "public_link": "Offentlig länk",
+      "open_link": "Öppna CV",
+      "copy_link": "Kopiera länk",
+      "download": "Ladda ner QR",
+      "copied": "Länk kopierad till urklipp!"
+    },
+    "actions": {
+          "save_resume": "Spara CV",
+          "save_changes": "Spara ändringar",
+          "customize": "Anpassa CV",
+          "saving": "Sparar...",
+          "create_success": "CV skapat framgångsrikt!",
+          "update_success": "CV uppdaterat framgångsrikt!",
+          "already_exists": "Du har redan ett CV. Uppdaterar befintligt CV..."
+        }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Integritetspolicy",
+      "intro": "Välkommen till CVATI. Vi respekterar din integritet och är fast beslutna att skydda dina personuppgifter."
+    },
+    "terms": {
+      "title": "Användarvillkor",
+      "intro": "Välkommen till CVATI. Dessa användarvillkor reglerar din användning av vår webbplats och tjänster."
+    },
+    "cookies": {
+      "title": "Cookiepolicy",
+      "whatAre": "Vad är cookies",
+      "howUse": "Hur vi använder cookies",
+      "specific": "Specifika cookies vi använder",
+      "managing": "Hantera cookies",
+      "consent": "Cookie-samtycke",
+      "changes": "Ändringar i denna Cookiepolicy"
+    },
+    "dataDeletion": {
+      "title": "Begäran om dataradering",
+      "intro": "Enligt olika integritetslagar har du rätt att begära radering av dina personuppgifter.",
+      "form": {
+        "email": "E-postadress",
+        "emailHelp": "Vi kommer att använda denna e-post för att identifiera ditt konto och kommunicera om din begäran.",
+        "additionalInfo": "Ytterligare information (Valfritt)",
+        "submit": "Skicka raderingsbegäran"
+      },
+      "success": "Din begäran om dataradering har skickats in. Vi kommer att behandla din begäran och kontakta dig på {email} inom 30 dagar.",
+      "whatDeleted": {
+        "title": "Vilka data kommer att raderas",
+        "intro": "Vid behandling av din begäran kommer vi att radera följande data som är kopplade till ditt konto:"
+      }
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "CVATI",
+      "description": "Skapa professionella CV:n med AI-drivna insikter för att förbättra dina karriärmöjligheter."
+    },
+    "quickLinks": {
+      "title": "Snabblänkar",
+      "home": "Hem",
+      "resumeBuilder": "CV-byggare",
+      "coverLetter": "Generator för personligt brev",
+      "aiEnhancement": "AI-förbättring"
+    },
+    "legal": {
+      "title": "Juridiskt",
+      "terms": "Användarvillkor",
+      "privacy": "Integritetspolicy",
+      "cookies": "Cookiepolicy",
+      "dataDeletion": "Dataradering"
+    },
+    "contact": {
+      "title": "Kontakta oss",
+      "contactForm": "Kontaktformulär"
+    },
+    "copyright": "CVATI",
+    "rights": "Alla rättigheter förbehållna"
+  },
+  "auth": {
+    "login": {
+      "title": "Logga in",
+      "email": "E-post",
+      "password": "Lösenord",
+      "forgotPassword": "Glömt lösenord?",
+      "submit": "Logga in",
+      "noAccount": "Har du inget konto?",
+      "register": "Registrera dig här",
+      "socialLogin": "Eller logga in med",
+      "welcome_back": "Välkommen tillbaka",
+      "sign_in_to_continue": "Logga in för att fortsätta använda våra tjänster",
+      "loading": "Laddar..."
+    },
+    "register": {
+      "title": "Registrera",
+      "create_account": "Skapa konto",
+      "sign_up_to_start": "Registrera dig för att börja bygga ditt CV",
+      "name": "Fullständigt namn",
+      "first_name": "Förnamn",
+      "last_name": "Efternamn",
+      "email": "E-post",
+      "password": "Lösenord",
+      "confirmPassword": "Bekräfta lösenord",
+      "submit": "Registrera",
+      "sign_up": "Registrera dig",
+      "creating_account": "Skapar konto...",
+      "haveAccount": "Har du redan ett konto?",
+      "login": "Logga in här",
+      "socialRegister": "Eller registrera med"
+    },
+    "social": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "error": "Fel vid social autentisering",
+      "success": "Autentisering lyckades",
+      "or_continue_with": "Eller fortsätt med"
+    },
+    "callback": {
+      "processing": "Bearbetar inloggning",
+      "please_wait": "Vänligen vänta...",
+      "auth_error": "Autentiseringsfel",
+      "return_to_login": "Återgå till inloggning",
+      "no_token": "Ingen autentiseringstoken mottagen",
+      "auth_failed": "Autentisering misslyckades. Försök igen."
+    },
+    "error": {
+      "title": "Inloggningsfel",
+      "return_to_login": "Återgå till inloggning"
+    }
+  },
+  "language": {
+    "title": "Välj språk",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français"
+  },
+  "common": {
+    "remove": "Ta bort",
+    "required_fields": "* Obligatoriska fält",
+    "start_date": "Startdatum",
+    "end_date": "Slutdatum",
+    "location": "Plats",
+    "location_placeholder": "Stad, Land",
+    "description": "Beskrivning",
+    "max_chars": "Maximalt {{count}} tecken",
+    "loading": "Laddar...",
+    "tonow" : "Pågående", 
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Radera",
+    "edit": "Redigera",
+    "apply": "Tillämpa",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "submit": "Skicka",
+    "search": "Sök",
+    "filter": "Filtrera",
+    "sortBy": "Sortera efter",
+    "actions": "Åtgärder",
+    "success": "Lyckades!",
+    "error": "Fel!",
+    "warning": "Varning!",
+    "info": "Information",
+    "company": "Företag",
+    "company_placeholder": "Företagsnamn",
+    "continue": "Fortsätt",
+    "back_to_editor": "Tillbaka till redigeraren",
+    "choose_template": "Välj mall",
+    "choose_your_templates": "Välj dina mallar",
+    "print": "Skriv ut",
+    "preparing": "Förbereder...",
+    "example_resume": "Exempel-CV",
+    "page": "Sida",
+    "of": "av",
+    "dismiss": "Avfärda",
+    "enhancing": "Förbättrar...",
+    "enhance": "Förbättra",
+    "enhance_with_ai": "Förbättra med AI",
+    "generate_tips": "Generera tips",
+    "ai_suggestions": "AI-förslag",
+    "apply_suggestion": "Använd förslag",
+    "reject": "Avvisa",
+    "ai_tips": "AI-tips",
+    "at": "hos",
+    "in": "i",
+    "copy": "Kopiera",
+    "download": "Ladda ner",
+    "untitled": "Namnlös",
+    "notSpecified": "Ej angiven",
+    "view": "Visa",
+    "favorite": "Lägg till i favoriter",
+    "unfavorite": "Ta bort från favoriter",
+    "local_draft": "Sparad lokalt",
+    "lastRefresh": "Senast uppdaterad ",
+    "refresh": "Uppdatera",
+    "cardView": "Byt till kortvy",
+     "loadingCover": "Laddar personliga brev...",
+     "ai": "AI",
+     "ai_enhancement": "AI-förbättring",
+     "no_summary": "Ingen sammanfattning tillagd ännu",
+     "save_changes": "Spara ändringar och återgå till redigeraren",
+     "select_file": "Välj CV-fil"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "subtitle": "Hantera dina kontoinställningar och preferenser",
+    "profile_info": "Profilinformation",
+    "loading_user": "Laddar användarinformation...",
+    "data_privacy": "Dataintegritet och kontroller",
+    "data_portability": "Dataportabilitet",
+    "data_portability_desc": "Ladda ner all din kontoinformation i ett portabelt format.",
+    "download_data": "Ladda ner mina data",
+    "downloading": "Laddar ner...",
+    "download": "Ladda ner",
+    "copy": "Kopiera",
+    "data_downloaded": "Dina data har laddats ner framgångsrikt.",
+    "download_failed": "Kunde inte ladda ner dina data. Försök igen.",
+    "danger_zone": "Riskzon",
+    "delete_account": "Radera konto",
+    "permanent_warning": "Denna åtgärd är permanent och kan inte ångras.",
+    "delete_warning_1": "All din personliga information kommer att raderas permanent.",
+    "delete_warning_2": "Du kommer att förlora tillgång till alla dina sparade CV:n och personliga brev.",
+    "delete_warning_3": "Ditt konto kan inte återställas när det väl har raderats.",
+    "download_before_delete": "Vi rekommenderar att du laddar ner dina data innan du raderar ditt konto.",
+    "deletion_reason": "Varför raderar du ditt konto? (Valfritt)",
+    "select_reason": "Välj en anledning",
+    "reason_no_longer_needed": "Jag behöver inte längre denna tjänst",
+    "reason_dissatisfied": "Jag är missnöjd med tjänsten",
+    "reason_privacy": "Integritetsproblem",
+    "reason_other": "Annan anledning",
+    "type_delete": "Skriv DELETE för att bekräfta",
+    "confirm_delete": "Bekräfta radering",
+    "deleting": "Raderar...",
+    "account_deleted": "Konto raderat. Omdirigerar...",
+    "delete_failed": "Kunde inte radera kontot. Försök igen.",
+    "enter_pass": "Ange ditt lösenord för att bekräfta",
+    "your_pass": "Ditt lösenord",
+    "security": "Säkerhet",
+    "change_password": "Ändra lösenord",
+    "current_password": "Nuvarande lösenord",
+  "new_password": "Nytt lösenord",
+  "confirm_password": "Bekräfta nytt lösenord",
+  "password_hint": "Måste vara minst 8 tecken med versaler, gemener och siffror",
+  "password_requirements": "Lösenordet måste innehålla versaler, gemener och siffror",
+  "password_changed": "Lösenordet har ändrats framgångsrikt",
+  "change_password_failed": "Kunde inte ändra lösenord",
+  "current_password_required": "Nuvarande lösenord krävs",
+  "passwords_not_match": "Lösenorden matchar inte",
+  "password_too_short": "Lösenordet måste vara minst 8 tecken långt",
+  "not_authenticated": "Du måste vara inloggad", 
+  "password_required": "Ange ditt lösenord för att bekräfta radering",
+  "logout_all_devices": "Logga ut från alla enheter",
+  "updating": "Uppdaterar...",
+  "update_password": "Uppdatera lösenord",
+  "confirm_delete_prompt": "Skriv DELETE för att bekräfta kontoradering:"
+  },
+  "ai_enhancement": {
+    "title": "AI-förbättrat CV",
+    "enhance_all": "Förbättra alla sektioner med AI",
+    "enhancing": "Förbättrar...",
+    "loading": "Laddar...",
+    "error_message": "Fel vid förbättring av sektion",
+    "create_resume_first": "Skapa ett CV först",
+    "current_content": "Nuvarande innehåll",
+    "no_experiences": "Inga erfarenheter listade",
+    "work_experiences": "arbetserfarenheter",
+    "no_recommendations": "Inga rekommendationer genererade ännu",
+    "generate_tips": "Generera tips",
+    "enhance": "Förbättra",
+    "no_suggestions": "Inga AI-förslag ännu. Klicka på \"Förbättra\" för att generera förbättringar.",
+    "ai_suggestions": "AI-förslag",
+    "apply": "Tillämpa",
+    "reject": "Avvisa",
+    "resume_preview": "Nuvarande CV-förhandsvisning",
+    "preview_note": "Obs: Detta är en förenklad förhandsvisning. Ändringar sparas tillfälligt och kommer att tillämpas när du sparar ditt CV.",
+    "resume_editor": "CV-redigerare",
+    "resume_preview_title": "CV-förhandsvisning",
+    "tips_on_formatting": "Tips om formatering och organisation",
+    "gaps_inconsistencies": "Identifiering av eventuella luckor eller inkonsekvenser",
+    "strengthening_narrative": "Förslag för att stärka den övergripande berättelsen",
+    "implementation_note": "Genom att implementera dessa förslag kommer ditt CV att presentera en tydligare, mer slagkraftig berättelse som effektivt visar dina kvalifikationer och beredskap för avancerade roller.",
+    "cv_recommendations": "CV-rekommendationer",
+    "ai_tips": "AI-tips",
+    "suggestions_count": "Förslag",
+    "suggestions_plural": "Förslag"
+  },
+  "preview": {
+    "canvas": "Canvas",
+    "pdf": "PDF",
+    "html": "HTML",
+    "view_mode": "Visningsläge",
+    "export_as_pdf": "Exportera som PDF",
+    "export_as_docx": "Exportera som Word",
+    "print_resume": "Skriv ut",
+    "pdf_success": "PDF har exporterats framgångsrikt!",
+    "pdf_error": "Kunde inte exportera PDF",
+    "word_success": "Word-dokument har exporterats framgångsrikt!",
+    "word_error": "Kunde inte exportera Word-dokument. Försök igen.",
+    "print_error": "Kunde inte skriva ut. Försök igen."
+  },
+  "editor": {
+    "resume_sections": "CV-sektioner",
+    "preview_resume": "Förhandsgranska CV",
+    "edit_resume": "Redigera CV"
+  },
+  "contact": {
+    "title": "Kontakta oss",
+    "intro": "Vi vill gärna höra från dig! Fyll i formuläret nedan, så kontaktar vårt team dig så snart som möjligt.",
+    "form": {
+      "name": "Namn",
+      "name_placeholder": "Ditt namn",
+      "email": "E-post",
+      "email_placeholder": "Din e-postadress",
+      "subject": "Ämne",
+      "subject_placeholder": "Ämne för ditt meddelande",
+      "message": "Meddelande",
+      "message_placeholder": "Ditt meddelande",
+      "submit": "Skicka meddelande",
+      "sending": "Skickar...",
+      "success": "Tack för ditt meddelande! Vi återkommer så snart som möjligt.",
+      "error": "Kunde inte skicka ditt meddelande. Försök igen senare."
+    },
+    "info": {
+      "title": "Kontaktinformation",
+      "email": "E-post",
+      "phone": "Telefon",
+      "address": "Adress",
+      "hours": "Öppettider"
+    }
+  }, 
+  "CoverLetter": {
+    "title": "Generator för personligt brev",
+    "viewAll": "Visa alla personliga brev",
+    "view_saved": "Visa sparat brev",
+    "form": {
+      "title": "Titel på personligt brev",
+      "title_prefix": "Personligt brev för",
+      "title_placeholder": "Ge ditt personliga brev en titel för enkel referens",
+      "full_name": "Fullständigt namn",
+      "email": "E-post",
+      "phone": "Telefon",
+      "company_name": "Företagsnamn",
+      "job_title": "Jobbtitel",
+      "hiring_manager": "Rekryteringsansvarig",
+      "hiring_manager_title": "Rekryterarens titel",
+      "hiringManagerTitle_placeholder": "t.ex. HR-direktör",
+      "job_description": "Arbetsbeskrivning",
+      "upload_cv": "Ladda upp CV",
+      "supported_formats": "Stöder: .txt, .doc, .docx, .pdf",
+      "file": "Fil",
+      "enter": "Ange",
+      "submit": "Generera personligt brev",
+      "using_stored_resume": "Vi kommer att använda ditt sparade CV för att generera ditt personliga brev.",
+      "generating": "Genererar...",
+      "generate_button": "Generera personligt brev",
+      "fullName_placeholder": "Ange ditt fullständiga namn",
+      "email_placeholder": "Ange din e-post",
+      "phone_placeholder": "Ange ditt telefonnummer",
+      "companyName_placeholder": "Ange företagsnamn",
+      "jobTitle_placeholder": "Ange jobbtitel",
+      "hiringManager_placeholder": "Ange rekryterarens namn",
+      "jobDescription_placeholder": "Klistra in arbetsbeskrivningen här...",
+      "save_to_account": "Spara detta personliga brev till mitt konto",
+      "resume_source": "Välj CV-källa",
+      "select_stored_resume": "Välj från dina sparade CV:n",
+      "select_resume": "-- Välj ett CV --",
+      "resume_required": "Välj ett CV eller ladda upp en fil",
+      "personal_info": "Din information",
+      "job_details": "Jobbdetaljer",
+      "job_description_tip": "Ju mer komplett arbetsbeskrivningen är, desto bättre skräddarsytt blir ditt personliga brev"
+    },
+    "preview": {
+      "title": "Förhandsvisning",
+      "empty_state": "Ditt personliga brev kommer att visas här när det har genererats",
+      "generating": "AI genererar ditt personliga brev...",
+      "generating_note": "Detta kan ta upp till en minut beroende på arbetsbeskrivningens komplexitet.",
+      "company": "Företag",
+      "position": "Position",
+      "updated": "Senast uppdaterad",
+      "no_results": "Inga personliga brev matchar dina sökkriterier"
+    },
+    "success": {
+      "file_uploaded": "Fil uppladdad framgångsrikt!",
+      "letter_generated": "Personligt brev genererat framgångsrikt!",
+      "copied": "Personligt brev kopierat till urklipp!",
+      "downloaded": "Personligt brev nerladdat framgångsrikt!"
+    },
+    "errors": {
+      "no_cv": "Vänligen ladda upp ditt CV",
+      "word_processing": "Kunde inte bearbeta Word-dokument. Säkerställ att det är en giltig .doc eller .docx-fil.",
+      "pdf_processing": "Kunde inte bearbeta PDF-fil. Säkerställ att det är en giltig PDF.",
+      "unsupported_format": "Format som inte stöds. Använd .txt, .doc, .docx eller .pdf",
+      "no_content": "Inget läsbart innehåll hittades i filen",
+      "file_processing": "Kunde inte bearbeta filen. Försök igen.",
+      "rate_limit": "Vänta {{seconds}} sekunder innan du försöker igen.",
+      "model_loading": "Modellen laddas... Försök {{attempt}}/{{maxRetries}}",
+      "api_rate_limit": "Hastighetsgräns överskriden. Väntar... Försök {{attempt}}/{{maxRetries}}",
+      "authentication": "Autentiseringsfel. Kontrollera din API-token.",
+      "server_error": "Serverfel. Försöker med kortare indata...",
+      "invalid_response": "Mottog ogiltigt svarsformat. Försöker igen...",
+      "empty_response": "Modellen returnerade ett tomt svar. Försöker igen...",
+      "unexpected": "Ett oväntat fel inträffade. Försök igen senare.",
+      "generation": "Kunde inte generera personligt brev", 
+      "requiredFields": "Fyll i alla obligatoriska fält",
+      "selectResume": "Ladda upp ett CV eller välj ett CV från ditt konto"
+    },
+    "alerts": {
+      "selectResume": "Ladda upp ett CV eller välj ett CV från ditt konto",
+      "requiredFields": "Fyll i alla obligatoriska fält"
+    },
+    "prompt": {
+      "task": "Uppgift: Generera ett professionellt personligt brev med informationen nedan.",
+      "context": "Kontext: Detta är för en jobbansökan. Skapa ett formellt, välstrukturerat personligt brev som lyfter fram kandidatens relevanta erfarenhet och visar deras entusiasm för rollen.",
+      "format_requirements": "Formatkrav",
+      "format_item1": "Börja med ett korrekt datum och adressblock",
+      "format_item2": "Använd en professionell hälsning",
+      "format_item3": "Inkludera 3-4 koncisa stycken",
+      "format_item4": "Avsluta med en professionell avslutning",
+      "format_item5": "Inkludera fullständig kontaktinformation i signaturen",
+      "candidate_info": "Kandidatinformation",
+      "name": "Namn",
+      "email": "E-post",
+      "phone": "Telefon",
+      "position_details": "Positionsdetaljer",
+      "company": "Företag",
+      "role": "Roll",
+      "hiring_manager": "Rekryteringsansvarig",
+      "default_hiring_manager": "Rekryteringsansvarig",
+      "cv_highlights": "CV-höjdpunkter",
+  "job_description_highlights": "Arbetsbeskrivningens höjdpunkter",
+  "important_notes": "Viktiga anteckningar",
+  "note_item1": "Fokusera på att matcha kandidatens erfarenhet med jobbkraven",
+  "note_item2": "Upprätthåll en professionell men entusiastisk ton",
+  "note_item3": "Var specifik angående bidrag och prestationer",
+  "note_item4": "Uttryck genuint intresse för rollen och företaget",
+  "note_item5": "Håll brevet koncist och slagkraftigt",
+  "final_instruction": "Generera ett komplett personligt brev med denna information.",
+  "instruction_text": "Använd punktlistor för att strukturera innehållet"
+    },
+    "signature": {
+      "closing": "Med vänliga hälsningar",
+      "email": "E-post",
+      "phone": "Telefon"
+    },
+    "download_prefix": "Personligt_Brev",
+    "login_notice": "för att spara dina personliga brev och använda dina lagrade CV:n"
+  },
+  "coverLetterDetail": {
+    "back": "Tillbaka till personliga brev",
+    "errors": {
+      "load": "Kunde inte ladda personligt brev",
+      "format": "Kunde inte formatera personligt brev",
+      "favorite": "Kunde inte uppdatera favoritstatus",
+      "delete": "Kunde inte radera personligt brev",
+      "copy": "Kunde inte kopiera till urklipp",
+      "notFound": {
+        "title": "Personligt brev hittades inte",
+        "message": "Det personliga brev du letar efter finns inte eller så har du inte behörighet att se det."
+      }
+    },
+    "success": {
+      "copied": "Personligt brev kopierat till urklipp",
+      "downloaded": "Personligt brev nerladdat",
+      "deleted": "Personligt brev raderat framgångsrikt",
+      "addedFavorite": "Tillagt i favoriter",
+      "removedFavorite": "Borttaget från favoriter"
+    },
+    "delete_confirm": {
+      "title": "Bekräfta radering",
+      "message": "Är du säker på att du vill radera detta personliga brev? Denna åtgärd kan inte ångras."
+    },
+    "last_updated": "Senast uppdaterad",
+    "content": "Personligt brev",
+    "no_content": "Inget innehåll tillgängligt",
+    "details": "Detaljer",
+    "company": "Företag",
+    "position": "Position",
+    "recipient": "Mottagare",
+    "created": "Skapad",
+    "not_specified": "Ej angivet",
+    "actions": {
+      "favorite": "Lägg till i favoriter",
+      "unfavorite": "Ta bort favorit",
+      "delete": "Radera personligt brev"
+    }
+  },
+  "coverLetterView": {
+    "untitled": "Namnlöst personligt brev",
+    "created": "Skapad",
+    "updated": "Uppdaterad",
+    "fields": {
+      "company": "Företag",
+      "position": "Position",
+      "recipient": "Mottagare"
+    },
+    "content": {
+      "title": "Innehåll i personligt brev"
+    },
+    "jobDescription": {
+      "title": "Arbetsbeskrivning"
+    },
+    "linkedResume": {
+      "title": "Länkat CV",
+      "loading": "Laddar CV-information...",
+      "view": "Visa CV"
+    },
+    "actions": {
+      "backToDashboard": "Tillbaka till instrumentpanel"
+    },
+    "errors": {
+      "load": "Kunde inte ladda personligt brev",
+      "format": "Kunde inte formatera personligt brev",
+      "favorite": "Kunde inte uppdatera favoritstatus",
+      "delete": "Kunde inte radera personligt brev",
+      "notFound": {
+        "title": "Personligt brev hittades inte",
+        "message": "Det personliga brev du letar efter finns inte eller så har du inte behörighet att se det."
+      }
+    },
+    "success": {
+      "copied": "Personligt brev kopierat till urklipp!",
+      "downloaded": "Personligt brev nerladdat framgångsrikt",
+      "deleted": "Personligt brev raderat framgångsrikt",
+      "addedFavorite": "Tillagt i favoriter",
+      "removedFavorite": "Borttaget från favoriter"
+    },
+    "delete_confirm": {
+      "title": "Bekräfta radering",
+      "message": "Är du säker på att du vill radera detta personliga brev? Denna åtgärd kan inte ångras."
+    }
+  },
+  "coverLetterEditor": {
+    "title": "Redigera personligt brev",
+    "tabs": {
+      "edit": "Redigera",
+      "preview": "Förhandsgranska"
+    },
+    "fields": {
+      "title": "Titel på personligt brev",
+      "companyName": "Företagsnamn",
+      "jobTitle": "Jobbtitel",
+      "recipientName": "Mottagarens namn",
+      "recipientTitle": "Mottagarens titel",
+      "jobDescription": "Arbetsbeskrivning",
+      "coverLetterContent": "Innehåll i personligt brev",
+      "greeting": "Hälsning",
+      "introduction": "Introduktion",
+      "bodyParagraphs": "Textstycken",
+      "closing": "Avslutning",
+      "signature": "Signatur"
+    },
+    "placeholders": {
+      "title": "Personligt brev för [Position] på [Företag]",
+      "companyName": "Företagsnamn",
+      "jobTitle": "Positionstitel",
+      "recipientName": "Rekryterarens namn",
+      "recipientTitle": "Rekryterarens titel",
+      "jobDescription": "Klistra in arbetsbeskrivningen här...",
+      "coverLetterContent": "Ange innehåll i personligt brev i JSON-format...",
+      "greeting": "Hej rekryteringsansvarig,",
+      "introduction": "Jag skriver för att uttrycka mitt intresse för...",
+      "bodyParagraph": "Beskriv din relevanta erfarenhet...",
+      "closing": "Jag ser fram emot möjligheten att ansluta till ert team...",
+      "signature": "Med vänliga hälsningar, [Ditt namn]"
+    },
+    "buttons": {
+      "switchToRaw": "Byt till rå redigerare",
+      "switchToRich": "Byt till rik redigerare",
+      "addParagraph": "+ Lägg till stycke",
+      "removeParagraph": "Ta bort stycke",
+      "initializeParagraphs": "Initiera textstycken"
+    },
+    "notes": {
+      "rawEditor": "Obs: Detta är det råa JSON-innehållet. Se till att upprätthålla giltig JSON-formatering."
+    },
+    "errors": {
+      "load": "Kunde inte ladda personligt brev",
+      "save": "Kunde inte spara personligt brev",
+      "preview": "Kunde inte generera förhandsvisning",
+      "invalidJson": "Ogiltigt JSON-format i innehållet i personligt brev",
+      "parsingError": "Fel vid parsing av innehåll. Byter till rå redigerare."
+    },
+    "success": {
+      "save": "Personligt brev sparat framgångsrikt",
+      "copied": "Personligt brev kopierat till urklipp!",
+      "downloaded": "Personligt brev nerladdat framgångsrikt"
+    }
+  },
+  "coverLetters": {
+    "title": "Dina personliga brev",
+    "description": "Hantera alla dina personliga brev på ett ställe",
+    "actions": {
+      "new": "Skapa nytt personligt brev"
+    },
+    "empty": {
+      "title": "Inga personliga brev ännu",
+      "message": "Du har inte skapat några personliga brev ännu. Kom igång genom att skapa ditt första.",
+      "action": "Skapa ditt första personliga brev"
+    },
+    "search": {
+      "placeholder": "Sök personliga brev..."
+    },
+    "filter": {
+      "favorites": "Visa endast favoriter"
+    },
+    "table": {
+      "title": "Titel",
+      "company": "Företag",
+      "position": "Position",
+      "date": "Senast uppdaterad",
+      "actions": "Åtgärder"
+    },
+    "no_results": "Inga personliga brev matchar dina sökkriterier",
+    "errors": {
+      "load": "Kunde inte ladda personliga brev",
+      "delete": "Kunde inte radera personligt brev",
+      "favorite": "Kunde inte uppdatera favoritstatus",
+      "preview": "Kunde inte förhandsgranska personligt brev"
+    },
+    "success": {
+      "deleted": "Personligt brev raderat framgångsrikt",
+      "favorited": "Tillagt i favoriter",
+      "unfavorited": "Borttaget från favoriter",
+      "copied": "Personligt brev kopierat till urklipp!",
+      "downloaded": "Personligt brev nerladdat framgångsrikt"
+    },
+    "delete_confirm": {
+      "title": "Bekräfta radering",
+      "message": "Är du säker på att du vill radera detta personliga brev? Denna åtgärd kan inte ångras."
+    },
+    "preview": {
+      "company": "Företag",
+      "position": "Position",
+      "updated": "Senast uppdaterad"
+    }
+  },
+  "resumeDashboard": {
+    "title": "Mina CV:n",
+    "loading": "Laddar dina CV:n...",
+    "noResumes": {
+      "title": "Du har inga CV:n ännu",
+      "description": "Skapa ditt första professionella CV och ta nästa steg i din karriärresa!"
+    },
+    "defaultTitle": "Mitt CV",
+    "unnamed": "Namnlöst CV",
+    "lastUpdated": "Senast uppdaterad",
+    "preview": "CV-förhandsvisning",
+    "confirmDelete": "Är du säker på att du vill radera detta CV?",
+    "errors": {
+      "noResumeId": "Inget CV-ID tillgängligt"
+    },
+    "buttons": {
+      "startBuilding": "Börja bygga ditt CV",
+      "createNew": "Skapa nytt CV",
+      "view": "Visa",
+      "edit": "Redigera",
+      "customize": "Anpassa",
+      "delete": "Radera"
+    }
+  },
+  "privacy": {
+    "title": "Integritetspolicy",
+    "lastUpdated": "Senast uppdaterad",
+    "updateDate": "4 april 2025",
+    "intro": "CVATI (\"vi\", \"vår\" eller \"oss\") är engagerade i att skydda din integritet. Denna integritetspolicy förklarar hur vi samlar in, använder, avslöjar och skyddar din information när du använder vår CV-byggningstjänst.",
+    "collection": {
+      "title": "Information vi samlar in",
+      "desc": "Vi samlar in personlig information som du frivilligt tillhandahåller när du använder vår tjänst, inklusive:",
+      "personal": "Personuppgifter (namn, e-postadress, telefonnummer)",
+      "professional": "Professionell information (arbetslivserfarenhet, färdigheter, utbildning)",
+      "optional": "Valfri information (födelsedatum, nationalitet, adress, foto)",
+      "account": "Kontouppgifter",
+      "usage": "Användningsdata och interaktioner med vår tjänst"
+    },
+    "use": {
+      "title": "Hur vi använder din information",
+      "desc": "Vi använder din information för följande ändamål:",
+      "provide": "För att tillhandahålla och upprätthålla vår tjänst",
+      "improve": "För att förbättra vår tjänst och användarupplevelse",
+      "communicate": "För att kommunicera med dig om tjänstuppdateringar",
+      "ai": "För att tillhandahålla AI-förbättrad CV- och personligt brev-generering",
+      "security": "För att säkerställa säkerhet och förhindra bedrägerier",
+      "legal": "För att uppfylla rättsliga skyldigheter"
+    },
+    "sharing": {
+      "title": "Informationsdelning och avslöjande",
+      "desc": "Vi kan dela din information med:",
+      "service": "Tjänsteleverantörer (molnlagring, bildlagring, analys)",
+      "legal": "Rättsliga myndigheter när det krävs enligt lag",
+      "business": "Affärspartners med ditt uttryckliga samtycke",
+      "note": "Vi använder Cloudinary för bildlagring och bearbetning. Dina uppladdade foton omfattas också av Cloudinarys integritetspolicy."
+    },
+    "storage": {
+      "title": "Datalagring och säkerhet",
+      "desc": "Vi implementerar lämpliga säkerhetsåtgärder för att skydda din personliga information. Dock är ingen överföringsmetod via internet 100% säker, och vi kan inte garantera absolut säkerhet.",
+      "retention": "Vi behåller din personliga information så länge ditt konto är aktivt eller så länge det behövs för att tillhandahålla dig tjänster. Du kan när som helst begära radering av dina data."
+    },
+    "rights": {
+      "title": "Dina datarättigheter",
+      "desc": "Enligt GDPR och andra tillämpliga dataskyddslagar har du rättigheter gällande dina personuppgifter, inklusive:",
+      "access": "Rätt att få tillgång till dina personuppgifter",
+      "rectify": "Rätt att korrigera felaktiga uppgifter",
+      "delete": "Rätt till radering (\"rätten att bli bortglömd\")",
+      "restrict": "Rätt att begränsa behandling",
+      "portability": "Rätt till dataportabilitet",
+      "object": "Rätt att invända mot behandling",
+      "exercise": "För att utöva dessa rättigheter kan du använda kontoinställningarna i vår applikation eller kontakta oss direkt."
+    },
+    "cookies": {
+      "title": "Cookies och liknande tekniker",
+      "desc": "Vi använder cookies och liknande spårningsteknologier för att förbättra din upplevelse på vår webbplats, analysera användning och hjälpa till med våra marknadsföringsinsatser. Du kan kontrollera cookies via dina webbläsarinställningar."
+    },
+    "ai": {
+      "title": "AI-genererat innehåll",
+      "desc": "Vår tjänst använder AI för att hjälpa till att generera CV-innehåll och personliga brev. Data du tillhandahåller kan bearbetas av våra AI-system för att generera personanpassat innehåll. Vi implementerar åtgärder för att skydda dina data under AI-bearbetning och använder inte dina personuppgifter för att träna våra AI-modeller utan uttryckligt samtycke."
+    },
+    "children": {
+      "title": "Barns integritet",
+      "desc": "Vår tjänst riktar sig inte till personer under 16 år. Om du är medveten om att en minderårig har lämnat oss personlig information utan föräldrars samtycke, vänligen kontakta oss."
+    },
+    "changes": {
+      "title": "Ändringar i denna integritetspolicy",
+      "desc": "Vi kan uppdatera vår integritetspolicy från tid till annan. Vi kommer att meddela dig om eventuella ändringar genom att publicera den nya integritetspolicyn på denna sida och uppdatera datumet för \"Senast uppdaterad\"."
+    },
+    "contact": {
+      "title": "Kontakta oss",
+      "desc": "Om du har några frågor om denna integritetspolicy, vänligen kontakta oss på:",
+      "email": "privacy@cvati.com"
+    }
+  },
+  "terms": {
+    "title": "Användarvillkor",
+    "lastUpdated": "Senast uppdaterad",
+    "updateDate": "4 april 2025",
+    "intro": "Välkommen till CVATI. Dessa användarvillkor reglerar din användning av vår CV-byggningstjänst och webbplats. Genom att använda CVATI godkänner du att följa dessa villkor.",
+    "definitions": {
+      "title": "1. Definitioner",
+      "service": "\"Tjänst\"",
+      "serviceDesc": "Avser CVATI:s webbplats och CV-byggapplikation.",
+      "content": "\"Innehåll\"",
+      "contentDesc": "Avser CV:n, personliga brev och annat material som skapats, laddats upp eller genererats via vår tjänst.",
+      "user": "\"Användare\"",
+      "userDesc": "Alla individer som använder vår tjänst.",
+      "account": "\"Konto\"",
+      "accountDesc": "En registrerad användarprofil inom vår tjänst."
+    },
+    "accounts": {
+      "title": "2. Användarkonton",
+      "registration": "När du skapar ett konto hos oss måste du ange korrekt, fullständig och aktuell information. Du är ansvarig för att skydda ditt lösenord och för alla aktiviteter som sker under ditt konto.",
+      "terminate": "Vi förbehåller oss rätten att avsluta eller stänga av ditt konto omedelbart, utan föregående meddelande eller ansvar, av vilken anledning som helst, inklusive brott mot dessa villkor."
+    },
+    "use": {
+      "title": "3. Godtagbar användning",
+      "desc": "Du godkänner att endast använda vår tjänst för lagliga ändamål och i enlighet med dessa villkor. Du godkänner att inte:",
+      "false": "Tillhandahålla falsk eller vilseledande information",
+      "impersonate": "Utge dig för att vara någon annan person eller enhet",
+      "infringe": "Inkräkta på patent, varumärken, affärshemligheter, upphovsrätter eller andra äganderätter",
+      "harmful": "Ladda upp virus eller annan skadlig kod",
+      "interfere": "Störa eller avbryta tjänsten eller servrar",
+      "automated": "Använda automatiserade metoder för att få åtkomst till eller använda tjänsten"
+    },
+    "content": {
+      "title": "4. Innehållsägandeskap och licens",
+      "ownership": "Du behåller alla äganderätter till CV:n, personliga brev eller annat innehåll du skapar genom vår tjänst. Du ger oss dock en icke-exklusiv, global, royaltyfri licens att använda, reproducera och visa ditt innehåll enbart i syfte att tillhandahålla och förbättra vår tjänst.",
+      "responsibility": "Du är ensam ansvarig för allt innehåll du skapar, laddar upp eller på annat sätt gör tillgängligt genom tjänsten. Du representerar och garanterar att du har rätt att använda all information som ingår i dina CV:n och att innehållet inte bryter mot några lagar eller tredje parts rättigheter."
+    },
+    "ai": {
+      "title": "5. AI-Genererat innehåll",
+      "desc": "Vår tjänst använder artificiell intelligens för att hjälpa till att skapa CV:n och personliga brev. Du erkänner att:",
+      "accuracy": "AI-genererat innehåll kanske inte alltid är korrekt eller lämpligt för dina specifika behov",
+      "review": "Du bör granska och redigera allt AI-genererat innehåll innan du använder det",
+      "responsibility": "Du är ytterst ansvarig för allt innehåll i ditt CV eller personliga brev, inklusive AI-genererade delar"
+    },
+    "disclaimer": {
+      "title": "6. Friskrivning från garantier",
+      "desc": "Vår tjänst tillhandahålls \"i befintligt skick\" och \"som tillgänglig\" utan någon garanti av något slag, vare sig uttrycklig eller underförstådd, inklusive men inte begränsat till underförstådda garantier för säljbarhet, lämplighet för ett visst ändamål eller icke-intrång.",
+      "success": "Vi garanterar inte att vår tjänst hjälper dig att säkra anställning eller intervjuer. Effektiviteten hos CV:n och personliga brev beror på många faktorer utanför vår kontroll."
+    },
+    "limitation": {
+      "title": "7. Ansvarsbegränsning",
+      "desc": "I den maximala utsträckning som tillåts enligt lag, ska CVATI, dess direktörer, anställda eller agenter inte vara ansvariga för några indirekta, straffande, tillfälliga, särskilda, följdskador eller exemplariska skador, inklusive utan begränsning skador för förlust av vinst, goodwill, användning, data eller andra immateriella förluster, som uppstår genom användning av eller oförmåga att använda denna tjänst."
+    },
+    "privacy": {
+      "title": "8. Integritetspolicy",
+      "desc": "Din användning av vår tjänst regleras också av vår integritetspolicy, som införlivas i dessa villkor genom referens. Vänligen granska vår integritetspolicy för att förstå våra rutiner gällande din personliga information."
+    },
+    "termination": {
+      "title": "9. Uppsägning",
+      "userRight": "Du kan avsluta ditt konto när som helst genom att följa instruktionerna i tjänsten. All din data kommer att raderas i enlighet med vår integritetspolicy.",
+      "ourRight": "Vi kan avsluta eller stänga av ditt konto omedelbart, utan föregående meddelande eller ansvar, av vilken anledning som helst, inklusive brott mot dessa villkor. Vid uppsägning upphör din rätt att använda tjänsten omedelbart."
+    },
+    "changes": {
+      "title": "10. Ändringar av villkor",
+      "desc": "Vi förbehåller oss rätten att ändra eller ersätta dessa villkor när som helst. Om en ändring är väsentlig kommer vi att ge minst 30 dagars varsel innan några nya villkor träder i kraft. Genom att fortsätta använda vår tjänst efter att några ändringar har trätt i kraft, godkänner du att vara bunden av de reviderade villkoren."
+    },
+    "governing": {
+      "title": "11. Gällande lag",
+      "desc": "Dessa villkor ska regleras av och tolkas i enlighet med lagarna i [Ditt land/stat], utan hänsyn till dess lagkonfliktbestämmelser."
+    },
+    "contact": {
+      "title": "12. Kontakta oss",
+      "desc": "Om du har några frågor om dessa villkor, vänligen kontakta oss på:",
+      "email": "info@cvati.com"
+    }
+  },
+  "cookiePolicy": {
+    "title": "Cookiepolicy",
+    "lastUpdated": "Senast uppdaterad",
+    "updateDate": "4 april 2025",
+    "intro": "Denna cookiepolicy förklarar hur CVATI (\"vi\", \"vår\" eller \"oss\") använder cookies och liknande teknologier på vår webbplats och applikation. Genom att använda CVATI samtycker du till användningen av cookies som beskrivs i denna policy.",
+    "what": {
+      "title": "Vad är cookies?",
+      "desc": "Cookies är små textfiler som lagras på din enhet (dator, surfplatta eller mobil) när du besöker webbplatser. De används allmänt för att få webbplatser att fungera mer effektivt, ge en bättre användarupplevelse och ge information till webbplatsägarna. Cookies kan inte skada din enhet eller komma åt annan information på din enhet."
+    },
+    "types": {
+      "title": "Typer av cookies vi använder",
+      "essential": {
+        "title": "Nödvändiga cookies",
+        "desc": "Dessa cookies är nödvändiga för att webbplatsen ska fungera korrekt. De möjliggör grundläggande funktioner som sidnavigering och åtkomst till säkra områden på webbplatsen. Webbplatsen kan inte fungera ordentligt utan dessa cookies.",
+        "examples": "Exempel: Sessionscookies, autentiseringscookies"
+      },
+      "preferences": {
+        "title": "Preferenscookies",
+        "desc": "Dessa cookies gör det möjligt för webbplatsen att komma ihåg val du gör (som ditt språkval eller din mörka/ljusa lägesinställning) och tillhandahålla förbättrade, mer personliga funktioner.",
+        "examples": "Exempel: Språkinställningar, temapreferenser"
+      },
+      "analytics": {
+        "title": "Analyticscookies",
+        "desc": "Dessa cookies samlar information om hur du använder vår webbplats, vilka sidor du besökte och vilka länkar du klickade på. All data är anonymiserad och kan inte användas för att identifiera dig.",
+        "examples": "Exempel: Google analytics cookies"
+      },
+      "functional": {
+        "title": "Funktionella cookies",
+        "desc": "Dessa cookies möjliggör förbättrad funktionalitet och personalisering. De kan sättas av oss eller av tredjepartsleverantörer vars tjänster vi har lagt till på våra sidor.",
+        "examples": "Exempel: Chattjänstcookies, sparade formulärdata"
+      }
+    },
+    "specific": {
+      "title": "Specifika cookies vi använder",
+      "name": "Namn",
+      "provider": "Leverantör",
+      "purpose": "Syfte",
+      "expiry": "Utgång",
+      "type": "Typ",
+      "consentPurpose": "Sparar dina cookiepreferenser",
+      "themePurpose": "Kommer ihåg din mörka/ljusa lägespreferens",
+      "languagePurpose": "Kommer ihåg din språkpreferens",
+      "authPurpose": "Håller dig inloggad",
+      "gaPurpose": "Används för att särskilja användare",
+      "essential": "Nödvändig",
+      "preference": "Preferens",
+      "analytics": "Analytics"
+    },
+    "thirdParty": {
+      "title": "Tredjepartscookies",
+      "desc": "Vissa cookies placeras av tredjepartstjänster som visas på våra sidor. Vi använder tjänster från följande tredje parter som kan använda cookies:",
+      "analytics": "Google analytics - för analys av webbplatsanvändning",
+      "cloudinary": "Cloudinary - för bildlagring och bearbetning",
+      "oauth": "OAuth-leverantörer (om du använder social inloggning)"
+    },
+    "manage": {
+      "title": "Hantera cookies",
+      "desc": "De flesta webbläsare låter dig hantera dina cookiepreferenser. Du kan ställa in din webbläsare att neka cookies eller att varna dig när cookies skickas. Metoderna för detta varierar från webbläsare till webbläsare och från version till version.",
+      "links": "Här är länkar till instruktioner för hantering av cookies för vanliga webbläsare:",
+      "note": "Observera att begränsning av cookies kan påverka funktionaliteten på vår webbplats. Du kanske till exempel inte kan använda alla interaktiva funktioner på vår webbplats eller spara dina preferenser mellan besök."
+    },
+    "similar": {
+      "title": "Liknande teknologier",
+      "desc": "Förutom cookies kan vi använda andra liknande teknologier för att lagra och komma åt data på din enhet:",
+      "storage": "Lokal lagring:",
+      "storageDesc": "Vi använder webbläsarens lokala lagring för att spara dina preferenser och förbättra prestanda.",
+      "session": "Sessionslagring:",
+      "sessionDesc": "Liknande lokal lagring men rensas när du stänger din webbläsare."
+    },
+    "updates": {
+      "title": "Uppdateringar till denna policy",
+      "desc": "Vi kan uppdatera denna cookiepolicy från tid till annan för att återspegla förändringar i teknik, reglering eller våra affärspraxis. Alla ändringar kommer att publiceras på denna sida och, om ändringarna är betydande, kommer vi att tillhandahålla ett mer framträdande meddelande."
+    },
+    "contact": {
+      "title": "Kontakta oss",
+      "desc": "Om du har några frågor om vår användning av cookies eller denna cookiepolicy, vänligen kontakta oss på:",
+      "email": "info@cvati.com"
+    }
+  },
+  "cookies": {
+    "message": "Vi använder cookies för att förbättra din upplevelse. Genom att fortsätta besöka denna webbplats godkänner du vår användning av cookies.",
+    "learnMore": "Läs mer",
+    "accept": "Acceptera",
+    "decline": "Avböj"
+  },
+  "prod1": {
+    "hero": {
+      "title": "Få ditt drömjobb",
+      "subtitle": "Skapa imponerande CV:n och övertygande personliga brev med AI som får dig uppmärksammad av arbetsgivare och passerar ATS-system."
+    },
+    "sections": {
+      "power_job_search": "Stärk din jobbsökning med AI",
+      "power_job_description": "Våra kraftfulla AI-verktyg hjälper dig att skapa professionella CV:n och personliga brev skräddarsydda för dina målroller.",
+      "job_winning_documents": "Skapa jobbvinnande dokument",
+      "job_winning_description": "Utformade för att hjälpa dig att utmärka dig och göra ett starkt intryck på arbetsgivare.",
+      "everything_to_succeed": "Allt du behöver för att lyckas",
+      "everything_description": "Fullt med funktioner som hjälper dig att skapa ansökningsmaterial som utmärker sig.",
+      "how_it_works": "Hur det fungerar",
+      "how_it_works_description": "Skapa professionella CV:n och personliga brev på några minuter med tre enkla steg.",
+      "what_users_say": "Vad våra användare säger",
+      "what_users_description": "Framgångshistorier från jobbsökande som använt CVATI för att få sina drömjobb.",
+      "current_language": "Aktuellt språk",
+      "current_template": "Aktuell mall",
+      "previous": "Föregående", 
+      "next": "Nästa"
+    },
+    "features": {
+      "ats_templates": {
+        "title": "ATS-optimerade mallar",
+        "description": "Våra CV-mallar är utformade för att passera rekryteringssystem och få ditt CV framför rekryterare."
+      },
+      "ai_content": {
+        "title": "AI-driven innehållsgenerering",
+        "description": "Intelligenta förslag för färdigheter, prestationer och arbetsbeskrivningar som matchar din målroll."
+      },
+      "cover_letters": {
+        "title": "Personanpassade personliga brev",
+        "description": "Generera skräddarsydda personliga brev som matchar arbetsbeskrivningen och lyfter fram din relevanta erfarenhet."
+      },
+      "keyword_optimization": {
+        "title": "Nyckelordoptimering",
+        "description": "Vi analyserar arbetsbeskrivningar för att inkludera rätt nyckelord."
+      },
+      "industry_content": {
+        "title": "Branschspecifikt innehåll",
+        "description": "Skräddarsytt innehåll för din bransch och erfarenhetsnivå."
+      },
+      "resume_analytics": {
+        "title": "CV-analys",
+        "description": "Se hur ditt CV presterar och få förslag på hur du kan förbättra det."
+      },
+      "expert_advice": {
+        "title": "Expertbaserade råd",
+        "description": "Innehåll baserat på insikter från rekryterare och rekryteringsansvariga."
+      }
+    },
+    "steps": {
+      "enter_details": {
+        "title": "Ange dina uppgifter",
+        "description": "Fyll i din information eller ladda upp ett befintligt CV för att komma igång snabbt."
+      },
+      "ai_enhancement": {
+        "title": "AI-förbättring",
+        "description": "Vår AI analyserar din erfarenhet och jobbkraven för att föreslå förbättringar."
+      },
+      "download_apply": {
+        "title": "Ladda ner och ansök",
+        "description": "Få ditt perfekt formaterade CV eller personliga brev redo att imponera på arbetsgivare."
+      }
+    },
+    "cta": {
+      "title": "Redo att få ditt drömjobb?",
+      "description": "Gå med tusentals yrkesverksamma som har förbättrat sin jobbsökning med våra AI-drivna verktyg.",
+      "build_resume": "Skapa mitt CV",
+      "create_cover_letter": "Skapa personligt brev"
+    },
+    "stats": {
+      "resumes_created": "CV:n skapade",
+      "cover_letters": "Personliga brev genererade",
+      "interview_rate": "Framgångsfrekvens för intervjuer",
+      "job_match": "Matchningsfrekvens för jobb"
+    }
+  },
+  "feedback": {
+    "title": "Dela din feedback",
+    "subtitle": "Hjälp oss förbättra CVATI genom att dela din upplevelse",
+    "rating_label": "Hur skulle du betygsätta din upplevelse?",
+    "rating_required": "Vänligen välj ett betyg",
+    "email_label": "Din e-post",
+    "email_required": "Vänligen ange din e-post",
+    "email_placeholder": "din.epost@exempel.com",
+    "comment_label": "Kommentarer (valfritt)",
+    "comment_placeholder": "Berätta om din upplevelse...",
+    "submit": "Skicka feedback",
+    "submitting": "Skickar...",
+    "submit_success": "Tack för din feedback!",
+    "submit_error": "Kunde inte skicka feedback"
+  },
+  "revamp": {
+    "needsResumeFirst": "Du behöver välja ett CV först",
+    "goToMyResumes": "Gå till Mina CV:n och välj ett CV att arbeta med.",
+    "signInFirst": "Du behöver logga in och skapa ett CV innan du exporterar.",
+    "exploreTemplates": "Utforska professionella mallar",
+    "exploreTemplatesDescription": "Bläddra i vår samling av professionellt designade CV-mallar. Hitta den perfekta stilen som matchar din bransch och personlighet för att få din ansökan att stå ut.",
+    "exploreTemplatesButton": "Utforska mallar",
+    "atsFriendly": "ATS-vänliga designer",
+    "modernLayouts": "Moderna och traditionella layouter", 
+     "customizableDesigns": "Helt anpassningsbara designer",
+    "browse": "Bläddra bland mallar",
+    "accept": "Jag accepterar",
+    "or": "Eller",
+    "offline_mode": "Du kan bygga ditt CV nu. Logga in för att spara eller ladda ner.",
+    "listView": "Byt till listvy",
+    "testimonials": {
+      "role1": "Mjukvaruingenjör",
+      "content1": "CVATI hjälpte mig att få intervjuer hos tre stora teknikföretag. AI-förslagen fick mitt CV att sticka ut från mängden!",
+      "role2": "Marknadsföringsspecialist",
+      "content2": "Generatorn för personliga brev är fantastisk! Den fångade perfekt min erfarenhet och tonen jag sökte. Sparade mig timmar av arbete.",
+      "role3": "Dataanalytiker",
+      "content3": "Efter att ha kämpat med att få svar, omarbetade jag mitt CV med CVATI och började få intervjuförfrågningar inom några dagar."
+    }
+  },
+  "jobMatching": {
+    "jobMatching": "Jobbmatchning",
+    "title": "🎯 Smart jobbmatchningsanalysator",
+    "subtitle": "Få brutalt ärlig AI-feedback om dina chanser att få jobbet. Inga sockerpiller – bara handlingsbara insikter som hjälper dig att få bättre roller snabbare.",
+    "socialProof": "Används av 10 000+ jobbsökare",
+    
+    "features": {
+      "instantScoring": "🎯 Omedelbar kompatibilitetsbedömning",
+      "beatATS": "🤖 Besegra ATS-system",
+      "personalizedTips": "💡 Personliga tips",
+      "keywordGaps": "📊 Nyckelordsgapanalys",
+      "atsOptimization": "🤖 ATS-optimeringsinsikter",
+      "keywordAnalysis": "📊 Detaljerad nyckelordsanalys"
+    },
+
+    "auth": {
+      "unlockPotential": "🎯 Lås upp din karriärpotential",
+      "joinThousands": "Gå med tusentals jobbsökare som använder vår AI för att få bättre roller snabbare. Få omedelbar, ärlig feedback på alla jobbansökningar.",
+      "getStarted": "🚀 Kom igång gratis"
+    },
+
+    "methods": {
+      "crewai": {
+        "title": "AI-expertpanel",
+        "subtitle": "Team av specialiserade rekryteringsagenter",
+        "badge": "Mest populär",
+        "description": "Flera specialiserade agenter arbetar tillsammans som en rekryteringspanel för att noggrant utvärdera din lämplighet"
+      },
+      "claude": {
+        "title": "Senior AI-rekryterare", 
+        "subtitle": "Avancerat resonemang som en rekryteringschef",
+        "badge": "Mest exakt",
+        "description": "Banbrytande AI som tänker som en senior rekryterare med års erfarenhet av anställning"
+      },
+      "both": {
+        "title": "Komplett analys",
+        "subtitle": "Dubbelkolla med båda AI-systemen", 
+        "badge": "Mest omfattande",
+        "description": "Få insikter från båda systemen och se hur de jämför sig för maximal tillförlitlighet"
+      }
+    },
+
+    "form": {
+      "title": "✨ Konfigurera din analys",
+      "chooseAnalysis": "🎯 Välj din analyskraft",
+      "differentApproaches": "Olika AI-tillvägagångssätt, samma ärliga resultat",
+      "targetPosition": "🎯 Målposition",
+      "jobTitlePlaceholder": "t.ex., Senior mjukvaruutvecklare, Marknadschef",
+      "dreamCompany": "🏢 Drömföretag",
+      "companyPlaceholder": "t.ex., Google, Microsoft, Tesla (valfritt)",
+      "howSubmitResume": "📄 Hur vill du skicka in ditt CV?",
+      "savedCVs": "📁 Mina sparade CV:n",
+      "uploadNew": "📤 Ladda upp nytt", 
+      "copyPaste": "✏️ Kopiera & klistra in",
+      "selectResume": "Välj CV",
+      "selectResumeOption": "Välj ett CV från din samling...",
+      "noResumes": "📝 Inga sparade CV:n än. Skapa ditt första CV eller ladda upp ett för att komma igång!",
+      "uploadCV": "📤 Ladda upp ditt CV",
+      "uploadPlaceholder": "📎 Klicka för att ladda upp eller dra och släpp ditt CV",
+      "supportedFormats": "Stödjer: PDF, DOC, DOCX, TXT (max 5MB)",
+      "processingFile": "🔄 Bearbetar din fil...",
+      "resumeContent": "📝 Ditt CV-innehåll",
+      "resumeContentPlaceholder": "Klistra in din CV-text här. Inkludera din erfarenhet, färdigheter och prestationer - ju mer detaljer, desto bättre analys!",
+      "jobPosting": "📋 Jobbannons",
+      "jobDescriptionPlaceholder": "Kopiera hela jobbbeskrivningen här. Inkludera krav, ansvarsområden och kvalifikationer för den mest exakta matchningsanalysen.",
+      "analyzeMatch": "🚀 Analysera min jobbmatchning",
+      "takes30Seconds": "(Tar 30 sekunder)",
+      "aiAnalyzing": "🧠 AI analyserar din potential...",
+      "usingMethod": "Använder",
+      "takesLonger": "⏱️ Tar 2 gånger längre tid men värt självförtroendet"
+    },
+
+    "progress": {
+      "expertPanel": "🤖 Vår AI-expertpanel granskar din profil...",
+      "deepAnalysis": "🧠 Avancerad AI genomför djupanalys...",
+      "comprehensive": "⚡ Kör omfattande analys med båda AI-systemen...",
+      "bothTakesTime": "Denna omfattande analys tar längre tid men ger maximal tillförlitlighet"
+    },
+
+    "scores": {
+      "excellent": "🔥 Utmärkt match! Du är en toppkandidat för denna roll.",
+      "good": "👍 Bra potential! Några justeringar kan ge dig en betydande boost.", 
+      "improvement": "📈 Utrymme för förbättring. Här är din väg till framgång.",
+      "levelUp": "💪 Dags att levla upp! Vi visar dig exakt hur."
+    },
+
+    "results": {
+      "intelligenceReport": "📊 Din ansökningsintelligensrapport",
+      "readyToDiscover": "Redo att upptäcka dina verkliga chanser?",
+      "fillFormGetInsights": "Fyll i formuläret och få omedelbara AI-drivna insikter som kan förändra hur du söker jobb.",
+      "aiComparison": "🔬 AI-systemjämförelse",
+      "confidence": "Tillförlitlighetsnivå",
+      "lowConfidence": "Blandade signaler upptäckta",
+      "highConfidence": "Båda systemen är överens",
+      "jobCompatibility": "🎯 Jobbkompatibilitetspoäng",
+      "analyzedBy": "Analyserad av",
+      "atsPassRate": "🤖 ATS-genomströmningsgrad",
+      "beatRobots": "Kommer du besegra robotarna?",
+      "recommendation": "💡 Bör du ansöka?",
+      "goForIt": "Kör på!",
+      "buildUpFirst": "Bygg upp först",
+      "yourSuperpowers": "🌟 Dina superkrafter",
+      "levelUpHere": "🎯 Levla upp här",
+      "skillsToAdd": "❌ Färdigheter att lägga till",
+      "skillsToAddDesc": "Dessa nyckelord kan öka dina chanser",
+      "winningKeywords": "✅ Dina vinnande nyckelord",
+      "winningKeywordsDesc": "Du är redan stark på dessa områden",
+      "yourActionPlan": "🚀 Din handlingsplan",
+      "strategicMoves": "💡 Strategiska drag",
+      "applicationHacks": "✨ Ansökningsknep",
+      "keyStrengths": "🌟 Nyckelstyrkor",
+      "improvementAreas": "🎯 Tillväxtmöjligheter",
+      "recommendations": "💼 Strategiska rekommendationer",
+      "applicationTips": "🚀 Ansökningsknep",
+      "missingKeywords": "❌ Färdigheter att lägga till ({count} gap hittades)",
+      "presentKeywords": "✅ Dina vinnande nyckelord ({count} matchningar)",
+      "applyNow": "Kör på!",
+      "improveFirst": "Bygg upp först",
+      "analysisComparison": "📊 AI-systemjämförelse"
+    },
+
+    "fileUpload": {
+      "notImplemented": "Obs: Avancerad filtolkning är ännu inte implementerad. Var god kopiera och klistra in din CV-text manuellt för den mest exakta analysen."
+    },
+
+    "errors": {
+      "jobDescriptionRequired": "📝 Vi behöver jobbbeskrivningen för att analysera din matchning. Kopiera den från företagets jobbannons.",
+      "resumeRequired": "📄 Var god ange ditt CV-innehåll så vi kan analysera dina kvalifikationer.",
+      "needLogin": "🔐 Skapa ett gratis konto för att låsa upp AI-driven jobbmatchningsanalys.",
+      "invalidFileType": "📎 Var god ladda upp en PDF, Word-dokument eller textfil.",
+      "fileTooLarge": "📦 Filen är för stor. Använd filer under 5MB.",
+      "fileProcessingFailed": "⚠️ Kunde inte bearbeta din fil. Försök kopiera och klistra in texten istället.",
+      "analysisFailed": "🔄 Analysen misslyckades (Status: {status}). Var god försök igen eller kontakta support.",
+      "analysisFailedGeneric": "❌ Något gick fel. Kontrollera dina uppgifter och försök igen."
+    }
+  },
+  "ai": {
+    "limit_reached": "Du har använt {{used}} av {{limit}} dagliga AI-förfrågningar. Var god försök igen om {{hours}} timmar.",
+    "limit_reached_simple": "Daglig AI-gräns uppnådd. Var god försök igen imorgon.",
+    "limit_info": "Återstående AI-förfrågningar: {{remaining}} av {{limit}}"
+  },
+  "newresume": {
+    "personal_info": {
+      "ai_error": "Misslyckades med att få AI-förslag. Var god försök igen.",
+      "summary_error": "Var god lägg till lite text i din sammanfattning först",
+      "improve_ai": "Förbättra med AI",
+      "generating": "Genererar förslag...",
+      "ai_suggestion": "AI-förbättringsförslag:",
+      "apply_suggestion": "Tillämpa förslag",
+      "discard": "Avvisa"
+    }
+  }
+}
