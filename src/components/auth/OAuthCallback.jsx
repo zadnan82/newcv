@@ -1,93 +1,66 @@
+// src/components/auth/OAuthCallback.jsx - Updated for cloud providers
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AUTH_ENDPOINTS } from '../../config';
 import useAuthStore from '../../stores/authStore';
 
 const OAuthCallback = ({ darkMode }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [status, setStatus] = useState(t('auth.oauth.processing', 'Processing authentication...'));
+  const [status, setStatus] = useState('Processing cloud connection...');
   const [error, setError] = useState(null);
+  const { refreshSession } = useAuthStore();
   
   useEffect(() => {
-    const processAuth = async () => {
-      const token = searchParams.get('token');
+    const processCloudConnection = async () => {
+      const code = searchParams.get('code');
+      const state = searchParams.get('state');
       const errorParam = searchParams.get('error');
+      const provider = searchParams.get('provider');
       
       if (errorParam) {
         setError(decodeURIComponent(errorParam));
-        setStatus(t('auth.oauth.failed', 'Authentication failed'));
+        setStatus('Connection failed');
         return;
       }
       
-      if (!token) {
-        setError(t('auth.oauth.no_token', 'No authentication token received'));
-        setStatus(t('auth.oauth.failed', 'Authentication failed'));
+      if (!code || !state) {
+        setError('Missing authorization parameters');
+        setStatus('Connection failed');
         return;
       }
       
       try {
-        setStatus(t('auth.oauth.fetching_user', 'Fetching user details...'));
+        setStatus('Connecting to your cloud storage...');
         
-        // Use the store's methods directly to maintain consistency
-        const authStore = useAuthStore.getState();
+        // The backend handles the OAuth callback automatically
+        // We just need to refresh our session to get the updated status
+        await refreshSession();
         
-        // Set token first
-        authStore.setTokenDirectly(token);
+        setStatus('Cloud storage connected successfully!');
         
-        // Fetch user info (using the auth store pattern you already have)
-        const userData = await authStore.refreshUserInfo();
+        // Redirect to the resume builder
+        setTimeout(() => navigate('/resume/new'), 1000);
         
-        if (!userData) {
-          throw new Error(t('auth.oauth.user_fetch_failed', 'Failed to fetch user details'));
-        }
-        
-        setStatus(t('auth.oauth.success', 'Authentication successful!'));
-        
-        // Dispatch auth change event (already done in refreshUserInfo, but just in case)
-        window.dispatchEvent(new Event('authChange'));
-        
-        // Redirect to dashboard/homepage after a short delay
-        setTimeout(() => navigate('/'), 1000);
       } catch (err) {
-        console.error('OAuth authentication error:', err);
-        setError(err.message || t('auth.oauth.unknown_error', 'An unknown error occurred'));
-        setStatus(t('auth.oauth.failed', 'Authentication failed'));
+        console.error('Cloud connection error:', err);
+        setError(err.message || 'Connection failed');
+        setStatus('Connection failed');
       }
     };
     
-    processAuth();
-  }, [searchParams, navigate, t]);
-  
-  // Add setTokenDirectly method to auth store if it doesn't exist yet
-  useEffect(() => {
-    if (!useAuthStore.getState().setTokenDirectly) {
-      useAuthStore.setState({
-        setTokenDirectly: (token) => {
-          useAuthStore.setState({ token, loading: false, error: null });
-        }
-      });
-    }
-  }, []);
+    processCloudConnection();
+  }, [searchParams, navigate, refreshSession]);
   
   return (
     <div className={`flex min-h-screen items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
-      {/* Background Elements */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -left-48 w-72 h-72 rounded-full bg-purple-600/20 mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute top-0 -right-48 w-72 h-72 rounded-full bg-pink-600/20 mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute -bottom-48 left-48 w-72 h-72 rounded-full bg-blue-600/20 mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute -bottom-48 right-48 w-72 h-72 rounded-full bg-purple-600/20 mix-blend-multiply filter blur-3xl"></div>
-      </div>
-      
       <div className="relative z-10 w-full max-w-sm mx-auto px-4">
         <div className={`rounded-xl p-6 shadow-xl backdrop-blur-sm border border-white/10 ${
           darkMode ? 'bg-gray-800/80' : 'bg-white/80'
         }`}>
           <h1 className={`text-xl font-bold text-center mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-            {t('auth.oauth.title', 'Authentication')}
+            Cloud Storage
           </h1>
           
           {!error ? (
@@ -105,13 +78,13 @@ const OAuthCallback = ({ darkMode }) => {
                 {error}
               </div>
               <p className={`text-center mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {t('auth.oauth.try_again', 'Please try again or use another login method.')}
+                Please try connecting again.
               </p>
               <button
                 onClick={() => navigate('/login')}
                 className="w-full rounded-md bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 p-2 text-sm text-white font-medium shadow-lg transition-all duration-300 hover:shadow-md"
               >
-                {t('auth.oauth.back_to_login', 'Back to Login')}
+                Try Again
               </button>
             </>
           )}

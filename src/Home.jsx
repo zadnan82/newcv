@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ResumeCard from './components/cards/ResumeCard';
 import CoverLetterCard from './components/cards/CoverLetterCard'; 
-import useAuthStore from './stores/authStore';
+import useSessionStore from './stores/sessionStore'; // Updated import
 import cvatiLogo from './assets/cvlogo.png';
 import { ArrowRight, CheckCircle, Star, Zap, PenTool, FileText, Briefcase, Users, BarChart, Target, Layout } from 'lucide-react';
 import temp1 from './assets/temp1.png';
@@ -13,36 +13,56 @@ import temp4 from './assets/temp4.png';
 import temp5 from './assets/temp5.png';
 import temp6 from './assets/temp6.png';
 
- 
-
 const Home = ({ darkMode }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuthStore();
   
-  const handleCreateResumeClick = () => {
-    if (isAuthenticated) {
+  // Updated to use session store instead of auth store
+  const { isSessionActive, hasConnectedProviders, initialize } = useSessionStore();
+  
+  const handleCreateResumeClick = async () => {
+    // Check if we have an active session
+    if (!isSessionActive) {
+      // Initialize session if needed
+      try {
+        await initialize();
+      } catch (error) {
+        console.error('Failed to initialize session:', error);
+      }
+    }
+    
+    // Check if user has connected cloud providers
+    if (hasConnectedProviders()) {
       navigate('/new-resume');
     } else {
-      navigate('/login', { state: { redirectTo: '/new-resume' } });
+      // Redirect to cloud setup first
+      navigate('/cloud-setup');
     }
   };
 
-  const handleCreateCoverLetterClick = () => {
-    if (isAuthenticated) {
+  const handleCreateCoverLetterClick = async () => {
+    // Check if we have an active session
+    if (!isSessionActive) {
+      try {
+        await initialize();
+      } catch (error) {
+        console.error('Failed to initialize session:', error);
+      }
+    }
+    
+    // Check if user has connected cloud providers
+    if (hasConnectedProviders()) {
       navigate('/cover-letter');
     } else {
-      navigate('/login', { state: { redirectTo: '/cover-letter' } });
+      // Redirect to cloud setup first
+      navigate('/cloud-setup');
     }
   };
   
   const handleExploreTemplatesClick = () => {
     console.log("Explore Templates button clicked");
-    // Remove the alert as it can cause issues
-    // Don't use try/catch as it doesn't help here
     navigate('/rc-public');
     
-    // Add a fallback after a short delay
     setTimeout(() => {
       if (window.location.pathname !== '/rc-public') {
         console.log("Navigation may have failed, using direct location change");
@@ -51,7 +71,21 @@ const Home = ({ darkMode }) => {
     }, 500);
   };
   
-  
+  const handleMyResumesClick = async () => {
+    if (!isSessionActive) {
+      try {
+        await initialize();
+      } catch (error) {
+        console.error('Failed to initialize session:', error);
+      }
+    }
+    
+    if (hasConnectedProviders()) {
+      navigate('/my-resumes');
+    } else {
+      navigate('/cloud-setup');
+    }
+  };
 
 // Inside your Home component
 const [currentIndex, setCurrentIndex] = useState(1); // Start with middle template
@@ -83,6 +117,7 @@ const getTemplateIndex = (offset) => {
   if (index >= templates.length) index = 0;
   return index;
 };
+
   // Testimonials data
   const testimonials = [
     {
@@ -113,7 +148,7 @@ const getTemplateIndex = (offset) => {
     { label: t('prod1.stats.job_match', 'Job Match Rate'), value: "92%" }
   ];
 
-  // Features data
+  // Features data - Updated descriptions for privacy-first approach
   const mainFeatures = [
     {
       icon: <FileText className="h-6 w-6" />,
@@ -129,33 +164,33 @@ const getTemplateIndex = (offset) => {
     },
     {
       icon: <PenTool className="h-6 w-6" />,
-      title: t('prod1.features.cover_letters.title', 'Personalized Cover Letters'),
-      description: t('prod1.features.cover_letters.description', 'Generate tailored cover letters that match the job description and highlight your relevant experience.'),
+      title: t('prod1.features.cover_letters.title', 'Privacy-First Cloud Storage'),
+      description: 'Your CV data is stored securely in YOUR cloud storage account. We never see or store your personal information.',
       color: "blue"
     }
   ];
 
-  // Secondary features
+  // Secondary features - Updated for cloud storage
   const secondaryFeatures = [
     {
       icon: <Target className="h-5 w-5" />,
-      title: t('prod1.features.keyword_optimization.title', 'Keyword Optimization'),
-      description: t('prod1.features.keyword_optimization.description', 'We analyze job descriptions to include the right keywords.')
+      title: t('prod1.features.keyword_optimization.title', 'Multi-Cloud Support'),
+      description: 'Works with Google Drive, OneDrive, Dropbox, and Box. Your choice, your control.'
     },
     {
       icon: <Briefcase className="h-5 w-5" />,
-      title: t('prod1.features.industry_content.title', 'Industry-Specific Content'),
-      description: t('prod1.features.industry_content.description', 'Tailored content for your industry and experience level.')
+      title: t('prod1.features.industry_content.title', 'No User Accounts'),
+      description: 'Anonymous sessions mean no passwords, no data breaches, no privacy concerns.'
     },
     {
       icon: <BarChart className="h-5 w-5" />,
-      title: t('prod1.features.resume_analytics.title', 'Resume Analytics'),
-      description: t('prod1.features.resume_analytics.description', 'See how your resume performs and get suggestions to improve it.')
+      title: t('prod1.features.resume_analytics.title', 'Real-time Sync'),
+      description: 'Access your CVs from any device. Changes sync automatically across all your devices.'
     },
     {
       icon: <Users className="h-5 w-5" />,
-      title: t('prod1.features.expert_advice.title', 'Expert-Backed Advice'),
-      description: t('prod1.features.expert_advice.description', 'Content based on insights from hiring managers and recruiters.')
+      title: t('prod1.features.expert_advice.title', 'GDPR Compliant'),
+      description: 'Privacy by design. We comply with all data protection regulations by not storing your data.'
     }
   ];
   
@@ -186,14 +221,22 @@ const getTemplateIndex = (offset) => {
   </div>
   
   <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 leading-relaxed`}>
-    {t('prod1.hero.title', 'Land Your Dream Job')}
+    {t('prod1.hero.title', 'Privacy-First CV Platform')}
   </h1>
   
   <p className={`text-base md:text-lg max-w-2xl mx-auto mb-8 ${
     darkMode ? 'text-gray-300' : 'text-gray-700'
   } leading-relaxed`}>
-    {t('prod1.hero.subtitle', 'Create stunning resumes and compelling cover letters with AI that gets you noticed by employers and passes ATS systems.')}
+    Create stunning resumes with AI enhancement. Your data stays in YOUR cloud storage - we never see your personal information.
   </p>
+
+  {/* Privacy Badge */}
+  <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 ${
+    darkMode ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-green-100 text-green-700 border border-green-200'
+  }`}>
+    <CheckCircle className="w-4 h-4 mr-2" />
+    Zero Data Liability • GDPR Compliant • Privacy by Design
+  </div>
 
   {/* Artistic 3D Carousel Section */}
 <section className="mb-16">
@@ -239,7 +282,6 @@ const getTemplateIndex = (offset) => {
               className="w-full h-full object-cover"
               loading="lazy"
             />
-            
           </div>
 
           {/* Right Template (tilted) */}
@@ -309,34 +351,34 @@ const getTemplateIndex = (offset) => {
         <ul className={`mb-6 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           <li className="flex items-center gap-2 mb-2">
             <CheckCircle className="size-4 text-green-500" />
-            {t('revamp.atsFriendly', 'Visually striking yet ATS-compatible')}
+            Stored securely in YOUR cloud storage
           </li>
           <li className="flex items-center gap-2 mb-2">
             <CheckCircle className="size-4 text-green-500" />
-            {t('revamp.modernLayouts', 'Balanced white space and typography')}
+            {t('revamp.modernLayouts', 'ATS-compatible and beautifully designed')}
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle className="size-4 text-green-500" />
-            {t('revamp.customizableDesigns', 'Pixel-perfect print-ready formats')}
+            {t('revamp.customizableDesigns', 'AI-enhanced content suggestions')}
           </li>
         </ul>
         
-        {/* Single "Use This Template" button that navigates to rc-public */}
-<div className="relative z-10 mt-4"> {/* Added z-10 and relative positioning */}
-  
-  <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-  <button 
-    onClick={() => navigate('/rc-public', { state: { selectedTemplate: currentIndex } })}
-    className={`w-full sm:w-auto px-6 py-3 rounded-full font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center
-      ${darkMode ? 
-        'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-purple-500/20' :
-        'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white hover:shadow-purple-400/20'
-      }`}
-    style={{ pointerEvents: 'auto' }} // Ensure button is clickable
-  >
-    <span className="text-base mr-2"> {t('revamp.exploreTemplatesButton', 'Template')}</span>
-    <ArrowRight size={16} />
-  </button>
+        {/* Action Buttons */}
+        <div className="relative z-10 mt-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+            <button 
+              onClick={() => navigate('/rc-public', { state: { selectedTemplate: currentIndex } })}
+              className={`w-full sm:w-auto px-6 py-3 rounded-full font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center ${
+                darkMode ? 
+                  'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-purple-500/20' :
+                  'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white hover:shadow-purple-400/20'
+              }`}
+              style={{ pointerEvents: 'auto' }}
+            >
+              <span className="text-base mr-2">Explore Templates</span>
+              <ArrowRight size={16} />
+            </button>
+            
             <button 
               onClick={handleCreateResumeClick}
               className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 flex items-center justify-center"
@@ -347,43 +389,36 @@ const getTemplateIndex = (offset) => {
             
             <button 
               onClick={handleCreateCoverLetterClick}
-              className={`w-full sm:w-auto px-6 py-3 rounded-full font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center
-                ${darkMode ? 
+              className={`w-full sm:w-auto px-6 py-3 rounded-full font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center ${
+                darkMode ? 
                   'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-purple-500/20' :
                   'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white hover:shadow-purple-400/20'
-                }`}
-              style={{ pointerEvents: 'auto' }} // Ensure button is clickable
+              }`}
+              style={{ pointerEvents: 'auto' }}
             >
               <span className="text-base mr-2">{t('cards.cover_letter.actions.create', 'Generate Cover Letter')}</span>
               <ArrowRight size={16} />
             </button>
           </div>
-
-</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
-          
-           
-
         </header>
 
-        
-
-
-        {/* Main Features Section */}
+        {/* Main Features Section - Updated for privacy-first */}
         <section className="mb-16">
           <div className="text-center mb-10">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              {t('prod1.sections.power_job_search', 'Power Your Job Search with AI')}
+              Privacy-First CV Platform
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              {t('prod1.sections.power_job_description', 'Our powerful AI tools help you create professional-quality resumes and cover letters tailored to your target roles.')}
+              Your CV data never leaves your control. We use your cloud storage, not ours.
             </p>
           </div>
           
@@ -397,7 +432,6 @@ const getTemplateIndex = (offset) => {
                     : 'bg-white/90 border border-gray-200/50 shadow-md'
                 }`}
               >
-                {/* Icon container positioned better */}
                 <div className="flex justify-start mb-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br ${
                     feature.color === 'purple' 
@@ -427,7 +461,7 @@ const getTemplateIndex = (offset) => {
           </div>
         </section>
 
-        {/* Cards Section */}
+        {/* Cards Section - Updated with new handlers */}
         <section className="mb-16">
           <div className="text-center mb-8">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
@@ -438,28 +472,28 @@ const getTemplateIndex = (offset) => {
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              {t('prod1.sections.job_winning_description', 'Designed to help you stand out and make a strong impression on employers.')}
+              Stored securely in your cloud storage. Access from anywhere, anytime.
             </p>
           </div>
           
           <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8">
-            <ResumeCard darkMode={darkMode} />
-            <CoverLetterCard darkMode={darkMode} /> 
+            <ResumeCard darkMode={darkMode} onCreateClick={handleCreateResumeClick} />
+            <CoverLetterCard darkMode={darkMode} onCreateClick={handleCreateCoverLetterClick} /> 
           </div>
         </section>
 
-        {/* Secondary Features Grid */}
+        {/* Secondary Features Grid - Updated for cloud features */}
         <section className="mb-16">
           <div className="text-center mb-8">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              {t('prod1.sections.everything_to_succeed', 'Everything You Need to Succeed')}
+              Why Choose Our Privacy-First Platform?
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              {t('prod1.sections.everything_description', 'Packed with features to help you create standout application materials.')}
+              Advanced features designed with your privacy and security in mind.
             </p>
           </div>
           
@@ -474,7 +508,6 @@ const getTemplateIndex = (offset) => {
                 }`}
               >
                 <div className="flex items-start">
-                  {/* Fixed icon container with proper spacing */}
                   <div className={`mr-3 p-2 rounded-lg inline-flex items-center justify-center flex-shrink-0 ${
                     darkMode ? 'bg-gray-700' : 'bg-gray-100'
                   }`} style={{ minWidth: '36px', minHeight: '36px' }}>
@@ -500,7 +533,7 @@ const getTemplateIndex = (offset) => {
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* How It Works - Updated for cloud storage flow */}
         <section className="mb-16">
           <div className="text-center mb-8">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
@@ -511,12 +544,12 @@ const getTemplateIndex = (offset) => {
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              {t('prod1.sections.how_it_works_description', 'Create professional resumes and cover letters in minutes with three simple steps.')}
+              Get started in minutes with our privacy-first approach to CV building.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {/* Step 1 */}
+            {/* Step 1 - Updated */}
             <div className={`relative p-6 ${
               darkMode ? 'bg-gray-800/80 text-white' : 'bg-white/90 text-gray-800'
             } rounded-xl border ${
@@ -527,13 +560,13 @@ const getTemplateIndex = (offset) => {
                   1
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t('prod1.steps.enter_details.title', 'Enter Your Details')}</h3>
+              <h3 className="text-lg font-semibold mb-2">Connect Your Cloud Storage</h3>
               <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {t('prod1.steps.enter_details.description', 'Fill in your information or upload an existing resume to get started quickly.')}
+                Choose from Google Drive, OneDrive, Dropbox, or Box. Your data stays in YOUR account.
               </p>
             </div>
             
-            {/* Step 2 */}
+            {/* Step 2 - Updated */}
             <div className={`relative p-6 ${
               darkMode ? 'bg-gray-800/80 text-white' : 'bg-white/90 text-gray-800'
             } rounded-xl border ${
@@ -544,13 +577,13 @@ const getTemplateIndex = (offset) => {
                   2
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t('prod1.steps.ai_enhancement.title', 'AI Enhancement')}</h3>
+              <h3 className="text-lg font-semibold mb-2">Create & Enhance with AI</h3>
               <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {t('prod1.steps.ai_enhancement.description', 'Our AI analyzes your experience and the job requirements to suggest improvements.')}
+                Build your CV with our templates and get AI-powered suggestions for content improvement.
               </p>
             </div>
             
-            {/* Step 3 */}
+            {/* Step 3 - Updated */}
             <div className={`relative p-6 ${
               darkMode ? 'bg-gray-800/80 text-white' : 'bg-white/90 text-gray-800'
             } rounded-xl border ${
@@ -561,9 +594,9 @@ const getTemplateIndex = (offset) => {
                   3
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t('prod1.steps.download_apply.title', 'Download & Apply')}</h3>
+              <h3 className="text-lg font-semibold mb-2">Access Anywhere</h3>
               <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {t('prod1.steps.download_apply.description', 'Get your perfectly formatted resume or cover letter ready to impress employers.')}
+                Your CV syncs across all devices. Download, share, or edit from anywhere, anytime.
               </p>
             </div>
           </div>
@@ -580,7 +613,7 @@ const getTemplateIndex = (offset) => {
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              {t('prod1.sections.what_users_description', 'Success stories from job seekers who used CVATI to land their dream jobs.')}
+              {t('prod1.sections.what_users_description', 'Success stories from job seekers who trust our privacy-first platform.')}
             </p>
           </div>
           
@@ -619,7 +652,7 @@ const getTemplateIndex = (offset) => {
           </div>
         </section>
 
-        {/* Final CTA */}
+        {/* Privacy-Focused CTA */}
         <section className="text-center">
           <div className={`max-w-3xl mx-auto p-8 rounded-2xl bg-gradient-to-r ${
             darkMode 
@@ -636,36 +669,45 @@ const getTemplateIndex = (offset) => {
               <h2 className={`text-2xl md:text-3xl font-bold mb-4 ${
                 darkMode ? 'text-white' : 'text-gray-800'
               }`}>
-                {t('prod1.cta.title', 'Ready to Land Your Dream Job?')}
+                Ready to Take Control of Your Career Data?
               </h2>
               
               <p className={`text-sm md:text-base max-w-xl mx-auto mb-6 ${
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>
-                {t('prod1.cta.description', 'Join thousands of professionals who have transformed their job search with our AI-powered tools.')}
+                Join thousands of professionals who have chosen our privacy-first CV platform. Your data, your cloud, your control.
               </p>
+              
+              {/* Trust indicators */}
+              <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-6 ${
+                darkMode ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-green-100 text-green-700 border border-green-200'
+              }`}>
+                <CheckCircle className="w-4 h-4 mr-2" />
+                No Data Storage • No Privacy Risks • No Vendor Lock-in
+              </div>
               
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <button 
                   onClick={handleCreateResumeClick}
                   className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 flex items-center justify-center"
                 >
-                  <span className="text-base mr-2">{t('prod1.cta.build_resume', 'Build My Resume')}</span>
+                  <span className="text-base mr-2">Start Building Securely</span>
                   <ArrowRight size={16} />
                 </button>
                 
-                <button 
-                  onClick={handleCreateCoverLetterClick}
-                  className={`w-full sm:w-auto px-6 py-3 rounded-full font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center
-                    ${darkMode ? 
-                      'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-purple-500/20' :
-                      'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white hover:shadow-purple-400/20'
+                {hasConnectedProviders() && (
+                  <button 
+                    onClick={handleMyResumesClick}
+                    className={`w-full sm:w-auto px-6 py-3 rounded-full font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center ${
+                      darkMode ? 
+                        'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-purple-500/20' :
+                        'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white hover:shadow-purple-400/20'
                     }`}
-                  style={{ pointerEvents: 'auto' }} // Ensure button is clickable
-                >
-                  <span className="text-base mr-2">{t('prod1.cta.create_cover_letter', 'Create Cover Letter')}</span>
-                  <ArrowRight size={16} />
-                </button>
+                  >
+                    <span className="text-base mr-2">View My Resumes</span>
+                    <ArrowRight size={16} />
+                  </button>
+                )}
               </div>
             </div>
           </div>

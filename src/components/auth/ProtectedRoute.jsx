@@ -1,22 +1,21 @@
+// src/components/auth/ProtectedRoute.jsx - Updated for cloud storage
 import { Navigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  // Get authentication state and user info
-  const { isAuthenticated, user } = useAuthStore.getState();
-  const authenticated = isAuthenticated();
+const ProtectedRoute = ({ children, requireCloudStorage = true }) => {
+  const { sessionToken, cloudProviders } = useAuthStore();
   
-  // If not authenticated, redirect to login
-  if (!authenticated) {
+  // Check if we have an active session
+  if (!sessionToken) {
     return <Navigate to="/login" replace />;
   }
   
-  // If this is an admin-only route and the user is not an admin, redirect to home
-  if (adminOnly && user?.role !== 'admin') {
-    return <Navigate to="/" replace />;
+  // Check if cloud storage is required and connected
+  if (requireCloudStorage && (!cloudProviders || cloudProviders.length === 0)) {
+    return <Navigate to="/login" replace />;
   }
   
-  // User is authenticated and has required role (if any)
+  // User has session and required cloud storage
   return children;
 };
 

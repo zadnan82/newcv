@@ -1,580 +1,487 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom'; 
-import { Menu, X, Moon, Sun, User, FileText, Settings, LogOut, FileSignature, ChevronDown, Shield, MessageSquare, LogIn, Target } from 'lucide-react';
+// src/Navbar.jsx - Updated for cloud storage system
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import logo from './assets/logo.png';
-import logo2 from './assets/logo2.png';
-import useAuthStore from './stores/authStore';
-import useResumeStore from './stores/resumeStore';
+import { 
+  Menu, 
+  X, 
+  Sun, 
+  Moon, 
+  Cloud, 
+  FileText, 
+  Settings, 
+  ChevronDown,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  LogOut,
+  HardDrive
+} from 'lucide-react';
+import useSessionStore from './stores/sessionStore';
+import cvatiLogo from './assets/cvlogo.png';
 
 const Navbar = ({ darkMode, toggleDarkMode }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, i18n } = useTranslation(); 
-  const [isAuthenticated, setIsAuthenticated] = useState(useAuthStore.getState().isAuthenticated());
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-  const menuRef = useRef(null);
-  const languageMenuRef = useRef(null);
-  const fetchResumes = useResumeStore(state => state.fetchResumes); 
-  const isRTL = i18n.dir() === 'rtl';
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showCloudDropdown, setShowCloudDropdown] = useState(false);
 
-  const changeLanguage = (langCode) => {
-    i18n.changeLanguage(langCode);
-    localStorage.setItem('preferredLanguage', langCode);
-    setShowLanguageMenu(false);
-    setMobileMenuOpen(false);
-  };
+  // Session store for cloud-based system
+  const {
+    isSessionActive,
+    hasConnectedProviders,
+    connectedProviders,
+    providersStatus,
+    loading,
+    disconnectProvider,
+    setShowCloudSetup,
+    checkCloudStatus
+  } = useSessionStore();
 
+  // Refresh cloud status periodically
   useEffect(() => {
-    // Function to handle authentication changes
-    const handleAuthChange = () => {
-      setIsAuthenticated(useAuthStore.getState().isAuthenticated());
-    };
-  
-    // Close mobile menu when route changes
-    setMobileMenuOpen(false);
-  
-    // Listen for auth changes
-    window.addEventListener('authChange', handleAuthChange);
-  
-    // Click outside to close menus - but only for the language menu, not mobile menu
-    const handleClickOutside = (event) => {
-      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target)) {
-        setShowLanguageMenu(false);
-      }
-    };
-  
-    document.addEventListener('mousedown', handleClickOutside);
-
-    // Cleanup listeners on unmount
-    return () => {
-      window.removeEventListener('authChange', handleAuthChange);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isAuthenticated, location]);
-  
-
-  const isAdmin = () => {
-    const { user } = useAuthStore.getState();
-    return user?.role === 'admin';
-  };
-  const handleSignOut = async () => {
-    // Use auth store logout
-    await useAuthStore.getState().logout();
-    navigate('/login');
-    setMobileMenuOpen(false);
-  };
- 
-  const isActive = (path) => {
-    if (path === '/') {
-      return location.pathname === '/';
+    if (isSessionActive && hasConnectedProviders()) {
+      const interval = setInterval(() => {
+        checkCloudStatus();
+      }, 30000); // Check every 30 seconds
+      
+      return () => clearInterval(interval);
     }
-    return location.pathname.startsWith(path);
+  }, [isSessionActive, hasConnectedProviders, checkCloudStatus]);
+
+  const handleCloudSetup = () => {
+    setShowCloudSetup(true);
+    navigate('/cloud-setup');
+    setIsMenuOpen(false);
+    setShowCloudDropdown(false);
   };
- 
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'pl', name: 'Polski', flag: '🇵🇱' },
-    { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
-    { code: 'ar', name: 'العربية', flag: '🇦🇪' },
-    { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-    { code: 'fa', name: 'فارسی', flag: '🇮🇷' },
-    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-    { code: 'ur', name: 'اردو', flag: '🇵🇰' },
-    { code: 'pt', name: 'Português', flag: '🇵🇹' },
-];
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const handleMyResumes = () => {
+    if (hasConnectedProviders()) {
+      navigate('/my-resumes');
+    } else {
+      navigate('/cloud-setup');
+    }
+    setIsMenuOpen(false);
+  };
 
-  return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md ${
-      darkMode 
-        ? 'bg-gray-900/95 text-white border-b border-gray-800' 
-        : 'bg-white/95 text-gray-800 border-b border-gray-200'
-      } transition-all duration-300`}
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="flex justify-between h-12">
-          {/* Logo and brand */}
-          <div className={`flex items-center ${isRTL ? 'order-2' : 'order-1'}`}>
-            <Link 
-              to="/" 
-              className="flex-shrink-0 flex items-center space-x-1"
-            >
-              <div className="flex items-center">
-                <img src={logo} alt="Logo" className="h-7 w-auto" />
-                <img src={logo2} alt="Logo" className={`h-7 w-auto ${isRTL ? 'mr-1' : 'ml-1'}`} />
-              </div>
-            </Link>
-          </div>
+  const handleCreateResume = () => {
+    if (hasConnectedProviders()) {
+      navigate('/new-resume');
+    } else {
+      navigate('/cloud-setup');
+    }
+    setIsMenuOpen(false);
+  };
+
+  const handleDisconnectProvider = async (provider) => {
+    try {
+      await disconnectProvider(provider);
+      if (!hasConnectedProviders()) {
+        navigate('/cloud-setup');
+      }
+    } catch (error) {
+      console.error('Failed to disconnect provider:', error);
+    }
+    setShowCloudDropdown(false);
+  };
+
+  const getProviderIcon = (providerId) => {
+    const icons = {
+      'google_drive': '🗂️',
+      'onedrive': '☁️',
+      'dropbox': '📦',
+      'box': '📁'
+    };
+    return icons[providerId] || '☁️';
+  };
+
+  const getProviderDisplayName = (providerId) => {
+    const names = {
+      'google_drive': 'Google Drive',
+      'onedrive': 'OneDrive',
+      'dropbox': 'Dropbox',
+      'box': 'Box'
+    };
+    return names[providerId] || providerId;
+  };
+
+  const CloudStatusButton = () => {
+    if (!isSessionActive) {
+      return (
+        <button
+          onClick={handleCloudSetup}
+          className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+            darkMode 
+              ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+          }`}
+        >
+          <Cloud className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline">Initialize</span>
+        </button>
+      );
+    }
+
+    if (loading) {
+      return (
+        <button
+          disabled
+          className={`flex items-center px-4 py-2 rounded-lg ${
+            darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
+          }`}
+        >
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          <span className="hidden sm:inline">Connecting...</span>
+        </button>
+      );
+    }
+
+    if (!hasConnectedProviders()) {
+      return (
+        <button
+          onClick={handleCloudSetup}
+          className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+            darkMode 
+              ? 'bg-orange-600 hover:bg-orange-700 text-white' 
+              : 'bg-orange-500 hover:bg-orange-600 text-white'
+          }`}
+        >
+          <AlertCircle className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline">Connect Storage</span>
+        </button>
+      );
+    }
+
+    if (connectedProviders.length === 1) {
+      const provider = connectedProviders[0];
+      const status = providersStatus[provider];
+      
+      return (
+        <button
+          onClick={() => setShowCloudDropdown(!showCloudDropdown)}
+          className={`flex items-center px-4 py-2 rounded-lg transition-colors relative ${
+            darkMode 
+              ? 'bg-green-600 hover:bg-green-700 text-white' 
+              : 'bg-green-500 hover:bg-green-600 text-white'
+          }`}
+        >
+          <span className="mr-2">{getProviderIcon(provider)}</span>
+          <CheckCircle className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline">{getProviderDisplayName(provider)}</span>
+          <ChevronDown className="w-4 h-4 ml-1" />
           
-          {/* Desktop Navigation - centered */}
-          <div className={`hidden md:flex md:items-center md:justify-center flex-1 ${isRTL ? 'order-1 mr-4 ml-4' : 'order-2 ml-4 mr-4'}`}>
-            <div className="rounded-full px-1 py-1 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-sm flex items-center">
-              {!isAuthenticated ? (
-                <>
-                  <Link 
-                    to="/register" 
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                      isActive('/register')
-                        ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                        : darkMode
-                          ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                          : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                    }`}
-                  >
-                    <User className="w-3 h-3" /> {t('navigation.register')}
-                  </Link>
-                  <Link 
-                    to="/login" 
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                      isActive('/login')
-                        ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                        : darkMode
-                          ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                          : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                    }`}
-                  >
-                    {t('navigation.login')}
-                  </Link>
-                  <Link 
-      to="/rc-public" 
-      className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-        isActive('/rc-public')
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-          : darkMode
-            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-            : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-      }`}
-    >
-      <FileText className="w-3 h-3" /> {t('revamp.browse')}
-    </Link>
-    <Link 
-      to="/new-resume" 
-      className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-        isActive('/new-resume')
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-          : darkMode
-            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-            : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-      }`}
-    >
-      <FileSignature className="w-3 h-3" /> {t('resumeDashboard.buttons.createNew')}
-    </Link>
-    <Link 
-      to="/cover-letter" 
-      className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-        isActive('/cover-letter')
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-          : darkMode
-            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-            : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-      }`}
-    >
-      <FileText className="w-3 h-3" /> {t('navigation.coverLetter')}
-    </Link>
-
-    <Link 
-  to="/job-matching" 
-  className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-    isActive('/job-matching')
-      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-      : darkMode
-        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-        : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-  }`}
->
-  <Target className="w-3 h-3" />{t('jobMatching.jobMatching')}
-</Link>
-                </>
-              ) : (
-                <>
-                  <Link 
-                    to="/settings" 
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                      isActive('/settings')
-                        ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                        : darkMode
-                          ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                          : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                    }`}
-                  >
-                    <Settings className="w-3 h-3" /> {t('navigation.settings')}
-                  </Link>
-                   {/* Admin Dashboard Link - Only visible to admins */}
-                  {isAdmin() && (
-                    <Link 
-                      to="/admin/dashboard" 
-                      className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                        isActive('/admin/dashboard')
-                          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                          : darkMode
-                            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                            : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                      }`}
-                    >
-                      <Shield className="w-3 h-3" /> Admin
-                    </Link>
-                  )}
-                  <Link 
-                    to="/my-resumes" 
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                      isActive('/my-resumes')
-                        ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                        : darkMode
-                          ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                          : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                    }`}
-                  >
-                    <FileText className="w-3 h-3" /> {t('navigation.myResumes')}
-                  </Link>
-                  
-                  <Link 
-                    to="/cover-letters" 
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                      isActive('/cover-letters')
-                        ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                        : darkMode
-                          ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                          : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                    }`}
-                  >
-                    <FileSignature className="w-3 h-3" /> {t('navigation.coverLetters', 'Cover Letters')}
-                  </Link>
-                  <Link 
-  to="/job-matching" 
-  className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-    isActive('/job-matching')
-      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-      : darkMode
-        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-        : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-  }`}
->
-  <Target className="w-3 h-3" /> {t('jobMatching.jobMatching', 'Job Matching')}
-</Link>
-                </>
-              )}
-              
-              {/* Feedback Link - Always visible */}
-              {/* <Link 
-                to="/feedback" 
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
-                  isActive('/feedback')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
-                <MessageSquare className="w-3 h-3" /> {t('navigation.feedback', 'Feedback')}
-              </Link> */}
-            </div>
-          </div>
-          
-          {/* Right side controls */}
-          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-1 sm:space-x-reverse sm:space-x-2 order-3' : 'space-x-1 sm:space-x-2 order-3'}`}>
-            {/* Language Dropdown */}
-            <div className="relative" ref={languageMenuRef}>
-              <button 
-                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className={`flex items-center gap-1 px-1.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                  darkMode 
-                    ? 'hover:bg-gray-800 text-gray-300' 
-                    : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                <span className="text-sm">{currentLanguage.flag}</span>
-                <span className="hidden sm:inline">{currentLanguage.code.toUpperCase()}</span>
-                <ChevronDown className="w-3 h-3" />
-              </button>
-              
-              {/* Language dropdown menu */}
-              {showLanguageMenu && (
-                <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-1.5 w-40 rounded-lg shadow-xl z-20 ${
-                  darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-                }`}>
-                  <div className="max-h-64 overflow-y-auto">
-                    {languages.map(lang => (
-                      <button
-                        key={lang.code}
-                        onClick={() => changeLanguage(lang.code)}
-                        className={`flex items-center px-3 py-1.5 text-xs w-full ${isRTL ? 'text-right' : 'text-left'} transition-colors ${
-                          lang.code === i18n.language
-                            ? darkMode
-                              ? 'bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-blue-600/20 text-white font-medium'
-                              : 'bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-blue-600/10 text-blue-700 font-medium'
-                            : darkMode
-                              ? 'text-gray-300 hover:bg-white/10'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                      >
-                        <span className={isRTL ? 'ml-2 text-sm' : 'mr-2 text-sm'}>{lang.flag}</span>
-                        <span>{lang.name}</span>
-                      </button>
-                    ))}
+          {showCloudDropdown && (
+            <div className={`absolute top-full right-0 mt-2 w-64 rounded-lg shadow-lg z-50 ${
+              darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+            }`}>
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <span className="text-lg mr-2">{getProviderIcon(provider)}</span>
+                    <div>
+                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                        {getProviderDisplayName(provider)}
+                      </p>
+                      <p className={`text-xs ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                        Connected • {status?.email || 'Active'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-            
-            {/* Dark Mode Toggle Button */}
-            <button 
-              onClick={toggleDarkMode}
-              aria-label={darkMode ? t('app.theme.light') : t('app.theme.dark')}
-              className={`p-1.5 rounded-full transition-colors focus:outline-none ${
-                darkMode 
-                  ? 'text-yellow-300 hover:bg-gray-800' 
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            
-            {/* Sign Out Button for Desktop */}
-            {isAuthenticated && (
-              <button
-                onClick={handleSignOut}
-                className={`hidden md:flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-                  darkMode
-                    ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
-                    : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
-                }`}
-              >
-                <LogOut className="w-3 h-3" /> {t('navigation.signOut')}
-              </button>
-            )}
-            
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 rounded-full focus:outline-none transition-colors"
-              aria-label={t('navigation.toggleMenu')}
-              ref={menuRef}
-            >
-              {mobileMenuOpen ? 
-                <X className={`h-4 w-4 ${darkMode ? 'text-white' : 'text-gray-800'}`} /> : 
-                <Menu className={`h-4 w-4 ${darkMode ? 'text-white' : 'text-gray-800'}`} />
-              }
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu - slide down animation */}
-      <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileMenuOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-        } ${darkMode ? 'bg-gray-900' : 'bg-white'}`}
-        dir={isRTL ? 'rtl' : 'ltr'}
-      >
-        <div className="px-3 py-3 space-y-2">
-          {!isAuthenticated ? (
-            <>
-              <Link 
-                to="/register" 
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                  isActive('/register')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
-                <User className="w-4 h-4" /> {t('navigation.register')}
-              </Link>
-              <Link 
-                to="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                  isActive('/login')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
-                <LogIn className="w-4 h-4" />  {t('navigation.login')}
                 
-              </Link>
-              <Link 
-      to="/rc-public" 
-      onClick={() => setMobileMenuOpen(false)}
-      className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-        isActive('/rc-public')
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-          : darkMode
-            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-            : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-      }`}
-    >
-      <FileText className="w-4 h-4" /> {t('revamp.browse')}
-    </Link>
-    <Link 
-      to="/new-resume"
-      onClick={() => setMobileMenuOpen(false)}
-      className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-        isActive('/new-resume')
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-          : darkMode
-            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-            : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-      }`}
-    >
-      <FileSignature className="w-4 h-4" /> {t('resumeDashboard.buttons.createNew')}
-    </Link>
-    <Link 
-      to="/cover-letter"
-      onClick={() => setMobileMenuOpen(false)}
-      className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-        isActive('/cover-letter')
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-          : darkMode
-            ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-            : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-      }`}
-    >
-      <FileText className="w-4 h-4" /> {t('navigation.coverLetter')}
-    </Link>
-    <Link 
-  to="/job-matching"
-  onClick={() => setMobileMenuOpen(false)}
-  className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-    isActive('/job-matching')
-      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-      : darkMode
-        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-        : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-  }`}
->
-  <Target className="w-4 h-4" /> Job Matching
-</Link>
-            </>
-          ) : (
-            <>
-              <Link 
-                to="/settings"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                  isActive('/settings')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
-                <Settings className="w-4 h-4" /> {t('navigation.settings')}
-              </Link>
-              
-              <Link 
-                to="/my-resumes"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                  isActive('/my-resumes')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
-                <FileText className="w-4 h-4" /> {t('navigation.myResumes')}
-              </Link>
-              
-              <Link 
-                to="/cover-letters"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                  isActive('/cover-letters')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
-                <FileSignature className="w-4 h-4" /> {t('navigation.coverLetters', 'Cover Letters')}
-              </Link>
+                <div className="space-y-2">
+                  <button
+                    onClick={handleMyResumes}
+                    className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                      darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    <FileText className="w-4 h-4 inline mr-2" />
+                    My Resumes
+                  </button>
+                  
+                  <button
+                    onClick={handleCloudSetup}
+                    className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                      darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 inline mr-2" />
+                    Manage Storage
+                  </button>
+                  
+                  <hr className={`my-2 ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
+                  
+                  <button
+                    onClick={() => handleDisconnectProvider(provider)}
+                    className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                      darkMode ? 'hover:bg-red-600 text-red-400' : 'hover:bg-red-100 text-red-600'
+                    }`}
+                  >
+                    <LogOut className="w-4 h-4 inline mr-2" />
+                    Disconnect
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </button>
+      );
+    }
 
-              <Link 
-  to="/job-matching"
-  onClick={() => setMobileMenuOpen(false)}
-  className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-    isActive('/job-matching')
-      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-      : darkMode
-        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-        : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-  }`}
->
-  <Target className="w-4 h-4" /> Job Matching
-</Link>
+    // Multiple providers connected
+    return (
+      <button
+        onClick={() => setShowCloudDropdown(!showCloudDropdown)}
+        className={`flex items-center px-4 py-2 rounded-lg transition-colors relative ${
+          darkMode 
+            ? 'bg-green-600 hover:bg-green-700 text-white' 
+            : 'bg-green-500 hover:bg-green-600 text-white'
+        }`}
+      >
+        <HardDrive className="w-4 h-4 mr-2" />
+        <span className="hidden sm:inline">{connectedProviders.length} Connected</span>
+        <ChevronDown className="w-4 h-4 ml-1" />
+        
+        {showCloudDropdown && (
+          <div className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-lg z-50 ${
+            darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+          }`}>
+            <div className="p-4">
+              <h3 className={`font-medium mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                Connected Storage
+              </h3>
               
-              {/* Admin Dashboard Link - Only visible to admins */}
-              {isAdmin() && (
-                <Link 
-                  to="/admin/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                    isActive('/admin/dashboard')
-                      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                      : darkMode
-                        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                        : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
+              {connectedProviders.map(provider => {
+                const status = providersStatus[provider];
+                return (
+                  <div key={provider} className={`flex items-center justify-between p-2 rounded mb-2 ${
+                    darkMode ? 'bg-gray-700' : 'bg-gray-50'
+                  }`}>
+                    <div className="flex items-center">
+                      <span className="text-lg mr-2">{getProviderIcon(provider)}</span>
+                      <div>
+                        <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                          {getProviderDisplayName(provider)}
+                        </p>
+                        <p className={`text-xs ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                          {status?.email || 'Connected'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDisconnectProvider(provider)}
+                      className={`p-1 rounded transition-colors ${
+                        darkMode ? 'hover:bg-red-600 text-red-400' : 'hover:bg-red-100 text-red-600'
+                      }`}
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
+              
+              <hr className={`my-3 ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
+              
+              <div className="space-y-2">
+                <button
+                  onClick={handleMyResumes}
+                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                    darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
-                  <Shield className="w-4 h-4" /> Admin Dashboard
-                </Link>
-              )}
-              
-              <button
-                onClick={handleSignOut}
-                className={`w-full ${isRTL ? 'text-right' : 'text-left'} flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${
-                  darkMode
-                    ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
-                    : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
-                }`}
-              >
-                <LogOut className="w-4 h-4" /> {t('navigation.signOut')}
-              </button>
-            </>
-          )}
-          
-          
-          
-          {/* Language options in mobile menu */}
-          <div className={`pt-3 pb-2 px-3 border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-            <p className={`mb-2 font-medium text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('language.title', 'Select Language')}
-            </p>
-            <div className="grid grid-cols-2 gap-1.5">
-              {languages.map(lang => (
-                <button
-                  key={lang.code}
-                  onClick={() => changeLanguage(lang.code)}
-                  className={`flex items-center px-2 py-1.5 rounded-lg text-xs transition-colors ${
-                    lang.code === i18n.language
-                      ? darkMode
-                        ? 'bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-blue-600/20 text-white font-medium'
-                        : 'bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-blue-600/10 text-blue-700 font-medium'
-                      : darkMode
-                        ? 'bg-white/5 text-gray-300 hover:bg-white/10'
-                        : 'bg-gray-100 text-gray-700 hover:bg-white/20'
-                    }`}
-                >
-                  <span className={isRTL ? 'ml-1.5 text-sm' : 'mr-1.5 text-sm'}>{lang.flag}</span>
-                  <span className="truncate">{lang.name}</span>
+                  <FileText className="w-4 h-4 inline mr-2" />
+                  My Resumes
                 </button>
-              ))}
+                
+                <button
+                  onClick={handleCloudSetup}
+                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                    darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <Settings className="w-4 h-4 inline mr-2" />
+                  Manage Storage
+                </button>
+              </div>
             </div>
           </div>
+        )}
+      </button>
+    );
+  };
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${
+      darkMode ? 'bg-gray-800/95 border-gray-700' : 'bg-white/95 border-gray-200'
+    } backdrop-blur-sm border-b transition-colors duration-200`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <img src={cvatiLogo} alt="CVATI" className="h-8 w-auto" />
+            <span className={`text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 hidden sm:inline`}>
+              CVATI
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            
+            {/* Navigation Links */}
+            <Link
+              to="/"
+              className={`text-sm font-medium transition-colors ${
+                location.pathname === '/' 
+                  ? darkMode ? 'text-purple-400' : 'text-purple-600'
+                  : darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {t('navigation.home', 'Home')}
+            </Link>
+
+            {hasConnectedProviders() && (
+              <>
+                <button
+                  onClick={handleMyResumes}
+                  className={`text-sm font-medium transition-colors ${
+                    location.pathname === '/my-resumes' 
+                      ? darkMode ? 'text-purple-400' : 'text-purple-600'
+                      : darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  My Resumes
+                </button>
+
+                <button
+                  onClick={handleCreateResume}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                    darkMode
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                      : 'bg-purple-500 hover:bg-purple-600 text-white'
+                  }`}
+                >
+                  Create Resume
+                </button>
+              </>
+            )}
+
+            {/* Privacy Badge */}
+            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              darkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+            }`}>
+              Privacy-First
+            </div>
+
+            {/* Cloud Status */}
+            <CloudStatusButton />
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-lg transition-colors ${
+                darkMode ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+              }`}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-lg transition-colors ${
+                darkMode ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+              }`}
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`p-2 rounded-lg transition-colors ${
+                darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+              }`}
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className={`md:hidden py-4 border-t ${
+            darkMode ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <div className="space-y-4">
+              <Link
+                to="/"
+                onClick={() => setIsMenuOpen(false)}
+                className={`block px-4 py-2 text-sm font-medium transition-colors ${
+                  location.pathname === '/' 
+                    ? darkMode ? 'text-purple-400' : 'text-purple-600'
+                    : darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {t('navigation.home', 'Home')}
+              </Link>
+
+              {hasConnectedProviders() && (
+                <>
+                  <button
+                    onClick={handleMyResumes}
+                    className={`block w-full text-left px-4 py-2 text-sm font-medium transition-colors ${
+                      location.pathname === '/my-resumes' 
+                        ? darkMode ? 'text-purple-400' : 'text-purple-600'
+                        : darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    My Resumes
+                  </button>
+
+                  <button
+                    onClick={handleCreateResume}
+                    className={`block w-full text-left px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                      darkMode
+                        ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                        : 'bg-purple-500 hover:bg-purple-600 text-white'
+                    }`}
+                  >
+                    Create Resume
+                  </button>
+                </>
+              )}
+
+              {/* Cloud Status in Mobile */}
+              <div className="px-4">
+                <CloudStatusButton />
+              </div>
+
+              {/* Privacy Badge in Mobile */}
+              <div className="px-4">
+                <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                  darkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+                }`}>
+                  🔒 Privacy-First Platform
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Click outside to close cloud dropdown */}
+      {showCloudDropdown && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowCloudDropdown(false)}
+        />
+      )}
     </nav>
   );
 };

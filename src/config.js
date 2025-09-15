@@ -1,63 +1,85 @@
-// config.js
-import useAuthStore from './stores/authStore'; // Adjust the import path as needed
+ // config.js - Updated for cloud storage backend
+import useAuthStore from './stores/authStore';
 
- 
-export const API_BASE_URL = 
-//'http://localhost:8000';
-//'https://51.20.70.82';
-'https://api.cvati.com' ; 
- 
-  
+export const API_BASE_URL = 'https://api.cvati.com';
 
-// (window.location.hostname !== 'localhost') 
-//   ? 'http://13.53.64.149:8000' 
-//   : 'http://localhost:8000';
- 
-// Auth endpoints
+// ================== HEALTH AND INFO ENDPOINTS ==================
+export const HEALTH_ENDPOINTS = {
+  HEALTH: `${API_BASE_URL}/health`,
+  DETAILED_HEALTH: `${API_BASE_URL}/health/detailed`,
+  API_INFO: `${API_BASE_URL}/api/info`,
+};
+
+export const CLOUD_ENDPOINTS = {
+  PROVIDERS: `${API_BASE_URL}/api/cloud/providers`,
+  CONNECT: (provider) => `${API_BASE_URL}/api/cloud/connect/${provider}`,
+  CALLBACK: (provider) => `${API_BASE_URL}/api/cloud/callback/${provider}`,
+  STATUS: `${API_BASE_URL}/api/cloud/status`,
+  STATUS_PROVIDER: (provider) => `${API_BASE_URL}/api/cloud/status/${provider}`,
+  DISCONNECT: (provider) => `${API_BASE_URL}/api/cloud/disconnect/${provider}`,
+  TEST: (provider) => `${API_BASE_URL}/api/cloud/test/${provider}`,
+  HEALTH: `${API_BASE_URL}/api/cloud/health`,
+  REFRESH_TOKENS: `${API_BASE_URL}/api/cloud/refresh-tokens`,
+};
+
+// ================== UPDATED RESUME ENDPOINTS ==================
+export const RESUME_ENDPOINTS = {
+  // All resume operations now require provider and file_id
+  LIST: `${API_BASE_URL}/api/resume/`,
+  GET_BY_ID: `${API_BASE_URL}/api/resume/`, // Will append file_id and provider as query params
+  CREATE: `${API_BASE_URL}/api/resume/`,
+  UPDATE: `${API_BASE_URL}/api/resume/`, // Will append file_id and provider as query params
+  DELETE: `${API_BASE_URL}/api/resume/`, // Will append file_id and provider as query params
+  SEARCH: `${API_BASE_URL}/api/resume/search/`,
+  BACKUP: `${API_BASE_URL}/api/resume/`, // Will append file_id/backup
+  SYNC: `${API_BASE_URL}/api/resume/`, // Will append file_id/sync
+  DUPLICATE: `${API_BASE_URL}/api/resume/`, // Will append file_id/duplicate
+  VERSIONS: `${API_BASE_URL}/api/resume/`, // Will append file_id/versions
+};
+
+// ================== AI ENHANCEMENT ENDPOINTS ==================
+export const AI_ENDPOINTS = {
+  USAGE: `${API_BASE_URL}/api/ai/usage`,
+  ENHANCE_SUMMARY: `${API_BASE_URL}/api/ai/enhance-summary`,
+  ENHANCE_EXPERIENCE: `${API_BASE_URL}/api/ai/enhance-experience`,
+  SUGGEST_SKILLS: `${API_BASE_URL}/api/ai/suggest-skills`,
+  ANALYZE_JOB: `${API_BASE_URL}/api/ai/analyze-job-match`,
+  MODELS: `${API_BASE_URL}/api/ai/models`,
+};
+
+// ================== COVER LETTER ENDPOINTS ==================
+export const COVER_LETTER_ENDPOINTS = {
+  LIST: `${API_BASE_URL}/api/cover-letter/`,
+  GENERATE: `${API_BASE_URL}/api/cover-letter/generate`,
+  GET_BY_ID: `${API_BASE_URL}/api/cover-letter/`, // Will append id
+  DELETE: `${API_BASE_URL}/api/cover-letter/`, // Will append id
+  CUSTOMIZE: `${API_BASE_URL}/api/cover-letter/customize`,
+};
+
+// ================== DEPRECATED - OLD AUTH ENDPOINTS ==================
+// These are kept for backward compatibility during migration
 export const AUTH_ENDPOINTS = {
-  LOGIN: `${API_BASE_URL}/auth/token`,        // This is correct - matches your backend
+  LOGIN: `${API_BASE_URL}/auth/token`,
   REGISTER: `${API_BASE_URL}/auth/register`,
-  USER_INFO: `${API_BASE_URL}/auth/me`,       // Make sure this endpoint exists on backend
-  SOCIAL_LOGIN: (provider) => `${API_BASE_URL}/social/${provider}/login`, 
+  USER_INFO: `${API_BASE_URL}/auth/me`,
+  LOGOUT: `${API_BASE_URL}/auth/logout`,
+  // Keep these for existing social login if still needed
   GOOGLE_LOGIN: `${API_BASE_URL}/auth/google-login`,
   REQUEST_PASSWORD_RESET: `${API_BASE_URL}/auth/request-password-reset`,
   CONFIRM_PASSWORD_RESET: `${API_BASE_URL}/auth/confirm-password-reset`,
   CHANGE_PASSWORD: `${API_BASE_URL}/auth/change-password`,
-  LOGOUT: `${API_BASE_URL}/auth/logout`,
 };
 
-// Resume endpoints - these look correct
-export const RESUME_ENDPOINTS = {
-  GET_RESUME: `${API_BASE_URL}/resume/`,
-  GET_RESUME_BY_ID: (id) => `${API_BASE_URL}/resume/${id}`,
-  GET_RESUME_LIST: `${API_BASE_URL}/resume/list`,
-  CREATE_RESUME: `${API_BASE_URL}/resume/`,
-  UPDATE_RESUME: `${API_BASE_URL}/resume/`,
-  DELETE_RESUME: (id) => `${API_BASE_URL}/resume/${id}`, // Fixed this to use id parameter
-};
 
-// CV AI endpoints 
+
+
+  // CV AI endpoints 
 export const CV_AI_ENDPOINTS = {
   IMPROVE_SECTION: `${API_BASE_URL}/cv-ai/improve-section`,
   IMPROVE_SUMMARY:  `${API_BASE_URL}/cv-ai/improve-section`, // ⭐ Check this
   IMPROVE_FULL_CV: `${API_BASE_URL}/cv-ai/improve-full-cv`,
   USAGE_LIMIT: `${API_BASE_URL}/cv-ai/usage-limit`,
   TASK_STATUS: (taskId) => `${API_BASE_URL}/cv-ai/task-status/${taskId}`,  
-};
-
-export const JOB_AI_ENDPOINTS = { 
-
-};
-
-
-// Cover Letter endpoints
-export const COVER_LETTER_ENDPOINTS = {
-  BASE: `${API_BASE_URL}/coverletter/`,
-  GENERATE_COVER_LETTER: `${API_BASE_URL}/coverletter/generate`,
-  BY_ID: (id) => `${API_BASE_URL}/coverletter/${id}`,
-  TASK_STATUS: (taskId) => `${API_BASE_URL}/coverletter/task-status/${taskId}`, 
-  REGENERATE: (id) => `${API_BASE_URL}/coverletter/${id}/regenerate`,
-  EXPORT: (id) => `${API_BASE_URL}/coverletter/${id}/export`,
 };
 
 export const FEEDBACK_ENDPOINTS = {
@@ -73,17 +95,59 @@ export const FEEDBACK_ENDPOINTS = {
   ADMIN_DELETE: (id) => `${API_BASE_URL}/feedback/admin/${id}`,
 };
 
-// Configure axios defaults
+// ================== UTILITY FUNCTIONS ==================
+
+// Helper to build resume API URLs with provider and file_id
+export const buildResumeURL = (baseEndpoint, fileId, provider, action = '') => {
+  const url = new URL(baseEndpoint + (action ? `${fileId}/${action}` : fileId));
+  url.searchParams.set('provider', provider);
+  return url.toString();
+};
+
+// Helper to build AI enhancement URLs
+export const buildAIURL = (baseEndpoint, fileId, provider) => {
+  const url = new URL(baseEndpoint);
+  url.searchParams.set('cv_file_id', fileId);
+  url.searchParams.set('provider', provider);
+  return url.toString();
+};
+
+// ================== SESSION TOKEN MANAGEMENT ==================
+
+// Get session token from localStorage or authStore
+export const getSessionToken = () => {
+  // First try to get from the new session storage
+  const sessionToken = localStorage.getItem('cv_session_token');
+  if (sessionToken) {
+    return sessionToken;
+  }
+  
+  // Fallback to old auth token during migration
+  const authToken = useAuthStore.getState().token;
+  return authToken;
+};
+
+// Set session token
+export const setSessionToken = (token) => {
+  localStorage.setItem('cv_session_token', token);
+};
+
+// Clear session token
+export const clearSessionToken = () => {
+  localStorage.removeItem('cv_session_token');
+  localStorage.removeItem('cv_cloud_providers');
+};
+
+// ================== AXIOS INTERCEPTOR - UPDATED ==================
 import axios from 'axios';
 
-// Set up default headers for all requests
+// Configure axios defaults
 axios.defaults.headers.common['Accept'] = 'application/json';
- 
-// Clean axios interceptor that adds the auth token to requests
+
+// Updated axios interceptor for session-based auth
 axios.interceptors.request.use(
   (config) => {
-    // Use Zustand store to get the token
-    const token = useAuthStore.getState().token;
+    const token = getSessionToken();
     
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -93,4 +157,24 @@ axios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Response interceptor to handle session expiration
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Session expired or invalid
+      clearSessionToken();
+      // Don't automatically redirect - let components handle this
+      window.dispatchEvent(new CustomEvent('sessionExpired'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default API_BASE_URL;
+
+
+
+
+
+ 

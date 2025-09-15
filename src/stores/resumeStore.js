@@ -1,18 +1,34 @@
+// src/stores/resumeStore.js - Updated for cloud storage backend
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import useAuthStore from './authStore';
-import { API_BASE_URL, RESUME_ENDPOINTS } from '../config';
+import { 
+  RESUME_ENDPOINTS, 
+  buildResumeURL,
+  getSessionToken 
+} from '../config';
+import useSessionStore from './sessionStore';
 
 // Helper to generate unique local IDs
 const generateLocalId = (prefix = 'local') => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-// Helper function for API calls
-// Update your apiCall function in resumeStore.js
-const apiCall = async (endpoint, method = 'GET', body = null) => {
-  const token = useAuthStore.getState().token;
+// Helper function for API calls with cloud provider context
+const apiCall = async (endpoint, method = 'GET', body = null, provider = null, fileId = null) => {
+  const token = getSessionToken();
   
   if (!token) {
-    throw new Error('Authentication required');
+    throw new Error('No active session');
+  }
+
+  let url = endpoint;
+  
+  // For resume operations, build the URL with provider and fileId
+  if (provider && (method !== 'GET' || fileId)) {
+    if (endpoint.includes('/api/resume/')) {
+      const baseUrl = endpoint.split('?')[0]; // Remove any existing query params
+      url = new URL(baseUrl + (fileId || ''));
+      url.searchParams.set('provider', provider);
+      url = url.toString();
+    }
   }
 
   const config = {
@@ -24,42 +40,34 @@ const apiCall = async (endpoint, method = 'GET', body = null) => {
     ...(body ? { body: JSON.stringify(body) } : {})
   };
 
-  // Use the full URL from the RESUME_ENDPOINTS
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
-  
   const response = await fetch(url, config);
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'An error occurred');
+    throw new Error(errorData.detail || `Request failed with status ${response.status}`);
   }
   
   // Check if there's no content (204) or if the response is empty
   if (response.status === 204 || response.headers.get('content-length') === '0') {
-    return null; // Return null for empty responses
+    return null;
   }
   
   return response.json();
 };
 
-// Helper to transform API response to store format
-// Helper to transform API response to store format
-const transformAPIResumeToStore = (apiResume) => {
+// Transform API response to store format (same logic but with cloud metadata)
+const transformAPIResumeToStore = (apiResume, provider = null, fileId = null) => {
   if (!apiResume) return null;
-   
   
-  // Handle array response (when getting all resumes)
   if (Array.isArray(apiResume)) {
-    // If we got an array but it's empty, return null
     if (apiResume.length === 0) return null;
-    
-    // Otherwise, use the first resume in the array
-    apiResume = apiResume[0]; 
+    apiResume = apiResume[0];
   }
   
   return {
-    id: apiResume.id || generateLocalId('resume'),
-    server_id: apiResume.id,
+    id: fileId || apiResume.id || generateLocalId('resume'),
+    cloud_file_id: fileId || apiResume.id,
+    cloud_provider: provider,
     title: apiResume.title || 'My Resume',
     is_public: apiResume.is_public || false,
     personal_info: {
@@ -91,15 +99,10 @@ const transformAPIResumeToStore = (apiResume) => {
         gpa: edu.gpa || ''
       }))
       .sort((a, b) => {
-        // Current education should appear first
         if (a.current && !b.current) return -1;
         if (!a.current && b.current) return 1;
-        
-        // Then sort by end_date or start_date (newest first)
         const aDate = a.current ? a.start_date : (a.end_date || a.start_date);
         const bDate = b.current ? b.start_date : (b.end_date || b.start_date);
-        
-        // Sort in reverse chronological order
         return new Date(bDate) - new Date(aDate);
       }),
     experiences: (apiResume.experiences || [])
@@ -114,15 +117,10 @@ const transformAPIResumeToStore = (apiResume) => {
         current: exp.current || false
       }))
       .sort((a, b) => {
-        // Current positions should appear first
         if (a.current && !b.current) return -1;
         if (!a.current && b.current) return 1;
-        
-        // Then sort by end_date or start_date (newest first)
         const aDate = a.current ? a.start_date : (a.end_date || a.start_date);
         const bDate = b.current ? b.start_date : (b.end_date || b.start_date);
-        
-        // Sort in reverse chronological order
         return new Date(bDate) - new Date(aDate);
       }),
     skills: (apiResume.skills || []).map(skill => ({
@@ -174,21 +172,15 @@ const transformAPIResumeToStore = (apiResume) => {
         current: internship.current || false
       }))
       .sort((a, b) => {
-        // Current internships should appear first
         if (a.current && !b.current) return -1;
         if (!a.current && b.current) return 1;
-        
-        // Then sort by end_date or start_date (newest first)
         const aDate = a.current ? a.start_date : (a.end_date || a.start_date);
         const bDate = b.current ? b.start_date : (b.end_date || b.start_date);
-        
-        // Sort in reverse chronological order
         return new Date(bDate) - new Date(aDate);
       }),
     photos: apiResume.photos || { photolink: null },
     created_at: apiResume.created_at || new Date().toISOString(),
     updated_at: apiResume.updated_at || new Date().toISOString(),
-    // Add template and customization if they exist
     template: apiResume.template || apiResume.customization?.template || 'stockholm',
     customization: apiResume.customization || {
       template: 'stockholm',
@@ -201,10 +193,9 @@ const transformAPIResumeToStore = (apiResume) => {
   };
 };
 
-// Helper to prepare resume data for API submission
+// Prepare resume data for API submission (updated for cloud format)
 const prepareResumeForAPI = (resumeData) => {
-  // Make a defensive copy
-  const result = {
+  return {
     title: resumeData.title || 'My Resume',
     is_public: resumeData.is_public || false,
     personal_info: {
@@ -281,50 +272,13 @@ const prepareResumeForAPI = (resumeData) => {
       end_date: internship.end_date || null,
       current: internship.current || false
     })),
-    // IMPROVED PHOTO HANDLING:
-    photo: (() => {
-      // Log for debugging
-      console.log('Processing photos for API submission:', {
-        photosArray: Array.isArray(resumeData.photos) ? resumeData.photos : 'not array',
-        photosObject: typeof resumeData.photos === 'object' ? resumeData.photos : 'not object',
-        photosDirect: resumeData.photo,
-        photosFromCurrentResume: resumeData.currentResume?.photos
-      });
-      
-      // CASE 1: Check in the photos array from form data
-      if (Array.isArray(resumeData.photos) && resumeData.photos.length > 0) {
-        // If the array contains objects with photo property (from onChange in EditPhotoUpload)
-        if (resumeData.photos[0].photo) {
-          return { photolink: resumeData.photos[0].photo };
-        }
-        // If the array contains objects with photolink
-        if (resumeData.photos[0].photolink) {
-          return { photolink: resumeData.photos[0].photolink };
-        }
-      }
-      
-      // CASE 2: Check if photos is an object with photolink (store format)
-      if (resumeData.photos && resumeData.photos.photolink) {
-        return { photolink: resumeData.photos.photolink };
-      }
-      
-      // CASE 3: Check if photo property exists directly
-      if (resumeData.photo && resumeData.photo.photolink) {
-        return { photolink: resumeData.photo.photolink };
-      }
-      
-      // CASE 4: Get photos from currentResume if present
-      const currentResume = resumeData.currentResume || window.resumeStore?.getState().currentResume;
-      if (currentResume?.photos?.photolink) {
-        return { photolink: currentResume.photos.photolink };
-      }
-      
-      // Default to empty string photolink if no photo found
-      // Using empty string instead of null to avoid nullish issues
-      return { photolink: '' };
-    })(),
-    // Include template and customization if they exist
-    template: resumeData.template || 'stockholm',
+    photo: {
+      photolink: resumeData.photos?.photolink || 
+                 resumeData.photo?.photolink || 
+                 (Array.isArray(resumeData.photos) && resumeData.photos[0]?.photo) ||
+                 (Array.isArray(resumeData.photos) && resumeData.photos[0]?.photolink) ||
+                 ''
+    },
     customization: resumeData.customization || {
       template: 'stockholm',
       accent_color: "#1a5276",
@@ -334,64 +288,68 @@ const prepareResumeForAPI = (resumeData) => {
       hide_skill_level: false
     }
   };
-  
-  // Debug log for the final result
-  console.log('Final photo data being sent to API:', result.photo);
-   
-  return result;
 };
 
-// Local storage helper methods
+// Local storage helpers (updated for cloud context)
 const localStorageHelpers = {
   clearResumeData: () => {
     localStorage.removeItem('resumeFormData');
-    console.log("Cleared resumeFormData from localStorage");
+    localStorage.removeItem('currentCloudProvider');
+    localStorage.removeItem('currentFileId');
   },
   
-  saveResumeToLocal: (resumeData) => {
+  saveResumeToLocal: (resumeData, provider = null, fileId = null) => {
     localStorage.setItem('resumeFormData', JSON.stringify(resumeData));
-    console.log("Saved resumeFormData to localStorage");
+    if (provider) localStorage.setItem('currentCloudProvider', provider);
+    if (fileId) localStorage.setItem('currentFileId', fileId);
   },
   
   getResumeFromLocal: () => {
     try {
       const data = localStorage.getItem('resumeFormData');
-      return data ? JSON.parse(data) : null;
+      const provider = localStorage.getItem('currentCloudProvider');
+      const fileId = localStorage.getItem('currentFileId');
+      
+      return {
+        resumeData: data ? JSON.parse(data) : null,
+        provider,
+        fileId
+      };
     } catch (e) {
       console.error("Error reading from localStorage:", e);
-      return null;
+      return { resumeData: null, provider: null, fileId: null };
     }
   },
   
-  // Check if the resume is just being created (not yet saved to server)
   isCreatingNewResume: () => {
-    return !localStorage.getItem('resumeFormData_savedToServer');
+    return !localStorage.getItem('currentFileId');
   },
   
-  // Mark that the resume has been saved to server
-  markResumeSavedToServer: (resumeId) => {
-    localStorage.setItem('resumeFormData_savedToServer', resumeId.toString());
+  markResumeSavedToCloud: (fileId, provider) => {
+    localStorage.setItem('currentFileId', fileId);
+    localStorage.setItem('currentCloudProvider', provider);
   },
   
-  // Clear the saved status
   clearResumeSavedStatus: () => {
-    localStorage.removeItem('resumeFormData_savedToServer');
+    localStorage.removeItem('currentFileId');
+    localStorage.removeItem('currentCloudProvider');
   }
 };
 
-// Resume Store
+// Resume Store (updated for cloud storage)
 const useResumeStore = create(
   persist(
     (set, get) => ({
       resumes: [],
       currentResume: null,
+      currentProvider: null,
+      currentFileId: null,
       loading: false,
       error: null,
-      isEditingLocally: false, // Flag to track local editing mode
+      isEditingLocally: false,
       
       // Helper function to get correct section name
       _getSectionName: (sectionName) => {
-        // Add any mappings if needed (e.g., 'hobby' -> 'hobbies')
         const mappings = {
           'hobby': 'hobbies',
           'education': 'educations',
@@ -408,97 +366,112 @@ const useResumeStore = create(
         return mappings[sectionName] || sectionName;
       },
       
-      // Start a new resume (use local storage only, no server)
-      startNewResume: () => {
+      // ================== CLOUD-AWARE RESUME OPERATIONS ==================
+      
+      // Start a new resume (requires cloud provider selection)
+      startNewResume: (provider = null) => {
         // Clear any existing local editing session
         localStorageHelpers.clearResumeData();
-        localStorageHelpers.clearResumeSavedStatus();
+        
+        // Get preferred provider if none specified
+        if (!provider) {
+          provider = useSessionStore.getState().getPreferredProvider();
+        }
+        
+        if (!provider) {
+          throw new Error('No cloud provider available. Please connect a cloud storage service first.');
+        }
         
         // Create a blank resume
         const blankResume = {
           id: generateLocalId('resume'),
+          cloud_provider: provider,
+          cloud_file_id: null, // Will be set when saved to cloud
           title: 'My Resume',
           is_public: false,
           personal_info: {
-            full_name: '',
-            email: '',
-            mobile: '',
-            address: '',
-            linkedin: '',
-            title: '',
-            date_of_birth: '',
-            nationality: '',
-            place_of_birth: '',
-            postal_code: '',
-            driving_license: '',
-            city: '',
-            website: '',
-            summary: ''
+            full_name: '', email: '', mobile: '', address: '', linkedin: '',
+            title: '', date_of_birth: '', nationality: '', place_of_birth: '',
+            postal_code: '', driving_license: '', city: '', website: '', summary: ''
           },
-          educations: [],
-          experiences: [],
-          skills: [],
-          languages: [],
-          referrals: [],
-          custom_sections: [],
-          extracurriculars: [],
-          hobbies: [],
-          courses: [],
-          internships: [],
+          educations: [], experiences: [], skills: [], languages: [], referrals: [],
+          custom_sections: [], extracurriculars: [], hobbies: [], courses: [], internships: [],
           photos: { photolink: null },
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           template: 'stockholm',
           customization: {
-            template: 'stockholm',
-            accent_color: "#1a5276",
-            font_family: "Helvetica, Arial, sans-serif",
-            line_spacing: 1.5,
-            headings_uppercase: false,
-            hide_skill_level: false
+            template: 'stockholm', accent_color: "#1a5276",
+            font_family: "Helvetica, Arial, sans-serif", line_spacing: 1.5,
+            headings_uppercase: false, hide_skill_level: false
           }
         };
         
-        // Set as current resume and mark as local editing
         set({ 
           currentResume: blankResume, 
+          currentProvider: provider,
+          currentFileId: null,
           isEditingLocally: true
         });
         
-        // Save to local storage for the editing session
-        localStorageHelpers.saveResumeToLocal(blankResume);
+        localStorageHelpers.saveResumeToLocal(blankResume, provider, null);
         
         return blankResume;
       },
       
-      // Fetch all resumes
+      // Fetch all resumes from all connected cloud providers
       fetchResumes: async () => {
         set({ loading: true, error: null });
         
         try {
-          const response = await apiCall(RESUME_ENDPOINTS.GET_RESUME);
-          console.log("fetchResumes response:", response);
+          const sessionStore = useSessionStore.getState();
+          const providers = sessionStore.connectedProviders;
           
-          // Handle both array and single object responses
-          let processedResumes = [];
-          if (Array.isArray(response)) {
-            processedResumes = response.map(transformAPIResumeToStore).filter(Boolean);
-          } else if (response) {
-            const processed = transformAPIResumeToStore(response);
-            if (processed) processedResumes = [processed];
+          if (providers.length === 0) {
+            set({ 
+              resumes: [],
+              currentResume: null,
+              loading: false,
+              isEditingLocally: false
+            });
+            return [];
+          }
+          
+          // Fetch from all providers
+          let allResumes = [];
+          
+          for (const provider of providers) {
+            try {
+              const url = new URL(RESUME_ENDPOINTS.LIST);
+              url.searchParams.set('provider', provider);
+              
+              const response = await apiCall(url.toString(), 'GET', null, provider);
+              
+              if (Array.isArray(response)) {
+                const providerResumes = response.map(file => 
+                  transformAPIResumeToStore({ 
+                    title: file.name.replace('.json', ''),
+                    // We'll need to load the full resume content separately
+                  }, provider, file.file_id)
+                );
+                allResumes = [...allResumes, ...providerResumes];
+              }
+            } catch (error) {
+              console.error(`Error fetching resumes from ${provider}:`, error);
+              // Continue with other providers
+            }
           }
           
           set({ 
-            resumes: processedResumes,
-            currentResume: processedResumes[0] || null,
+            resumes: allResumes,
+            currentResume: allResumes[0] || null,
             loading: false,
-            isEditingLocally: false // We're working with server data now
+            isEditingLocally: false
           });
-          console.log("resumes are ", processedResumes);
-          return processedResumes;
+          
+          return allResumes;
         } catch (err) {
           console.error('Error fetching resumes:', err);
-          
           set({ 
             error: err.message || 'Failed to load resumes',
             loading: false 
@@ -507,54 +480,49 @@ const useResumeStore = create(
         }
       },
       
-      fetchResume: async (resumeId) => {
+      // Fetch specific resume by file ID and provider
+      fetchResume: async (fileId, provider = null) => {
         set({ loading: true, error: null });
         
         try {
-          
-          // Validate the ID
-          if (!resumeId || resumeId === 'default_resume') {
-            throw new Error('Invalid resume ID provided');
+          if (!fileId) {
+            throw new Error('Invalid resume file ID provided');
           }
           
-          // Always use the specific endpoint to fetch by ID to ensure we get exactly what we asked for
-          if (!isNaN(parseInt(resumeId))) {
-            const endpoint = RESUME_ENDPOINTS.GET_RESUME_BY_ID(resumeId);
-            //console.log(`Fetching resume with endpoint: ${endpoint}`);
-            
-            try {
-              const response = await apiCall(endpoint);
-              //console.log("Response from specific resume endpoint:", response);
-              
-              if (!response || typeof response !== 'object') {
-                throw new Error('Invalid response from server');
-              }
-              
-              const processedResume = transformAPIResumeToStore(response);
-              //console.log("Processed resume:", processedResume);
-              
-              if (!processedResume) {
-                throw new Error('Failed to process resume data');
-              }
-              
-              // Update the store state
-              set({ 
-                currentResume: processedResume,
-                resumes: get().resumes.some(r => r.id == processedResume.id) 
-                  ? get().resumes.map(r => r.id == processedResume.id ? processedResume : r)
-                  : [...get().resumes, processedResume],
-                loading: false,
-                isEditingLocally: false
-              });
-              
-              return processedResume;
-            } catch (error) {
-              console.error(`Error fetching resume with ID ${resumeId}:`, error);
-              throw error;
-            }
-          } else {
-            throw new Error('Invalid resume ID format');
+          // Use provided provider or get from session
+          if (!provider) {
+            provider = get().currentProvider || useSessionStore.getState().getPreferredProvider();
           }
+          
+          if (!provider) {
+            throw new Error('No cloud provider specified');
+          }
+          
+          const url = buildResumeURL(RESUME_ENDPOINTS.GET_BY_ID, fileId, provider);
+          const response = await apiCall(url, 'GET', null, provider, fileId);
+          
+          if (!response || typeof response !== 'object') {
+            throw new Error('Invalid response from server');
+          }
+          
+          const processedResume = transformAPIResumeToStore(response, provider, fileId);
+          
+          if (!processedResume) {
+            throw new Error('Failed to process resume data');
+          }
+          
+          set({ 
+            currentResume: processedResume,
+            currentProvider: provider,
+            currentFileId: fileId,
+            resumes: get().resumes.some(r => r.id === processedResume.id) 
+              ? get().resumes.map(r => r.id === processedResume.id ? processedResume : r)
+              : [...get().resumes, processedResume],
+            loading: false,
+            isEditingLocally: false
+          });
+          
+          return processedResume;
         } catch (err) {
           console.error("Error in fetchResume:", err);
           set({ 
@@ -564,42 +532,47 @@ const useResumeStore = create(
           return null;
         }
       },
-
-      // Create a new resume with localStorage clearing
-      createResume: async (resumeData) => {
+      
+      // Create a new resume in cloud storage
+      createResume: async (resumeData, provider = null) => {
         set({ loading: true, error: null });
         
         try {
-          // Prepare data for API
+          // Use provided provider or get from current state
+          if (!provider) {
+            provider = get().currentProvider || useSessionStore.getState().getPreferredProvider();
+          }
+          
+          if (!provider) {
+            throw new Error('No cloud provider available');
+          }
+          
           const dataForAPI = prepareResumeForAPI(resumeData);
           
-          console.log('Creating resume with data:', dataForAPI);
+          const url = new URL(RESUME_ENDPOINTS.CREATE);
+          url.searchParams.set('provider', provider);
           
-          const response = await apiCall(RESUME_ENDPOINTS.CREATE_RESUME, 'POST', dataForAPI);
-          console.log('Create resume - API response:', response);
+          const response = await apiCall(url.toString(), 'POST', dataForAPI, provider);
           
-          const processedResume = transformAPIResumeToStore(response);
-          console.log('Create resume - Processed resume:', processedResume);
+          const fileId = response.id || response.file_id;
+          const processedResume = transformAPIResumeToStore(response, provider, fileId);
           
-          // Clear localStorage since we've successfully saved to server
+          // Clear localStorage since we've successfully saved to cloud
           localStorageHelpers.clearResumeData();
-          
-          // Mark as saved to server
-          if (processedResume && processedResume.id) {
-            localStorageHelpers.markResumeSavedToServer(processedResume.id);
-          }
+          localStorageHelpers.markResumeSavedToCloud(fileId, provider);
           
           set(state => ({ 
             resumes: [...state.resumes, processedResume],
             currentResume: processedResume,
+            currentProvider: provider,
+            currentFileId: fileId,
             loading: false,
-            isEditingLocally: false // Now working with server data
+            isEditingLocally: false
           }));
           
           return processedResume;
         } catch (err) {
           console.error('Error creating resume:', err);
-          
           set({ 
             error: err.message || 'Failed to create resume',
             loading: false 
@@ -608,28 +581,47 @@ const useResumeStore = create(
         }
       },
       
-      // Update resume with localStorage management
-      updateResume: async (resumeId, resumeData) => {
+      // Update resume in cloud storage
+      updateResume: async (resumeData, fileId = null, provider = null) => {
         set({ loading: true, error: null });
         
         try {
-          // If no resumeId provided, use current resume ID
-          const targetResumeId = resumeId || get().currentResume?.id;
-          if (!targetResumeId) {
-            throw new Error('No resume ID provided for update');
+          // Use provided values or get from current state
+          const targetFileId = fileId || get().currentFileId;
+          const targetProvider = provider || get().currentProvider;
+          
+          if (!targetFileId || !targetProvider) {
+            throw new Error('No file ID or provider specified for update');
           }
           
-          // Check if this is a numeric ID (server-side resume)
-          const isServerResume = !isNaN(parseInt(targetResumeId));
-          
-          // If we're in local editing mode and not making a server update
-          if (get().isEditingLocally && !isServerResume) {
-            console.log('Saving resume to localStorage only');
+          // If we're in local editing mode, save to cloud
+          if (get().isEditingLocally) {
+            const dataForAPI = prepareResumeForAPI(resumeData);
             
-            // Update local storage
-            localStorageHelpers.saveResumeToLocal(resumeData);
+            const url = buildResumeURL(RESUME_ENDPOINTS.UPDATE, targetFileId, targetProvider);
+            const response = await apiCall(url, 'PUT', dataForAPI, targetProvider, targetFileId);
             
-            // Update the state
+            const processedResume = transformAPIResumeToStore(response, targetProvider, targetFileId);
+            
+            localStorageHelpers.clearResumeData();
+            localStorageHelpers.markResumeSavedToCloud(targetFileId, targetProvider);
+            
+            set(state => ({
+              resumes: state.resumes.map(r => 
+                r.cloud_file_id === targetFileId && r.cloud_provider === targetProvider ? processedResume : r
+              ),
+              currentResume: processedResume,
+              currentProvider: targetProvider,
+              currentFileId: targetFileId,
+              loading: false,
+              isEditingLocally: false
+            }));
+            
+            return processedResume;
+          } else {
+            // Update local state and localStorage for local editing
+            localStorageHelpers.saveResumeToLocal(resumeData, targetProvider, targetFileId);
+            
             set(state => ({
               currentResume: resumeData,
               loading: false
@@ -637,42 +629,8 @@ const useResumeStore = create(
             
             return resumeData;
           }
-          
-          // Otherwise, this is a server update
-          // Get endpoint for update
-          const endpoint = RESUME_ENDPOINTS.UPDATE_RESUME.replace(':id', targetResumeId);
-          
-          // Prepare payload to match backend schema
-          const payload = prepareResumeForAPI(resumeData);
-          console.log('Updating resume with data:', payload);
-          
-          const response = await apiCall(endpoint, 'PATCH', payload);
-          console.log('Update resume - API response:', response);
-          
-          const processedResume = transformAPIResumeToStore(response);
-          console.log('Update resume - Processed resume:', processedResume);
-          
-          // Clear localStorage since we've successfully saved to server
-          localStorageHelpers.clearResumeData();
-          
-          // Mark as saved to server
-          if (processedResume && processedResume.id) {
-            localStorageHelpers.markResumeSavedToServer(processedResume.id);
-          }
-          
-          set(state => ({
-            resumes: state.resumes.map(r => 
-              r.id === targetResumeId ? processedResume : r
-            ),
-            currentResume: processedResume,
-            loading: false,
-            isEditingLocally: false // Now working with server data
-          }));
-          
-          return processedResume;
         } catch (err) {
           console.error('Error updating resume:', err);
-          
           set({ 
             error: err.message || 'Failed to update resume',
             loading: false 
@@ -681,28 +639,29 @@ const useResumeStore = create(
         }
       },
       
-      // Delete resume with localStorage management
-      deleteResume: async (resumeId) => {
+      // Delete resume from cloud storage
+      deleteResume: async (fileId = null, provider = null) => {
         set({ loading: true, error: null });
         
         try {
-          // If no resumeId provided, use current resume ID
-          const targetResumeId = resumeId || get().currentResume?.id;
-          if (!targetResumeId) {
-            throw new Error('No resume ID provided for deletion');
+          const targetFileId = fileId || get().currentFileId;
+          const targetProvider = provider || get().currentProvider;
+          
+          if (!targetFileId || !targetProvider) {
+            throw new Error('No file ID or provider specified for deletion');
           }
           
           // Check if this is a local-only resume
-          const isLocalId = targetResumeId.toString().startsWith('local_');
+          const isLocalId = targetFileId.toString().startsWith('local_');
           
           if (isLocalId) {
-            // Just clear localStorage
             localStorageHelpers.clearResumeData();
-            localStorageHelpers.clearResumeSavedStatus();
             
             set(state => ({
-              resumes: state.resumes.filter(r => r.id !== targetResumeId),
-              currentResume: state.currentResume?.id === targetResumeId ? null : state.currentResume,
+              resumes: state.resumes.filter(r => r.id !== targetFileId),
+              currentResume: state.currentResume?.id === targetFileId ? null : state.currentResume,
+              currentFileId: null,
+              currentProvider: null,
               loading: false,
               isEditingLocally: false
             }));
@@ -710,16 +669,19 @@ const useResumeStore = create(
             return true;
           }
            
-          const endpoint = RESUME_ENDPOINTS.DELETE_RESUME(targetResumeId);
-          await apiCall(endpoint, 'DELETE');
+          const url = buildResumeURL(RESUME_ENDPOINTS.DELETE, targetFileId, targetProvider);
+          await apiCall(url, 'DELETE', null, targetProvider, targetFileId);
           
-          // Clear associated localStorage if it exists
           localStorageHelpers.clearResumeData();
-          localStorageHelpers.clearResumeSavedStatus();
           
           set(state => ({
-            resumes: state.resumes.filter(r => r.id !== targetResumeId),
-            currentResume: state.currentResume?.id === targetResumeId ? null : state.currentResume,
+            resumes: state.resumes.filter(r => 
+              !(r.cloud_file_id === targetFileId && r.cloud_provider === targetProvider)
+            ),
+            currentResume: (state.currentResume?.cloud_file_id === targetFileId && 
+                           state.currentResume?.cloud_provider === targetProvider) ? null : state.currentResume,
+            currentFileId: state.currentFileId === targetFileId ? null : state.currentFileId,
+            currentProvider: state.currentFileId === targetFileId ? null : state.currentProvider,
             loading: false,
             isEditingLocally: false
           }));
@@ -727,7 +689,6 @@ const useResumeStore = create(
           return true;
         } catch (err) {
           console.error('Error deleting resume:', err);
-          
           set({ 
             error: err.message || 'Failed to delete resume',
             loading: false 
@@ -736,150 +697,37 @@ const useResumeStore = create(
         }
       },
       
+      // ================== LOCAL EDITING METHODS ==================
+      
       // Save current state to localStorage
       saveToLocalStorage: () => {
-        const currentResume = get().currentResume;
+        const { currentResume, currentProvider, currentFileId } = get();
         if (currentResume) {
-          localStorageHelpers.saveResumeToLocal(currentResume);
+          localStorageHelpers.saveResumeToLocal(currentResume, currentProvider, currentFileId);
           set({ isEditingLocally: true });
         }
       },
-      updatePhoto: async (photoUrl, resumeId = null) => {
-        const state = get();
-        
-        // If resumeId is provided, use it; otherwise use the currentResume's ID
-        const targetResumeId = resumeId || (state.currentResume?.server_id || state.currentResume?.id);
-        
-        if (!targetResumeId) {
-          console.error("No resume ID provided or available for photo update");
-          return null;
-        }
-        
-        try {
-          console.log(`Updating photo for resume ${targetResumeId} with URL: ${photoUrl}`);
-          
-          // If resumeId is a number or can be parsed as one, it's a server-side resume
-          const isServerResume = !isNaN(parseInt(targetResumeId));
-          
-          // Update the database if this is a server-side resume
-          if (isServerResume) {
-            console.log(`Sending photo update to server for resume ${targetResumeId}`);
-            
-            // Call the API to update the photo
-            await apiCall(
-              `${RESUME_ENDPOINTS.GET_RESUME_BY_ID(targetResumeId)}/photo`,
-              'PUT',
-              { photolink: photoUrl || '' }
-            );
-            
-            console.log(`Photo updated in database for resume ${targetResumeId}`);
-          } else {
-            console.log('Working with local resume, not sending to server yet');
-          }
-          
-          // Get the current resume to update, either the one specified by resumeId or the current one in state
-          let resumeToUpdate = null;
-          if (resumeId && resumeId !== state.currentResume?.id) {
-            // Find the resume in the list if it's not the current one
-            resumeToUpdate = state.resumes.find(r => r.id === resumeId);
-          } else {
-            resumeToUpdate = state.currentResume;
-          }
-          
-          if (!resumeToUpdate) {
-            console.error(`Cannot find resume with ID ${targetResumeId} to update photo`);
-            return null;
-          }
-          
-          // Update the resume with the new photo URL
-          const updatedResume = {
-            ...resumeToUpdate,
-            photos: { photolink: photoUrl || '' }
-          };
-          
-          // Update localStorage if we're in local editing mode
-          if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
-          }
-          
-          // Update state
-          set({
-            currentResume: state.currentResume?.id === updatedResume.id ? updatedResume : state.currentResume,
-            resumes: state.resumes.map(r => 
-              r.id === updatedResume.id ? updatedResume : r
-            )
-          });
-          
-          return photoUrl || '';
-        } catch (err) {
-          console.error('Error updating photo:', err);
-          throw err;
-        }
-      },
-      
-      // Update deletePhoto method
-      deletePhoto: async (resumeId) => {
-        const state = get();
-        if (!state.currentResume) return false;
-        
-        try {
-          // If working with a server-side resume, send delete request
-          if (resumeId && !isNaN(parseInt(resumeId))) {
-            await apiCall(
-              `${RESUME_ENDPOINTS.GET_RESUME_BY_ID(resumeId)}/photo`,
-              'DELETE'
-            );
-            console.log(`Photo deleted for resume ${resumeId}`);
-          }
-          
-          // Update the current resume in state
-          const updatedResume = {
-            ...state.currentResume,
-            photos: { photolink: null } // Use empty string instead of null
-          };
-          
-          // Update localStorage if we're in local editing mode
-          if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
-          }
-          
-          // Update state
-          set({
-            currentResume: updatedResume,
-            resumes: state.resumes.map(r => 
-              r.id === updatedResume.id ? updatedResume : r
-            )
-          });
-          
-          return true;
-        } catch (err) {
-          console.error('Error deleting photo:', err);
-          throw err;
-        }
-      },
-      
       
       // Clear localStorage
       clearLocalStorage: () => {
         localStorageHelpers.clearResumeData();
-        localStorageHelpers.clearResumeSavedStatus();
       },
       
-      // Clear error
-      clearError: () => set({ error: null }),
-      
-      // Set current resume
-      setCurrentResume: (resume) => {
+      // Set current resume with cloud context
+      setCurrentResume: (resume, provider = null, fileId = null) => {
         set({ 
           currentResume: resume,
-          isEditingLocally: resume && resume.id && resume.id.toString().startsWith('local_')
+          currentProvider: provider || resume?.cloud_provider,
+          currentFileId: fileId || resume?.cloud_file_id,
+          isEditingLocally: resume && (!resume.cloud_file_id || resume.id?.toString().startsWith('local_'))
         });
         
-        // If setting a local resume, also update localStorage
-        if (resume && (!resume.id || resume.id.toString().startsWith('local_'))) {
-          localStorageHelpers.saveResumeToLocal(resume);
+        if (resume && (!resume.cloud_file_id || resume.id?.toString().startsWith('local_'))) {
+          localStorageHelpers.saveResumeToLocal(resume, provider, fileId);
         }
       },
+      
+      // ================== SECTION MANAGEMENT WITH LOCAL SYNC ==================
       
       // Add section item with localStorage sync
       addSectionItem: (sectionName, item) => {
@@ -901,9 +749,8 @@ const useResumeStore = create(
             ]
           };
           
-          // Update localStorage if we're in local editing mode
           if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
+            localStorageHelpers.saveResumeToLocal(updatedResume, state.currentProvider, state.currentFileId);
           }
           
           return {
@@ -920,7 +767,6 @@ const useResumeStore = create(
       
       // Update section item with localStorage sync
       updateSectionItem: (sectionName, itemId, updatedItem) => {
-        // Convert section name to the correct plural form if needed
         const storeSectionName = get()._getSectionName(sectionName);
         
         set(state => {
@@ -936,9 +782,8 @@ const useResumeStore = create(
             [storeSectionName]: updatedItems
           };
           
-          // Update localStorage if we're in local editing mode
           if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
+            localStorageHelpers.saveResumeToLocal(updatedResume, state.currentProvider, state.currentFileId);
           }
           
           return {
@@ -953,7 +798,6 @@ const useResumeStore = create(
       
       // Remove section item with localStorage sync
       removeSectionItem: (sectionName, itemId) => {
-        // Convert section name to the correct plural form if needed
         const storeSectionName = get()._getSectionName(sectionName);
         
         set(state => {
@@ -967,9 +811,8 @@ const useResumeStore = create(
             [storeSectionName]: updatedItems
           };
           
-          // Update localStorage if we're in local editing mode
           if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
+            localStorageHelpers.saveResumeToLocal(updatedResume, state.currentProvider, state.currentFileId);
           }
           
           return {
@@ -995,9 +838,8 @@ const useResumeStore = create(
             }
           };
           
-          // Update localStorage if we're in local editing mode
           if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
+            localStorageHelpers.saveResumeToLocal(updatedResume, state.currentProvider, state.currentFileId);
           }
           
           return {
@@ -1020,9 +862,8 @@ const useResumeStore = create(
             title
           };
           
-          // Update localStorage if we're in local editing mode
           if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
+            localStorageHelpers.saveResumeToLocal(updatedResume, state.currentProvider, state.currentFileId);
           }
           
           return {
@@ -1035,77 +876,7 @@ const useResumeStore = create(
         });
       },
       
-      // Reorder section items with localStorage sync
-      reorderSectionItems: (sectionName, newOrderedItems) => {
-        set(state => {
-          if (!state.currentResume) return state;
-          
-          const updatedResume = {
-            ...state.currentResume,
-            [sectionName]: newOrderedItems
-          };
-          
-          // Update localStorage if we're in local editing mode
-          if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
-          }
-          
-          return {
-            ...state,
-            currentResume: updatedResume,
-            resumes: state.resumes.map(r => 
-              r.id === updatedResume.id ? updatedResume : r
-            )
-          };
-        });
-      },
-      
-      // Function to convert local resume to server resume (save to server)
-      saveLocalResumeToServer: async () => {
-        // If there's no current resume or we're not in local mode, return
-        if (!get().currentResume || !get().isEditingLocally) {
-          console.log("No local resume to save or not in local editing mode");
-          return null;
-        }
-        
-        try {
-          set({ loading: true, error: null });
-          
-          const resumeData = get().currentResume;
-          const dataForAPI = prepareResumeForAPI(resumeData);
-          
-          console.log('Saving local resume to server:', dataForAPI);
-          
-          const response = await apiCall(RESUME_ENDPOINTS.CREATE_RESUME, 'POST', dataForAPI);
-          const processedResume = transformAPIResumeToStore(response);
-          
-          // Clear localStorage since we've successfully saved to server
-          localStorageHelpers.clearResumeData();
-          
-          // Mark as saved to server
-          if (processedResume && processedResume.id) {
-            localStorageHelpers.markResumeSavedToServer(processedResume.id);
-          }
-          
-          set(state => ({ 
-            resumes: [...state.resumes.filter(r => r.id !== resumeData.id), processedResume],
-            currentResume: processedResume,
-            loading: false,
-            isEditingLocally: false // Now working with server data
-          }));
-          
-          return processedResume;
-        } catch (err) {
-          console.error('Error saving local resume to server:', err);
-          set({ 
-            error: err.message || 'Failed to save resume to server',
-            loading: false 
-          });
-          throw err;
-        }
-      },
-      
-      // Update the customization settings with localStorage sync
+      // Update customization settings with localStorage sync
       updateCustomization: (updatedSettings) => {
         set(state => {
           if (!state.currentResume) return state;
@@ -1116,13 +887,11 @@ const useResumeStore = create(
               ...state.currentResume.customization,
               ...updatedSettings
             },
-            // Also update the template directly if it's included in the settings
             ...(updatedSettings.template ? { template: updatedSettings.template } : {})
           };
           
-          // Update localStorage if we're in local editing mode
           if (state.isEditingLocally) {
-            localStorageHelpers.saveResumeToLocal(updatedResume);
+            localStorageHelpers.saveResumeToLocal(updatedResume, state.currentProvider, state.currentFileId);
           }
           
           return {
@@ -1133,16 +902,33 @@ const useResumeStore = create(
             )
           };
         });
-      }
+      },
+      
+      // ================== UTILITY METHODS ==================
+      
+      // Clear error
+      clearError: () => set({ error: null }),
+      
+      // Check if user has connected cloud providers
+      hasCloudProviders: () => {
+        return useSessionStore.getState().hasConnectedProviders();
+      },
+      
+      // Get current provider info
+      getCurrentProviderInfo: () => {
+        const { currentProvider } = get();
+        if (!currentProvider) return null;
+        
+        return useSessionStore.getState().getProviderStatus(currentProvider);
+      },
     }),
     {
       name: 'resume-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist specific parts of the state to avoid duplication with our manual localStorage management
       partialize: (state) => ({
         resumes: state.resumes,
-        // Don't persist currentResume - we'll manage that separately
         error: state.error
+        // Don't persist currentResume - we'll manage that separately with cloud context
       }),
     }
   )

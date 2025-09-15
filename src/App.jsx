@@ -1,21 +1,13 @@
 import { useState, useEffect } from 'react'; 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
-// import { HashRouter as Router, Routes, Route } from 'react-router-dom'; // Removed HashRouter
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next';
 import Home from './Home';  
 import CoverLetter from './components/auth-coverletter/CoverLetter';
-import Register from './components/auth/Register';
-import Login from './components/auth/Login';
-import ProtectedRoute from './components/auth/ProtectedRoute';  
-import Settings from './components/auth/settings'; 
-import CVAIEnhancement from './components/auth-resume/view-cv/CVAIEnhancement'; 
 import Navbar from './Navbar';
 import Footer from './Footer'; 
 import ResumePreview from './components/auth-resume/view-cv/ResumePreview';
 import ResumeCustomizer from './components/auth-resume/template-selector/ResumeCustomizer';
 import { Toaster } from 'react-hot-toast'; 
-import SocialCallback from './components/auth/SocialCallback';
-import SocialError from './components/auth/SocialError';
 import PrivacyPolicy from './components/legal/PrivacyPolicy';
 import TermsAndConditions from './components/legal/TermsAndConditions';
 import DataDeletion from './components/legal/DataDeletion';
@@ -24,36 +16,30 @@ import CookiePolicy from './components/legal/CookiePolicy';
 import CV from './CV';
 import PublicCVView from './components/auth-resume/public-cv/PublicCVView';
 import PublicResumeViewer from './components/auth-resume/public-cv/PublicResumeViewer';
-import useAuthStore from './stores/authStore';
 import ResumeDashboard from './components/auth-resume/ResumeDashboard';
 import NewResumeBuilder from './components/auth-resume/view-cv/NewResumeBuilder';
 import EditResumeBuilder from './components/auth-resume/view-cv/EditResumeBuilder';
 import CoverLetterDashboard from './components/auth-coverletter/CoverLetterDashboard';
 import CoverLetterEditor from './components/auth-coverletter/CoverLetterEditor';
-import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/legal/CookieConsent';
-import AdminDashboard from './components/admin/AdminDashboard';
-import CreateAdmin from './components/admin/CreateAdmin'; 
 import FeedbackButton from './components/feedback/FeedbackButton'; 
-import FeedbackPage from './components/feedback/FeedbackPage'; // Import the new feedback page
-import FeedbackDashboard from './components/feedback/FeedbackDashboard';
+import FeedbackPage from './components/feedback/FeedbackPage';
 import RCPublic from './components/customizer-public/RCPublic';
-import JobMatching from './components/job-matching/JobMatching';
-import JobSearchComponent from './components/job-search/JobSearch';
+import JobMatching from './components/job-matching/JobMatching'; 
+
+// Import the new stores
+import useSessionStore from './stores/sessionStore';
+import useAuthStore from './stores/authStore'; // Keep for backward compatibility during transition
+import CloudSetup from './components/clouds/CloudSetup';
+import CloudCallback from './components/clouds/CloudCallback';
 
 // ============ START OF HTTPS ENFORCEMENT ============
-// Monkey patch fetch to force HTTPS for api.cvati.com
-// More aggressive approach to force HTTPS
 (() => { 
-  
-  // Override the entire fetch function
   const originalFetch = window.fetch;
   window.fetch = function(...args) {
     let [resource, config] = args;
     
-    // Convert URL objects to strings for easier manipulation
     if (resource instanceof Request) {
-      // Clone the request to modify it
       const originalRequest = resource;
       const url = new URL(originalRequest.url);
       
@@ -61,7 +47,6 @@ import JobSearchComponent from './components/job-search/JobSearch';
         url.protocol = 'https:';
         console.log(`Upgraded Request URL to: ${url.toString()}`);
         
-        // Create a new Request with the HTTPS URL
         resource = new Request(url.toString(), {
           method: originalRequest.method,
           headers: originalRequest.headers,
@@ -76,23 +61,18 @@ import JobSearchComponent from './components/job-search/JobSearch';
       }
     } else if (typeof resource === 'string') {
       if (resource.includes('api.cvati.com')) {
-        // Handle string URLs
         try {
-          // Try to parse as URL if it has a protocol
           if (resource.includes('://')) {
             const url = new URL(resource);
             url.protocol = 'https:';
             resource = url.toString();
           } 
-          // Handle domain without protocol
           else if (resource.startsWith('api.cvati.com')) {
             resource = 'https://' + resource;
           }
-          // Handle just the paths
           else if (resource.startsWith('/')) {
             resource = 'https://api.cvati.com' + resource;
           }
-           
         } catch (e) {
           console.error('Error processing URL:', e);
         }
@@ -102,15 +82,12 @@ import JobSearchComponent from './components/job-search/JobSearch';
     return originalFetch.call(window, resource, config);
   };
   
-  // Also intercept XMLHttpRequest
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url, ...rest) {
     if (typeof url === 'string' && url.includes('api.cvati.com')) {
-      // Replace protocol with HTTPS
       if (url.startsWith('http://')) {
         url = url.replace('http://', 'https://');
       }
-      // Add protocol if missing
       else if (!url.includes('://')) {
         if (url.startsWith('//')) {
           url = 'https:' + url;
@@ -121,29 +98,49 @@ import JobSearchComponent from './components/job-search/JobSearch';
     }
     return originalOpen.call(this, method, url, ...rest);
   };
-  
-  // Try to prevent HTTP requests before they happen by intercepting URL objects
-  const originalURL = window.URL;
-  window.URL = function(...args) {
-    const url = new originalURL(...args);
-    
-    // If we're creating a URL for the API, ensure it uses HTTPS
-    if (url.hostname.includes('api.cvati.com') && url.protocol === 'http:') {
-      url.protocol = 'https:';
-      console.log(`Corrected URL protocol during creation: ${url.toString()}`);
-    }
-    
-    return url;
-  };
-  window.URL.prototype = originalURL.prototype;
-  window.URL.createObjectURL = originalURL.createObjectURL;
-  window.URL.revokeObjectURL = originalURL.revokeObjectURL;
-   
 })();
- 
 
-useAuthStore.getState();
- 
+// Enhanced Route Protection Component for Cloud Storage
+const CloudProtectedRoute = ({ children, requiresCloudSetup = true }) => {
+  const { isSessionActive, hasConnectedProviders, showCloudSetup, loading } = useSessionStore();
+
+  // Show loading while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
+  // If no active session, redirect to home
+  if (!isSessionActive) {
+    return <Navigate to="/" replace />;
+  }
+
+  // If requires cloud setup and no providers connected, show cloud setup
+  if (requiresCloudSetup && !hasConnectedProviders()) {
+    return <CloudSetup darkMode={localStorage.getItem('theme') === 'dark'} />;
+  }
+
+  return children;
+};
+
+// Backward Compatibility Route Protection (for old auth system)
+const LegacyProtectedRoute = ({ children, adminOnly = false }) => {
+  const { isAuthenticated, user } = useAuthStore();
+  
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (adminOnly && (!user || user.role !== 'admin')) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
 const MainLayout = ({ children, darkMode, toggleDarkMode }) => (
   <>
     <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -162,19 +159,26 @@ function App() {
     if (storedTheme !== null) {
       return storedTheme === 'dark';
     }
-    // Check system preference
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }); 
+
+  // Session store for new cloud-based system
+  const { 
+    isSessionActive, 
+    hasConnectedProviders, 
+    initialize: initializeSession 
+  } = useSessionStore();
+
+  // Auth store for backward compatibility
+  const { isAuthenticated } = useAuthStore();
 
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
   };
  
   useEffect(() => {
-    // Save preference to local storage
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
     
-    // Apply dark mode class to html element if needed
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -184,19 +188,15 @@ function App() {
    
   useEffect(() => {
     document.documentElement.lang = i18n.language || 'en';
-    // Set direction for RTL languages if needed
     document.documentElement.dir = i18n.dir();
   }, [i18n.language]);
    
+  // Initialize session on app load
   useEffect(() => {
-    // Check authentication on app load
-    const { token, user } = useAuthStore.getState(); 
-    
-    // Trigger auth change event to update UI
-    window.dispatchEvent(new Event('authChange'));
-  }, []);
-   
+    initializeSession().catch(console.error);
+  }, [initializeSession]);
 
+  // Handle legacy auth system during transition
   useEffect(() => {
     const { token, refreshUserInfo } = useAuthStore.getState();
     if (token) {
@@ -204,30 +204,36 @@ function App() {
     }
   }, []);
 
+  // Listen for session expiration
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      // Could show a toast notification here
+      console.log('Session expired, please refresh to continue');
+    };
+
+    window.addEventListener('sessionExpired', handleSessionExpired);
+    return () => window.removeEventListener('sessionExpired', handleSessionExpired);
+  }, []);
+
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
     const handleChange = (e) => {
-      // Only update if user hasn't made an explicit choice
       if (localStorage.getItem('theme') === null) {
         setDarkMode(e.matches);
       }
     };
     
-    // Add listener
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange);
     } else {
-      // Fallback for older browsers
       mediaQuery.addListener(handleChange);
     }
     
-    // Cleanup
     return () => {
       if (mediaQuery.removeEventListener) {
         mediaQuery.removeEventListener('change', handleChange);
       } else {
-        // Fallback for older browsers
         mediaQuery.removeListener(handleChange);
       }
     };
@@ -237,7 +243,6 @@ function App() {
     <Router basename="/">
       <div className={`${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} min-h-screen flex flex-col`}>
         <Toaster position="top-center" />
-        {/* Place CookieConsent outside of Routes */}
         <CookieConsent />
   
         <Routes>
@@ -245,104 +250,142 @@ function App() {
           <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
           <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
           
+          {/* Cloud OAuth Callback Route */}
+          <Route path="/api/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} />
+          
+          {/* Legacy protected route for existing resume viewer */}
           <Route path="/resume/:resumeId" element={
-                  <ProtectedRoute>
-                    <CV darkMode={darkMode} />
-                  </ProtectedRoute>
-                } />
+            <LegacyProtectedRoute>
+              <CV darkMode={darkMode} />
+            </LegacyProtectedRoute>
+          } />
 
-                
           {/* All other routes with Navbar and Footer */}
           <Route path="*" element={
             <MainLayout darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
               <Routes>
-                <Route path="/login" element={<Login darkMode={darkMode} />} />
-                <Route path="/register" element={<Register darkMode={darkMode} />} />
-                <Route path="/reset-password" element={<ResetPassword darkMode={darkMode} />} />
-                <Route path="/" element={<Home darkMode={darkMode} />} />  
-                <Route path="/oauth-callback" element={<SocialCallback darkMode={darkMode} />} />
-                <Route path="/auth/social-error" element={<SocialError />} />
-                <Route path="/public-cv-view" element={<PublicCVView />} /> 
-                <Route path="/new-resume" element={<NewResumeBuilder darkMode={darkMode} />} />
-                <Route path="/rc-public" element={<RCPublic darkMode={darkMode} />} />
-                <Route path="/cover-letter" element={<CoverLetter darkMode={darkMode} /> } /> 
-                {/* Legal and information pages */}
+                {/* Public Routes */}
+                <Route path="/" element={<Home darkMode={darkMode} />} />
                 <Route path="/privacy" element={<PrivacyPolicy darkMode={darkMode} />} />
                 <Route path="/terms" element={<TermsAndConditions darkMode={darkMode} />} />
                 <Route path="/data-deletion" element={<DataDeletion darkMode={darkMode} />} />
                 <Route path="/cookies" element={<CookiePolicy darkMode={darkMode} />} />
-                <Route path="/contact" element={<Contact darkMode={darkMode} />} /> 
-                {/* New Feedback Page Route */}
+                <Route path="/contact" element={<Contact darkMode={darkMode} />} />
                 <Route path="/feedback" element={<FeedbackPage darkMode={darkMode} />} />
-                <Route path="/job-matching" element={<JobMatching darkMode={darkMode} />} />
+                <Route path="/rc-public" element={<RCPublic darkMode={darkMode} />} />
 
-{/*                 
-                <Route path="/job-search" element={<JobSearchComponent darkMode={darkMode} />} /> */}
+                {/* Cloud Setup Route */}
+                <Route path="/cloud-setup" element={<CloudSetup darkMode={darkMode} />} />
 
-                <Route path="/admin/dashboard" element={
-                  <ProtectedRoute adminOnly={true}>
-                    <AdminDashboard darkMode={darkMode} />
-                  </ProtectedRoute>
+                {/* UPDATED: Cloud-Protected Routes (New System) */}
+                <Route path="/new-resume" element={
+                  <CloudProtectedRoute requiresCloudSetup={true}>
+                    <NewResumeBuilder darkMode={darkMode} />
+                  </CloudProtectedRoute>
                 } />
 
-                <Route path="/admin/create" element={
-                  <ProtectedRoute adminOnly={true}>
-                    <CreateAdmin darkMode={darkMode} />
-                  </ProtectedRoute>
-                } />
-
-                {/* New admin feedback dashboard route */}
-                <Route path="/admin/feedback" element={
-                  <ProtectedRoute adminOnly={true}>
-                    <FeedbackDashboard darkMode={darkMode} />
-                  </ProtectedRoute>
-                } />
-
-                {/* Protected routes */}
                 <Route path="/my-resumes" element={
-                  <ProtectedRoute>
+                  <CloudProtectedRoute requiresCloudSetup={true}>
                     <ResumeDashboard darkMode={darkMode} />
-                  </ProtectedRoute>
+                  </CloudProtectedRoute>
                 } />
-                {/* Edit resume builder */}
+
                 <Route path="/edit-resume/:resumeId" element={
-                  <ProtectedRoute>
+                  <CloudProtectedRoute requiresCloudSetup={true}>
                     <EditResumeBuilder darkMode={darkMode} />
-                  </ProtectedRoute>
-                } />               
-                {/* New Cover Letter Dashboard */}
+                  </CloudProtectedRoute>
+                } />
+
                 <Route path="/cover-letters" element={
-                  <ProtectedRoute>
+                  <CloudProtectedRoute requiresCloudSetup={true}>
                     <CoverLetterDashboard darkMode={darkMode} />
-                  </ProtectedRoute>
+                  </CloudProtectedRoute>
                 } />
-                {/* Edit Cover Letter */}
+
                 <Route path="/cover-letter/:id/edit" element={
-                  <ProtectedRoute>
+                  <CloudProtectedRoute requiresCloudSetup={true}>
                     <CoverLetterEditor darkMode={darkMode} />
-                  </ProtectedRoute>
+                  </CloudProtectedRoute>
                 } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <Settings darkMode={darkMode} />
-                  </ProtectedRoute>
+
+                <Route path="/cover-letter" element={
+                  <CloudProtectedRoute requiresCloudSetup={true}>
+                    <CoverLetter darkMode={darkMode} />
+                  </CloudProtectedRoute>
                 } />
-               
-                <Route path="/cv-ai-enhancement" element={
-                  <ProtectedRoute>
-                    <CVAIEnhancement darkMode={darkMode} />
-                  </ProtectedRoute>
-                } />
+
                 <Route path="/resume-customizer" element={
-                  <ProtectedRoute>
+                  <CloudProtectedRoute requiresCloudSetup={false}>
                     <ResumeCustomizer darkMode={darkMode} />
-                  </ProtectedRoute>
+                  </CloudProtectedRoute>
                 } />
+
                 <Route path="/resume-preview" element={
-                  <ProtectedRoute>
+                  <CloudProtectedRoute requiresCloudSetup={false}>
                     <ResumePreview darkMode={darkMode} />
-                  </ProtectedRoute>
+                  </CloudProtectedRoute>
                 } />
+
+                <Route path="/job-matching" element={
+                  <CloudProtectedRoute requiresCloudSetup={true}>
+                    <JobMatching darkMode={darkMode} />
+                  </CloudProtectedRoute>
+                } />
+
+                {/* LEGACY: Keep old auth-protected routes for transition period */}
+                {/* These can be gradually migrated or removed */}
+                <Route path="/login" element={
+                  <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold mb-4">Welcome to the New CV Platform!</h2>
+                      <p className="mb-4">We've upgraded to a privacy-first system.</p>
+                      <p className="mb-6">No more user accounts - your data stays in YOUR cloud storage.</p>
+                      <button 
+                        onClick={() => window.location.href = '/'}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                      >
+                        Get Started
+                      </button>
+                    </div>
+                  </div>
+                } />
+
+                <Route path="/register" element={
+                  <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold mb-4">No Registration Required!</h2>
+                      <p className="mb-4">Our new system doesn't need user accounts.</p>
+                      <p className="mb-6">Just connect your cloud storage and start building.</p>
+                      <button 
+                        onClick={() => window.location.href = '/'}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                      >
+                        Start Building Your CV
+                      </button>
+                    </div>
+                  </div>
+                } />
+
+                {/* Legacy admin routes - these might need special handling */}
+                <Route path="/settings" element={
+                  <CloudProtectedRoute requiresCloudSetup={false}>
+                    <div className="min-h-screen flex items-center justify-center">
+                      <div className="text-center">
+                        <h2 className="text-2xl font-bold mb-4">Cloud Storage Settings</h2>
+                        <p className="mb-6">Manage your connected cloud storage providers</p>
+                        <button 
+                          onClick={() => window.location.href = '/cloud-setup'}
+                          className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                        >
+                          Manage Cloud Storage
+                        </button>
+                      </div>
+                    </div>
+                  </CloudProtectedRoute>
+                } />
+
+                {/* Catch-all for unknown routes */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </MainLayout>
           } />
