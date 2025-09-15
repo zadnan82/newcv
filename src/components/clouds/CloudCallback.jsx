@@ -1,8 +1,9 @@
-// src/components/clouds/CloudCallback.jsx - Updated version
+// src/components/clouds/CloudCallback.jsx - Updated for development mode
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
+import { ENV_INFO } from '../../config';
 
 const CloudCallback = ({ darkMode }) => {
   const { provider } = useParams();
@@ -10,55 +11,100 @@ const CloudCallback = ({ darkMode }) => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('processing'); // processing, success, error
   const [message, setMessage] = useState('');
+  const [debugInfo, setDebugInfo] = useState({});
   
-  const { handleOAuthSuccess, checkCloudStatus } = useSessionStore();
+  const { handleOAuthSuccess, checkCloudStatus, backendAvailable } = useSessionStore();
 
   useEffect(() => {
     const handleCallback = async () => {
       const code = searchParams.get('code');
       const state = searchParams.get('state');
       const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
+
+      // Set debug info for development
+      if (ENV_INFO.isDevelopment) {
+        setDebugInfo({
+          provider,
+          code: code ? `${code.substring(0, 10)}...` : null,
+          state: state ? `${state.substring(0, 10)}...` : null,
+          error,
+          errorDescription,
+          backendAvailable,
+          searchParams: Object.fromEntries(searchParams.entries())
+        });
+      }
 
       if (error) {
         setStatus('error');
-        setMessage(`Connection failed: ${error}`);
+        setMessage(`Connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`);
         return;
       }
 
-      if (!code || !state) {
+      if (!code) {
         setStatus('error');
-        setMessage('Invalid callback parameters');
+        setMessage('No authorization code received from provider');
         return;
       }
 
       try {
         setMessage('Completing connection...');
         
-        // In a real implementation, this would call your backend
-        // For now, simulate the process
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        if (backendAvailable) {
+          // Real backend flow
+          console.log(`🔗 Processing OAuth callback for ${provider} with backend`);
+          
+          // Send the authorization code to your backend
+          const response = await fetch(`${ENV_INFO.apiBaseUrl}/api/cloud/callback/${provider}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              code,
+              state,
+              redirect_uri: `${window.location.origin}/cloud/connected`
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || `Backend callback failed: ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log('✅ Backend callback successful:', result);
+          
+        } else {
+          // Development simulation
+          console.log(`🔧 Simulating OAuth callback for ${provider} (no backend)`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
         
         // Update session store
-        await handleOAuthSuccess(provider);
-        await checkCloudStatus();
+        const success = await handleOAuthSuccess(provider);
         
-        setStatus('success');
-        setMessage('Successfully connected!');
-        
-        // Redirect to success page after a brief delay
-        setTimeout(() => {
-          navigate(`/cloud/connected?provider=${provider}`, { replace: true });
-        }, 1500);
+        if (success) {
+          setStatus('success');
+          setMessage('Successfully connected!');
+          
+          // Redirect to success page after a brief delay
+          setTimeout(() => {
+            navigate(`/cloud/connected?provider=${provider}`, { replace: true });
+          }, 1500);
+        } else {
+          throw new Error('Failed to update session after OAuth success');
+        }
         
       } catch (error) {
         console.error('OAuth callback error:', error);
         setStatus('error');
-        setMessage('Failed to complete connection');
+        setMessage(error.message || 'Failed to complete connection');
       }
     };
 
     handleCallback();
-  }, [provider, searchParams, handleOAuthSuccess, checkCloudStatus, navigate]);
+  }, [provider, searchParams, handleOAuthSuccess, checkCloudStatus, navigate, backendAvailable]);
 
   const getProviderName = (provider) => {
     const names = {
@@ -68,6 +114,14 @@ const CloudCallback = ({ darkMode }) => {
       box: 'Box'
     };
     return names[provider] || provider;
+  };
+
+  const handleRetry = () => {
+    navigate('/cloud-setup');
+  };
+
+  const handleGoHome = () => {
+    navigate('/');
   };
 
   return (
@@ -118,13 +172,13 @@ const CloudCallback = ({ darkMode }) => {
         {status === 'error' && (
           <div className="space-y-3">
             <button
-              onClick={() => navigate('/cloud-setup')}
+              onClick={handleRetry}
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Try Again
             </button>
             <button
-              onClick={() => navigate('/')}
+              onClick={handleGoHome}
               className={`w-full px-4 py-2 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
             >
               Back to Home
@@ -137,6 +191,32 @@ const CloudCallback = ({ darkMode }) => {
           <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Redirecting you to get started...
           </p>
+        )}
+
+        {/* Development Debug Info */}
+        {ENV_INFO.isDevelopment && Object.keys(debugInfo).length > 0 && (
+          <div className={`mt-6 p-4 rounded-lg text-left ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+            <h3 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+              🔧 Debug Info (Development)
+            </h3>
+            <div className={`text-xs space-y-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <div><strong>Provider:</strong> {debugInfo.provider}</div>
+              <div><strong>Backend Available:</strong> {debugInfo.backendAvailable ? 'Yes' : 'No'}</div>
+              <div><strong>Auth Code:</strong> {debugInfo.code || 'None'}</div>
+              <div><strong>State:</strong> {debugInfo.state || 'None'}</div>
+              {debugInfo.error && <div><strong>Error:</strong> {debugInfo.error}</div>}
+              {debugInfo.errorDescription && <div><strong>Error Description:</strong> {debugInfo.errorDescription}</div>}
+              
+              {Object.keys(debugInfo.searchParams).length > 0 && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer">Search Params</summary>
+                  <pre className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {JSON.stringify(debugInfo.searchParams, null, 2)}
+                  </pre>
+                </details>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

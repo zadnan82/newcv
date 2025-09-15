@@ -33,6 +33,7 @@ import useAuthStore from './stores/authStore'; // Keep for backward compatibilit
 import CloudSetup from './components/clouds/CloudSetup';
 import CloudCallback from './components/clouds/CloudCallback';
 import CloudConnectionSuccess from './components/clouds/CloudConnectionSuccess';
+import DevTools from './components/dev/DevTools';
 
 // ============ START OF HTTPS ENFORCEMENT ============
 (() => { 
@@ -394,6 +395,7 @@ function App() {
             </MainLayout>
           } />
         </Routes>
+           <DevTools darkMode={darkMode} />
       </div>
     </Router>
   );

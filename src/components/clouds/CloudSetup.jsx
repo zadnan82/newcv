@@ -1,4 +1,4 @@
-// src/components/cloud/CloudSetup.jsx
+// src/components/cloud/CloudSetup.jsx - Updated for development mode
 import React, { useState, useEffect } from 'react';
 import { 
   Cloud, 
@@ -8,9 +8,14 @@ import {
   ExternalLink,
   Loader2,
   AlertCircle,
-  RefreshCw 
+  RefreshCw,
+  Settings,
+  Zap
 } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
+import { ENV_INFO } from '../../config';
+import OAuthDebugger from '../dev/OAuthDebugger';
+import OAuthRedirectDebugger from '../dev/OAuthRedirectDebugger';
 
 const CloudSetup = ({ darkMode, onComplete, required = true }) => {
   const {
@@ -24,11 +29,15 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
     getAvailableProviders,
     setShowCloudSetup,
     clearError,
-    testProvider
+    testProvider,
+    backendAvailable,
+    forceConnectProvider, // Development helper
+    getEnvironmentInfo
   } = useSessionStore();
 
   const [availableProviders, setAvailableProviders] = useState([]);
   const [testingProvider, setTestingProvider] = useState(null);
+  const [showDevOptions, setShowDevOptions] = useState(ENV_INFO.isDevelopment);
 
   // Load available providers on mount
   useEffect(() => {
@@ -91,6 +100,19 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
     }
   };
 
+  // Development helper - force connect a provider
+  const handleForceConnect = (providerId) => {
+    console.log(`🔧 Force connecting ${providerId} for development`);
+    forceConnectProvider(providerId, {
+      email: `dev-user@${providerId.replace('_', '')}.com`,
+      storage_quota: {
+        total: 15 * 1024 * 1024 * 1024, // 15GB
+        used: 5 * 1024 * 1024 * 1024,   // 5GB
+        available: 10 * 1024 * 1024 * 1024 // 10GB
+      }
+    });
+  };
+
   const getProviderIcon = (providerId) => {
     const icons = {
       'google_drive': '🗂️',
@@ -106,6 +128,8 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
     if (!status) return { connected: false, status: 'unknown' };
     return status;
   };
+
+  const environmentInfo = getEnvironmentInfo();
 
   if (!showCloudSetup && connectedProviders.length > 0) {
     return null; // Don't show if already set up
@@ -130,7 +154,49 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
           <p className="text-blue-100">
             Your CV data will be stored securely in YOUR cloud storage account
           </p>
+          
+          {/* Development Mode Indicator */}
+          {ENV_INFO.isDevelopment && (
+            <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-200 text-sm">
+              <Settings className="w-4 h-4 mr-2" />
+              Development Mode
+            </div>
+          )}
         </div>
+
+        {/* Environment Info (Development) */}
+        {showDevOptions && (
+          <div className={`px-8 py-4 border-b ${
+            darkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-yellow-50'
+          }`}>
+            <div className="flex items-start space-x-4">
+              <Zap className={`w-6 h-6 mt-1 ${
+                darkMode ? 'text-yellow-400' : 'text-yellow-600'
+              }`} />
+              <div>
+                <h3 className={`font-semibold mb-2 ${
+                  darkMode ? 'text-yellow-400' : 'text-yellow-700'
+                }`}>
+                  Development Environment
+                </h3>
+                <ul className={`text-sm space-y-1 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                  <li>• Backend Available: {environmentInfo.backendAvailable ? '✅ Yes' : '❌ No'}</li>
+                  <li>• API URL: {environmentInfo.apiBaseUrl}</li>
+                  <li>• Session Active: {environmentInfo.sessionActive ? '✅ Yes' : '❌ No'}</li>
+                  <li>• Connected Providers: {environmentInfo.connectedProviders}</li>
+                </ul>
+                
+                {!environmentInfo.backendAvailable && (
+                  <div className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
+                    💡 Backend offline - using development simulation mode
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Privacy Notice */}
         <div className={`px-8 py-6 border-b ${
@@ -168,6 +234,13 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
           </div>
         )}
 
+        {/* OAuth Redirect URI Debugger - Show prominently */}
+        {ENV_INFO.isDevelopment && (
+          <div className="px-8 py-6">
+            <OAuthRedirectDebugger darkMode={darkMode} />
+          </div>
+        )}
+
         {/* Connected Providers */}
         {connectedProviders.length > 0 && (
           <div className="px-8 py-6">
@@ -192,7 +265,7 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
                           <p className={`font-medium ${
                             darkMode ? 'text-white' : 'text-gray-800'
                           }`}>
-                            {provider?.name || providerId}
+                            {provider?.name || providerId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </p>
                           <p className={`text-sm ${
                             darkMode ? 'text-green-400' : 'text-green-600'
@@ -253,6 +326,9 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
             {connectedProviders.length > 0 ? 'Add More Storage' : 'Choose Your Cloud Storage'}
           </h3>
           
+          {/* OAuth Debug Component */}
+          {ENV_INFO.isDevelopment && <OAuthDebugger darkMode={darkMode} />}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {availableProviders.map(provider => {
               const isConnected = connectedProviders.includes(provider.id);
@@ -302,24 +378,40 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
                   </div>
                   
                   {!isConnected && (
-                    <button
-                      onClick={() => handleConnectProvider(provider.id)}
-                      disabled={loading}
-                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                        darkMode 
-                          ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-                          : 'bg-purple-500 hover:bg-purple-600 text-white'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      {loading ? (
-                        <div className="flex items-center justify-center">
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Connecting...
-                        </div>
-                      ) : (
-                        `Connect to ${provider.name}`
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleConnectProvider(provider.id)}
+                        disabled={loading}
+                        className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                          darkMode 
+                            ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                            : 'bg-purple-500 hover:bg-purple-600 text-white'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {loading ? (
+                          <div className="flex items-center justify-center">
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            Connecting...
+                          </div>
+                        ) : (
+                          `Connect to ${provider.name}`
+                        )}
+                      </button>
+                      
+                      {/* Development Mode: Force Connect Button */}
+                      {showDevOptions && !backendAvailable && (
+                        <button
+                          onClick={() => handleForceConnect(provider.id)}
+                          className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 border-2 border-dashed ${
+                            darkMode 
+                              ? 'border-yellow-600 text-yellow-400 hover:bg-yellow-900/20' 
+                              : 'border-yellow-500 text-yellow-600 hover:bg-yellow-50'
+                          }`}
+                        >
+                          🔧 Force Connect (Dev)
+                        </button>
                       )}
-                    </button>
+                    </div>
                   )}
                 </div>
               );
@@ -405,6 +497,22 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
             </div>
           </div>
         </div>
+
+        {/* Development Options Toggle */}
+        {ENV_INFO.isDevelopment && (
+          <div className={`px-8 py-4 border-t ${
+            darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-100'
+          }`}>
+            <button
+              onClick={() => setShowDevOptions(!showDevOptions)}
+              className={`text-sm ${
+                darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              {showDevOptions ? '🔽' : '▶️'} Development Options
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

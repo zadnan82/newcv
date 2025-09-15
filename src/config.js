@@ -1,7 +1,15 @@
- // config.js - Updated for cloud storage backend
+// config.js - Updated for development mode with localhost backend
 import useAuthStore from './stores/authStore';
 
-export const API_BASE_URL = 'https://api.cvati.com';
+// ================== ENVIRONMENT DETECTION ==================
+const isDevelopment = process.env.NODE_ENV === 'development' || 
+                     window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1';
+
+// Use localhost for development, production API for production
+export const API_BASE_URL = isDevelopment ? 'http://localhost:8000' : 'https://api.cvati.com';
+
+console.log(`🔧 API Mode: ${isDevelopment ? 'Development (localhost:8000)' : 'Production (api.cvati.com)'}`);
 
 // ================== HEALTH AND INFO ENDPOINTS ==================
 export const HEALTH_ENDPOINTS = {
@@ -10,6 +18,7 @@ export const HEALTH_ENDPOINTS = {
   API_INFO: `${API_BASE_URL}/api/info`,
 };
 
+// ================== CLOUD ENDPOINTS ==================
 export const CLOUD_ENDPOINTS = {
   PROVIDERS: `${API_BASE_URL}/api/cloud/providers`,
   CONNECT: (provider) => `${API_BASE_URL}/api/cloud/connect/${provider}`,
@@ -24,17 +33,16 @@ export const CLOUD_ENDPOINTS = {
 
 // ================== UPDATED RESUME ENDPOINTS ==================
 export const RESUME_ENDPOINTS = {
-  // All resume operations now require provider and file_id
   LIST: `${API_BASE_URL}/api/resume/`,
-  GET_BY_ID: `${API_BASE_URL}/api/resume/`, // Will append file_id and provider as query params
+  GET_BY_ID: `${API_BASE_URL}/api/resume/`,
   CREATE: `${API_BASE_URL}/api/resume/`,
-  UPDATE: `${API_BASE_URL}/api/resume/`, // Will append file_id and provider as query params
-  DELETE: `${API_BASE_URL}/api/resume/`, // Will append file_id and provider as query params
+  UPDATE: `${API_BASE_URL}/api/resume/`,
+  DELETE: `${API_BASE_URL}/api/resume/`,
   SEARCH: `${API_BASE_URL}/api/resume/search/`,
-  BACKUP: `${API_BASE_URL}/api/resume/`, // Will append file_id/backup
-  SYNC: `${API_BASE_URL}/api/resume/`, // Will append file_id/sync
-  DUPLICATE: `${API_BASE_URL}/api/resume/`, // Will append file_id/duplicate
-  VERSIONS: `${API_BASE_URL}/api/resume/`, // Will append file_id/versions
+  BACKUP: `${API_BASE_URL}/api/resume/`,
+  SYNC: `${API_BASE_URL}/api/resume/`,
+  DUPLICATE: `${API_BASE_URL}/api/resume/`,
+  VERSIONS: `${API_BASE_URL}/api/resume/`,
 };
 
 // ================== AI ENHANCEMENT ENDPOINTS ==================
@@ -51,9 +59,22 @@ export const AI_ENDPOINTS = {
 export const COVER_LETTER_ENDPOINTS = {
   LIST: `${API_BASE_URL}/api/cover-letter/`,
   GENERATE: `${API_BASE_URL}/api/cover-letter/generate`,
-  GET_BY_ID: `${API_BASE_URL}/api/cover-letter/`, // Will append id
-  DELETE: `${API_BASE_URL}/api/cover-letter/`, // Will append id
+  GET_BY_ID: `${API_BASE_URL}/api/cover-letter/`,
+  DELETE: `${API_BASE_URL}/api/cover-letter/`,
   CUSTOMIZE: `${API_BASE_URL}/api/cover-letter/customize`,
+};
+
+// ================== DEVELOPMENT OAUTH REDIRECT URLS ==================
+export const getOAuthRedirectUrl = (provider) => {
+  const baseUrl = isDevelopment ? 'http://localhost:3000' : window.location.origin;
+  return `${baseUrl}/api/cloud/callback/${provider}`;
+};
+
+// ================== SESSION ENDPOINTS ==================
+export const SESSION_ENDPOINTS = {
+  CREATE: `${API_BASE_URL}/api/session`,
+  VALIDATE: `${API_BASE_URL}/api/session/validate`,
+  CLEAR: `${API_BASE_URL}/api/session/clear`,
 };
 
 // ================== DEPRECATED - OLD AUTH ENDPOINTS ==================
@@ -63,20 +84,16 @@ export const AUTH_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/auth/register`,
   USER_INFO: `${API_BASE_URL}/auth/me`,
   LOGOUT: `${API_BASE_URL}/auth/logout`,
-  // Keep these for existing social login if still needed
   GOOGLE_LOGIN: `${API_BASE_URL}/auth/google-login`,
   REQUEST_PASSWORD_RESET: `${API_BASE_URL}/auth/request-password-reset`,
   CONFIRM_PASSWORD_RESET: `${API_BASE_URL}/auth/confirm-password-reset`,
   CHANGE_PASSWORD: `${API_BASE_URL}/auth/change-password`,
 };
 
-
-
-
-  // CV AI endpoints 
+// CV AI endpoints 
 export const CV_AI_ENDPOINTS = {
   IMPROVE_SECTION: `${API_BASE_URL}/cv-ai/improve-section`,
-  IMPROVE_SUMMARY:  `${API_BASE_URL}/cv-ai/improve-section`, // ⭐ Check this
+  IMPROVE_SUMMARY: `${API_BASE_URL}/cv-ai/improve-section`,
   IMPROVE_FULL_CV: `${API_BASE_URL}/cv-ai/improve-full-cv`,
   USAGE_LIMIT: `${API_BASE_URL}/cv-ai/usage-limit`,
   TASK_STATUS: (taskId) => `${API_BASE_URL}/cv-ai/task-status/${taskId}`,  
@@ -86,7 +103,6 @@ export const FEEDBACK_ENDPOINTS = {
   SUBMIT: `${API_BASE_URL}/feedback/submit`,
   SUBMIT_ANONYMOUS: `${API_BASE_URL}/feedback/anonymous`,
   GET_MY_FEEDBACK: `${API_BASE_URL}/feedback/my`,
-  // Admin endpoints
   ADMIN_GET_ALL: `${API_BASE_URL}/feedback/admin/all`,
   ADMIN_GET_USERS: `${API_BASE_URL}/admin/users`,
   ADMIN_GET_STATS: `${API_BASE_URL}/admin/stats`,
@@ -116,13 +132,11 @@ export const buildAIURL = (baseEndpoint, fileId, provider) => {
 
 // Get session token from localStorage or authStore
 export const getSessionToken = () => {
-  // First try to get from the new session storage
   const sessionToken = localStorage.getItem('cv_session_token');
   if (sessionToken) {
     return sessionToken;
   }
   
-  // Fallback to old auth token during migration
   const authToken = useAuthStore.getState().token;
   return authToken;
 };
@@ -143,6 +157,7 @@ import axios from 'axios';
 
 // Configure axios defaults
 axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.baseURL = API_BASE_URL;
 
 // Updated axios interceptor for session-based auth
 axios.interceptors.request.use(
@@ -152,6 +167,15 @@ axios.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+    
+    // Log requests in development
+    if (isDevelopment) {
+      console.log(`🔗 ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data
+      });
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -159,22 +183,51 @@ axios.interceptors.request.use(
 
 // Response interceptor to handle session expiration
 axios.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Log responses in development
+    if (isDevelopment) {
+      console.log(`✅ ${response.status} ${response.config.url}`, response.data);
+    }
+    return response;
+  },
   (error) => {
+    // Log errors in development
+    if (isDevelopment) {
+      console.error(`❌ ${error.response?.status || 'Network'} ${error.config?.url}`, {
+        error: error.response?.data || error.message,
+        status: error.response?.status
+      });
+    }
+    
     if (error.response?.status === 401) {
-      // Session expired or invalid
       clearSessionToken();
-      // Don't automatically redirect - let components handle this
       window.dispatchEvent(new CustomEvent('sessionExpired'));
     }
     return Promise.reject(error);
   }
 );
 
+// ================== DEVELOPMENT HELPERS ==================
+
+// Check if backend is available
+export const checkBackendAvailability = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`, {
+      method: 'GET',
+      timeout: 5000
+    });
+    return response.ok;
+  } catch (error) {
+    console.warn('Backend not available:', error);
+    return false;
+  }
+};
+
+// Export environment info
+export const ENV_INFO = {
+  isDevelopment,
+  apiBaseUrl: API_BASE_URL,
+  frontendUrl: isDevelopment ? 'http://localhost:3000' : window.location.origin
+};
+
 export default API_BASE_URL;
-
-
-
-
-
- 
