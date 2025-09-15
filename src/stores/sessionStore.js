@@ -1,4 +1,4 @@
-// src/stores/sessionStore.js - Development-friendly version
+// src/stores/sessionStore.js - Complete version with real Google Drive OAuth
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -20,18 +20,16 @@ const useSessionStore = create(
       error: null,
       showCloudSetup: false,
       
-      // Development mode flag
-      isDevelopmentMode: process.env.NODE_ENV === 'development',
+      // Development mode flag - force true for development
+      isDevelopmentMode: true,
       
       // ================== SESSION MANAGEMENT ==================
       
       // Initialize session store
       initialize: async () => {
-        const { isDevelopmentMode } = get();
-        
         try {
-          // Test basic connectivity with health endpoint
-          const response = await fetch('https://api.cvati.com/health');
+          // Try to connect to backend first
+          const response = await fetch('http://localhost:8000/health');
           
           if (response.ok) {
             // Backend is available - use real session
@@ -50,14 +48,11 @@ const useSessionStore = create(
               await get().checkCloudStatus();
             } catch (error) {
               console.log('Cloud status check failed during init:', error);
-              // Set up development state
-              if (isDevelopmentMode) {
-                set({
-                  connectedProviders: [],
-                  providersStatus: {},
-                  showCloudSetup: true
-                });
-              }
+              set({
+                connectedProviders: [],
+                providersStatus: {},
+                showCloudSetup: true
+              });
             }
             
             return true;
@@ -67,39 +62,30 @@ const useSessionStore = create(
         } catch (error) {
           console.error('Backend connection failed:', error);
           
-          if (isDevelopmentMode) {
-            // In development, continue without backend
-            console.log('🔧 Development mode: Running without full backend - this is normal during development');
-            
-            const sessionId = `dev_session_${Date.now()}`;
-            const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-            
-            set({
-              sessionId: sessionId,
-              sessionToken: 'dev_session',
-              sessionExpires: expires.toISOString(),
-              isSessionActive: true,
-              connectedProviders: [],
-              providersStatus: {},
-              showCloudSetup: true,
-              error: null
-            });
-            
-            return true;
-          } else {
-            // In production, fail gracefully
-            set({ 
-              isSessionActive: false,
-              error: 'Unable to connect to the platform. Please try again later.'
-            });
-            return false;
-          }
+          // In development, continue without backend but set up for real OAuth
+          console.log('🔧 Development mode: Setting up for real Google Drive OAuth');
+          
+          const sessionId = `dev_session_${Date.now()}`;
+          const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+          
+          set({
+            sessionId: sessionId,
+            sessionToken: 'dev_session',
+            sessionExpires: expires.toISOString(),
+            isSessionActive: true,
+            connectedProviders: [],
+            providersStatus: {},
+            showCloudSetup: true,
+            error: null
+          });
+          
+          return true;
         }
       },
       
       // Check if session is valid and active
       validateSession: async () => {
-        const { sessionExpires, isDevelopmentMode } = get();
+        const { sessionExpires } = get();
         
         // Check if session is expired
         if (sessionExpires && new Date() > new Date(sessionExpires)) {
@@ -108,27 +94,8 @@ const useSessionStore = create(
         }
         
         // In development mode, always consider session valid
-        if (isDevelopmentMode) {
-          set({ isSessionActive: true });
-          return true;
-        }
-        
-        // Test session with health endpoint
-        try {
-          const response = await fetch('https://api.cvati.com/health');
-          
-          if (response.ok) {
-            set({ isSessionActive: true });
-            return true;
-          } else {
-            await get().clearSession();
-            return false;
-          }
-        } catch (error) {
-          console.error('Session validation error:', error);
-          await get().clearSession();
-          return false;
-        }
+        set({ isSessionActive: true });
+        return true;
       },
       
       // Clear session data
@@ -148,10 +115,8 @@ const useSessionStore = create(
       
       // Get available cloud providers
       getAvailableProviders: async () => {
-        const { isDevelopmentMode } = get();
-        
         try {
-          const response = await fetch('https://api.cvati.com/api/cloud/providers');
+          const response = await fetch('http://localhost:8000/api/cloud/providers');
           
           if (!response.ok) {
             throw new Error('Failed to get available providers');
@@ -161,94 +126,49 @@ const useSessionStore = create(
         } catch (error) {
           console.error('Error getting providers:', error);
           
-          if (isDevelopmentMode) {
-            // Return mock providers for development
-            return {
-              providers: [
-                {
-                  id: 'google_drive',
-                  name: 'Google Drive',
-                  description: 'Store your CVs in Google Drive',
-                  logo_url: '/static/logos/google-drive.png',
-                  supported_features: ['read', 'write', 'delete', 'folders']
-                },
-                {
-                  id: 'onedrive',
-                  name: 'Microsoft OneDrive',
-                  description: 'Store your CVs in OneDrive',
-                  logo_url: '/static/logos/onedrive.png',
-                  supported_features: ['read', 'write', 'delete', 'folders']
-                },
-                {
-                  id: 'dropbox',
-                  name: 'Dropbox',
-                  description: 'Store your CVs in Dropbox',
-                  logo_url: '/static/logos/dropbox.png',
-                  supported_features: ['read', 'write', 'delete', 'folders']
-                },
-                {
-                  id: 'box',
-                  name: 'Box',
-                  description: 'Store your CVs in Box',
-                  logo_url: '/static/logos/box.png',
-                  supported_features: ['read', 'write', 'delete', 'folders']
-                }
-              ]
-            };
-          }
-          
-          set({ error: error.message });
-          return { providers: [] };
+          // Return mock providers for development
+          return {
+            providers: [
+              {
+                id: 'google_drive',
+                name: 'Google Drive',
+                description: 'Store your CVs in Google Drive',
+                logo_url: '/static/logos/google-drive.png',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              },
+              {
+                id: 'onedrive',
+                name: 'Microsoft OneDrive',
+                description: 'Store your CVs in OneDrive',
+                logo_url: '/static/logos/onedrive.png',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              },
+              {
+                id: 'dropbox',
+                name: 'Dropbox',
+                description: 'Store your CVs in Dropbox',
+                logo_url: '/static/logos/dropbox.png',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              },
+              {
+                id: 'box',
+                name: 'Box',
+                description: 'Store your CVs in Box',
+                logo_url: '/static/logos/box.png',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              }
+            ]
+          };
         }
       },
       
       // Initiate cloud provider connection
       connectProvider: async (provider) => {
-        const { isDevelopmentMode } = get();
         set({ loading: true, error: null });
         
         try {
-          if (isDevelopmentMode) {
-            // Mock connection in development
-            console.log(`🔧 Dev mode: Mock connecting to ${provider}`);
-            
-            // Simulate OAuth flow
-            const confirmConnect = window.confirm(
-              `Connect to ${provider}?\n\nThis is a development simulation. In production, you would be redirected to ${provider}'s OAuth page.`
-            );
-            
-            if (confirmConnect) {
-              // Simulate successful connection
-              setTimeout(() => {
-                set(state => ({
-                  connectedProviders: [...state.connectedProviders, provider],
-                  providersStatus: {
-                    ...state.providersStatus,
-                    [provider]: {
-                      provider: provider,
-                      connected: true,
-                      email: 'dev@example.com',
-                      storage_quota: {
-                        total: 15 * 1024 * 1024 * 1024, // 15GB
-                        used: 5 * 1024 * 1024 * 1024,   // 5GB
-                        available: 10 * 1024 * 1024 * 1024 // 10GB
-                      }
-                    }
-                  },
-                  loading: false,
-                  showCloudSetup: false
-                }));
-              }, 1000);
-              
-              return { success: true };
-            } else {
-              set({ loading: false });
-              return { success: false };
-            }
-          }
-          
-          // Production mode - real API call
-          const response = await fetch(`https://api.cvati.com/api/cloud/connect/${provider}`, {
+          // Use real OAuth flow for all providers
+          const response = await fetch(`http://localhost:8000/api/cloud/connect/${provider}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -277,10 +197,8 @@ const useSessionStore = create(
       
       // Check status of all cloud providers
       checkCloudStatus: async () => {
-        const { isDevelopmentMode } = get();
-        
         try {
-          const response = await fetch('https://api.cvati.com/api/cloud/status');
+          const response = await fetch('http://localhost:8000/api/cloud/status');
           
           if (!response.ok) {
             if (response.status === 401 || response.status === 404) {
@@ -317,14 +235,12 @@ const useSessionStore = create(
         } catch (error) {
           console.error('Error checking cloud status:', error);
           
-          if (isDevelopmentMode) {
-            // In development, set empty state but don't error
-            set({
-              connectedProviders: [],
-              providersStatus: {},
-              showCloudSetup: get().isSessionActive
-            });
-          }
+          // In development, set empty state but don't error
+          set({
+            connectedProviders: [],
+            providersStatus: {},
+            showCloudSetup: get().isSessionActive
+          });
           
           return [];
         }
@@ -332,32 +248,10 @@ const useSessionStore = create(
       
       // Disconnect from a cloud provider
       disconnectProvider: async (provider) => {
-        const { isDevelopmentMode } = get();
         set({ loading: true, error: null });
         
         try {
-          if (isDevelopmentMode) {
-            // Mock disconnection in development
-            console.log(`🔧 Dev mode: Mock disconnecting from ${provider}`);
-            
-            set(state => ({
-              connectedProviders: state.connectedProviders.filter(p => p !== provider),
-              providersStatus: {
-                ...state.providersStatus,
-                [provider]: { ...state.providersStatus[provider], connected: false }
-              },
-              loading: false,
-            }));
-            
-            if (get().connectedProviders.length === 0) {
-              set({ showCloudSetup: true });
-            }
-            
-            return true;
-          }
-          
-          // Production mode - real API call
-          const response = await fetch(`https://api.cvati.com/api/cloud/disconnect/${provider}`, {
+          const response = await fetch(`http://localhost:8000/api/cloud/disconnect/${provider}`, {
             method: 'DELETE',
           });
           
@@ -392,21 +286,8 @@ const useSessionStore = create(
       
       // Test cloud provider connection
       testProvider: async (provider) => {
-        const { isDevelopmentMode } = get();
-        
         try {
-          if (isDevelopmentMode) {
-            // Mock test in development
-            console.log(`🔧 Dev mode: Mock testing ${provider}`);
-            return {
-              provider: provider,
-              status: 'healthy',
-              response_time_ms: 150,
-              user_info: { email: 'dev@example.com' }
-            };
-          }
-          
-          const response = await fetch(`https://api.cvati.com/api/cloud/test/${provider}`, {
+          const response = await fetch(`http://localhost:8000/api/cloud/test/${provider}`, {
             method: 'POST',
           });
           
@@ -446,8 +327,18 @@ const useSessionStore = create(
       
       // Handle OAuth callback success
       handleOAuthSuccess: async (provider) => {
-        await get().checkCloudStatus();
-        set({ showCloudSetup: false });
+        console.log(`🔗 Handling OAuth success for ${provider}`);
+        
+        try {
+          // Refresh cloud status to get the real connection data
+          await get().checkCloudStatus();
+          
+          set({ showCloudSetup: false });
+          return true;
+        } catch (error) {
+          console.error('Error handling OAuth success:', error);
+          return false;
+        }
       },
       
       // Check if specific provider is connected

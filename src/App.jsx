@@ -32,6 +32,7 @@ import useSessionStore from './stores/sessionStore';
 import useAuthStore from './stores/authStore'; // Keep for backward compatibility during transition
 import CloudSetup from './components/clouds/CloudSetup';
 import CloudCallback from './components/clouds/CloudCallback';
+import CloudConnectionSuccess from './components/clouds/CloudConnectionSuccess';
 
 // ============ START OF HTTPS ENFORCEMENT ============
 (() => { 
@@ -246,19 +247,22 @@ function App() {
         <CookieConsent />
   
         <Routes>
-          {/* Public Resume Routes - No Navbar/Footer */}
-          <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
-          <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
-          
-          {/* Cloud OAuth Callback Route */}
-          <Route path="/api/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} />
-          
-          {/* Legacy protected route for existing resume viewer */}
-          <Route path="/resume/:resumeId" element={
-            <LegacyProtectedRoute>
-              <CV darkMode={darkMode} />
-            </LegacyProtectedRoute>
-          } />
+  {/* Public Resume Routes - No Navbar/Footer */}
+  <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
+  <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
+  
+  {/* Cloud OAuth Callback Route */}
+  <Route path="/api/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} />
+  
+  {/* Cloud Connection Success Route - NEW */}
+  <Route path="/cloud/connected" element={<CloudConnectionSuccess darkMode={darkMode} />} />
+  
+  {/* Legacy protected route for existing resume viewer */}
+  <Route path="/resume/:resumeId" element={
+    <LegacyProtectedRoute>
+      <CV darkMode={darkMode} />
+    </LegacyProtectedRoute>
+  } />
 
           {/* All other routes with Navbar and Footer */}
           <Route path="*" element={
