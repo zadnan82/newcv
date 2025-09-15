@@ -19,6 +19,7 @@ import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import PersonalInfo from '../builder/PersonalInfo';  
 import ResumeTitle from '../builder/ResumeTitle';
 import SaveButton from './SaveButton';
+import useSessionStore from '../../../stores/sessionStore';
 
 const NewResumeBuilder = ({ darkMode }) => {
   const navigate = useNavigate();
@@ -101,19 +102,28 @@ const NewResumeBuilder = ({ darkMode }) => {
     }
   }, []);
   
-  useEffect(() => {
-    const startNewResume = useResumeStore.getState().startNewResume;
-    // This ensures we're actually working with a new resume and not an existing one
-    startNewResume();
-    
-    // Clear local storage to ensure we start fresh
-    localStorage.removeItem('resumeFormData');
-    localStorage.removeItem('loadedFromAPI');
-    
-    // Set blank template directly
-    setFormData(blankResumeTemplate);
-    setIsLoading(false);
-  }, []);
+useEffect(() => {
+  const sessionStore = useSessionStore.getState();
+  const resumeStore = useResumeStore.getState();
+  
+  // Check if we have connected cloud providers first
+  if (!sessionStore.connectedProviders || sessionStore.connectedProviders.length === 0) {
+    console.log('No cloud providers connected, redirecting to setup...');
+    navigate('/cloud-setup');
+    return;
+  }
+  
+  // Only start new resume if providers are available
+  resumeStore.startNewResume();
+  
+  // Clear local storage to ensure we start fresh
+  localStorage.removeItem('resumeFormData');
+  localStorage.removeItem('loadedFromAPI');
+  
+  // Set blank template directly
+  setFormData(blankResumeTemplate);
+  setIsLoading(false);
+}, [navigate]); // Add navigate to dependencies
   
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(false);

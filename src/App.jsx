@@ -284,7 +284,7 @@ function App() {
 
                 {/* UPDATED: Cloud-Protected Routes (New System) */}
                 <Route path="/new-resume" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
+                  <CloudProtectedRoute requiresCloudSetup={false}>
                     <NewResumeBuilder darkMode={darkMode} />
                   </CloudProtectedRoute>
                 } />

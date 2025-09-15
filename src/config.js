@@ -65,8 +65,8 @@ export const COVER_LETTER_ENDPOINTS = {
 };
 
 // ================== DEVELOPMENT OAUTH REDIRECT URLS ==================
-export const getOAuthRedirectUrl = (provider) => {
-  const baseUrl = isDevelopment ? 'http://localhost:3000' : window.location.origin;
+export const getOAuthRedirectUrl = (provider) => { 
+  const baseUrl = isDevelopment ? window.location.origin : window.location.origin;
   return `${baseUrl}/api/cloud/callback/${provider}`;
 };
 
@@ -227,7 +227,7 @@ export const checkBackendAvailability = async () => {
 export const ENV_INFO = {
   isDevelopment,
   apiBaseUrl: API_BASE_URL,
-  frontendUrl: isDevelopment ? 'http://localhost:3000' : window.location.origin
+  frontendUrl: isDevelopment ? 'http://localhost:5173' : window.location.origin
 };
 
 export default API_BASE_URL;

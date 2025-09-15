@@ -369,55 +369,66 @@ const useResumeStore = create(
       // ================== CLOUD-AWARE RESUME OPERATIONS ==================
       
       // Start a new resume (requires cloud provider selection)
-      startNewResume: (provider = null) => {
-        // Clear any existing local editing session
-        localStorageHelpers.clearResumeData();
-        
-        // Get preferred provider if none specified
-        if (!provider) {
-          provider = useSessionStore.getState().getPreferredProvider();
-        }
-        
-        if (!provider) {
-          throw new Error('No cloud provider available. Please connect a cloud storage service first.');
-        }
-        
-        // Create a blank resume
-        const blankResume = {
-          id: generateLocalId('resume'),
-          cloud_provider: provider,
-          cloud_file_id: null, // Will be set when saved to cloud
-          title: 'My Resume',
-          is_public: false,
-          personal_info: {
-            full_name: '', email: '', mobile: '', address: '', linkedin: '',
-            title: '', date_of_birth: '', nationality: '', place_of_birth: '',
-            postal_code: '', driving_license: '', city: '', website: '', summary: ''
-          },
-          educations: [], experiences: [], skills: [], languages: [], referrals: [],
-          custom_sections: [], extracurriculars: [], hobbies: [], courses: [], internships: [],
-          photos: { photolink: null },
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          template: 'stockholm',
-          customization: {
-            template: 'stockholm', accent_color: "#1a5276",
-            font_family: "Helvetica, Arial, sans-serif", line_spacing: 1.5,
-            headings_uppercase: false, hide_skill_level: false
-          }
-        };
-        
-        set({ 
-          currentResume: blankResume, 
-          currentProvider: provider,
-          currentFileId: null,
-          isEditingLocally: true
-        });
-        
-        localStorageHelpers.saveResumeToLocal(blankResume, provider, null);
-        
-        return blankResume;
-      },
+      // Fix for startNewResume function in resumeStore.js
+// Replace the existing startNewResume function (around line 375-395) with this:
+
+startNewResume: (provider = null) => {
+  // Clear any existing local editing session
+  localStorageHelpers.clearResumeData();
+  
+  // Get preferred provider if none specified
+  if (!provider) {
+    const sessionStore = useSessionStore.getState();
+    
+    // Check if we have any connected providers
+    if (!sessionStore.connectedProviders || sessionStore.connectedProviders.length === 0) {
+      console.error('No connected providers found:', sessionStore.connectedProviders);
+      throw new Error('No cloud provider available. Please connect a cloud storage service first.');
+    }
+    
+    // Use the first connected provider
+    provider = sessionStore.connectedProviders[0];
+  }
+  
+  console.log('Starting new resume with provider:', provider);
+  
+  // Create a blank resume
+  const blankResume = {
+    id: generateLocalId('resume'),
+    cloud_provider: provider,
+    cloud_file_id: null, // Will be set when saved to cloud
+    title: 'My Resume',
+    is_public: false,
+    personal_info: {
+      full_name: '', email: '', mobile: '', address: '', linkedin: '',
+      title: '', date_of_birth: '', nationality: '', place_of_birth: '',
+      postal_code: '', driving_license: '', city: '', website: '', summary: ''
+    },
+    educations: [], experiences: [], skills: [], languages: [], referrals: [],
+    custom_sections: [], extracurriculars: [], hobbies: [], courses: [], internships: [],
+    photos: { photolink: null },
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    template: 'stockholm',
+    customization: {
+      template: 'stockholm', accent_color: "#1a5276",
+      font_family: "Helvetica, Arial, sans-serif", line_spacing: 1.5,
+      headings_uppercase: false, hide_skill_level: false
+    }
+  };
+  
+  set({ 
+    currentResume: blankResume, 
+    currentProvider: provider,
+    currentFileId: null,
+    isEditingLocally: true
+  });
+  
+  localStorageHelpers.saveResumeToLocal(blankResume, provider, null);
+  
+  console.log('New resume created successfully:', blankResume);
+  return blankResume;
+},
       
       // Fetch all resumes from all connected cloud providers
       fetchResumes: async () => {

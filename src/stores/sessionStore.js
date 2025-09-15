@@ -274,9 +274,11 @@ const useSessionStore = create(
       
       // Get development OAuth URLs for real testing
       getDevelopmentOAuthUrls: (provider) => {
+         const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 
+                   import.meta.env.REACT_APP_GOOGLE_CLIENT_ID;
         // These would be configured in your .env file for development
-        const devOAuthUrls = {
-          google_drive: `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.REACT_APP_GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:3000/cloud/connected&scope=https://www.googleapis.com/auth/drive.file&response_type=code&access_type=offline&prompt=consent&state=dev_${provider}_${Date.now()}`,
+        const devOAuthUrls = { 
+          google_drive: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${window.location.origin}/cloud/connected&scope=https://www.googleapis.com/auth/drive.file&response_type=code&access_type=offline&prompt=consent&state=dev_${provider}_${Date.now()}`,
           onedrive: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${process.env.REACT_APP_MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=http://localhost:3000/cloud/connected&scope=Files.ReadWrite&state=dev_${provider}_${Date.now()}`,
           dropbox: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.REACT_APP_DROPBOX_APP_KEY}&response_type=code&redirect_uri=http://localhost:3000/cloud/connected&state=dev_${provider}_${Date.now()}`,
           box: `https://account.box.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_BOX_CLIENT_ID}&response_type=code&redirect_uri=http://localhost:3000/cloud/connected&state=dev_${provider}_${Date.now()}`
@@ -315,67 +317,59 @@ const useSessionStore = create(
       },
       
       // Check status of all cloud providers
-      checkCloudStatus: async () => {
-        const { backendAvailable, sessionToken } = get();
-        
-        if (backendAvailable) {
-          try {
-            const response = await fetch(CLOUD_ENDPOINTS.STATUS, {
-              headers: {
-                ...(sessionToken ? { 'Authorization': `Bearer ${sessionToken}` } : {})
-              }
-            });
-            
-            if (!response.ok) {
-              if (response.status === 401 || response.status === 404) {
-                set({
-                  connectedProviders: [],
-                  providersStatus: {},
-                  showCloudSetup: get().isSessionActive
-                });
-                return [];
-              }
-              throw new Error('Failed to check cloud status');
-            }
-            
-            const statusData = await response.json();
-            
-            // Update connected providers
-            const connected = statusData.filter(status => status.connected);
-            const statusMap = {};
-            
-            statusData.forEach(status => {
-              statusMap[status.provider] = status;
-            });
-            
-            set({
-              connectedProviders: connected.map(p => p.provider),
-              providersStatus: statusMap,
-            });
-            
-            if (connected.length === 0 && get().isSessionActive) {
-              set({ showCloudSetup: true });
-            }
-            
-            return statusData;
-          } catch (error) {
-            console.error('Error checking cloud status:', error);
-            
-            // Set empty state but don't error in development
-            set({
-              connectedProviders: [],
-              providersStatus: {},
-              showCloudSetup: get().isSessionActive
-            });
-            
-            return [];
-          }
-        } else {
-          // Development mode - use local state
-          const { connectedProviders, providersStatus } = get();
-          return Object.keys(providersStatus).map(provider => providersStatus[provider]);
+      // Check status of all cloud providers
+checkCloudStatus: async () => {
+  const { backendAvailable, sessionToken } = get();
+  
+  if (backendAvailable) {
+    try {
+      const response = await fetch(CLOUD_ENDPOINTS.STATUS, {
+        headers: {
+          ...(sessionToken ? { 'Authorization': `Bearer ${sessionToken}` } : {})
         }
-      },
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 404) {
+          set({
+            connectedProviders: [],
+            providersStatus: {},
+            showCloudSetup: get().isSessionActive
+          });
+          return [];
+        }
+        throw new Error('Failed to check cloud status');
+      }
+      
+      const statusData = await response.json();
+      
+      // Update connected providers
+      const connected = statusData.filter(status => status.connected);
+      const statusMap = {};
+      
+      statusData.forEach(status => {
+        statusMap[status.provider] = status;
+      });
+      
+      // CRITICAL: This should update the connectedProviders array
+      set({
+        connectedProviders: connected.map(p => p.provider), // This line updates the connected providers
+        providersStatus: statusMap,
+        showCloudSetup: connected.length === 0 && get().isSessionActive
+      });
+      
+      return statusData;
+    } catch (error) {
+      console.error('Error checking cloud status:', error);
+      // Don't clear state on error, just return current state
+      return Object.keys(get().providersStatus).map(provider => get().providersStatus[provider]);
+    }
+  } else {
+    // Development mode - use local state
+    const { connectedProviders, providersStatus } = get();
+    return Object.keys(providersStatus).map(provider => providersStatus[provider]);
+  }
+},
       
       // Disconnect from a cloud provider
       disconnectProvider: async (provider) => {
@@ -480,26 +474,34 @@ const useSessionStore = create(
       },
       
       // Handle OAuth callback success
-      handleOAuthSuccess: async (provider) => {
-        console.log(`🔗 Handling OAuth success for ${provider}`);
-        
-        try {
-          // In development mode, simulate the connection
-          if (!get().backendAvailable) {
-            await get().simulateProviderConnection(provider);
-            return true;
-          }
-          
-          // For real backend, refresh cloud status
-          await get().checkCloudStatus();
-          
-          set({ showCloudSetup: false });
-          return true;
-        } catch (error) {
-          console.error('Error handling OAuth success:', error);
-          return false;
-        }
-      },
+      // Handle OAuth callback success
+handleOAuthSuccess: async (provider) => {
+   console.log('🔄 handleOAuthSuccess called for:', provider);
+  console.log('Current connectedProviders:', get().connectedProviders);
+ 
+  
+  try {
+    // In development mode, simulate the connection
+    if (!get().backendAvailable) {
+      await get().simulateProviderConnection(provider);
+      return true;
+    }
+    
+    // For real backend, refresh cloud status to get the actual connection data
+    await get().checkCloudStatus();
+    
+    // Update the state to reflect the new connection
+    set(state => ({
+      connectedProviders: [...new Set([...state.connectedProviders, provider])],
+      showCloudSetup: false
+    }));
+    
+    return true;
+  } catch (error) {
+    console.error('Error handling OAuth success:', error);
+    return false;
+  }
+},
       
       // Check if specific provider is connected
       isProviderConnected: (provider) => {
@@ -563,24 +565,23 @@ const useSessionStore = create(
 );
 
 // Auto-initialize session on store creation (with rate limiting)
+// Auto-initialize session on store creation (with rate limiting)
 if (typeof window !== 'undefined') {
-  // Use a longer delay and check if already initialized
-  let initTimeout = null;
+  // Use a flag to prevent multiple initializations
+  let hasInitialized = false;
   
   const tryInitialize = () => {
+    if (hasInitialized) return;
+    
     const store = useSessionStore.getState();
-    if (!store.isSessionActive && !store.isInitializing) {
+    if (!store.isSessionActive && !store.loading) {
+      hasInitialized = true;
       store.initialize().catch(console.error);
     }
   };
   
-  // Clear any existing timeout
-  if (initTimeout) {
-    clearTimeout(initTimeout);
-  }
-  
   // Initialize after a delay to avoid multiple rapid calls
-  initTimeout = setTimeout(tryInitialize, 1000);
+  setTimeout(tryInitialize, 1000);
 }
 
 export default useSessionStore;

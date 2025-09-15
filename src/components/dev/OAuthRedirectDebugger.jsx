@@ -183,7 +183,7 @@ REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id_here`}
         <summary className="cursor-pointer font-semibold">📝 Common Redirect URIs (for reference)</summary>
         <div className="mt-2 text-xs space-y-1">
           <div>Vite (port 5173): <code>http://localhost:5173/cloud/connected</code></div>
-          <div>Create React App (port 3000): <code>http://localhost:3000/cloud/connected</code></div>
+          <div>Create React App (port 5173): <code>http://localhost:5173/cloud/connected</code></div>
           <div>Backend callback: <code>http://localhost:8000/api/cloud/callback/google_drive</code></div>
         </div>
       </details>

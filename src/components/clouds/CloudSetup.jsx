@@ -39,6 +39,10 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
   const [testingProvider, setTestingProvider] = useState(null);
   const [showDevOptions, setShowDevOptions] = useState(ENV_INFO.isDevelopment);
 
+
+  if (!showCloudSetup && connectedProviders.length > 0) {
+  return null; // Don't render if already connected
+}
   // Load available providers on mount
   useEffect(() => {
     const loadProviders = async () => {
@@ -61,15 +65,33 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
     }
   }, [connectedProviders]);
 
-  const handleConnectProvider = async (providerId) => {
-    try {
-      clearError();
-      await connectProvider(providerId);
-      // The OAuth flow will redirect away from this page
-    } catch (error) {
-      console.error(`Failed to connect to ${providerId}:`, error);
-    }
-  };
+ const handleConnectProvider = async (providerId) => {
+  // 🎯 USE THE SAME CLIENT ID AS THE WORKING TEST BUTTON
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 
+                   import.meta.env.REACT_APP_GOOGLE_CLIENT_ID ||
+                   '1010674150807-jt9b1bq7e8mem10b2tjgnlhf5j5ogeib.apps.googleusercontent.com';
+  
+  const redirectUri = 'http://localhost:5173/cloud/connected';
+  const scope = 'https://www.googleapis.com/auth/drive.file';
+  const state = `connect_${Date.now()}`;
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    scope: scope,
+    response_type: 'code',
+    access_type: 'offline',
+    prompt: 'consent',
+    state: state
+  });
+
+  const oauthUrl = `https://accounts.google.com/o/oauth2/auth?${params.toString()}`;
+  
+  console.log('🔗 Using Client ID:', clientId);
+  console.log('🔗 OAuth URL:', oauthUrl);
+  
+  window.location.href = oauthUrl;
+};
 
   const handleTestConnection = async (providerId) => {
     setTestingProvider(providerId);

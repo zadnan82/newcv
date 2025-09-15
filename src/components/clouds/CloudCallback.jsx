@@ -82,17 +82,18 @@ const CloudCallback = ({ darkMode }) => {
         }
         
         // Update session store
-        const success = await handleOAuthSuccess(provider);
-        
-        if (success) {
-          setStatus('success');
-          setMessage('Successfully connected!');
-          
-          // Redirect to success page after a brief delay
-          setTimeout(() => {
-            navigate(`/cloud/connected?provider=${provider}`, { replace: true });
-          }, 1500);
-        } else {
+        // In CloudCallback.jsx, the handleCallback function should:
+const success = await handleOAuthSuccess(provider);
+
+if (success) {
+  // This should update connectedProviders in sessionStore
+  setStatus('success');
+  setMessage('Successfully connected!');
+  
+  setTimeout(() => {
+    navigate(`/cloud/connected?provider=${provider}`, { replace: true });
+  }, 1500);
+} else {
           throw new Error('Failed to update session after OAuth success');
         }
         
