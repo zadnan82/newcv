@@ -85,7 +85,7 @@ const NewResumeBuilder = ({ darkMode }) => {
   const resumeId = paramResumeId || stateResumeId || 'default_resume';
   const { isAuthenticated } = useAuthStore();
   const userIsAuthenticated = isAuthenticated();
-
+  const { checkCloudStatus } = useSessionStore();
   useEffect(() => {
     const isUserAuthenticated = useAuthStore.getState().isAuthenticated();
     
@@ -102,28 +102,32 @@ const NewResumeBuilder = ({ darkMode }) => {
     }
   }, []);
   
-useEffect(() => {
-  const sessionStore = useSessionStore.getState();
-  const resumeStore = useResumeStore.getState();
-  
-  // Check if we have connected cloud providers first
-  if (!sessionStore.connectedProviders || sessionStore.connectedProviders.length === 0) {
-    console.log('No cloud providers connected, redirecting to setup...');
-    navigate('/cloud-setup');
-    return;
-  }
-  
-  // Only start new resume if providers are available
-  resumeStore.startNewResume();
-  
-  // Clear local storage to ensure we start fresh
-  localStorage.removeItem('resumeFormData');
-  localStorage.removeItem('loadedFromAPI');
-  
-  // Set blank template directly
-  setFormData(blankResumeTemplate);
-  setIsLoading(false);
-}, [navigate]); // Add navigate to dependencies
+
+  useEffect(() => {
+    const checkCloudConnection = async () => {
+      try {
+        console.log('⏳ Checking cloud provider status...');
+        
+        // Don't check cloud status if we're on a callback page
+        if (window.location.pathname.includes('/cloud/callback')) {
+          console.log('⏳ OAuth callback in progress, skipping cloud check');
+          return;
+        }
+        
+        const providers = await checkCloudStatus();
+        console.log('📊 Cloud providers:', providers);
+        
+        if (providers.length === 0) {
+          console.log('No cloud providers connected, redirecting to setup...');
+          navigate('/cloud-setup', { replace: true });
+        }
+      } catch (error) {
+        console.error('Error checking cloud status:', error);
+      }
+    };
+
+    checkCloudConnection();
+  }, [checkCloudStatus, navigate]);
   
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(false);

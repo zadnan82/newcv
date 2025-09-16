@@ -259,7 +259,7 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
         {/* OAuth Redirect URI Debugger - Show prominently */}
         {ENV_INFO.isDevelopment && (
           <div className="px-8 py-6">
-            <OAuthRedirectDebugger darkMode={darkMode} />
+            {/* <OAuthRedirectDebugger darkMode={darkMode} /> */}
           </div>
         )}
 

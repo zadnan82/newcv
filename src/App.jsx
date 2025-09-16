@@ -34,6 +34,7 @@ import CloudSetup from './components/clouds/CloudSetup';
 import CloudCallback from './components/clouds/CloudCallback';
 import CloudConnectionSuccess from './components/clouds/CloudConnectionSuccess';
 import DevTools from './components/dev/DevTools';
+import CloudConnected from './components/clouds/CloudConnected';
 
 // ============ START OF HTTPS ENFORCEMENT ============
 (() => { 
@@ -103,14 +104,28 @@ import DevTools from './components/dev/DevTools';
 })();
 
 // Enhanced Route Protection Component for Cloud Storage
-const CloudProtectedRoute = ({ children, requiresCloudSetup = true }) => {
-  const { isSessionActive, hasConnectedProviders, showCloudSetup, loading } = useSessionStore();
+// Fix for App.jsx - Enhanced CloudProtectedRoute with proper loading states
 
-  // Show loading while checking session
-  if (loading) {
+const CloudProtectedRoute = ({ children, requiresCloudSetup = true }) => {
+  const { 
+    isSessionActive, 
+    hasConnectedProviders, 
+    showCloudSetup, 
+    loading,
+    initializing,          // Add this
+    initializeComplete     // Add this  
+  } = useSessionStore();
+
+  // Show loading while initializing or checking session
+  if (initializing || loading || !initializeComplete) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500 mb-4"></div>
+          <p className="text-gray-600">
+            {initializing ? 'Initializing session...' : 'Loading...'}
+          </p>
+        </div>
       </div>
     );
   }
@@ -251,13 +266,11 @@ function App() {
   {/* Public Resume Routes - No Navbar/Footer */}
   <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
   <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
-  
-  {/* Cloud OAuth Callback Route */}
-  <Route path="/api/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} />
-  
-  {/* Cloud Connection Success Route - NEW */}
-  <Route path="/cloud/connected" element={<CloudConnectionSuccess darkMode={darkMode} />} />
-  
+   
+   
+<Route path="/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} /> 
+<Route path="/cloud/connected" element={<CloudConnected darkMode={darkMode} />} />
+
   {/* Legacy protected route for existing resume viewer */}
   <Route path="/resume/:resumeId" element={
     <LegacyProtectedRoute>
