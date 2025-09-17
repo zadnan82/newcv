@@ -12,13 +12,13 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   const { t, i18n } = useTranslation(); 
   
   // Updated to use session store instead of auth store
+ 
   const { 
-    isSessionActive, 
-    hasConnectedProviders, 
-    connectedProviders,
-    clearSession,
-    initialize 
-  } = useSessionStore();
+  isSessionActive, 
+  connectedProviders,
+  clearSession,
+  initialize 
+} = useSessionStore();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
@@ -150,99 +150,100 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
   // Cloud status indicator component
-  const CloudStatusIndicator = () => {
-    if (!isSessionActive) return null;
+ // Cloud status indicator component
+const CloudStatusIndicator = () => {
+  if (!isSessionActive) return null;
 
-    const cloudCount = connectedProviders.length;
-    const hasProviders = hasConnectedProviders();
+  const cloudCount = connectedProviders.length;
+  const hasProviders = cloudCount > 0; // Fixed this line
 
-    return (
-      <div className="relative" ref={cloudStatusRef}>
-        <button 
-          onClick={() => setShowCloudStatus(!showCloudStatus)}
-          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-            hasProviders
-              ? darkMode 
-                ? 'hover:bg-green-800/20 text-green-400' 
-                : 'hover:bg-green-100 text-green-700'
-              : darkMode
-                ? 'hover:bg-red-800/20 text-red-400'
-                : 'hover:bg-red-100 text-red-600'
-          }`}
-          title={hasProviders ? `${cloudCount} cloud provider${cloudCount !== 1 ? 's' : ''} connected` : 'No cloud providers connected'}
-        >
-          {hasProviders ? (
-            <Cloud className="w-3 h-3" />
-          ) : (
-            <CloudOff className="w-3 h-3" />
-          )}
-          <span className="hidden sm:inline">
-            {hasProviders ? `${cloudCount}` : 'No Cloud'}
-          </span>
-          <ChevronDown className="w-3 h-3" />
-        </button>
-        
-        {/* Cloud status dropdown */}
-        {showCloudStatus && (
-          <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-2 w-48 rounded-lg shadow-xl z-20 ${
-            darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-          }`}>
-            <div className="px-3 py-1 border-b border-gray-200 dark:border-gray-700">
-              <p className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Cloud Storage Status
-              </p>
-            </div>
-            
-            {hasProviders ? (
-              <>
-                <div className="px-3 py-2">
-                  <p className={`text-xs ${darkMode ? 'text-green-400' : 'text-green-600'} mb-2`}>
-                    ✓ {cloudCount} provider{cloudCount !== 1 ? 's' : ''} connected:
-                  </p>
-                  {connectedProviders.map(provider => (
-                    <div key={provider} className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-1`}>
-                      • {provider.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
-                  <button
-                    onClick={handleCloudSetup}
-                    className={`w-full text-left px-3 py-1 text-xs transition-colors ${
-                      darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    Manage Cloud Storage
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="px-3 py-2">
-                  <p className={`text-xs ${darkMode ? 'text-red-400' : 'text-red-600'} mb-2`}>
-                    ⚠ No cloud storage connected
-                  </p>
-                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
-                    Connect your cloud storage to save and access your CVs.
-                  </p>
-                </div>
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
-                  <button
-                    onClick={handleCloudSetup}
-                    className={`w-full text-left px-3 py-1 text-xs font-medium transition-colors ${
-                      darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    Connect Cloud Storage
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+  return (
+    <div className="relative" ref={cloudStatusRef}>
+      <button 
+        onClick={() => setShowCloudStatus(!showCloudStatus)}
+        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+          hasProviders
+            ? darkMode 
+              ? 'hover:bg-green-800/20 text-green-400' 
+              : 'hover:bg-green-100 text-green-700'
+            : darkMode
+              ? 'hover:bg-red-800/20 text-red-400'
+              : 'hover:bg-red-100 text-red-600'
+        }`}
+        title={hasProviders ? `${cloudCount} cloud provider${cloudCount !== 1 ? 's' : ''} connected` : 'No cloud providers connected'}
+      >
+        {hasProviders ? (
+          <Cloud className="w-3 h-3" />
+        ) : (
+          <CloudOff className="w-3 h-3" />
         )}
-      </div>
-    );
-  };
+        <span className="hidden sm:inline">
+          {hasProviders ? `${cloudCount}` : 'No Cloud'}
+        </span>
+        <ChevronDown className="w-3 h-3" />
+      </button>
+      
+      {/* Cloud status dropdown */}
+      {showCloudStatus && (
+        <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-2 w-48 rounded-lg shadow-xl z-20 ${
+          darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+        }`}>
+          <div className="px-3 py-1 border-b border-gray-200 dark:border-gray-700">
+            <p className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Cloud Storage Status
+            </p>
+          </div>
+          
+          {hasProviders ? (
+            <>
+              <div className="px-3 py-2">
+                <p className={`text-xs ${darkMode ? 'text-green-400' : 'text-green-600'} mb-2`}>
+                  ✓ {cloudCount} provider{cloudCount !== 1 ? 's' : ''} connected:
+                </p>
+                {connectedProviders.map(provider => (
+                  <div key={provider} className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-1`}>
+                    • {provider.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                <button
+                  onClick={handleCloudSetup}
+                  className={`w-full text-left px-3 py-1 text-xs transition-colors ${
+                    darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Manage Cloud Storage
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="px-3 py-2">
+                <p className={`text-xs ${darkMode ? 'text-red-400' : 'text-red-600'} mb-2`}>
+                  ⚠ No cloud storage connected
+                </p>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
+                  Connect your cloud storage to save and access your CVs.
+                </p>
+              </div>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                <button
+                  onClick={handleCloudSetup}
+                  className={`w-full text-left px-3 py-1 text-xs font-medium transition-colors ${
+                    darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Connect Cloud Storage
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md ${

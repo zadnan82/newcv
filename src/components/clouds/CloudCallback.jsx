@@ -1,4 +1,4 @@
-// src/components/clouds/CloudCallback.jsx - NUCLEAR FIX
+// src/components/clouds/CloudCallback.jsx - Google Drive focused
 import React, { useLayoutEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader, Shield } from 'lucide-react';
@@ -25,7 +25,7 @@ const CloudCallback = ({ darkMode }) => {
   });
   const [message, setMessage] = useState(() => {
     const cached = window.__OAUTH_RESULTS__.get(urlKey);
-    return cached?.message || 'Processing OAuth callback...';
+    return cached?.message || 'Processing Google Drive connection...';
   });
 
   const { handleOAuthReturn } = useSessionStore();
@@ -34,7 +34,7 @@ const CloudCallback = ({ darkMode }) => {
   useLayoutEffect(() => {
     // Check if this exact URL combination was already processed
     if (window.__OAUTH_PROCESSED__.has(urlKey)) {
-      console.log('OAuth already processed for this URL, using cached result');
+      console.log('Google Drive OAuth already processed for this URL, using cached result');
       const cached = window.__OAUTH_RESULTS__.get(urlKey);
       if (cached) {
         setStatus(cached.status);
@@ -48,7 +48,7 @@ const CloudCallback = ({ darkMode }) => {
 
     // Mark as processing to prevent other instances
     window.__OAUTH_PROCESSED__.add(urlKey);
-    console.log('Processing OAuth for:', urlKey);
+    console.log('Processing Google Drive OAuth for:', urlKey);
 
     const processCallback = async () => {
       const success = searchParams.get('success');
@@ -60,36 +60,37 @@ const CloudCallback = ({ darkMode }) => {
       if (error) {
         result = {
           status: 'error',
-          message: `Connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`
+          message: `Google Drive connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`
         };
       } else if (success === 'true') {
         try {
           // Set processing status
           const processingResult = {
             status: 'processing',
-            message: 'Verifying connection...'
+            message: 'Verifying Google Drive connection...'
           };
           window.__OAUTH_RESULTS__.set(urlKey, processingResult);
           setStatus('processing');
-          setMessage('Verifying connection...');
+          setMessage('Verifying Google Drive connection...');
 
           // Wait for backend
           await new Promise(resolve => setTimeout(resolve, 2000));
 
           // Try verification ONCE
-          const verificationResult = await handleOAuthReturn(provider);
+          const verificationResult = await handleOAuthReturn('google_drive');
 
           if (verificationResult?.success) {
             result = {
               status: 'success',
-              message: `Successfully connected to ${provider.replace('_', ' ')}!`,
+              message: `Successfully connected to Google Drive!`,
               redirect: {
                 path: '/new-resume',
                 options: {
                   replace: true,
                   state: {
-                    message: `${provider.replace('_', ' ')} connected! You can now save your CV to the cloud.`,
-                    provider
+                    message: `Google Drive connected! You can now save your CV to the cloud.`,
+                    provider: 'google_drive',
+                    email: verificationResult.email
                   }
                 }
               }
@@ -140,24 +141,15 @@ const CloudCallback = ({ darkMode }) => {
 
   }, [provider, urlKey, searchParams, navigate, handleOAuthReturn]);
 
-  const getProviderName = (provider) => {
-    const names = {
-      google_drive: 'Google Drive',
-      onedrive: 'OneDrive',
-      dropbox: 'Dropbox',
-      box: 'Box',
-    };
-    return names[provider] || provider;
-  };
-
   const handleContinueAnyway = () => {
     // Force set provider as connected
     const store = useSessionStore.getState();
-    if (store.connectedProviders && !store.connectedProviders.includes(provider)) {
+    if (store.connectedProviders && !store.connectedProviders.includes('google_drive')) {
       // Manually update the store
-      const newProviders = [...store.connectedProviders, provider];
+      const newProviders = [...store.connectedProviders, 'google_drive'];
       useSessionStore.setState({ 
         connectedProviders: newProviders,
+        googleDriveConnected: true,
         capabilities: {
           ...store.capabilities,
           canSaveToCloud: true,
@@ -168,8 +160,8 @@ const CloudCallback = ({ darkMode }) => {
     
     navigate('/new-resume', {
       state: {
-        message: `Assuming ${provider.replace('_', ' ')} is connected. Try saving to test.`,
-        provider,
+        message: `Assuming Google Drive is connected. Try saving to test.`,
+        provider: 'google_drive',
         assumeConnected: true
       }
     });
@@ -227,7 +219,7 @@ const CloudCallback = ({ darkMode }) => {
         <h1 className={`text-2xl font-bold mb-4 ${
           darkMode ? 'text-white' : 'text-gray-900'
         }`}>
-          {status === 'processing' && `Connecting to ${getProviderName(provider)}...`}
+          {status === 'processing' && `Connecting to Google Drive...`}
           {status === 'success' && 'Connection Successful!'}
           {status === 'error' && 'Connection Issue'}
         </h1>
@@ -251,7 +243,7 @@ const CloudCallback = ({ darkMode }) => {
               <span className={`text-sm font-medium ${
                 darkMode ? 'text-green-300' : 'text-green-700'
               }`}>
-                Your data stays in YOUR {getProviderName(provider)} account
+                Your data stays in YOUR Google Drive account
               </span>
             </div>
           </div>

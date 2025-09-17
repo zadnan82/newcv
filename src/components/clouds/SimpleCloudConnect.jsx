@@ -1,4 +1,4 @@
-// src/components/clouds/SimpleCloudConnect.jsx - New component
+// src/components/clouds/SimpleCloudConnect.jsx - Google Drive focused
 import React, { useState } from 'react';
 import { Cloud, CheckCircle, Loader2, Shield } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
@@ -147,9 +147,9 @@ const SimpleCloudConnect = ({ darkMode }) => {
                 Privacy Protected
               </p>
               <p className={`text-xs ${
-                darkMode ? 'text-green-300' : 'text-green-600'
+                darkMode ? 'text-green-400' : 'text-green-600'
               }`}>
-                We never see or store your personal data. Everything stays in your own Google Drive.
+                Your CVs are saved directly to your Google Drive - we never access your files
               </p>
             </div>
           </div>
