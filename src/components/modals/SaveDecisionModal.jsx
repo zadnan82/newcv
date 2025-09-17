@@ -38,29 +38,42 @@ const SaveDecisionModal = ({ darkMode, onClose }) => {
   }
 };
 
-  const handleSaveCloud = async () => {
-    if (!capabilities.canSaveToCloud) {
-      // Need to connect cloud first
-      setSelectedOption('cloud-setup');
-      return;
-    }
+// In SaveDecisionModal.jsx - Update handleSaveCloud
+// In SaveDecisionModal.jsx - Update handleSaveCloud
+const handleSaveCloud = async () => {
+  if (!capabilities.canSaveToCloud) {
+    setSelectedOption('cloud-setup');
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const result = await saveToCloud(cvData);
-      if (result.success) {
-        onClose({ success: true, type: 'cloud', provider: result.provider });
+  setLoading(true);
+  try {
+    console.log('💾 Attempting cloud save with data:', cvData);
+    const result = await saveToCloud(cvData);
+    
+    if (result.success) {
+      console.log('✅ Cloud save successful:', result);
+      onClose({ success: true, type: 'cloud', provider: result.provider });
+    } else {
+      console.error('❌ Cloud save failed:', result.error);
+      
+      // Handle specific error cases
+      if (result.needsReconnect) {
+        // Offer to reconnect
+        if (confirm('Your cloud connection expired. Would you like to reconnect?')) {
+          setSelectedOption('cloud-setup');
+        }
       } else {
-        alert('Failed to save to cloud');
+        alert('Failed to save to cloud: ' + (result.error || 'Unknown error'));
       }
-    } catch (error) {
-      console.error('Cloud save error:', error);
-      alert('Failed to save to cloud');
-    } finally {
-      setLoading(false);
     }
-  };
-
+  } catch (error) {
+    console.error('❌ Cloud save error:', error);
+    alert('Failed to save to cloud: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
   const handleCloudConnect = async (provider) => {
     setLoading(true);
     try {
@@ -72,7 +85,7 @@ const SaveDecisionModal = ({ darkMode, onClose }) => {
       setLoading(false);
     }
   };
-
+ 
   if (selectedOption === 'cloud-setup') {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

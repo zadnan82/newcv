@@ -1,4 +1,4 @@
-// src/components/cloud/CloudSetup.jsx - Updated for development mode
+// src/components/clouds/CloudSetup.jsx - Fixed version
 import React, { useState, useEffect } from 'react';
 import { 
   Cloud, 
@@ -10,92 +10,80 @@ import {
   AlertCircle,
   RefreshCw,
   Settings,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
 import { ENV_INFO } from '../../config';
-import OAuthDebugger from '../dev/OAuthDebugger';
-import OAuthRedirectDebugger from '../dev/OAuthRedirectDebugger';
 
 const CloudSetup = ({ darkMode, onComplete, required = true }) => {
   const {
     connectedProviders,
-    providersStatus,
+    cloudStatus,
     loading,
     error,
     showCloudSetup,
-    connectProvider,
-    checkCloudStatus,
+    connectCloudProvider,
+    checkCloudConnections,
     getAvailableProviders,
     setShowCloudSetup,
     clearError,
-    testProvider,
     backendAvailable,
-    forceConnectProvider, // Development helper
     getEnvironmentInfo
   } = useSessionStore();
 
   const [availableProviders, setAvailableProviders] = useState([]);
-  const [testingProvider, setTestingProvider] = useState(null);
+  const [connectingProvider, setConnectingProvider] = useState(null);
   const [showDevOptions, setShowDevOptions] = useState(ENV_INFO.isDevelopment);
 
-
-  if (!showCloudSetup && connectedProviders.length > 0) {
-  return null; // Don't render if already connected
-}
   // Load available providers on mount
   useEffect(() => {
     const loadProviders = async () => {
       try {
-        const providers = await getAvailableProviders();
-        setAvailableProviders(providers.providers || []);
+        const response = await getAvailableProviders();
+        setAvailableProviders(response.providers || []);
+        console.log('✅ Loaded providers:', response.providers?.length || 0);
       } catch (error) {
         console.error('Failed to load providers:', error);
+        // Set fallback providers
+        setAvailableProviders([
+          {
+            id: 'google_drive',
+            name: 'Google Drive',
+            description: 'Store your CVs in Google Drive',
+            supported_features: ['read', 'write', 'delete', 'folders']
+          }
+        ]);
       }
     };
 
     loadProviders();
-  }, []);
+  }, [getAvailableProviders]);
 
-  // Auto-check status periodically
+  // Auto-refresh status periodically
   useEffect(() => {
     if (connectedProviders.length > 0) {
-      const interval = setInterval(checkCloudStatus, 30000); // Check every 30 seconds
+      const interval = setInterval(() => {
+        checkCloudConnections().catch(console.error);
+      }, 30000); // Check every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [connectedProviders]);
+  }, [connectedProviders.length, checkCloudConnections]);
 
- const handleConnectProvider = async (providerId) => {
-  if (providerId === 'google_drive') {
+  const handleConnectProvider = async (providerId) => {
+    setConnectingProvider(providerId);
+    clearError();
+    
     try {
-      const response = await fetch('http://localhost:8000/api/cloud/connect/google_drive', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${sessionToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      console.log('🔄 Connecting to provider:', providerId);
+      await connectCloudProvider(providerId);
       
-      if (response.ok) {
-        const data = await response.json();
-        window.location.href = data.auth_url; // Redirect to Google OAuth
-      }
+      // connectCloudProvider redirects to OAuth, so this code won't be reached
+      // unless there's an error
+      
     } catch (error) {
-      console.error('Failed to initiate Google OAuth:', error);
-    }
-  }
-};
-
-  const handleTestConnection = async (providerId) => {
-    setTestingProvider(providerId);
-    try {
-      await testProvider(providerId);
-      // Refresh status after successful test
-      await checkCloudStatus();
-    } catch (error) {
-      console.error(`Test failed for ${providerId}:`, error);
-    } finally {
-      setTestingProvider(null);
+      console.error('Failed to connect provider:', error);
+      setConnectingProvider(null);
     }
   };
 
@@ -115,19 +103,6 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
     }
   };
 
-  // Development helper - force connect a provider
-  const handleForceConnect = (providerId) => {
-    console.log(`🔧 Force connecting ${providerId} for development`);
-    forceConnectProvider(providerId, {
-      email: `dev-user@${providerId.replace('_', '')}.com`,
-      storage_quota: {
-        total: 15 * 1024 * 1024 * 1024, // 15GB
-        used: 5 * 1024 * 1024 * 1024,   // 5GB
-        available: 10 * 1024 * 1024 * 1024 // 10GB
-      }
-    });
-  };
-
   const getProviderIcon = (providerId) => {
     const icons = {
       'google_drive': '🗂️',
@@ -139,15 +114,16 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
   };
 
   const getProviderStatus = (providerId) => {
-    const status = providersStatus[providerId];
+    const status = cloudStatus[providerId];
     if (!status) return { connected: false, status: 'unknown' };
     return status;
   };
 
   const environmentInfo = getEnvironmentInfo();
 
-  if (!showCloudSetup && connectedProviders.length > 0) {
-    return null; // Don't show if already set up
+  // Don't render if already connected and not required to show
+  if (!showCloudSetup && connectedProviders.length > 0 && !required) {
+    return null;
   }
 
   return (
@@ -205,7 +181,7 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
                 
                 {!environmentInfo.backendAvailable && (
                   <div className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-                    💡 Backend offline - using development simulation mode
+                    💡 Backend offline - OAuth will redirect through localhost:8000
                   </div>
                 )}
               </div>
@@ -249,13 +225,6 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
           </div>
         )}
 
-        {/* OAuth Redirect URI Debugger - Show prominently */}
-        {ENV_INFO.isDevelopment && (
-          <div className="px-8 py-6">
-            {/* <OAuthRedirectDebugger darkMode={darkMode} /> */}
-          </div>
-        )}
-
         {/* Connected Providers */}
         {connectedProviders.length > 0 && (
           <div className="px-8 py-6">
@@ -289,22 +258,9 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
                           </p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleTestConnection(providerId)}
-                        disabled={testingProvider === providerId}
-                        className={`p-2 rounded-full transition-colors ${
-                          darkMode 
-                            ? 'hover:bg-gray-600 text-gray-300' 
-                            : 'hover:bg-green-100 text-green-600'
-                        }`}
-                        title="Test connection"
-                      >
-                        {testingProvider === providerId ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <RefreshCw className="w-4 h-4" />
-                        )}
-                      </button>
+                      <div className="text-green-500">
+                        <Check className="w-5 h-5" />
+                      </div>
                     </div>
                     
                     {status.storage_quota && (
@@ -341,12 +297,10 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
             {connectedProviders.length > 0 ? 'Add More Storage' : 'Choose Your Cloud Storage'}
           </h3>
           
-          {/* OAuth Debug Component */}
-          {ENV_INFO.isDevelopment && <OAuthDebugger darkMode={darkMode} />}
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {availableProviders.map(provider => {
               const isConnected = connectedProviders.includes(provider.id);
+              const isConnecting = connectingProvider === provider.id;
               
               return (
                 <div key={provider.id} className={`p-6 rounded-xl border-2 transition-all duration-200 ${
@@ -368,166 +322,130 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
                           {provider.name}
                         </h4>
                         <p className={`text-sm ${
-                          darkMode ? 'text-gray-400' : 'text-gray-600'
+                          darkMode ? 'text-gray-400' : 'text-gray-500'
                         }`}>
                           {provider.description}
                         </p>
                       </div>
                     </div>
                     
-                    {isConnected ? (
-                      <Check className="w-6 h-6 text-green-500" />
-                    ) : (
-                      <ExternalLink className={`w-5 h-5 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-500'
-                      }`} />
+                    {isConnected && (
+                      <div className={`p-1 rounded-full ${
+                        darkMode ? 'bg-green-900/30' : 'bg-green-100'
+                      }`}>
+                        <Check className="w-4 h-4 text-green-500" />
+                      </div>
                     )}
                   </div>
                   
-                  <div className="mb-4">
-                    <p className={`text-sm ${
-                      darkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                      Features: {provider.supported_features?.join(', ') || 'File storage and management'}
-                    </p>
-                  </div>
-                  
-                  {!isConnected && (
-                    <div className="space-y-2">
-                      <button
-                        onClick={() => handleConnectProvider(provider.id)}
-                        disabled={loading}
-                        className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                          darkMode 
-                            ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-                            : 'bg-purple-500 hover:bg-purple-600 text-white'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
-                      >
-                        {loading ? (
-                          <div className="flex items-center justify-center">
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                            Connecting...
-                          </div>
-                        ) : (
-                          `Connect to ${provider.name}`
-                        )}
-                      </button>
-                      
-                      {/* Development Mode: Force Connect Button */}
-                      {showDevOptions && !backendAvailable && (
-                        <button
-                          onClick={() => handleForceConnect(provider.id)}
-                          className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 border-2 border-dashed ${
-                            darkMode 
-                              ? 'border-yellow-600 text-yellow-400 hover:bg-yellow-900/20' 
-                              : 'border-yellow-500 text-yellow-600 hover:bg-yellow-50'
-                          }`}
-                        >
-                          🔧 Force Connect (Dev)
-                        </button>
-                      )}
+                  {/* Features */}
+                  {provider.supported_features && (
+                    <div className="mb-4">
+                      <p className={`text-xs font-medium mb-2 ${
+                        darkMode ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        Supported features:
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {provider.supported_features.map(feature => (
+                          <span key={feature} className={`px-2 py-1 rounded-full text-xs ${
+                            darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
                     </div>
+                  )}
+                  
+                  {/* Connect Button */}
+                  {!isConnected && (
+                    <button
+                      onClick={() => handleConnectProvider(provider.id)}
+                      disabled={isConnecting}
+                      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+                        isConnecting
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : darkMode
+                            ? 'bg-purple-600 text-white hover:bg-purple-700'
+                            : 'bg-purple-500 text-white hover:bg-purple-600'
+                      }`}
+                    >
+                      {isConnecting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin inline" />
+                          Connecting...
+                        </>
+                      ) : (
+                        'Connect'
+                      )}
+                    </button>
+                  )}
+                  
+                  {isConnected && (
+                    <button
+                      className={`w-full py-2 px-4 rounded-lg font-medium ${
+                        darkMode 
+                          ? 'bg-gray-600 text-gray-300 cursor-default' 
+                          : 'bg-gray-200 text-gray-700 cursor-default'
+                      }`}
+                      disabled
+                    >
+                      Connected
+                    </button>
                   )}
                 </div>
               );
             })}
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className={`px-8 py-6 border-t ${
-          darkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'
-        }`}>
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {connectedProviders.length === 0 && !required && (
+              <button
+                onClick={handleSkip}
+                className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
+                  darkMode 
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Skip for now
+              </button>
+            )}
             
-            {/* Info */}
-            <div className={`text-sm ${
-              darkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>
-              {connectedProviders.length > 0 ? (
-                <span>✓ You're ready to create and store CVs securely</span>
-              ) : (
-                <span>Connect at least one cloud storage to continue</span>
-              )}
-            </div>
-
-            {/* Buttons */}
-            <div className="flex space-x-4">
-              {!required && (
-                <button
-                  onClick={handleSkip}
-                  className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-600' 
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                  }`}
-                >
-                  Skip for now
-                </button>
-              )}
-              
-              {connectedProviders.length > 0 && (
-                <button
-                  onClick={handleContinue}
-                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    darkMode 
-                      ? 'bg-green-600 hover:bg-green-700 text-white' 
-                      : 'bg-green-500 hover:bg-green-600 text-white'
-                  }`}
-                >
-                  Continue to CV Builder
-                </button>
-              )}
-            </div>
+            {connectedProviders.length > 0 && (
+              <button
+                onClick={handleContinue}
+                className={`flex-1 py-3 px-6 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-colors`}
+              >
+                Continue
+              </button>
+            )}
+            
+            {ENV_INFO.isDevelopment && (
+              <button
+                onClick={() => setShowDevOptions(!showDevOptions)}
+                className={`py-3 px-6 rounded-lg font-medium ${
+                  darkMode 
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {showDevOptions ? 'Hide Debug' : 'Show Debug'}
+              </button>
+            )}
           </div>
         </div>
-
-        {/* How it works */}
-        <div className={`px-8 py-6 ${
-          darkMode ? 'bg-gray-800' : 'bg-gray-50'
+        
+        {/* Footer Note */}
+        <div className={`px-8 py-4 text-center ${
+          darkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-500'
         }`}>
-          <h4 className={`font-semibold mb-3 ${
-            darkMode ? 'text-white' : 'text-gray-800'
-          }`}>
-            How it works:
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-start space-x-2">
-              <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
-                Connect your preferred cloud storage account
-              </p>
-            </div>
-            <div className="flex items-start space-x-2">
-              <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
-                Create and edit your CV using our builder
-              </p>
-            </div>
-            <div className="flex items-start space-x-2">
-              <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
-                Your CV is automatically saved to your cloud storage
-              </p>
-            </div>
-          </div>
+          <p className="text-sm">
+            You can always connect additional cloud storage later from settings
+          </p>
         </div>
-
-        {/* Development Options Toggle */}
-        {ENV_INFO.isDevelopment && (
-          <div className={`px-8 py-4 border-t ${
-            darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-100'
-          }`}>
-            <button
-              onClick={() => setShowDevOptions(!showDevOptions)}
-              className={`text-sm ${
-                darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              {showDevOptions ? '🔽' : '▶️'} Development Options
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

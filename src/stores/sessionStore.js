@@ -458,37 +458,78 @@ pendingSaveData: null,
       error: error.message || "Failed to save locally" 
     };
   }
+}, 
+
+
+// In sessionStore.js - Update the saveToCloud function
+saveToCloud: async (cvData, provider = null) => {
+  const { connectedProviders, sessionToken } = get();
+
+  if (!connectedProviders.length) {
+    return {
+      success: false,
+      needsCloudSetup: true,
+      availableProviders: ['google_drive', 'onedrive', 'dropbox', 'box'],
+    };
+  }
+
+  const targetProvider = provider || connectedProviders[0];
+
+  try {
+    console.log('🌐 Saving to cloud:', targetProvider, 'with data:', cvData);
+    
+    // Check if we have a session token
+    if (!sessionToken) {
+      console.error('❌ No session token available for cloud save');
+      return { 
+        success: false, 
+        error: "No active session. Please reconnect to cloud storage." 
+      };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/resume?provider=${targetProvider}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(cvData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Cloud save failed:', response.status, errorText);
+      
+      // Handle specific error cases
+      if (response.status === 403) {
+        return { 
+          success: false, 
+          error: "Cloud connection expired. Please reconnect.",
+          needsReconnect: true 
+        };
+      }
+      
+      throw new Error(`Cloud save failed: ${response.status} ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Cloud save successful:', result);
+
+    return {
+      success: true,
+      provider: targetProvider,
+      message: `CV saved to ${targetProvider}`,
+      file: result,
+    };
+  } catch (error) {
+    console.error("❌ saveToCloud error:", error);
+    return { success: false, error: error.message };
+  }
 },
 
-      // User chooses cloud save
-      saveToCloud: async (cvData, provider = null) => {
-        const { connectedProviders, sessionToken } = get();
-        
-        if (!connectedProviders.length) {
-          return { 
-            success: false, 
-            needsCloudSetup: true,
-            availableProviders: ['google_drive', 'onedrive', 'dropbox', 'box']
-          };
-        }
 
-        const targetProvider = provider || connectedProviders[0];
-        
-        try {
-          // Implementation for cloud save
-          // This would call your existing cloud save logic
-          return { 
-            success: true, 
-            provider: targetProvider,
-            message: `CV saved to ${targetProvider}`
-          };
-        } catch (error) {
-          return { 
-            success: false, 
-            error: error.message 
-          };
-        }
-      },
+
+
 
       // User wants to access saved CVs
       getSavedCVs: async () => {
@@ -591,6 +632,8 @@ pendingSaveData: null,
       })
     }
   )
+
+  
 );
 
 export default useSessionStore;

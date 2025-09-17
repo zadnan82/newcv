@@ -1,4 +1,4 @@
-// src/components/clouds/CloudCallback.jsx - Fixed version
+// src/components/clouds/CloudCallback.jsx - Fixed to match backend flow
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
@@ -10,232 +10,168 @@ const CloudCallback = ({ darkMode }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState('processing');
-  const [message, setMessage] = useState('');
-  const [debugInfo, setDebugInfo] = useState({});
-  
-  const { 
-    handleOAuthSuccess, 
-    checkCloudStatus, 
-    backendAvailable, 
-    sessionToken, 
-    updateProviderConnection 
-  } = useSessionStore();
+  const [message, setMessage] = useState('Processing OAuth callback...');
+
+  const { onCloudConnected, backendAvailable, sessionToken, connectedProviders } =
+    useSessionStore();
 
   useEffect(() => {
     const handleCallback = async () => {
-      
-      console.log('🔍 CloudCallback started');
-      
-      // HARDCODE provider for testing - fix the undefined issue
-      const actualProvider = provider || 'google_drive';
-      console.log('🔍 Provider:', actualProvider);
-      
-      const code = searchParams.get('code');
-      const state = searchParams.get('state');
+      console.log('🔍 CloudCallback processing...');
+
+      const success = searchParams.get('success');
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
 
-      console.log('🔍 Search params:', Object.fromEntries(searchParams.entries()));
-      console.log('🔍 Backend available:', backendAvailable);
-      console.log('🔍 Session token:', sessionToken ? 'present' : 'missing');
-
-      // Set debug info
-      setDebugInfo({
-        provider: actualProvider,
-        backendAvailable,
-        sessionToken: sessionToken ? 'present' : 'missing',
-        code: code ? `${code.substring(0, 20)}...` : 'none',
-        state: state || 'none',
-        error,
-        errorDescription
-      });
+      console.log('🔍 Callback params:', { success, error, provider });
 
       if (error) {
         console.error('❌ OAuth error:', error, errorDescription);
         setStatus('error');
-        setMessage(`Connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`);
+        setMessage(
+          `Connection failed: ${error}${
+            errorDescription ? ` - ${errorDescription}` : ''
+          }`
+        );
         return;
       }
 
-      if (!code) {
-        console.error('❌ No authorization code received');
-        setStatus('error');
-        setMessage('No authorization code received from provider');
-        return;
-      }
-
-      try {
-        setMessage('Completing connection...');
-        
-        if (backendAvailable && sessionToken) {
-          console.log('🔄 Making backend request...');
-          
-          const url = `${ENV_INFO.apiBaseUrl}/api/cloud/callback/${actualProvider}`;
-          console.log('🔄 Request URL:', url);
-          
-          const requestBody = {
-  code,
-  state,
-  redirect_uri: window.location.origin + '/cloud/callback/google_drive'  // ← CORRECT!
-};
-          console.log('🔄 Request body:', requestBody);
-          
-          // Send the authorization code to your backend
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${sessionToken}`
-            },
-            body: JSON.stringify(requestBody)
-          });
-
-          console.log('📡 Response status:', response.status);
-          console.log('📡 Response ok:', response.ok);
-          
-          const responseText = await response.text();
-          console.log('📡 Response text:', responseText);
-
-          if (!response.ok) {
-            let errorData;
-            try {
-              errorData = JSON.parse(responseText);
-            } catch {
-              errorData = { detail: responseText };
-            }
-            console.error('❌ Backend callback failed:', response.status, errorData);
-            throw new Error(errorData.detail || `Backend callback failed: ${response.status}`);
-          }
-
-          let result;
-          try {
-            result = JSON.parse(responseText);
-          } catch {
-            result = { success: true };
-          }
-          console.log('✅ Backend callback successful:', result);
-          
-         
-          
-        } else {
-          // Development simulation - no backend or no session token
-          console.log('🔧 Simulating OAuth callback (no backend or session)');
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          // Force update the provider connection for development
-          updateProviderConnection(
-            actualProvider,
-            { connected: true },
-            { 
-              email: `dev-user@${actualProvider}.com`,
-              storage_quota: {
-                total: 15 * 1024 * 1024 * 1024,
-                used: 5 * 1024 * 1024 * 1024,
-                available: 10 * 1024 * 1024 * 1024
-              }
-            }
-          );
-        }
-        
-        // Verify the provider is now connected
-        // Success - navigate immediately without waiting for state verification
-console.log('✅ Provider connection process completed:', actualProvider);
-// Immediate navigation without setTimeout
-setStatus('success');
-setMessage('Connection successful!');
-
-// Use requestAnimationFrame for better timing
-requestAnimationFrame(() => {
- navigate(`/cloud/connected?provider=${actualProvider}`, { 
-  replace: true,
-  state: { fromCallback: true } // Optional: pass some state if needed
-});
-});
-        
-      } catch (error) {
-        console.error('❌ OAuth callback error:', error);
-        console.error('❌ Error details:', error.message);
-        setStatus('error');
-        setMessage(error.message || 'Failed to complete connection');
-        
-        // Fallback: try to use the handleOAuthSuccess method
+      if (success === 'true') {
         try {
-          console.log('🔄 Trying fallback connection method...');
-          const success = await handleOAuthSuccess(actualProvider);
-          if (success) {
+          setMessage('Completing connection...');
+          const ok = await onCloudConnected(provider);
+
+          if (ok) {
+            console.log('✅ Connection verified successfully');
             setStatus('success');
-            setMessage('Connection completed via fallback method!');
-            setTimeout(() => navigate(`/cloud/connected?provider=${actualProvider}`), 1500);
-            
+            setMessage('Connection successful!');
+            setTimeout(() => {
+              navigate('/cloud/connected?provider=' + provider, {
+                replace: true,
+              });
+            }, 1500);
+          } else {
+            console.error('❌ Connection verification failed');
+            setStatus('error');
+            setMessage(
+              'Connection verification failed. The provider may not be properly connected.'
+            );
           }
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
+        } catch (e) {
+          console.error('❌ Connection processing failed:', e);
+          setStatus('error');
+          setMessage('Failed to complete connection: ' + e.message);
         }
+      } else {
+        setStatus('error');
+        setMessage('No success flag received from backend callback');
       }
     };
 
     handleCallback();
-  }, [searchParams, navigate, backendAvailable, sessionToken, provider, updateProviderConnection, handleOAuthSuccess]);
+  }, [searchParams, navigate, provider, onCloudConnected]);
 
   const getProviderName = (provider) => {
     const names = {
       google_drive: 'Google Drive',
       onedrive: 'OneDrive',
       dropbox: 'Dropbox',
-      box: 'Box'
+      box: 'Box',
     };
     return names[provider] || provider;
   };
 
-  const handleRetry = () => {
-    navigate('/cloud-setup');
-  };
-
-  const handleGoHome = () => {
-    navigate('/');
-  };
+  const handleRetry = () => navigate('/cloud-setup');
+  const handleGoHome = () => navigate('/');
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
-      <div className={`max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border text-center`}>
-        
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        darkMode
+          ? 'bg-gray-900'
+          : 'bg-gradient-to-br from-blue-50 to-purple-50'
+      }`}
+    >
+      <div
+        className={`max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl ${
+          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        } border text-center`}
+      >
         {/* Status Icon */}
         <div className="mb-6">
           {status === 'processing' && (
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${darkMode ? 'bg-blue-900/30' : 'bg-blue-100'} mb-4`}>
-              <Loader className={`w-8 h-8 ${darkMode ? 'text-blue-400' : 'text-blue-600'} animate-spin`} />
+            <div
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${
+                darkMode ? 'bg-blue-900/30' : 'bg-blue-100'
+              } mb-4`}
+            >
+              <Loader
+                className={`w-8 h-8 ${
+                  darkMode ? 'text-blue-400' : 'text-blue-600'
+                } animate-spin`}
+              />
             </div>
           )}
-          
           {status === 'success' && (
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${darkMode ? 'bg-green-900/30' : 'bg-green-100'} mb-4`}>
-              <CheckCircle className={`w-8 h-8 ${darkMode ? 'text-green-400' : 'text-green-600'}`} />
+            <div
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${
+                darkMode ? 'bg-green-900/30' : 'bg-green-100'
+              } mb-4`}
+            >
+              <CheckCircle
+                className={`w-8 h-8 ${
+                  darkMode ? 'text-green-400' : 'text-green-600'
+                }`}
+              />
             </div>
           )}
-          
           {status === 'error' && (
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${darkMode ? 'bg-red-900/30' : 'bg-red-100'} mb-4`}>
-              <AlertCircle className={`w-8 h-8 ${darkMode ? 'text-red-400' : 'text-red-600'}`} />
+            <div
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${
+                darkMode ? 'bg-red-900/30' : 'bg-red-100'
+              } mb-4`}
+            >
+              <AlertCircle
+                className={`w-8 h-8 ${
+                  darkMode ? 'text-red-400' : 'text-red-600'
+                }`}
+              />
             </div>
           )}
         </div>
 
         {/* Title */}
-        <h1 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-          {status === 'processing' && `Connecting to ${getProviderName(provider)}...`}
+        <h1
+          className={`text-2xl font-bold mb-4 ${
+            darkMode ? 'text-white' : 'text-gray-900'
+          }`}
+        >
+          {status === 'processing' &&
+            `Connecting to ${getProviderName(provider)}...`}
           {status === 'success' && 'Connection Successful!'}
           {status === 'error' && 'Connection Failed'}
         </h1>
 
         {/* Message */}
-        <p className={`text-base mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <p
+          className={`text-base mb-6 ${
+            darkMode ? 'text-gray-300' : 'text-gray-600'
+          }`}
+        >
           {message}
         </p>
 
-        {/* Progress bar for processing */}
+        {/* Progress bar */}
         {status === 'processing' && (
-          <div className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-2 mb-6`}>
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+          <div
+            className={`w-full ${
+              darkMode ? 'bg-gray-700' : 'bg-gray-200'
+            } rounded-full h-2 mb-6`}
+          >
+            <div
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse"
+              style={{ width: '70%' }}
+            ></div>
           </div>
         )}
 
@@ -250,7 +186,11 @@ requestAnimationFrame(() => {
             </button>
             <button
               onClick={handleGoHome}
-              className={`w-full px-4 py-2 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`w-full px-4 py-2 rounded-lg transition-colors ${
+                darkMode
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
             >
               Back to Home
             </button>
@@ -259,25 +199,52 @@ requestAnimationFrame(() => {
 
         {/* Success message */}
         {status === 'success' && (
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          <p
+            className={`text-sm ${
+              darkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}
+          >
             Redirecting you to get started...
           </p>
         )}
 
         {/* Development Debug Info */}
-        {ENV_INFO.isDevelopment && Object.keys(debugInfo).length > 0 && (
-          <div className={`mt-6 p-4 rounded-lg text-left ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <h3 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
-              🔧 Debug Info (Development)
+        {ENV_INFO.isDevelopment && (
+          <div
+            className={`mt-6 p-4 rounded-lg text-left ${
+              darkMode ? 'bg-gray-700' : 'bg-gray-100'
+            }`}
+          >
+            <h3
+              className={`text-sm font-semibold mb-2 ${
+                darkMode ? 'text-yellow-400' : 'text-yellow-600'
+              }`}
+            >
+              🔧 Debug Info
             </h3>
-            <div className={`text-xs space-y-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              <div><strong>Provider:</strong> {debugInfo.provider}</div>
-              <div><strong>Backend Available:</strong> {debugInfo.backendAvailable ? 'Yes' : 'No'}</div>
-              <div><strong>Session Token:</strong> {debugInfo.sessionToken}</div>
-              <div><strong>Auth Code:</strong> {debugInfo.code}</div>
-              <div><strong>State:</strong> {debugInfo.state}</div>
-              {debugInfo.error && <div><strong>Error:</strong> {debugInfo.error}</div>}
-              {debugInfo.errorDescription && <div><strong>Error Description:</strong> {debugInfo.errorDescription}</div>}
+            <div
+              className={`text-xs space-y-1 ${
+                darkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              <div>
+                <strong>Provider:</strong> {provider}
+              </div>
+              <div>
+                <strong>Backend Available:</strong>{' '}
+                {backendAvailable ? 'Yes' : 'No'}
+              </div>
+              <div>
+                <strong>Session Token:</strong>{' '}
+                {sessionToken ? 'Present' : 'Missing'}
+              </div>
+              <div>
+                <strong>Connected Providers:</strong>{' '}
+                {connectedProviders.length}
+              </div>
+              <div>
+                <strong>Status:</strong> {status}
+              </div>
             </div>
           </div>
         )}
