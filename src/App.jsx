@@ -339,9 +339,7 @@ function App() {
             </MainLayout>
           } />
         </Routes>
-        
-        {/* Development tools */}
-        <DevTools darkMode={darkMode} />
+         
       </div>
     </Router>
   );

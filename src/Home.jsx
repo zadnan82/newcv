@@ -1,10 +1,10 @@
-// src/Home.jsx - Redesigned for immediate access, no barriers
+// src/Home.jsx - SIMPLIFIED VERSION - No complex store functions
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next';
 import ResumeCard from './components/cards/ResumeCard';
 import CoverLetterCard from './components/cards/CoverLetterCard'; 
-import useSessionStore from './stores/sessionStore'; // Updated to use unified store
+import useSessionStore from './stores/sessionStore';
 import cvatiLogo from './assets/cvlogo.png';
 import { ArrowRight, CheckCircle, Star, Zap, PenTool, FileText, Briefcase, Users, BarChart, Target, Layout, HardDrive, Cloud, Smartphone } from 'lucide-react';
 import temp1 from './assets/temp1.png';
@@ -18,26 +18,19 @@ const Home = ({ darkMode }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   
-  // Use the unified session store - much simpler now
+  // SIMPLIFIED - Just get what we actually need
   const { 
-    getUserExperience,
-    startBuilding,
-    capabilities 
+    connectedProviders,
+    localCVs,
+    canSaveToCloud
   } = useSessionStore();
 
-  // Get current user experience state
-  const userExperience = getUserExperience();
-  
-  // Simple handlers - no complex logic, no barriers
+  // SIMPLIFIED handlers - no complex logic
   const handleCreateResumeClick = () => {
-    const result = startBuilding();
-    if (result.canProceed) {
-      navigate(result.redirect);
-    }
+    navigate('/new-resume');
   };
 
   const handleCreateCoverLetterClick = () => {
-    // Cover letters work locally too
     navigate('/cover-letter');
   };
   
@@ -46,7 +39,6 @@ const Home = ({ darkMode }) => {
   };
   
   const handleMyResumesClick = () => {
-    // Always accessible - shows local + cloud CVs
     navigate('/my-resumes');
   };
 
@@ -75,6 +67,11 @@ const Home = ({ darkMode }) => {
     if (index >= templates.length) index = 0;
     return index;
   };
+
+  // SIMPLIFIED status indicators
+  const hasCloudStorage = connectedProviders && connectedProviders.length > 0;
+  const hasLocalCVs = localCVs && localCVs.length > 0;
+  const totalCVs = (localCVs?.length || 0) + (hasCloudStorage ? 1 : 0); // Simplified count
 
   // Updated testimonials focusing on flexibility
   const testimonials = [
@@ -190,15 +187,15 @@ const Home = ({ darkMode }) => {
             Save locally or connect cloud storage when you need it.
           </p>
 
-          {/* Current Capabilities Badge */}
+          {/* SIMPLIFIED Current Capabilities Badge */}
           <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 ${
-            capabilities.canSaveToCloud 
+            hasCloudStorage 
               ? darkMode ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-green-100 text-green-700 border border-green-200'
               : darkMode ? 'bg-blue-900/30 text-blue-400 border border-blue-700/50' : 'bg-blue-100 text-blue-700 border border-blue-200'
           }`}>
             <CheckCircle className="w-4 h-4 mr-2" />
-            {capabilities.canSaveToCloud 
-              ? `Ready: Local + Cloud Storage (${userExperience.storage.cloud} providers)` 
+            {hasCloudStorage 
+              ? `Ready: Local + Cloud Storage (Connected)` 
               : 'Ready: Local Storage • Cloud Available'
             }
           </div>
@@ -359,7 +356,7 @@ const Home = ({ darkMode }) => {
           </section>
         </header>
 
-        {/* Main Features Section - Updated for local-first approach */}
+        {/* Main Features Section */}
         <section className="mb-16">
           <div className="text-center mb-10">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
@@ -413,7 +410,7 @@ const Home = ({ darkMode }) => {
           </div>
         </section>
 
-        {/* Cards Section - No barriers, immediate access */}
+        {/* Cards Section */}
         <section className="mb-16">
           <div className="text-center mb-8">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
@@ -485,7 +482,7 @@ const Home = ({ darkMode }) => {
           </div>
         </section>
 
-        {/* How It Works - Updated for local-first */}
+        {/* How It Works */}
         <section className="mb-16">
           <div className="text-center mb-8">
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
@@ -601,12 +598,12 @@ const Home = ({ darkMode }) => {
           </div>
         </section>
 
-        {/* Final CTA - No barriers */}
+        {/* Final CTA - SIMPLIFIED */}
         <section className="text-center">
-          <div className={`max-w-3xl mx-auto p-8 rounded-2xl bg-gradient-to-r ${
+          <div className={`max-w-3xl mx-auto p-8 rounded-2xl ${
             darkMode 
-              ? 'from-gray-800 via-gray-800 to-gray-800 border border-gray-700' 
-              : 'from-white/90 via-white/90 to-white/90 border border-gray-200/50'
+              ? 'bg-gray-800/80 border border-gray-700' 
+              : 'bg-white/90 border border-gray-200/50'
           } shadow-xl relative overflow-hidden`}>
             {/* Decorative background */}
             <div className="absolute inset-0 overflow-hidden opacity-10">
@@ -627,14 +624,14 @@ const Home = ({ darkMode }) => {
                 Start immediately - no signup required. Save locally for privacy or connect cloud storage for convenience.
               </p>
               
-              {/* Current status indicator */}
+              {/* SIMPLIFIED status indicator */}
               <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-6 ${
-                capabilities.canSaveToCloud 
+                hasCloudStorage 
                   ? darkMode ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-green-100 text-green-700 border border-green-200'
                   : darkMode ? 'bg-blue-900/30 text-blue-400 border border-blue-700/50' : 'bg-blue-100 text-blue-700 border border-blue-200'
               }`}>
                 <CheckCircle className="w-4 h-4 mr-2" />
-                {capabilities.canSaveToCloud 
+                {hasCloudStorage 
                   ? `Ready: Local + Cloud Storage Available`
                   : 'Ready: Local Storage • Cloud Optional'
                 }
@@ -658,8 +655,8 @@ const Home = ({ darkMode }) => {
                   }`}
                 >
                   <span className="text-base mr-2">
-                    {userExperience.storage.local > 0 || userExperience.storage.cloud > 0 
-                      ? `View My CVs (${userExperience.storage.local + userExperience.storage.cloud})` 
+                    {hasLocalCVs || hasCloudStorage 
+                      ? `View My CVs ${totalCVs > 0 ? `(${totalCVs})` : ''}` 
                       : 'Browse Templates'
                     }
                   </span>
@@ -667,24 +664,12 @@ const Home = ({ darkMode }) => {
                 </button>
               </div>
               
-              {/* Suggestions based on current state */}
-              {userExperience.suggestions.length > 0 && (
+              {/* SIMPLIFIED suggestions */}
+              {!hasCloudStorage && (
                 <div className="mt-6">
                   <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-3`}>
-                    Suggestions:
+                    💡 Tip: Connect cloud storage to access your CVs from any device
                   </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {userExperience.suggestions.map((suggestion, index) => (
-                      <div 
-                        key={index}
-                        className={`px-3 py-1 rounded-full text-xs ${
-                          darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        💡 {suggestion.title}
-                      </div>
-                    ))}
-                  </div>
                 </div>
               )}
             </div>
