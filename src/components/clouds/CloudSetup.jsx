@@ -65,7 +65,7 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
     if (connectedProviders.length > 0) {
       const interval = setInterval(() => {
         checkCloudConnections().catch(console.error);
-      }, 30000); // Check every 30 seconds
+      }, 300000); // Check every 300 seconds
       return () => clearInterval(interval);
     }
   }, [connectedProviders.length, checkCloudConnections]);

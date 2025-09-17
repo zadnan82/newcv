@@ -1,4 +1,4 @@
-// src/stores/sessionStore.js - Redesigned for smooth local-first flow
+// src/stores/sessionStore.js - Add missing functions and fix auto-save
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { API_BASE_URL, CLOUD_ENDPOINTS, checkBackendAvailability } from '../config';
@@ -10,16 +10,15 @@ const useSessionStore = create(
   persist(
     (set, get) => ({
       // ================== USER EXPERIENCE STATE ==================
-      // Simple states: 'browsing' | 'building' | 'cloud_available' 
       userState: 'browsing',
       
-      // Storage capabilities - what user can do right now
+      // Storage capabilities
       capabilities: {
-        canBuildLocally: true,     // Always true
-        canSaveLocally: true,      // Always true  
-        canSaveToCloud: false,     // True when cloud connected
-        canAccessSavedCVs: false,  // True when has local OR cloud CVs
-        canSyncAcrossDevices: false // True when cloud connected
+        canBuildLocally: true,
+        canSaveLocally: true,
+        canSaveToCloud: false,
+        canAccessSavedCVs: false,
+        canSyncAcrossDevices: false
       },
 
       // Session data
@@ -27,42 +26,425 @@ const useSessionStore = create(
       sessionToken: null,
       isSessionActive: false,
       
-      // Cloud providers - simpler structure
+      // Cloud providers
       connectedProviders: [],
-      cloudStatus: {}, // { google_drive: { connected: true, email: "...", quota: {...} } }
+      cloudStatus: {},
       
       // Local storage status
-      localCVs: [], // List of locally stored CVs
+      localCVs: [],
       
       // UI state
       loading: false,
       error: null,
-      showCloudUpgradeModal: false, // For save decision modal
-      initializing: false, // Add initialization guard
+      showCloudUpgradeModal: false,
+      initializing: false,
       
       // Backend availability
       backendAvailable: false,
       
+      // Persist pending save data across OAuth redirects
+      pendingSaveData: null,
+      pendingSaveContext: null,
+
+      // ================== MISSING FUNCTION FIX ==================
+      getAvailableProviders: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/cloud/providers`);
+          if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Loaded available providers:', data);
+            return data;
+          } else {
+            console.error('❌ Failed to load providers:', response.status);
+            throw new Error(`HTTP ${response.status}`);
+          }
+        } catch (error) {
+          console.error('❌ getAvailableProviders error:', error);
+          // Return fallback providers
+          return {
+            providers: [
+              {
+                id: 'google_drive',
+                name: 'Google Drive',
+                description: 'Store your CVs in Google Drive',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              },
+              {
+                id: 'onedrive',
+                name: 'Microsoft OneDrive', 
+                description: 'Store your CVs in OneDrive',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              },
+              {
+                id: 'dropbox',
+                name: 'Dropbox',
+                description: 'Store your CVs in Dropbox', 
+                supported_features: ['read', 'write', 'delete', 'folders']
+              },
+              {
+                id: 'box',
+                name: 'Box',
+                description: 'Store your CVs in Box',
+                supported_features: ['read', 'write', 'delete', 'folders']
+              }
+            ]
+          };
+        }
+      },
+
+      // ================== SAVE FLOW FIXES ==================
+      
+      initiateSave: (cvData) => {
+        const { capabilities } = get();
+        
+        console.log('💾 initiateSave called with:', cvData?.title);
+        
+        // Store the data AND context for OAuth flow
+        const saveContext = {
+          timestamp: Date.now(),
+          returnUrl: window.location.pathname,
+          cvTitle: cvData?.title,
+          action: 'save'
+        };
+        
+        set({ 
+          showCloudUpgradeModal: true,
+          pendingSaveData: cvData,
+          pendingSaveContext: saveContext
+        });
+        
+        // Also store in localStorage as backup
+        try {
+          localStorage.setItem('pending_save_data', JSON.stringify(cvData));
+          localStorage.setItem('pending_save_context', JSON.stringify(saveContext));
+          console.log('💾 Stored pending save data in localStorage as backup');
+        } catch (e) {
+          console.warn('Failed to backup save data to localStorage:', e);
+        }
+        
+        return { cvData, options: { local: { available: true }, cloud: { available: capabilities.canSaveToCloud } } };
+      },
+
+      connectCloudProvider: async (provider) => {
+        set({ loading: true });
+        
+        try {
+          console.log('🔗 Connecting to cloud provider:', provider);
+          console.log('🔗 Pending save data exists:', !!get().pendingSaveData);
+          
+          // Ensure session exists
+          await get().createOrRestoreSession();
+          
+          const response = await fetch(CLOUD_ENDPOINTS.CONNECT(provider), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${get().sessionToken}`
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Store additional context before redirect
+            const redirectContext = {
+              provider,
+              hasPendingSave: !!get().pendingSaveData,
+              cvTitle: get().pendingSaveData?.title,
+              timestamp: Date.now()
+            };
+            
+            try {
+              localStorage.setItem('oauth_redirect_context', JSON.stringify(redirectContext));
+              console.log('🔗 Stored OAuth context for return');
+            } catch (e) {
+              console.warn('Failed to store OAuth context:', e);
+            }
+            
+            console.log('🔗 Redirecting to OAuth URL:', data.auth_url);
+            window.location.href = data.auth_url;
+            return true;
+          }
+          throw new Error('Failed to initiate cloud connection');
+        } catch (error) {
+          console.error('❌ Cloud connection error:', error);
+          set({ error: error.message, loading: false });
+          return false;
+        }
+      },
+
+      // ================== FIXED ONCLOUDCONNECTED ==================
+      onCloudConnected: async (provider) => {
+  try {
+    console.log('✅ Cloud connected, checking for pending save...');
+    
+    // CRITICAL FIX: Update cloud status FIRST, then check pending save
+    console.log('🔄 Refreshing cloud connection status...');
+    const cloudData = await get().checkCloudConnections();
+    
+    console.log('🔍 Cloud data received:', {
+      providers: cloudData.providers,
+      providerCount: cloudData.providers.length,
+      status: Object.keys(cloudData.status)
+    });
+    
+    // CRITICAL: Update the store state BEFORE attempting to save
+    set({
+      connectedProviders: cloudData.providers,
+      cloudStatus: cloudData.status,
+      capabilities: {
+        ...get().capabilities,
+        canSaveToCloud: cloudData.providers.length > 0,
+        canSyncAcrossDevices: cloudData.providers.length > 0,
+        canAccessSavedCVs: true
+      },
+      userState: cloudData.providers.length > 0 ? 'cloud_available' : get().userState,
+      loading: false
+    });
+
+    console.log('✅ Store updated with cloud providers:', cloudData.providers);
+
+    // Now check for pending save with the updated state
+    const pendingData = get().pendingSaveData || get().tryRestorePendingSaveData();
+    
+    if (pendingData) {
+      console.log('💾 Found pending save data, auto-saving to cloud...');
+      console.log('💾 Pending data structure:', {
+        title: pendingData.title,
+        hasPersonalInfo: !!pendingData.personal_info,
+        hasEducations: Array.isArray(pendingData.educations),
+        hasExperiences: Array.isArray(pendingData.experiences)
+      });
+      
+      // CRITICAL: Get the updated connectedProviders from the store
+      const { connectedProviders } = get();
+      
+      console.log('💾 Current connected providers for save:', connectedProviders);
+      
+      if (connectedProviders.length === 0) {
+        console.error('❌ Still no connected providers after update!');
+        return { success: false, autoSaved: false, error: 'Provider connection failed' };
+      }
+      
+      // Auto-save to the newly connected cloud provider
+      const saveResult = await get().saveToCloud(pendingData, provider);
+      
+      console.log('💾 Auto-save result:', saveResult);
+      
+      if (saveResult.success) {
+        console.log('✅ Auto-save to cloud successful!');
+        
+        // Clear pending data
+        get().clearPendingSaveData();
+        
+        return { success: true, autoSaved: true, provider, fileId: saveResult.fileId };
+      } else {
+        console.error('❌ Auto-save failed:', saveResult.error);
+        return { success: true, autoSaved: false, error: saveResult.error };
+      }
+    } else {
+      console.log('ℹ️ No pending save data found');
+      return { success: true, autoSaved: false };
+    }
+    
+  } catch (error) {
+    console.error('❌ Post-connection error:', error);
+    return { success: false, error: error.message };
+  }
+},
+
+      // Helper: Try to restore pending save data from localStorage
+      tryRestorePendingSaveData: () => {
+        try {
+          const storedData = localStorage.getItem('pending_save_data');
+          const storedContext = localStorage.getItem('pending_save_context');
+          
+          if (storedData && storedContext) {
+            const data = JSON.parse(storedData);
+            const context = JSON.parse(storedContext);
+            
+            // Check if data is recent (within last 30 minutes)
+            const isRecent = (Date.now() - context.timestamp) < 30 * 60 * 1000;
+            
+            if (isRecent) {
+              console.log('🔄 Restored pending save data from localStorage');
+              set({ 
+                pendingSaveData: data, 
+                pendingSaveContext: context 
+              });
+              return data;
+            } else {
+              console.log('⏰ Pending save data too old, clearing...');
+              get().clearPendingSaveData();
+            }
+          }
+        } catch (e) {
+          console.error('Failed to restore pending save data:', e);
+        }
+        return null;
+      },
+
+      // Helper: Clear all pending save data
+      clearPendingSaveData: () => {
+        set({ 
+          pendingSaveData: null, 
+          pendingSaveContext: null,
+          showCloudUpgradeModal: false 
+        });
+        
+        // Also clear from localStorage
+        try {
+          localStorage.removeItem('pending_save_data');
+          localStorage.removeItem('pending_save_context');
+          localStorage.removeItem('oauth_redirect_context');
+        } catch (e) {
+          console.warn('Failed to clear localStorage:', e);
+        }
+      },
+
+      // ================== IMPROVED SAVETOCLOUD ==================
+      saveToCloud: async (cvData, provider = null) => {
+        console.log('🌐 saveToCloud called with:', {
+          cvData: !!cvData,
+          provider,
+          title: cvData?.title
+        });
+
+        const { connectedProviders, sessionToken } = get();
+
+        if (!connectedProviders.length) {
+          console.error('❌ No connected providers');
+          return {
+            success: false,
+            needsCloudSetup: true,
+            error: 'No cloud providers connected',
+            availableProviders: ['google_drive', 'onedrive', 'dropbox', 'box'],
+          };
+        }
+
+        const targetProvider = provider || connectedProviders[0];
+        console.log('🌐 Using provider:', targetProvider);
+
+        if (!sessionToken) {
+          console.error('❌ No session token for cloud save');
+          return { 
+            success: false, 
+            error: "No session token. Please reconnect to cloud storage." 
+          };
+        }
+
+        if (!cvData) {
+          console.error('❌ No CV data to save');
+          return {
+            success: false,
+            error: "No CV data provided to save"
+          };
+        }
+
+        try {
+          // Ensure CV data has proper structure for backend
+          const formattedCVData = {
+            title: cvData.title || 'My Resume',
+            template: cvData.template || 'stockholm',
+            personal_info: cvData.personal_info || {},
+            experiences: cvData.experiences || [],
+            educations: cvData.educations || [],
+            skills: cvData.skills || [],
+            languages: cvData.languages || [],
+            referrals: cvData.referrals || [],
+            custom_sections: cvData.custom_sections || [],
+            extracurriculars: cvData.extracurriculars || [],
+            hobbies: cvData.hobbies || [],
+            courses: cvData.courses || [],
+            internships: cvData.internships || [],
+            photos: cvData.photos || { photolink: null },
+            customization: cvData.customization || {
+              template: "stockholm",
+              accent_color: "#1a5276",
+              font_family: "Helvetica, Arial, sans-serif",
+              line_spacing: 1.5,
+              headings_uppercase: false,
+              hide_skill_level: false
+            }
+          };
+
+          console.log('🌐 Formatted CV data:', {
+            title: formattedCVData.title,
+            template: formattedCVData.template,
+            hasPersonalInfo: Object.keys(formattedCVData.personal_info).length > 0,
+            experienceCount: formattedCVData.experiences.length,
+            educationCount: formattedCVData.educations.length
+          });
+
+          const url = `${API_BASE_URL}/api/resume?provider=${targetProvider}`;
+          console.log('🌐 Saving to URL:', url);
+
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${sessionToken}`,
+            },
+            body: JSON.stringify(formattedCVData),
+          });
+
+          console.log('🌐 Response status:', response.status);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Cloud save HTTP error:', response.status, errorText);
+            
+            if (response.status === 403) {
+              return { 
+                success: false, 
+                error: "Cloud connection expired. Please reconnect.",
+                needsReconnect: true 
+              };
+            }
+            
+            return { 
+              success: false, 
+              error: `Save failed (${response.status}): ${errorText}` 
+            };
+          }
+
+          const result = await response.json();
+          console.log('✅ Cloud save successful:', result);
+
+          return {
+            success: true,
+            provider: targetProvider,
+            message: `CV saved to ${targetProvider.replace('_', ' ')}`,
+            fileId: result.id,
+          };
+          
+        } catch (error) {
+          console.error("❌ saveToCloud network error:", error);
+          return { 
+            success: false, 
+            error: `Network error: ${error.message}` 
+          };
+        }
+      },
+
       // ================== INITIALIZATION ==================
+      
       initialize: async () => {
-        // Global guard to prevent any initialization
         if (globalInitialized) {
           console.log('🔧 Already globally initialized, skipping...');
           return true;
         }
         
-        // Prevent multiple simultaneous initializations
         if (get().initializing || get().loading) {
           console.log('🔧 Initialization already in progress, skipping...');
           return true;
         }
         
         console.log('🔧 Starting sessionStore initialization...');
-        globalInitialized = true; // Set global flag immediately
+        globalInitialized = true;
         set({ loading: true, initializing: true });
         
         try {
-          // 1. Check backend availability (with timeout)
           const backendAvailable = await Promise.race([
             checkBackendAvailability(),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Backend check timeout')), 5000))
@@ -70,11 +452,9 @@ const useSessionStore = create(
           
           console.log(`🔧 Backend available: ${backendAvailable}`);
           
-          // 2. Load local CVs (always works)
           const localCVs = get().loadLocalCVs();
           console.log(`🔧 Local CVs loaded: ${localCVs.length}`);
           
-          // 3. Set basic capabilities (local always works)
           const basicCapabilities = {
             canBuildLocally: true,
             canSaveLocally: true,
@@ -83,7 +463,6 @@ const useSessionStore = create(
             canSyncAcrossDevices: false
           };
           
-          // 4. If backend available, try to restore cloud connections (but don't block on it)
           let cloudStatus = {};
           let connectedProviders = [];
           
@@ -100,11 +479,10 @@ const useSessionStore = create(
                 console.log(`🔧 Cloud providers restored: ${connectedProviders.length}`);
               }
             } catch (error) {
-              console.log('🔧 Cloud restoration failed (continuing with local-only):', error.message);
+              console.log('🔧 Cloud restoration failed:', error.message);
             }
           }
           
-          // 5. Update capabilities with cloud info
           const finalCapabilities = {
             ...basicCapabilities,
             canSaveToCloud: connectedProviders.length > 0,
@@ -112,13 +490,11 @@ const useSessionStore = create(
             canSyncAcrossDevices: connectedProviders.length > 0
           };
           
-          // 6. Determine user state
           let userState = 'browsing';
           if (connectedProviders.length > 0) {
             userState = 'cloud_available';
           }
           
-          // 7. Set final state
           set({
             backendAvailable,
             localCVs,
@@ -127,9 +503,12 @@ const useSessionStore = create(
             capabilities: finalCapabilities,
             userState,
             loading: false,
-            initializing: false, // Clear initialization flag
+            initializing: false,
             error: null
           });
+          
+          // Check for pending save data after initialization
+          get().tryRestorePendingSaveData();
           
           console.log('✅ SessionStore initialization completed successfully');
           return true;
@@ -137,7 +516,6 @@ const useSessionStore = create(
         } catch (error) {
           console.error('❌ SessionStore initialization error:', error);
           
-          // Even if everything fails, set up basic local functionality
           const localCVs = get().loadLocalCVs();
           
           set({
@@ -154,7 +532,7 @@ const useSessionStore = create(
             },
             userState: 'browsing',
             loading: false,
-            initializing: false, // Clear initialization flag
+            initializing: false,
             error: 'Running in local-only mode'
           });
           
@@ -163,7 +541,8 @@ const useSessionStore = create(
         }
       },
 
-      // ================== LOCAL STORAGE MANAGEMENT ==================
+      // ================== EXISTING METHODS ==================
+      
       loadLocalCVs: () => {
         try {
           const stored = localStorage.getItem('local_cvs');
@@ -173,104 +552,104 @@ const useSessionStore = create(
         }
       },
 
-     
-
-// Debug the local save functionality
-// Add this debugging to your saveLocalCV method in sessionStore.js
-
-saveLocalCV: (cvData) => {
-  try {
-    console.log('🔧 saveLocalCV called with:', cvData);
-    
-    // Check if cvData is valid
-    if (!cvData) {
-      console.error('❌ No CV data provided to saveLocalCV');
-      throw new Error('No CV data provided');
-    }
-    
-    // Check localStorage availability
-    if (typeof Storage === 'undefined') {
-      console.error('❌ localStorage not supported');
-      throw new Error('Local storage not supported by browser');
-    }
-    
-    const localCVs = get().loadLocalCVs();
-    console.log('🔧 Current local CVs:', localCVs);
-    
-    const cvId = cvData.id || `local_${Date.now()}`;
-    const cvWithMeta = {
-      ...cvData,
-      id: cvId,
-      storageType: 'local',
-      lastModified: new Date().toISOString(),
-      createdAt: cvData.createdAt || new Date().toISOString()
-    };
-    
-    console.log('🔧 CV to save:', cvWithMeta);
-
-    const existingIndex = localCVs.findIndex(cv => cv.id === cvId);
-    if (existingIndex >= 0) {
-      localCVs[existingIndex] = cvWithMeta;
-      console.log('🔧 Updating existing CV at index:', existingIndex);
-    } else {
-      localCVs.push(cvWithMeta);
-      console.log('🔧 Adding new CV');
-    }
-
-    // Try to save to localStorage with error handling
-    try {
-      const serializedData = JSON.stringify(localCVs);
-      localStorage.setItem('local_cvs', serializedData);
-      console.log('✅ Successfully saved to localStorage');
-    } catch (storageError) {
-      console.error('❌ localStorage save failed:', storageError);
-      
-      // Check if it's a quota exceeded error
-      if (storageError.name === 'QuotaExceededError') {
-        throw new Error('Storage quota exceeded. Please clear some space or use cloud storage.');
-      }
-      
-      throw new Error(`Failed to save to local storage: ${storageError.message}`);
-    }
-    
-    set({ 
-      localCVs: [...localCVs],
-      capabilities: { 
-        ...get().capabilities, 
-        canAccessSavedCVs: true 
-      }
-    });
-    
-    console.log('✅ Local save completed successfully');
-    return cvWithMeta;
-    
-  } catch (error) {
-    console.error('❌ saveLocalCV error:', error);
-    throw error; // Re-throw so the UI can handle it
-  }
-},
-
-      deleteLocalCV: (cvId) => {
-        const localCVs = get().loadLocalCVs().filter(cv => cv.id !== cvId);
-        localStorage.setItem('local_cvs', JSON.stringify(localCVs));
-        
-        set({ 
-          localCVs,
-          capabilities: { 
-            ...get().capabilities, 
-            canAccessSavedCVs: localCVs.length > 0 || get().connectedProviders.length > 0
+      saveLocalCV: (cvData) => {
+        try {
+          console.log('🔧 saveLocalCV called with:', cvData);
+          
+          if (!cvData) {
+            console.error('❌ No CV data provided to saveLocalCV');
+            throw new Error('No CV data provided');
           }
-        });
+          
+          if (typeof Storage === 'undefined') {
+            console.error('❌ localStorage not supported');
+            throw new Error('Local storage not supported by browser');
+          }
+          
+          const localCVs = get().loadLocalCVs();
+          console.log('🔧 Current local CVs:', localCVs);
+          
+          const cvId = cvData.id || `local_${Date.now()}`;
+          const cvWithMeta = {
+            ...cvData,
+            id: cvId,
+            storageType: 'local',
+            lastModified: new Date().toISOString(),
+            createdAt: cvData.createdAt || new Date().toISOString()
+          };
+          
+          const existingIndex = localCVs.findIndex(cv => cv.id === cvId);
+          if (existingIndex >= 0) {
+            localCVs[existingIndex] = cvWithMeta;
+            console.log('🔧 Updating existing CV at index:', existingIndex);
+          } else {
+            localCVs.push(cvWithMeta);
+            console.log('🔧 Adding new CV');
+          }
+
+          try {
+            const serializedData = JSON.stringify(localCVs);
+            localStorage.setItem('local_cvs', serializedData);
+            console.log('✅ Successfully saved to localStorage');
+          } catch (storageError) {
+            console.error('❌ localStorage save failed:', storageError);
+            
+            if (storageError.name === 'QuotaExceededError') {
+              throw new Error('Storage quota exceeded. Please clear some space or use cloud storage.');
+            }
+            
+            throw new Error(`Failed to save to local storage: ${storageError.message}`);
+          }
+          
+          set({ 
+            localCVs: [...localCVs],
+            capabilities: { 
+              ...get().capabilities, 
+              canAccessSavedCVs: true 
+            }
+          });
+          
+          console.log('✅ Local save completed successfully');
+          return cvWithMeta;
+          
+        } catch (error) {
+          console.error('❌ saveLocalCV error:', error);
+          throw error;
+        }
       },
 
-      // ================== CLOUD MANAGEMENT ==================
+      saveLocally: (cvData) => {
+        try {
+          console.log('🔧 saveLocally called with cvData:', !!cvData);
+          
+          if (!cvData) {
+            return { 
+              success: false, 
+              error: "No CV data to save" 
+            };
+          }
+          
+          const savedCV = get().saveLocalCV(cvData);
+          return { 
+            success: true, 
+            cv: savedCV,
+            message: "CV saved to this device"
+          };
+        } catch (error) {
+          console.error('❌ saveLocally error:', error);
+          return { 
+            success: false, 
+            error: error.message || "Failed to save locally" 
+          };
+        }
+      },
+
       createOrRestoreSession: async () => {
         if (get().sessionToken) {
           return { success: true, restored: true };
         }
 
         try {
-          // Add timeout to prevent hanging
           const response = await Promise.race([
             fetch(`${API_BASE_URL}/api/session`, {
               method: 'POST',
@@ -294,99 +673,91 @@ saveLocalCV: (cvData) => {
           return { success: false };
         }
       },
-
-      checkCloudConnections: async () => {
-        const { sessionToken } = get();
-        if (!sessionToken) {
-          return { providers: [], status: {} };
-        }
-
-        try {
-          // Add timeout to prevent hanging
-          const response = await Promise.race([
-            fetch(CLOUD_ENDPOINTS.STATUS, {
-              headers: { 'Authorization': `Bearer ${sessionToken}` }
-            }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Cloud check timeout')), 8000))
-          ]);
-
-          if (response.ok) {
-            const statusData = await response.json();
-            const connected = Array.isArray(statusData) 
-              ? statusData.filter(s => s.connected) 
-              : [];
-            
-            const providers = connected.map(p => p.provider);
-            const status = {};
-            connected.forEach(p => {
-              status[p.provider] = p;
-            });
-
-            return { providers, status };
-          }
-          return { providers: [], status: {} };
-        } catch (error) {
-          console.error('Cloud status check failed:', error);
-          return { providers: [], status: {} };
-        }
-      },
-
-      connectCloudProvider: async (provider) => {
-        set({ loading: true });
-        
-        try {
-          // Create session if needed
-          await get().createOrRestoreSession();
-          
-          const response = await fetch(CLOUD_ENDPOINTS.CONNECT(provider), {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${get().sessionToken}`
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            // Redirect to OAuth
-            window.location.href = data.auth_url;
-            return true;
-          }
-          throw new Error('Failed to initiate cloud connection');
-        } catch (error) {
-          set({ error: error.message, loading: false });
-          return false;
-        }
-      },
-
-      // Called after successful OAuth
-      onCloudConnected: async (provider) => {
-        try {
-          const cloudData = await get().checkCloudConnections();
-          
-          set({
-            connectedProviders: cloudData.providers,
-            cloudStatus: cloudData.status,
-            capabilities: {
-              ...get().capabilities,
-              canSaveToCloud: true,
-              canSyncAcrossDevices: true,
-              canAccessSavedCVs: true
-            },
-            userState: 'cloud_available',
-            loading: false
-          });
-          
-          return true;
-        } catch (error) {
-          console.error('Post-connection setup failed:', error);
-          return false;
-        }
-      },
-
-      // ================== USER ACTIONS ==================
       
-      // User wants to start building
+      // Replace your checkCloudConnections function with this version for better debugging:
+
+checkCloudConnections: async () => {
+  const { sessionToken } = get();
+  
+  console.log('🔍 Checking cloud connections...', {
+    hasToken: !!sessionToken,
+    tokenPreview: sessionToken ? sessionToken.substring(0, 20) + '...' : 'none'
+  });
+  
+  if (!sessionToken) {
+    console.log('❌ No session token for cloud check');
+    return { providers: [], status: {} };
+  }
+
+  try {
+    console.log('🔍 Making request to:', CLOUD_ENDPOINTS.STATUS);
+    
+    const response = await Promise.race([
+      fetch(CLOUD_ENDPOINTS.STATUS, {
+        headers: { 'Authorization': `Bearer ${sessionToken}` }
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Cloud check timeout')), 8000))
+    ]);
+
+    console.log('🔍 Response status:', response.status);
+
+    if (response.ok) {
+      const statusData = await response.json();
+      console.log('🔍 Raw response data:', statusData);
+      
+      // ENHANCED DEBUG: Log each provider's details
+      if (Array.isArray(statusData)) {
+        statusData.forEach((provider, index) => {
+          console.log(`🔍 Provider ${index}:`, {
+            provider: provider.provider,
+            connected: provider.connected,
+            email: provider.email,
+            keys: Object.keys(provider)
+          });
+        });
+      }
+      
+      // Handle different response formats
+      let connected = [];
+      if (Array.isArray(statusData)) {
+        connected = statusData.filter(s => {
+          console.log(`🔍 Checking if ${s.provider} is connected: ${s.connected}`);
+          return s.connected === true; // Be explicit about boolean check
+        });
+      } else if (statusData.providers) {
+        connected = statusData.providers.filter(s => s.connected === true);
+      } else {
+        console.warn('⚠️ Unexpected response format:', statusData);
+        return { providers: [], status: {} };
+      }
+      
+      console.log('🔍 Connected providers after filtering:', connected);
+      
+      const providers = connected.map(p => p.provider);
+      const status = {};
+      connected.forEach(p => {
+        status[p.provider] = p;
+      });
+
+      console.log('✅ Processed cloud data:', {
+        connectedCount: connected.length,
+        providers,
+        statusKeys: Object.keys(status)
+      });
+
+      return { providers, status };
+    } else {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      console.error('❌ Cloud status check failed:', response.status, errorText);
+      return { providers: [], status: {} };
+    }
+  } catch (error) {
+    console.error('❌ Cloud status check error:', error);
+    return { providers: [], status: {} };
+  }
+},
+
+      // Keep other helper methods
       startBuilding: () => {
         set({ userState: 'building' });
         return { 
@@ -399,170 +770,10 @@ saveLocalCV: (cvData) => {
         };
       },
 
-      // In sessionStore.js, update the initiateSave method:
-initiateSave: (cvData) => {
-  const { capabilities } = get();
-  
-  // Store the data for when user makes a choice
-  set({ 
-    showCloudUpgradeModal: true,
-    pendingSaveData: cvData // Make sure this is set
-  });
-  
-  return {
-    cvData,
-    options: {
-      local: {
-        available: capabilities.canSaveLocally,
-        description: "Save on this device only",
-        pros: ["Instant save", "No setup required"],
-        cons: ["Device only", "No backup", "No sync"]
-      },
-      cloud: {
-        available: capabilities.canSaveToCloud,
-        description: "Save to cloud storage for access anywhere",
-        pros: ["Access anywhere", "Automatic backup", "Sync across devices"],
-        cons: capabilities.canSaveToCloud ? [] : ["Requires cloud setup"]
-      }
-    }
-  };
-},
-
-// Also add pendingSaveData to your state initialization:
-// Add this to your initial state:
-pendingSaveData: null,
-
-
-      // User chooses local save
-      saveLocally: (cvData) => {
-  try {
-    console.log('🔧 saveLocally called with cvData:', !!cvData);
-    
-    if (!cvData) {
-      return { 
-        success: false, 
-        error: "No CV data to save" 
-      };
-    }
-    
-    const savedCV = get().saveLocalCV(cvData);
-    return { 
-      success: true, 
-      cv: savedCV,
-      message: "CV saved to this device"
-    };
-  } catch (error) {
-    console.error('❌ saveLocally error:', error);
-    return { 
-      success: false, 
-      error: error.message || "Failed to save locally" 
-    };
-  }
-}, 
-
-
-// In sessionStore.js - Update the saveToCloud function
-saveToCloud: async (cvData, provider = null) => {
-  const { connectedProviders, sessionToken } = get();
-
-  if (!connectedProviders.length) {
-    return {
-      success: false,
-      needsCloudSetup: true,
-      availableProviders: ['google_drive', 'onedrive', 'dropbox', 'box'],
-    };
-  }
-
-  const targetProvider = provider || connectedProviders[0];
-
-  try {
-    console.log('🌐 Saving to cloud:', targetProvider, 'with data:', cvData);
-    
-    // Check if we have a session token
-    if (!sessionToken) {
-      console.error('❌ No session token available for cloud save');
-      return { 
-        success: false, 
-        error: "No active session. Please reconnect to cloud storage." 
-      };
-    }
-
-    const response = await fetch(`${API_BASE_URL}/api/resume?provider=${targetProvider}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${sessionToken}`,
-      },
-      body: JSON.stringify(cvData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Cloud save failed:', response.status, errorText);
-      
-      // Handle specific error cases
-      if (response.status === 403) {
-        return { 
-          success: false, 
-          error: "Cloud connection expired. Please reconnect.",
-          needsReconnect: true 
-        };
-      }
-      
-      throw new Error(`Cloud save failed: ${response.status} ${errorText}`);
-    }
-
-    const result = await response.json();
-    console.log('✅ Cloud save successful:', result);
-
-    return {
-      success: true,
-      provider: targetProvider,
-      message: `CV saved to ${targetProvider}`,
-      file: result,
-    };
-  } catch (error) {
-    console.error("❌ saveToCloud error:", error);
-    return { success: false, error: error.message };
-  }
-},
-
-
-
-
-
-      // User wants to access saved CVs
-      getSavedCVs: async () => {
-        const { localCVs, connectedProviders } = get();
-        let allCVs = [...localCVs];
-
-        // If cloud connected, fetch cloud CVs too
-        if (connectedProviders.length > 0) {
-          try {
-            // Fetch cloud CVs - you'd implement this
-            const cloudCVs = []; // await fetchCloudCVs();
-            allCVs = [...allCVs, ...cloudCVs];
-          } catch (error) {
-            console.error('Failed to fetch cloud CVs:', error);
-          }
-        }
-
-        return {
-          cvs: allCVs,
-          sources: {
-            local: localCVs.length,
-            cloud: allCVs.length - localCVs.length
-          }
-        };
-      },
-
-      // ================== UI HELPERS ==================
       showCloudUpgrade: () => set({ showCloudUpgradeModal: true }),
       hideCloudUpgrade: () => set({ showCloudUpgradeModal: false }),
-      
       clearError: () => set({ error: null }),
 
-      // Get current user experience state
       getUserExperience: () => {
         const { userState, capabilities, connectedProviders, localCVs } = get();
         
@@ -603,7 +814,6 @@ saveToCloud: async (cvData, provider = null) => {
         return suggestions;
       },
 
-      // Get environment info for DevTools
       getEnvironmentInfo: () => ({
         backendAvailable: get().backendAvailable,
         apiBaseUrl: API_BASE_URL,
@@ -615,8 +825,7 @@ saveToCloud: async (cvData, provider = null) => {
         capabilities: get().capabilities
       }),
 
-      // ================== BACKWARD COMPATIBILITY ==================
-      // Keep old method names for existing components
+      // Backward compatibility
       checkCloudStatus: () => get().checkCloudConnections(),
       hasConnectedProviders: () => get().connectedProviders.length > 0,
       isAuthenticated: () => get().isSessionActive
@@ -628,12 +837,13 @@ saveToCloud: async (cvData, provider = null) => {
         sessionToken: state.sessionToken,
         connectedProviders: state.connectedProviders,
         cloudStatus: state.cloudStatus,
-        localCVs: state.localCVs
+        localCVs: state.localCVs,
+        // Persist pending save data
+        pendingSaveData: state.pendingSaveData,
+        pendingSaveContext: state.pendingSaveContext
       })
     }
   )
-
-  
 );
 
 export default useSessionStore;

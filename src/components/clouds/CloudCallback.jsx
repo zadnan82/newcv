@@ -1,7 +1,7 @@
-// src/components/clouds/CloudCallback.jsx - Fixed to match backend flow
+// src/components/clouds/CloudCallback.jsx - Fixed with auto-save
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader, Save, FileText } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
 import { ENV_INFO } from '../../config';
 
@@ -11,9 +11,16 @@ const CloudCallback = ({ darkMode }) => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('processing');
   const [message, setMessage] = useState('Processing OAuth callback...');
+  const [autoSaveStatus, setAutoSaveStatus] = useState(null);
 
-  const { onCloudConnected, backendAvailable, sessionToken, connectedProviders } =
-    useSessionStore();
+  const { 
+    onCloudConnected, 
+    backendAvailable, 
+    sessionToken, 
+    connectedProviders,
+    pendingSaveData,
+    clearPendingSaveData 
+  } = useSessionStore();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -39,24 +46,74 @@ const CloudCallback = ({ darkMode }) => {
       if (success === 'true') {
         try {
           setMessage('Completing connection...');
-          const ok = await onCloudConnected(provider);
+          
+          // Check if we have pending save data before connecting
+          const hasPendingData = !!pendingSaveData;
+          const cvTitle = pendingSaveData?.title;
+          
+          console.log('🔍 Pre-connection check:', {
+            hasPendingData,
+            cvTitle,
+            provider
+          });
 
-          if (ok) {
+          // Connect to cloud provider
+          const connectionResult = await onCloudConnected(provider);
+
+          if (connectionResult.success) {
             console.log('✅ Connection verified successfully');
             setStatus('success');
-            setMessage('Connection successful!');
-            setTimeout(() => {
-              navigate('/cloud/connected?provider=' + provider, {
-                replace: true,
-              });
-            }, 1500);
+
+            // Handle auto-save result
+            if (connectionResult.autoSaved) {
+              setMessage(`Connected successfully! Your CV "${cvTitle}" has been saved to ${provider.replace('_', ' ')}.`);
+              setAutoSaveStatus('success');
+              
+              // Redirect to dashboard/success page
+              setTimeout(() => {
+                navigate('/dashboard', { 
+                  replace: true,
+                  state: { 
+                    message: `CV saved successfully to ${provider.replace('_', ' ')}!`,
+                    provider 
+                  }
+                });
+              }, 2500);
+
+            } else if (hasPendingData && !connectionResult.autoSaved) {
+              // Connection successful but auto-save failed
+              setMessage('Connected successfully, but there was an issue saving your CV. Please try saving again.');
+              setAutoSaveStatus('failed');
+              
+              setTimeout(() => {
+                navigate('/new-resume', { 
+                  replace: true,
+                  state: { 
+                    message: 'Cloud connected! Please save your CV again.',
+                    provider 
+                  }
+                });
+              }, 2500);
+
+            } else {
+              // Regular connection without pending save
+              setMessage('Connection successful!');
+              setTimeout(() => {
+                navigate('/cloud-setup', { 
+                  replace: true,
+                  state: { connected: provider }
+                });
+              }, 1500);
+            }
+
           } else {
             console.error('❌ Connection verification failed');
             setStatus('error');
             setMessage(
-              'Connection verification failed. The provider may not be properly connected.'
+              `Connection verification failed: ${connectionResult.error || 'Unknown error'}`
             );
           }
+          
         } catch (e) {
           console.error('❌ Connection processing failed:', e);
           setStatus('error');
@@ -69,7 +126,7 @@ const CloudCallback = ({ darkMode }) => {
     };
 
     handleCallback();
-  }, [searchParams, navigate, provider, onCloudConnected]);
+  }, [searchParams, navigate, provider, onCloudConnected, pendingSaveData, clearPendingSaveData]);
 
   const getProviderName = (provider) => {
     const names = {
@@ -83,6 +140,7 @@ const CloudCallback = ({ darkMode }) => {
 
   const handleRetry = () => navigate('/cloud-setup');
   const handleGoHome = () => navigate('/');
+  const handleGoToBuilder = () => navigate('/new-resume');
 
   return (
     <div
@@ -161,6 +219,41 @@ const CloudCallback = ({ darkMode }) => {
           {message}
         </p>
 
+        {/* Auto-save Status */}
+        {autoSaveStatus && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            autoSaveStatus === 'success' 
+              ? darkMode ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'
+              : darkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-200'
+          }`}>
+            <div className="flex items-center justify-center">
+              {autoSaveStatus === 'success' ? (
+                <>
+                  <Save className={`w-5 h-5 mr-2 ${
+                    darkMode ? 'text-green-400' : 'text-green-600'
+                  }`} />
+                  <span className={`text-sm font-medium ${
+                    darkMode ? 'text-green-300' : 'text-green-700'
+                  }`}>
+                    CV Auto-Saved Successfully!
+                  </span>
+                </>
+              ) : (
+                <>
+                  <FileText className={`w-5 h-5 mr-2 ${
+                    darkMode ? 'text-yellow-400' : 'text-yellow-600'
+                  }`} />
+                  <span className={`text-sm font-medium ${
+                    darkMode ? 'text-yellow-300' : 'text-yellow-700'
+                  }`}>
+                    Please save your CV manually
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Progress bar */}
         {status === 'processing' && (
           <div
@@ -175,7 +268,7 @@ const CloudCallback = ({ darkMode }) => {
           </div>
         )}
 
-        {/* Error Actions */}
+        {/* Actions */}
         {status === 'error' && (
           <div className="space-y-3">
             <button
@@ -197,14 +290,39 @@ const CloudCallback = ({ darkMode }) => {
           </div>
         )}
 
+        {/* Success actions */}
+        {status === 'success' && autoSaveStatus === 'failed' && (
+          <div className="space-y-3">
+            <button
+              onClick={handleGoToBuilder}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Continue Building CV
+            </button>
+            <button
+              onClick={handleGoHome}
+              className={`w-full px-4 py-2 rounded-lg transition-colors ${
+                darkMode
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        )}
+
         {/* Success message */}
-        {status === 'success' && (
+        {status === 'success' && autoSaveStatus !== 'failed' && (
           <p
             className={`text-sm ${
               darkMode ? 'text-gray-400' : 'text-gray-500'
             }`}
           >
-            Redirecting you to get started...
+            {autoSaveStatus === 'success' 
+              ? 'Taking you to your dashboard...'
+              : 'Redirecting you to get started...'
+            }
           </p>
         )}
 
@@ -227,24 +345,16 @@ const CloudCallback = ({ darkMode }) => {
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}
             >
-              <div>
-                <strong>Provider:</strong> {provider}
-              </div>
-              <div>
-                <strong>Backend Available:</strong>{' '}
-                {backendAvailable ? 'Yes' : 'No'}
-              </div>
-              <div>
-                <strong>Session Token:</strong>{' '}
-                {sessionToken ? 'Present' : 'Missing'}
-              </div>
-              <div>
-                <strong>Connected Providers:</strong>{' '}
-                {connectedProviders.length}
-              </div>
-              <div>
-                <strong>Status:</strong> {status}
-              </div>
+              <div><strong>Provider:</strong> {provider}</div>
+              <div><strong>Backend Available:</strong> {backendAvailable ? 'Yes' : 'No'}</div>
+              <div><strong>Session Token:</strong> {sessionToken ? 'Present' : 'Missing'}</div>
+              <div><strong>Connected Providers:</strong> {connectedProviders.length}</div>
+              <div><strong>Status:</strong> {status}</div>
+              <div><strong>Pending Save Data:</strong> {pendingSaveData ? 'Yes' : 'No'}</div>
+              {pendingSaveData && (
+                <div><strong>CV Title:</strong> {pendingSaveData.title}</div>
+              )}
+              <div><strong>Auto-Save Status:</strong> {autoSaveStatus || 'None'}</div>
             </div>
           </div>
         )}

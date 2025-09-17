@@ -1,6 +1,6 @@
-// src/components/modals/SaveDecisionModal.jsx - The key decision point
+// src/components/modals/SaveDecisionModal.jsx - Fixed cloud flow
 import React, { useState } from 'react';
-import { X, HardDrive, Cloud, Check, ArrowRight, Smartphone, RefreshCw, Shield } from 'lucide-react';
+import { X, HardDrive, Cloud, Check, ArrowRight, Smartphone, RefreshCw, Shield, AlertTriangle } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
 
 const SaveDecisionModal = ({ darkMode, onClose }) => {
@@ -13,75 +13,76 @@ const SaveDecisionModal = ({ darkMode, onClose }) => {
     saveToCloud, 
     connectCloudProvider,
     connectedProviders,
-    pendingSaveData // Get the pending save data from session store
+    pendingSaveData
   } = useSessionStore();
 
-  const cvData = pendingSaveData; // Use the data from session store
-   
+  const cvData = pendingSaveData;
 
   const handleSaveLocal = async () => {
-  console.log('🔄 handleSaveLocal called with cvData:', cvData); // Add this
-  setLoading(true);
-  try {
-    const result = await saveLocally(cvData);
-    console.log('✅ saveLocally result:', result); // Add this
-    if (result.success) {
-      onClose({ success: true, type: 'local', cv: result.cv });
-    } else {
-      alert('Failed to save locally: ' + (result.error || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('Local save error:', error);
-    alert('Failed to save locally: ' + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-// In SaveDecisionModal.jsx - Update handleSaveCloud
-// In SaveDecisionModal.jsx - Update handleSaveCloud
-const handleSaveCloud = async () => {
-  if (!capabilities.canSaveToCloud) {
-    setSelectedOption('cloud-setup');
-    return;
-  }
-
-  setLoading(true);
-  try {
-    console.log('💾 Attempting cloud save with data:', cvData);
-    const result = await saveToCloud(cvData);
-    
-    if (result.success) {
-      console.log('✅ Cloud save successful:', result);
-      onClose({ success: true, type: 'cloud', provider: result.provider });
-    } else {
-      console.error('❌ Cloud save failed:', result.error);
-      
-      // Handle specific error cases
-      if (result.needsReconnect) {
-        // Offer to reconnect
-        if (confirm('Your cloud connection expired. Would you like to reconnect?')) {
-          setSelectedOption('cloud-setup');
-        }
+    console.log('🔄 handleSaveLocal called with cvData:', cvData);
+    setLoading(true);
+    try {
+      const result = await saveLocally(cvData);
+      console.log('✅ saveLocally result:', result);
+      if (result.success) {
+        onClose({ success: true, type: 'local', cv: result.cv });
       } else {
-        alert('Failed to save to cloud: ' + (result.error || 'Unknown error'));
+        alert('Failed to save locally: ' + (result.error || 'Unknown error'));
       }
+    } catch (error) {
+      console.error('Local save error:', error);
+      alert('Failed to save locally: ' + error.message);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('❌ Cloud save error:', error);
-    alert('Failed to save to cloud: ' + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  const handleSaveCloud = async () => {
+    if (!capabilities.canSaveToCloud) {
+      setSelectedOption('cloud-setup');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      console.log('💾 Attempting cloud save with data:', cvData);
+      const result = await saveToCloud(cvData);
+      
+      if (result.success) {
+        console.log('✅ Cloud save successful:', result);
+        onClose({ success: true, type: 'cloud', provider: result.provider });
+      } else {
+        console.error('❌ Cloud save failed:', result.error);
+        
+        if (result.needsReconnect) {
+          if (confirm('Your cloud connection expired. Would you like to reconnect?')) {
+            setSelectedOption('cloud-setup');
+          }
+        } else {
+          alert('Failed to save to cloud: ' + (result.error || 'Unknown error'));
+        }
+      }
+    } catch (error) {
+      console.error('❌ Cloud save error:', error);
+      alert('Failed to save to cloud: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const handleCloudConnect = async (provider) => {
     setLoading(true);
     try {
+      console.log('🔗 Connecting to cloud provider:', provider);
+      console.log('🔗 CV data to save after connection:', cvData?.title);
+      
+      // This will store the CV data and redirect to OAuth
       await connectCloudProvider(provider);
-      // This will redirect to OAuth, so no need to handle response here
+      // OAuth redirect happens here - the CloudCallback will handle auto-save
+      
     } catch (error) {
       console.error('Cloud connection error:', error);
-      alert('Failed to connect to cloud storage');
+      alert('Failed to connect to cloud storage: ' + error.message);
       setLoading(false);
     }
   };
@@ -95,7 +96,7 @@ const handleSaveCloud = async () => {
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Connect Cloud Storage
+                Connect & Save
               </h3>
               <button 
                 onClick={() => setSelectedOption(null)}
@@ -107,8 +108,31 @@ const handleSaveCloud = async () => {
               </button>
             </div>
 
+            {/* Important Notice */}
+            <div className={`mb-6 p-4 rounded-lg border-l-4 ${
+              darkMode ? 'bg-blue-900/20 border-blue-500' : 'bg-blue-50 border-blue-400'
+            }`}>
+              <div className="flex items-start">
+                <Shield className={`w-5 h-5 mt-0.5 mr-3 ${
+                  darkMode ? 'text-blue-400' : 'text-blue-600'
+                }`} />
+                <div>
+                  <p className={`text-sm font-medium mb-1 ${
+                    darkMode ? 'text-blue-300' : 'text-blue-800'
+                  }`}>
+                    Your CV will be saved automatically
+                  </p>
+                  <p className={`text-xs ${
+                    darkMode ? 'text-blue-200' : 'text-blue-700'
+                  }`}>
+                    After connecting, your CV "{cvData?.title}" will be saved directly to your chosen cloud storage.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <p className={`text-sm mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Choose a cloud storage provider to save your CV and access it from any device:
+              Choose a cloud storage provider. Your CV will be saved there automatically after connection:
             </p>
 
             <div className="space-y-3">
@@ -117,11 +141,13 @@ const handleSaveCloud = async () => {
                   key={provider}
                   onClick={() => handleCloudConnect(provider)}
                   disabled={loading}
-                  className={`w-full p-4 rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-105 ${
-                    darkMode 
-                      ? 'border-purple-700 hover:border-purple-500 hover:bg-purple-900/20' 
-                      : 'border-purple-300 hover:border-purple-500 hover:bg-purple-50'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
+                    loading
+                      ? 'opacity-50 cursor-not-allowed border-gray-300'
+                      : darkMode 
+                        ? 'border-purple-700 hover:border-purple-500 hover:bg-purple-900/20' 
+                        : 'border-purple-300 hover:border-purple-500 hover:bg-purple-50'
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -139,11 +165,18 @@ const handleSaveCloud = async () => {
                           {provider === 'box' && 'Box'}
                         </div>
                         <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Connect to save and sync
+                          {loading 
+                            ? 'Connecting & saving...'
+                            : 'Connect and auto-save CV'
+                          }
                         </div>
                       </div>
                     </div>
-                    <ArrowRight className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <ArrowRight className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                    )}
                   </div>
                 </button>
               ))}
@@ -152,14 +185,45 @@ const handleSaveCloud = async () => {
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setSelectedOption(null)}
+                disabled={loading}
                 className={`w-full px-4 py-2 rounded-lg transition-colors ${
-                  darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
+                  loading 
+                    ? 'opacity-50 cursor-not-allowed'
+                    : darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 ← Back to storage options
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cvData) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className={`max-w-md w-full rounded-2xl ${
+          darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'
+        } shadow-2xl p-6 text-center`}>
+          <AlertTriangle className={`w-16 h-16 mx-auto mb-4 ${
+            darkMode ? 'text-yellow-400' : 'text-yellow-500'
+          }`} />
+          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            No CV Data Found
+          </h3>
+          <p className={`mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            There's no CV data to save. Please create or load a CV first.
+          </p>
+          <button
+            onClick={() => onClose({ cancelled: true })}
+            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Close
+          </button>
         </div>
       </div>
     );
@@ -172,9 +236,14 @@ const handleSaveCloud = async () => {
       } shadow-2xl`}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              How would you like to save your CV?
-            </h3>
+            <div>
+              <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Save Your CV
+              </h3>
+              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                "{cvData.title}"
+              </p>
+            </div>
             <button 
               onClick={() => onClose({ cancelled: true })}
               className={`p-2 rounded-full hover:bg-gray-100 ${
@@ -376,14 +445,17 @@ const handleSaveCloud = async () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Saving...
+                  {selectedOption === 'cloud' && !capabilities.canSaveToCloud 
+                    ? 'Connecting...' 
+                    : 'Saving...'
+                  }
                 </div>
               ) : selectedOption === 'local' ? (
                 'Save Locally'
               ) : capabilities.canSaveToCloud ? (
                 'Save to Cloud'
               ) : (
-                'Connect Cloud Storage'
+                'Connect & Save to Cloud'
               )}
             </button>
           </div>
