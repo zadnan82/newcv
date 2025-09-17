@@ -1,8 +1,7 @@
+// src/components/auth-resume/view-cv/NewResumeBuilder.jsx - Redesigned for local-first approach
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams, useParams } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next'; 
-import useAuthStore from '../../../stores/authStore';
-import useResumeStore from '../../../stores/resumeStore';
 import Education from '../builder/Education';
 import Experience from '../builder/Experience';
 import Skills from '../builder/Skills';
@@ -15,10 +14,9 @@ import Courses from '../builder/Courses';
 import Internships from '../builder/Internships'; 
 import Alert from '../../shared/Alert';  
 import ResumePreview from './ResumePreview';
-import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X, Save, HardDrive, Cloud } from 'lucide-react';
 import PersonalInfo from '../builder/PersonalInfo';  
 import ResumeTitle from '../builder/ResumeTitle';
-import SaveButton from './SaveButton';
 import useSessionStore from '../../../stores/sessionStore';
 
 const NewResumeBuilder = ({ darkMode }) => {
@@ -27,28 +25,33 @@ const NewResumeBuilder = ({ darkMode }) => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { resumeId: paramResumeId } = useParams();
-  const { token } = useAuthStore(); 
+  
+  // Use unified session store
   const { 
-    createResume, 
-    loading, 
-    error: storeError 
-  } = useResumeStore(); 
+    capabilities,
+    showCloudUpgrade,
+    initiateSave,
+    startBuilding
+  } = useSessionStore();
+  
   const [activeSection, setActiveSection] = useState('personal');
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // No more long loading
   const [toast, setToast] = useState(null);
   const [viewMode, setViewMode] = useState('edit');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [authToken, setAuthToken] = useState(token);
-  const [localError, setLocalError] = useState(null); 
+  const [localError, setLocalError] = useState(null);
+  
+  // Blank resume template (same as before)
   const blankResumeTemplate = {
+    id: `local_${Date.now()}`, // Give it a local ID immediately
     title: "My Resume", 
     template: "stockholm",
     personal_info: {
-      full_name: '',   // Required, must be filled by user
+      full_name: '',
       title: '',
-      email: '',       // Required, must be filled by user
-      mobile: '',      // Required, must be filled by user 
+      email: '',
+      mobile: '', 
       city: '',
       address: '',
       postal_code: '',
@@ -80,54 +83,36 @@ const NewResumeBuilder = ({ darkMode }) => {
       hide_skill_level: false
     }
   };
+  
   const [formData, setFormData] = useState(blankResumeTemplate);
   const stateResumeId = location.state?.resumeId;
-  const resumeId = paramResumeId || stateResumeId || 'default_resume';
-  const { isAuthenticated } = useAuthStore();
-  const userIsAuthenticated = isAuthenticated();
-  const { checkCloudStatus } = useSessionStore();
+  const resumeId = paramResumeId || stateResumeId || formData.id;
+
+  // Initialize builder - no cloud check needed
   useEffect(() => {
-    const isUserAuthenticated = useAuthStore.getState().isAuthenticated();
+    console.log('🔧 NewResumeBuilder: Starting...');
     
-    if (!isUserAuthenticated) {
-      // Show a helpful message after a short delay
-      const timer = setTimeout(() => {
+    // Let the session store know user is building
+    startBuilding();
+    
+    // Check if we're loading an existing resume
+    if (paramResumeId && paramResumeId !== 'new') {
+      // TODO: Load existing resume (could be local or cloud)
+      console.log('🔧 Loading existing resume:', paramResumeId);
+    }
+    
+    // Show welcome message for new users
+    setTimeout(() => {
+      if (!hasUserStartedFilling) {
         showToast(
-          t('revamp.offline_mode', 'You can build your resume now. Sign in to save or download.'),
+          'Welcome! Start building your CV. You can save locally or connect cloud storage later.',
           'info'
         );
-      }, 1500);
-      
-      return () => clearTimeout(timer);
-    }
-  }, []);
-  
-
-  useEffect(() => {
-    const checkCloudConnection = async () => {
-      try {
-        console.log('⏳ Checking cloud provider status...');
-        
-        // Don't check cloud status if we're on a callback page
-        if (window.location.pathname.includes('/cloud/callback')) {
-          console.log('⏳ OAuth callback in progress, skipping cloud check');
-          return;
-        }
-        
-        const providers = await checkCloudStatus();
-        console.log('📊 Cloud providers:', providers);
-        
-        if (providers.length === 0) {
-          console.log('No cloud providers connected, redirecting to setup...');
-          navigate('/cloud-setup', { replace: true });
-        }
-      } catch (error) {
-        console.error('Error checking cloud status:', error);
       }
-    };
-
-    checkCloudConnection();
-  }, [checkCloudStatus, navigate]);
+    }, 2000);
+    
+    setIsLoading(false);
+  }, [paramResumeId, startBuilding]);
   
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(false);
@@ -149,26 +134,11 @@ const NewResumeBuilder = ({ darkMode }) => {
   
   const isMobileView = useMediaQuery('(max-width: 768px)');
   const isTabletView = useMediaQuery('(min-width: 769px) and (max-width: 1024px)');   
+  
   const hasUserStartedFilling = formData.personal_info?.full_name || 
     formData.personal_info?.email ||
     formData.experiences?.some(exp => exp?.company || exp?.position) ||
     formData.educations?.some(edu => edu?.institution || edu?.degree);
-  
-  useEffect(() => {
-    if (storeError) {
-      setLocalError(storeError);
-    }
-  }, [storeError]);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isLoading) { 
-        setIsLoading(false); 
-      }
-    }, 5000);
-    
-    return () => clearTimeout(timer);
-  }, [isLoading]);
   
   const updateFormData = (section, data) => {
     console.log(`Updating section ${section} with:`, data);
@@ -177,34 +147,21 @@ const NewResumeBuilder = ({ darkMode }) => {
       let updatedData;
       
       if (section === 'title') {
-        updatedData = {
-          ...prev,
-          title: data
-        };
+        updatedData = { ...prev, title: data };
       } else if (section === 'photos') {
         console.log('Updating photos in formData:', data);
-        
-        updatedData = {
-          ...prev,
-          photos: data
-        };
+        updatedData = { ...prev, photos: data };
       } else if (section === 'personal_info') {
-        updatedData = {
-          ...prev,
-          personal_info: {
-            ...data
-          }
+        updatedData = { 
+          ...prev, 
+          personal_info: { ...data }
         };
-        
-        console.log('Updated personal info in formData:', updatedData.personal_info);
       } else {
-        updatedData = {
-          ...prev,
-          [section]: data
-        };
+        updatedData = { ...prev, [section]: data };
       }
       
-      localStorage.setItem('resumeFormData', JSON.stringify(updatedData));
+      // Auto-save to localStorage as user types
+      localStorage.setItem('cv_draft', JSON.stringify(updatedData));
       
       return updatedData;
     });
@@ -251,6 +208,23 @@ const NewResumeBuilder = ({ darkMode }) => {
     
     setActiveSection(sections[newIndex].id);
   };
+
+  // Handle save - show the save decision modal
+ // In NewResumeBuilder.jsx, update the handleSave function:
+// In NewResumeBuilder.jsx, add this to see what data is being passed:
+// In NewResumeBuilder.jsx, update the handleSave function:
+const handleSave = () => {
+  console.log('💾 Save clicked with formData:', formData);
+  
+  if (!hasUserStartedFilling) {
+    showToast('Please add some information to your CV before saving.', 'error');
+    return;
+  }
+
+  // Use initiateSave instead of showCloudUpgrade
+  initiateSave(formData);
+};
+ 
   
   const Toast = ({ message, type, onClose }) => {
     let displayMessage = message;
@@ -267,7 +241,9 @@ const NewResumeBuilder = ({ darkMode }) => {
         className={`fixed top-4 right-4 z-50 px-4 py-2 rounded shadow-lg transition-all duration-300 max-w-md overflow-hidden
           ${type === 'success' 
             ? 'bg-green-500 text-white' 
-            : 'bg-red-500 text-white'
+            : type === 'info'
+              ? 'bg-blue-500 text-white'
+              : 'bg-red-500 text-white'
           }`}
       >
         <div className="flex justify-between items-center">
@@ -285,11 +261,6 @@ const NewResumeBuilder = ({ darkMode }) => {
   
   const closeToast = () => {
     setToast(null);
-  };
-
-  const handleLoginRedirect = () => {
-    localStorage.setItem('tempResumeData', JSON.stringify(formData));
-    navigate('/login', { state: { returnTo: location.pathname } });
   };
 
   if (isLoading) {
@@ -340,17 +311,19 @@ const NewResumeBuilder = ({ darkMode }) => {
               {viewMode === 'edit' ? t('editor.edit_resume') : t('editor.preview_resume')}
             </div>
 
-            <SaveButton  
-              formData={formData}
-              darkMode={darkMode}
-              isSaving={isSaving}
-              setIsSaving={setIsSaving}
-              showToast={showToast}
-              isLocalDraft={false}
-              forceCreate={true}
-              userIsAuthenticated={userIsAuthenticated}
-              onLoginRequired={handleLoginRedirect}
-            />
+            <button 
+              onClick={handleSave}
+              disabled={isSaving || !hasUserStartedFilling}
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center ${
+                isSaving || !hasUserStartedFilling
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
+              }`}
+            >
+              <Save size={16} className="mr-1" />
+              Save
+            </button>
+
             <button 
               onClick={toggleViewMode}
               className={`p-2 rounded-md ${
@@ -361,11 +334,8 @@ const NewResumeBuilder = ({ darkMode }) => {
             >
               {viewMode === 'edit' ? <Eye size={20} /> : <Edit size={20} />}
             </button>
-            
           </div>
-          
         </div>
-        
       )}
 
       {/* Mobile Section Navigation (Slide-in Drawer) */}
@@ -507,7 +477,6 @@ const NewResumeBuilder = ({ darkMode }) => {
                 sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
                 data
               )}
-              token={authToken}
             />
           )}
         </div>
@@ -576,22 +545,49 @@ const NewResumeBuilder = ({ darkMode }) => {
           <div className={`flex gap-2 p-2 border-b ${
             darkMode ? 'border-gray-700' : 'border-gray-200'
           }`}>
-            <SaveButton  
-              formData={formData}
-              darkMode={darkMode}
-              isSaving={isSaving}
-              setIsSaving={setIsSaving}
-              showToast={showToast}
-              isLocalDraft={false}
-              forceCreate={true}
-              userIsAuthenticated={userIsAuthenticated}
-              onLoginRequired={handleLoginRedirect}
-            />
+            {/* Save Button with Storage Options */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSave}
+                disabled={isSaving || !hasUserStartedFilling}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
+                  isSaving || !hasUserStartedFilling
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
+                }`}
+              >
+                {isSaving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} className="mr-2" />
+                    Save CV
+                  </>
+                )}
+              </button>
+              
+              {/* Storage status indicator */}
+              <div className="text-xs text-gray-500">
+                {capabilities.canSaveToCloud ? (
+                  <span className="flex items-center">
+                    <Cloud size={12} className="mr-1" />
+                    Local + Cloud
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <HardDrive size={12} className="mr-1" />
+                    Local Storage
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         <div className="flex-grow overflow-auto">
-         
           <ResumePreview
             formData={{
               ...formData,
@@ -603,14 +599,10 @@ const NewResumeBuilder = ({ darkMode }) => {
             darkMode={darkMode}
             hasUserStartedFilling={hasUserStartedFilling}
             isMobileView={isMobileView}
-            isSaving={isSaving}
-            setIsSaving={setIsSaving}
             showPlaceholders={true}
             showToast={showToast}
           />
         </div>
-
-         
       </div>
 
       {/* Toast Notification */}

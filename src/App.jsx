@@ -1,3 +1,4 @@
+// src/App.jsx - Redesigned for smooth local-first flow
 import { useState, useEffect } from 'react'; 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next';
@@ -27,14 +28,13 @@ import FeedbackPage from './components/feedback/FeedbackPage';
 import RCPublic from './components/customizer-public/RCPublic';
 import JobMatching from './components/job-matching/JobMatching'; 
 
-// Import the new stores
+// Import the unified store
 import useSessionStore from './stores/sessionStore';
-import useAuthStore from './stores/authStore'; // Keep for backward compatibility during transition
 import CloudSetup from './components/clouds/CloudSetup';
 import CloudCallback from './components/clouds/CloudCallback';
-import CloudConnectionSuccess from './components/clouds/CloudConnectionSuccess';
-import DevTools from './components/dev/DevTools';
 import CloudConnected from './components/clouds/CloudConnected';
+import DevTools from './components/dev/DevTools';
+import SaveDecisionModal from './components/modals/SaveDecisionModal'; // We'll create this
 
 // ============ START OF HTTPS ENFORCEMENT ============
 (() => { 
@@ -103,61 +103,19 @@ import CloudConnected from './components/clouds/CloudConnected';
   };
 })();
 
-// Enhanced Route Protection Component for Cloud Storage
-// Fix for App.jsx - Enhanced CloudProtectedRoute with proper loading states
+// Simple Loading Component
+const AppLoading = ({ darkMode }) => (
+  <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mb-4"></div>
+      <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        Loading CV Platform...
+      </p>
+    </div>
+  </div>
+);
 
-const CloudProtectedRoute = ({ children, requiresCloudSetup = true }) => {
-  const { 
-    isSessionActive, 
-    hasConnectedProviders, 
-    showCloudSetup, 
-    loading,
-    initializing,          // Add this
-    initializeComplete     // Add this  
-  } = useSessionStore();
-
-  // Show loading while initializing or checking session
-  if (initializing || loading || !initializeComplete) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500 mb-4"></div>
-          <p className="text-gray-600">
-            {initializing ? 'Initializing session...' : 'Loading...'}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // If no active session, redirect to home
-  if (!isSessionActive) {
-    return <Navigate to="/" replace />;
-  }
-
-  // If requires cloud setup and no providers connected, show cloud setup
-  if (requiresCloudSetup && !hasConnectedProviders()) {
-    return <CloudSetup darkMode={localStorage.getItem('theme') === 'dark'} />;
-  }
-
-  return children;
-};
-
-// Backward Compatibility Route Protection (for old auth system)
-const LegacyProtectedRoute = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, user } = useAuthStore();
-  
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (adminOnly && (!user || user.role !== 'admin')) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-};
-
+// Main Layout Component
 const MainLayout = ({ children, darkMode, toggleDarkMode }) => (
   <>
     <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -179,15 +137,17 @@ function App() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }); 
 
-  // Session store for new cloud-based system
+  // Get session state
   const { 
-    isSessionActive, 
-    hasConnectedProviders, 
-    initialize: initializeSession 
+    loading,
+    initialize,
+    showCloudUpgradeModal,
+    hideCloudUpgrade,
+    getUserExperience,
+    userState // Add this to track initialization state
   } = useSessionStore();
 
-  // Auth store for backward compatibility
-  const { isAuthenticated } = useAuthStore();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
@@ -208,29 +168,16 @@ function App() {
     document.documentElement.dir = i18n.dir();
   }, [i18n.language]);
    
-  // Initialize session on app load
+  // Initialize app on load - ONLY ONCE, no dependencies
   useEffect(() => {
-    initializeSession().catch(console.error);
-  }, [initializeSession]);
-
-  // Handle legacy auth system during transition
-  useEffect(() => {
-    const { token, refreshUserInfo } = useAuthStore.getState();
-    if (token) {
-      refreshUserInfo();
+    if (!isInitialized) {
+      console.log('🚀 App.jsx: Starting initialization...');
+      setIsInitialized(true);
+      
+      // Call initialize directly from the store state, not from the hook
+      useSessionStore.getState().initialize().catch(console.error);
     }
-  }, []);
-
-  // Listen for session expiration
-  useEffect(() => {
-    const handleSessionExpired = () => {
-      // Could show a toast notification here
-      console.log('Session expired, please refresh to continue');
-    };
-
-    window.addEventListener('sessionExpired', handleSessionExpired);
-    return () => window.removeEventListener('sessionExpired', handleSessionExpired);
-  }, []);
+  }, [isInitialized]); // Remove 'initialize' from dependencies
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -256,33 +203,42 @@ function App() {
     };
   }, []);
 
+  // Show loading during initialization
+  if (loading || !isInitialized) {
+    return <AppLoading darkMode={darkMode} />;
+  }
+
   return (
     <Router basename="/">
       <div className={`${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} min-h-screen flex flex-col`}>
         <Toaster position="top-center" />
         <CookieConsent />
+        
+        {/* Save Decision Modal - Global */}
+        {showCloudUpgradeModal && (
+          <SaveDecisionModal 
+            darkMode={darkMode} 
+            onClose={hideCloudUpgrade}
+          />
+        )}
   
         <Routes>
-  {/* Public Resume Routes - No Navbar/Footer */}
-  <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
-  <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
-   
-   
-<Route path="/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} /> 
-<Route path="/cloud/connected" element={<CloudConnected darkMode={darkMode} />} />
+          {/* Public Resume Routes - No Navbar/Footer */}
+          <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
+          <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
+          
+          {/* Cloud OAuth Callbacks */}
+          <Route path="/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} /> 
+          <Route path="/cloud/connected" element={<CloudConnected darkMode={darkMode} />} />
 
-  {/* Legacy protected route for existing resume viewer */}
-  <Route path="/resume/:resumeId" element={
-    <LegacyProtectedRoute>
-      <CV darkMode={darkMode} />
-    </LegacyProtectedRoute>
-  } />
+          {/* Legacy route for backward compatibility */}
+          <Route path="/resume/:resumeId" element={<CV darkMode={darkMode} />} />
 
           {/* All other routes with Navbar and Footer */}
           <Route path="*" element={
             <MainLayout darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
               <Routes>
-                {/* Public Routes */}
+                {/* =============== PUBLIC ROUTES (Always Accessible) =============== */}
                 <Route path="/" element={<Home darkMode={darkMode} />} />
                 <Route path="/privacy" element={<PrivacyPolicy darkMode={darkMode} />} />
                 <Route path="/terms" element={<TermsAndConditions darkMode={darkMode} />} />
@@ -292,90 +248,43 @@ function App() {
                 <Route path="/feedback" element={<FeedbackPage darkMode={darkMode} />} />
                 <Route path="/rc-public" element={<RCPublic darkMode={darkMode} />} />
 
-                {/* Cloud Setup Route */}
+                {/* =============== CORE FEATURES (Always Available - Local First) =============== */}
+                
+                {/* Resume Building - Always available with local storage */}
+                <Route path="/new-resume" element={<NewResumeBuilder darkMode={darkMode} />} />
+                <Route path="/edit-resume/:resumeId" element={<EditResumeBuilder darkMode={darkMode} />} />
+                
+                {/* Resume Customization - Always available */}
+                <Route path="/resume-customizer" element={<ResumeCustomizer darkMode={darkMode} />} />
+                <Route path="/resume-preview" element={<ResumePreview darkMode={darkMode} />} />
+                
+                {/* Cover Letter - Available locally, enhanced with cloud */}
+                <Route path="/cover-letter" element={<CoverLetter darkMode={darkMode} />} />
+                <Route path="/cover-letter/:id/edit" element={<CoverLetterEditor darkMode={darkMode} />} />
+                
+                {/* Job Matching - Works with local CVs too */}
+                <Route path="/job-matching" element={<JobMatching darkMode={darkMode} />} />
+
+                {/* =============== SAVED CONTENT (Local + Cloud) =============== */}
+                
+                {/* My Resumes - Shows local AND cloud CVs */}
+                <Route path="/my-resumes" element={<ResumeDashboard darkMode={darkMode} />} />
+                
+                {/* Cover Letter Dashboard - Local + Cloud */}
+                <Route path="/cover-letters" element={<CoverLetterDashboard darkMode={darkMode} />} />
+
+                {/* =============== CLOUD SETUP (Optional Upgrade) =============== */}
                 <Route path="/cloud-setup" element={<CloudSetup darkMode={darkMode} />} />
 
-                {/* UPDATED: Cloud-Protected Routes (New System) */}
-                <Route path="/new-resume" element={
-                  <CloudProtectedRoute requiresCloudSetup={false}>
-                    <NewResumeBuilder darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/my-resumes" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
-                    <ResumeDashboard darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/edit-resume/:resumeId" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
-                    <EditResumeBuilder darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/cover-letters" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
-                    <CoverLetterDashboard darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/cover-letter/:id/edit" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
-                    <CoverLetterEditor darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/cover-letter" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
-                    <CoverLetter darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/resume-customizer" element={
-                  <CloudProtectedRoute requiresCloudSetup={false}>
-                    <ResumeCustomizer darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/resume-preview" element={
-                  <CloudProtectedRoute requiresCloudSetup={false}>
-                    <ResumePreview darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                <Route path="/job-matching" element={
-                  <CloudProtectedRoute requiresCloudSetup={true}>
-                    <JobMatching darkMode={darkMode} />
-                  </CloudProtectedRoute>
-                } />
-
-                {/* LEGACY: Keep old auth-protected routes for transition period */}
-                {/* These can be gradually migrated or removed */}
+                {/* =============== LEGACY REDIRECTS =============== */}
                 <Route path="/login" element={
                   <div className="min-h-screen flex items-center justify-center">
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold mb-4">Welcome to the New CV Platform!</h2>
-                      <p className="mb-4">We've upgraded to a privacy-first system.</p>
-                      <p className="mb-6">No more user accounts - your data stays in YOUR cloud storage.</p>
+                    <div className="text-center max-w-md">
+                      <h2 className="text-2xl font-bold mb-4">No Login Required!</h2>
+                      <p className="mb-4">Our platform works without user accounts.</p>
+                      <p className="mb-6">Start building your CV immediately, then optionally connect cloud storage for sync across devices.</p>
                       <button 
-                        onClick={() => window.location.href = '/'}
-                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                      >
-                        Get Started
-                      </button>
-                    </div>
-                  </div>
-                } />
-
-                <Route path="/register" element={
-                  <div className="min-h-screen flex items-center justify-center">
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold mb-4">No Registration Required!</h2>
-                      <p className="mb-4">Our new system doesn't need user accounts.</p>
-                      <p className="mb-6">Just connect your cloud storage and start building.</p>
-                      <button 
-                        onClick={() => window.location.href = '/'}
+                        onClick={() => window.location.href = '/new-resume'}
                         className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                       >
                         Start Building Your CV
@@ -384,31 +293,55 @@ function App() {
                   </div>
                 } />
 
-                {/* Legacy admin routes - these might need special handling */}
+                <Route path="/register" element={
+                  <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center max-w-md">
+                      <h2 className="text-2xl font-bold mb-4">No Registration Needed!</h2>
+                      <p className="mb-4">Jump straight into building your CV.</p>
+                      <p className="mb-6">Your data stays in your own cloud storage when you choose to save.</p>
+                      <button 
+                        onClick={() => window.location.href = '/new-resume'}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                      >
+                        Start Building
+                      </button>
+                    </div>
+                  </div>
+                } />
+
+                {/* Settings - Now shows storage management */}
                 <Route path="/settings" element={
-                  <CloudProtectedRoute requiresCloudSetup={false}>
-                    <div className="min-h-screen flex items-center justify-center">
-                      <div className="text-center">
-                        <h2 className="text-2xl font-bold mb-4">Cloud Storage Settings</h2>
-                        <p className="mb-6">Manage your connected cloud storage providers</p>
+                  <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center max-w-md">
+                      <h2 className="text-2xl font-bold mb-4">Storage Settings</h2>
+                      <p className="mb-6">Manage your local and cloud storage options</p>
+                      <div className="space-y-3">
+                        <button 
+                          onClick={() => window.location.href = '/my-resumes'}
+                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                          View My CVs
+                        </button>
                         <button 
                           onClick={() => window.location.href = '/cloud-setup'}
-                          className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                          className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                         >
                           Manage Cloud Storage
                         </button>
                       </div>
                     </div>
-                  </CloudProtectedRoute>
+                  </div>
                 } />
 
-                {/* Catch-all for unknown routes */}
+                {/* Catch-all redirect */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </MainLayout>
           } />
         </Routes>
-           <DevTools darkMode={darkMode} />
+        
+        {/* Development tools */}
+        <DevTools darkMode={darkMode} />
       </div>
     </Router>
   );

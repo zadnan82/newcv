@@ -74,10 +74,10 @@ const CloudCallback = ({ darkMode }) => {
           console.log('🔄 Request URL:', url);
           
           const requestBody = {
-            code,
-            state,
-            redirect_uri: window.location.origin + '/cloud/connected'
-          };
+  code,
+  state,
+  redirect_uri: window.location.origin + '/cloud/callback/google_drive'  // ← CORRECT!
+};
           console.log('🔄 Request body:', requestBody);
           
           // Send the authorization code to your backend
@@ -115,19 +115,7 @@ const CloudCallback = ({ darkMode }) => {
           }
           console.log('✅ Backend callback successful:', result);
           
-          // CRITICAL: Update the provider connection status immediately
-          updateProviderConnection(
-            actualProvider,
-            { connected: true },
-            { 
-              email: result.email || `user@${actualProvider}.com`,
-              storage_quota: result.storage_quota || {
-                total: 15 * 1024 * 1024 * 1024,
-                used: 5 * 1024 * 1024 * 1024,
-                available: 10 * 1024 * 1024 * 1024
-              }
-            }
-          );
+         
           
         } else {
           // Development simulation - no backend or no session token

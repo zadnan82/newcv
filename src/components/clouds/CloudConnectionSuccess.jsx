@@ -1,4 +1,4 @@
-// src/components/clouds/CloudConnectionSuccess.jsx
+// src/components/clouds/CloudConnectionSuccess.jsx - Updated for cleaner flow
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, ArrowRight, FileText, FileSignature, FolderOpen, Cloud, Sparkles } from 'lucide-react';
@@ -10,9 +10,15 @@ const CloudConnectionSuccess = ({ darkMode }) => {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const [showAnimation, setShowAnimation] = useState(false);
+  const [redirectTimer, setRedirectTimer] = useState(5);
   
   const provider = searchParams.get('provider');
-  const { checkCloudStatus, connectedProviders } = useSessionStore();
+  const { 
+    checkCloudStatus, 
+    connectedProviders, 
+    completeOnboarding,
+    canAccessCVFeatures
+  } = useSessionStore();
 
   useEffect(() => {
     // Refresh cloud status after connection
@@ -20,7 +26,23 @@ const CloudConnectionSuccess = ({ darkMode }) => {
     
     // Show animation after a brief delay
     setTimeout(() => setShowAnimation(true), 500);
-  }, [checkCloudStatus]);
+    
+    // Complete onboarding since user connected a provider
+    completeOnboarding();
+  }, [checkCloudStatus, completeOnboarding]);
+
+  // Auto-redirect timer
+  useEffect(() => {
+    if (redirectTimer > 0 && canAccessCVFeatures()) {
+      const timer = setTimeout(() => {
+        setRedirectTimer(prev => prev - 1);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    } else if (redirectTimer === 0) {
+      navigate('/new-resume');
+    }
+  }, [redirectTimer, navigate, canAccessCVFeatures]);
 
   const handleCreateResume = () => {
     navigate('/new-resume');
@@ -30,12 +52,12 @@ const CloudConnectionSuccess = ({ darkMode }) => {
     navigate('/my-resumes');
   };
 
-  const handleCreateCoverLetter = () => {
-    navigate('/cover-letter');
-  };
-
   const handleContinueExploring = () => {
     navigate('/');
+  };
+
+  const handleSkipTimer = () => {
+    setRedirectTimer(0);
   };
 
   const providerNames = {
@@ -69,7 +91,22 @@ const CloudConnectionSuccess = ({ darkMode }) => {
           </div>
         </div>
 
-        {/* What's Next Section */}
+        {/* Auto-redirect notice */}
+        {canAccessCVFeatures() && redirectTimer > 0 && (
+          <div className={`text-center mb-6 p-4 rounded-lg ${darkMode ? 'bg-purple-900/20 border border-purple-700/50' : 'bg-purple-50 border border-purple-200'}`}>
+            <p className={`text-sm ${darkMode ? 'text-purple-300' : 'text-purple-700'} mb-2`}>
+              Automatically redirecting to CV builder in {redirectTimer} seconds...
+            </p>
+            <button
+              onClick={handleSkipTimer}
+              className={`text-sm font-medium ${darkMode ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-700'} underline`}
+            >
+              Skip and go now
+            </button>
+          </div>
+        )}
+
+        {/* Quick Actions */}
         <div className="mb-8">
           <h2 className={`text-xl font-semibold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center`}>
             <Sparkles className="w-5 h-5 mr-2 text-purple-500" />
@@ -126,27 +163,10 @@ const CloudConnectionSuccess = ({ darkMode }) => {
         {/* Additional Actions */}
         <div className="mb-8">
           <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            More Actions
+            More Options
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <button
-              onClick={handleCreateCoverLetter}
-              className={`flex items-center p-4 rounded-lg border transition-all duration-200 hover:scale-105 ${darkMode ? 'border-gray-600 hover:border-pink-500 hover:bg-pink-900/10' : 'border-gray-200 hover:border-pink-400 hover:bg-pink-50'}`}
-            >
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-4 ${darkMode ? 'bg-pink-900/30' : 'bg-pink-100'}`}>
-                <FileText className={`w-5 h-5 ${darkMode ? 'text-pink-400' : 'text-pink-600'}`} />
-              </div>
-              <div className="text-left">
-                <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Generate Cover Letter
-                </h4>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  AI-powered cover letters
-                </p>
-              </div>
-            </button>
-
             <button
               onClick={handleContinueExploring}
               className={`flex items-center p-4 rounded-lg border transition-all duration-200 hover:scale-105 ${darkMode ? 'border-gray-600 hover:border-green-500 hover:bg-green-900/10' : 'border-gray-200 hover:border-green-400 hover:bg-green-50'}`}
@@ -163,6 +183,20 @@ const CloudConnectionSuccess = ({ darkMode }) => {
                 </p>
               </div>
             </button>
+
+            <div className={`flex items-center p-4 rounded-lg border ${darkMode ? 'border-gray-600 bg-gray-700/50' : 'border-gray-200 bg-gray-50'}`}>
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-4 ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
+                <Cloud className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              </div>
+              <div className="text-left">
+                <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Cloud Storage
+                </h4>
+                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {connectedProviders.length} provider{connectedProviders.length !== 1 ? 's' : ''} connected
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

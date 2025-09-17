@@ -66,31 +66,24 @@ const CloudSetup = ({ darkMode, onComplete, required = true }) => {
   }, [connectedProviders]);
 
  const handleConnectProvider = async (providerId) => {
-  // 🎯 USE THE SAME CLIENT ID AS THE WORKING TEST BUTTON
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 
-                   import.meta.env.REACT_APP_GOOGLE_CLIENT_ID ||
-                   '1010674150807-jt9b1bq7e8mem10b2tjgnlhf5j5ogeib.apps.googleusercontent.com';
-  
-  const redirectUri = 'http://localhost:5173/cloud/connected';
-  const scope = 'https://www.googleapis.com/auth/drive.file';
-  const state = `connect_${Date.now()}`;
-
-  const params = new URLSearchParams({
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    scope: scope,
-    response_type: 'code',
-    access_type: 'offline',
-    prompt: 'consent',
-    state: state
-  });
-
-  const oauthUrl = `https://accounts.google.com/o/oauth2/auth?${params.toString()}`;
-  
-  console.log('🔗 Using Client ID:', clientId);
-  console.log('🔗 OAuth URL:', oauthUrl);
-  
-  window.location.href = oauthUrl;
+  if (providerId === 'google_drive') {
+    try {
+      const response = await fetch('http://localhost:8000/api/cloud/connect/google_drive', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        window.location.href = data.auth_url; // Redirect to Google OAuth
+      }
+    } catch (error) {
+      console.error('Failed to initiate Google OAuth:', error);
+    }
+  }
 };
 
   const handleTestConnection = async (providerId) => {
