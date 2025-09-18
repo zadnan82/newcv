@@ -2,21 +2,10 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { API_BASE_URL, checkBackendAvailability } from '../config';
+import { API_BASE_URL, checkBackendAvailability, GOOGLE_DRIVE_ENDPOINTS } from '../config';
 
 // Google Drive specific endpoints
-const GOOGLE_DRIVE_ENDPOINTS = {
-  PROVIDERS: `${API_BASE_URL}/api/google-drive/providers`,
-  CONNECT: `${API_BASE_URL}/api/google-drive/connect`,
-  STATUS: `${API_BASE_URL}/api/google-drive/status`,
-  TEST: `${API_BASE_URL}/api/google-drive/test`,
-  SAVE: `${API_BASE_URL}/api/google-drive/save`,
-  LIST: `${API_BASE_URL}/api/google-drive/list`,
-  LOAD: (fileId) => `${API_BASE_URL}/api/google-drive/load/${fileId}`,
-  DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/delete/${fileId}`,
-  DISCONNECT: `${API_BASE_URL}/api/google-drive/disconnect`,
-  DEBUG: `${API_BASE_URL}/api/google-drive/debug`
-};
+ 
 
 let globalInitialized = false;
 

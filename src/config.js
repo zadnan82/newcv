@@ -111,6 +111,20 @@ export const FEEDBACK_ENDPOINTS = {
   ADMIN_DELETE: (id) => `${API_BASE_URL}/feedback/admin/${id}`,
 };
 
+
+export const GOOGLE_DRIVE_ENDPOINTS = {
+  PROVIDERS: `${API_BASE_URL}/api/google-drive/providers`,
+  CONNECT: `${API_BASE_URL}/api/google-drive/connect`,
+  STATUS: `${API_BASE_URL}/api/google-drive/status`,
+  TEST: `${API_BASE_URL}/api/google-drive/test`,
+  SAVE: `${API_BASE_URL}/api/google-drive/save`,
+  LIST: `${API_BASE_URL}/api/google-drive/list`,
+  LOAD: (fileId) => `${API_BASE_URL}/api/google-drive/load/${fileId}`,
+  DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/delete/${fileId}`,
+  DISCONNECT: `${API_BASE_URL}/api/google-drive/disconnect`,
+  DEBUG: `${API_BASE_URL}/api/google-drive/debug`
+};
+
 // ================== UTILITY FUNCTIONS ==================
 
 // Helper to build resume API URLs with provider and file_id
