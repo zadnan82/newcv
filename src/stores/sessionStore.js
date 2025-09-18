@@ -1,11 +1,8 @@
-// src/stores/sessionStore.js - Fixed cleanCVDataForAPI scope issue
+// src/stores/sessionStore.js - Fixed version with proper Google Drive CV loading
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { API_BASE_URL, checkBackendAvailability, GOOGLE_DRIVE_ENDPOINTS } from '../config';
-
-// Google Drive specific endpoints
- 
 
 let globalInitialized = false;
 
@@ -181,18 +178,6 @@ const useSessionStore = create(
           }
         }
         
-        // Final validation summary
-        let validationWarnings = 0;
-        const logValidationIssue = (message) => {
-          console.warn(message);
-          validationWarnings++;
-        };
-        
-        // Check for any remaining validation issues
-        if (validationWarnings > 0) {
-          console.warn(`⚠️ Fixed ${validationWarnings} validation issues`);
-        }
-        
         console.log('✅ CV data cleaned and validated successfully');
         return cleaned;
       },
@@ -332,7 +317,6 @@ const useSessionStore = create(
         }
       },
 
-    
       // ================== GOOGLE DRIVE CV OPERATIONS ==================
 
       saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
@@ -345,25 +329,6 @@ const useSessionStore = create(
         }
         
         console.log('💾 Saving to Google Drive...');
-        console.log('💾 CV Data structure:', {
-          title: cvData.title,
-          hasPersonalInfo: !!cvData.personal_info,
-          hasPhoto: !!cvData.photo,
-          hasPhotos: !!cvData.photos,
-          photoStructure: cvData.photo || cvData.photos,
-          sectionsCount: {
-            educations: cvData.educations?.length || 0,
-            experiences: cvData.experiences?.length || 0,
-            skills: cvData.skills?.length || 0,
-            languages: cvData.languages?.length || 0,
-            referrals: cvData.referrals?.length || 0,
-            custom_sections: cvData.custom_sections?.length || 0,
-            extracurriculars: cvData.extracurriculars?.length || 0,
-            hobbies: cvData.hobbies?.length || 0,
-            courses: cvData.courses?.length || 0,
-            internships: cvData.internships?.length || 0
-          }
-        });
         
         const { connectedProviders, sessionToken } = get();
         
@@ -385,7 +350,7 @@ const useSessionStore = create(
         try {
           set({ loading: true, error: null });
           
-          // Clean the data before sending - NOW USING CORRECT SCOPE
+          // Clean the data before sending
           const cleanedData = get().cleanCVDataForAPI(cvData);
           
           // Check data size before sending
@@ -394,34 +359,15 @@ const useSessionStore = create(
           
           console.log('💾 Sending cleaned CV to Google Drive API...');
           console.log(`📊 Final CV data size: ${dataSizeKB}KB (${dataSize} bytes)`);
-          console.log('💾 Cleaned data preview:', {
-            date_of_birth: cleanedData.personal_info?.date_of_birth,
-            hasEmptyStrings: JSON.stringify(cleanedData).includes('""'),
-            hasPhoto: !!cleanedData.photo?.photolink,
-            photoSize: cleanedData.photo?.photolink ? `${(cleanedData.photo.photolink.length / 1024).toFixed(1)}KB` : 'none'
-          });
 
-          // Add timeout handling - increased to 90 seconds and add progress logging
+          // Add timeout handling - increased to 90 seconds
           const controller = new AbortController();
-          
-          // Log progress every 10 seconds
-          const progressInterval = setInterval(() => {
-            console.log('⏳ Request still in progress...');
-          }, 10000);
           
           const timeoutId = setTimeout(() => {
             console.error('⏰ Request timed out after 90 seconds');
-            clearInterval(progressInterval);
             controller.abort();
-          }, 90000); // 90 second timeout
+          }, 90000);
 
-          console.log('About to make request with headers:', {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionToken}` 
-          });
-
-          console.log('Request body preview:', JSON.stringify(cleanedData).substring(0, 200) + '...');
-          
           const startTime = Date.now();
           console.log('🚀 Starting fetch request at:', new Date().toISOString());
 
@@ -436,30 +382,19 @@ const useSessionStore = create(
           });
 
           clearTimeout(timeoutId);
-          clearInterval(progressInterval);
           
           const endTime = Date.now();
           const duration = ((endTime - startTime) / 1000).toFixed(2);
           console.log(`📊 Request completed in ${duration} seconds`);
 
-          console.log('📊 Google Drive save response status:', response.status);
-
           if (response.ok) {
             const responseText = await response.text();
-            console.log('📊 Google Drive save response text:', responseText);
             
             let result;
             try {
               result = JSON.parse(responseText);
             } catch (parseError) {
               console.error('❌ Failed to parse JSON response:', parseError);
-              console.error('❌ Response text was:', responseText);
-              
-              // Check if response is HTML (error page)
-              if (responseText.trim().startsWith('<')) {
-                throw new Error('Server returned an error page instead of JSON. Check server logs.');
-              }
-              
               throw new Error('Invalid response from server');
             }
             
@@ -485,7 +420,6 @@ const useSessionStore = create(
               const errorData = JSON.parse(responseText);
               errorMessage = errorData.detail || errorData.message || errorMessage;
             } catch (e) {
-              // If response is HTML, extract meaningful error
               if (responseText.includes('504 Gateway Time-out')) {
                 errorMessage = 'Request timed out. The file might be too large. Try with a smaller image.';
               } else if (responseText.includes('413 Request Entity Too Large')) {
@@ -509,11 +443,10 @@ const useSessionStore = create(
           
           // Handle specific error types
           if (error.name === 'AbortError') {
-            // Check data size to provide specific guidance
             const dataSize = JSON.stringify(cvData).length;
             const sizeKB = (dataSize / 1024).toFixed(1);
             
-            let message = `Request timed out after 60 seconds (CV size: ${sizeKB}KB).`;
+            let message = `Request timed out after 90 seconds (CV size: ${sizeKB}KB).`;
             
             if (dataSize > 500000) {
               message += ' Your CV appears to have large image data. Try compressing or removing the photo, or use a smaller image.';
@@ -527,26 +460,16 @@ const useSessionStore = create(
               success: false, 
               error: message 
             };
-          } else if (error.message.includes('Failed to fetch')) {
-            return { 
-              success: false, 
-              error: 'Network error. Please check your connection and try again.' 
-            };
-          } else if (error.message.includes('NetworkError')) {
-            return { 
-              success: false, 
-              error: 'Network connection issue. Please try again.' 
-            };
-          } else {
-            return { 
-              success: false, 
-              error: `Save failed: ${error.message}` 
-            };
           }
+          
+          return { 
+            success: false, 
+            error: `Save failed: ${error.message}` 
+          };
         }
       },
 
-      // List CVs from Google Drive
+      // FIXED: List CVs from Google Drive - using config endpoints
       listGoogleDriveCVs: async () => {
         const { sessionToken } = get();
         
@@ -557,16 +480,35 @@ const useSessionStore = create(
         try {
           console.log('📋 Listing CVs from Google Drive...');
           
+          // Use the predefined endpoint from config.js
           const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.LIST, {
             headers: { 'Authorization': `Bearer ${sessionToken}` }
           });
 
           if (response.ok) {
             const result = await response.json();
-            console.log('📋 Google Drive CVs:', result);
-            return result.files;
+            console.log('📋 Google Drive API response:', result);
+            
+            // Handle the response structure properly
+            let files = [];
+            
+            if (result.files && Array.isArray(result.files)) {
+              // If result has a files property with an array
+              files = result.files;
+            } else if (Array.isArray(result)) {
+              // If result is directly an array
+              files = result;
+            } else {
+              console.warn('⚠️ Unexpected Google Drive API response structure:', result);
+              files = [];
+            }
+            
+            console.log(`📋 Extracted ${files.length} Google Drive files:`, files);
+            
+            return files; // Return just the files array
           } else {
             const errorText = await response.text();
+            console.error('❌ Google Drive list API error:', response.status, errorText);
             throw new Error(`List failed: ${errorText}`);
           }
         } catch (error) {
@@ -575,7 +517,7 @@ const useSessionStore = create(
         }
       },
 
-      // Load CV from Google Drive
+      // Load CV from Google Drive - using config endpoints  
       loadGoogleDriveCV: async (fileId) => {
         const { sessionToken } = get();
         
@@ -586,25 +528,35 @@ const useSessionStore = create(
         try {
           console.log('📥 Loading CV from Google Drive:', fileId);
           
+          // Use the predefined endpoint from config.js
           const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.LOAD(fileId), {
             headers: { 'Authorization': `Bearer ${sessionToken}` }
           });
 
           if (response.ok) {
             const result = await response.json();
-            console.log('📥 Google Drive CV loaded:', result);
-            return result.cv_data;
+            console.log('📥 Google Drive CV load response:', result);
+            
+            // The backend returns: {"success": True, "provider": "google_drive", "cv_data": response_data}
+            if (result.success && result.cv_data) {
+              console.log(`✅ Successfully loaded CV from Google Drive: ${fileId}`);
+              return result.cv_data; // Return just the CV data
+            } else {
+              console.error('❌ Invalid response structure from Google Drive load:', result);
+              return null;
+            }
           } else {
             const errorText = await response.text();
-            throw new Error(`Load failed: ${errorText}`);
+            console.error('❌ Google Drive load failed:', response.status, errorText);
+            throw new Error(`Load failed: ${response.status} - ${errorText}`);
           }
         } catch (error) {
-          console.error('❌ Google Drive load failed:', error);
+          console.error('❌ Google Drive load error:', error);
           throw error;
         }
       },
 
-      // Delete CV from Google Drive
+      // Delete CV from Google Drive - using config endpoints
       deleteGoogleDriveCV: async (fileId) => {
         const { sessionToken } = get();
         
@@ -615,6 +567,7 @@ const useSessionStore = create(
         try {
           console.log('🗑️ Deleting CV from Google Drive:', fileId);
           
+          // Use the predefined endpoint from config.js
           const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.DELETE(fileId), {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${sessionToken}` }
@@ -634,7 +587,7 @@ const useSessionStore = create(
         }
       },
 
-      // Disconnect Google Drive
+      // Disconnect Google Drive - using config endpoints
       disconnectGoogleDrive: async () => {
         const { sessionToken } = get();
         
@@ -645,6 +598,7 @@ const useSessionStore = create(
         try {
           console.log('🔓 Disconnecting Google Drive...');
           
+          // Use the predefined endpoint from config.js
           const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.DISCONNECT, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${sessionToken}` }
@@ -679,7 +633,7 @@ const useSessionStore = create(
         }
       },
 
-      // Get debug info
+      // Get debug info - using config endpoints
       getGoogleDriveDebugInfo: async () => {
         const { sessionToken } = get();
         
@@ -690,6 +644,7 @@ const useSessionStore = create(
         try {
           console.log('🐛 Getting Google Drive debug info...');
           
+          // Use the predefined endpoint from config.js
           const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.DEBUG, {
             headers: { 'Authorization': `Bearer ${sessionToken}` }
           });
@@ -736,63 +691,63 @@ const useSessionStore = create(
           return { success: false };
         }
       },
-      
 
+      // Test Google Drive connection with minimal data - using config endpoints
+      testMinimalSave: async () => {
+        const { sessionToken } = get();
+        
+        if (!sessionToken) {
+          throw new Error('No session token available');
+        }
 
-      // Test Google Drive connection with minimal data
-testMinimalSave: async () => {
-  const { sessionToken } = get();
-  
-  if (!sessionToken) {
-    throw new Error('No session token available');
-  }
+        try {
+          console.log('🧪 Testing minimal save to Google Drive...');
+          
+          // Create minimal test CV
+          const testCV = {
+            title: "Test CV",
+            is_public: false,
+            personal_info: {
+              full_name: "Test User"
+            },
+            educations: [],
+            experiences: [],
+            skills: [],
+            languages: [],
+            referrals: [],
+            custom_sections: [],
+            extracurriculars: [],
+            hobbies: [],
+            courses: [],
+            internships: [],
+            photo: { photolink: null }
+          };
+          
+          // Use the predefined endpoint from config.js
+          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${sessionToken}`,
+            },
+            body: JSON.stringify(testCV)
+          });
 
-  try {
-    console.log('🧪 Testing minimal save to Google Drive...');
-    
-    // Create minimal test CV
-    const testCV = {
-      title: "Test CV",
-      is_public: false,
-      personal_info: {
-        full_name: "Test User"
+          if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Minimal save test successful:', result);
+            return { success: true, result };
+          } else {
+            const errorText = await response.text();
+            console.error('❌ Minimal save test failed:', response.status, errorText);
+            return { success: false, error: errorText };
+          }
+        } catch (error) {
+          console.error('❌ Minimal save test error:', error);
+          return { success: false, error: error.message };
+        }
       },
-      educations: [],
-      experiences: [],
-      skills: [],
-      languages: [],
-      referrals: [],
-      custom_sections: [],
-      extracurriculars: [],
-      hobbies: [],
-      courses: [],
-      internships: [],
-      photo: { photolink: null }
-    };
-    
-    const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${sessionToken}`,
-      },
-      body: JSON.stringify(testCV)
-    });
 
-    if (response.ok) {
-      const result = await response.json();
-      console.log('✅ Minimal save test successful:', result);
-      return { success: true, result };
-    } else {
-      const errorText = await response.text();
-      console.error('❌ Minimal save test failed:', response.status, errorText);
-      return { success: false, error: errorText };
-    }
-  } catch (error) {
-    console.error('❌ Minimal save test error:', error);
-    return { success: false, error: error.message };
-  }
-},
       // ================== LOCAL STORAGE METHODS ==================
       
       saveLocally: (cvData) => {

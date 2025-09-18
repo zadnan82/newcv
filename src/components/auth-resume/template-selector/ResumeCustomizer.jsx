@@ -1,3 +1,5 @@
+// src/components/auth-resume/template-selector/ResumeCustomizer.jsx - Fixed Complete Version
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';  
 import { useTranslation } from 'react-i18next';
@@ -12,11 +14,11 @@ import useAuthStore from '../../../stores/authStore';
 import useResumeStore from '../../../stores/resumeStore';
 import useSessionStore from '../../../stores/sessionStore';
 import ResumeQRCode from '../public-cv/ResumeQRCode';
-import API_BASE_URL from '../../../config';
 import PublicToggle from './PublicToggle';
 import SaveCustomizationsButton from './SaveCustomizationsButton'; 
 import { exportToDocx } from '../view-cv/js/Exportdocx';
 import SaveConfirmationModal from './SaveConfirmationModal';
+import API_BASE_URL from '../../../config';
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
@@ -70,7 +72,7 @@ const addGlobalStyles = () => {
 }; 
 addGlobalStyles();
 
-// Enhanced CV Selection Modal
+// Enhanced CV Selection Modal (Inline since import might be failing)
 const CVSelectionModal = ({ 
   isOpen, 
   onClose, 
@@ -79,15 +81,16 @@ const CVSelectionModal = ({
   onSelectCV, 
   isLoading, 
   onRefresh,
-  isDarkMode 
+  isDarkMode,
+  title = "Select CV",
+  subtitle = "Choose which CV you'd like to work with"
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+  const [viewMode, setViewMode] = useState('list');
 
   if (!isOpen) return null;
 
-  // Group CVs by source
   const groupedCVs = availableCVs.reduce((groups, cv) => {
     const source = cv.source;
     if (!groups[source]) groups[source] = [];
@@ -95,7 +98,6 @@ const CVSelectionModal = ({
     return groups;
   }, {});
 
-  // Filter CVs based on search
   const filteredGroupedCVs = {};
   Object.keys(groupedCVs).forEach(source => {
     const filtered = groupedCVs[source].filter(cv => 
@@ -156,15 +158,14 @@ const CVSelectionModal = ({
         }`}>
           <div>
             <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Select CV to Customize
+              {title}
             </h2>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Choose which CV you'd like to customize. Found {availableCVs.length} CV{availableCVs.length !== 1 ? 's' : ''}.
+              {subtitle}. Found {availableCVs.length} CV{availableCVs.length !== 1 ? 's' : ''}.
             </p>
           </div>
           
           <div className="flex items-center gap-2">
-            {/* Refresh button */}
             <button
               onClick={onRefresh}
               disabled={isLoading}
@@ -178,7 +179,6 @@ const CVSelectionModal = ({
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
             
-            {/* Close button */}
             <button 
               onClick={onClose}
               className={`p-2 rounded-lg ${
@@ -212,7 +212,6 @@ const CVSelectionModal = ({
               />
             </div>
             
-            {/* View toggle */}
             <div className={`flex rounded-lg p-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
               <button
                 onClick={() => setViewMode('list')}
@@ -252,14 +251,13 @@ const CVSelectionModal = ({
                 {searchTerm ? 'No CVs match your search' : 'No CVs found'}
               </p>
               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                {searchTerm ? 'Try a different search term' : 'Create a CV first to customize it'}
+                {searchTerm ? 'Try a different search term' : 'Create a CV first to work with it'}
               </p>
             </div>
           ) : (
             <div className="space-y-6">
               {Object.entries(filteredGroupedCVs).map(([source, cvs]) => (
                 <div key={source}>
-                  {/* Source Header */}
                   <div className="flex items-center gap-2 mb-3">
                     {getSourceIcon(source)}
                     <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -272,7 +270,6 @@ const CVSelectionModal = ({
                     </span>
                   </div>
 
-                  {/* CVs Grid/List */}
                   <div className={viewMode === 'grid' 
                     ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3' 
                     : 'space-y-2'
@@ -293,7 +290,6 @@ const CVSelectionModal = ({
                               : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
                           }`}
                         >
-                          {/* CV Header */}
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1 min-w-0">
                               <h4 className={`font-medium truncate ${
@@ -320,7 +316,6 @@ const CVSelectionModal = ({
                             )}
                           </div>
 
-                          {/* CV Details */}
                           <div className="space-y-1">
                             {preview.title && (
                               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -330,13 +325,17 @@ const CVSelectionModal = ({
                             
                             <div className="flex items-center justify-between text-xs">
                               <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
-                                {source === 'cloud' && cv.modifiedTime && `Modified ${formatDate(cv.modifiedTime)}`}
+                                {source === 'cloud' && cv.modifiedTime && (
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    {formatDate(cv.modifiedTime)}
+                                  </div>
+                                )}
                                 {source === 'draft' && 'Current editing session'}
                                 {source === 'local' && 'Saved on this device'}
                                 {source === 'api' && `ID: ${cv.id}`}
                               </span>
                               
-                              {/* Source badge */}
                               <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
                                 source === 'cloud' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
                                 source === 'draft' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
@@ -397,7 +396,7 @@ const CVSelectionModal = ({
                     : 'bg-gray-400 text-gray-600 cursor-not-allowed'
                 }`}
               >
-                Customize This CV
+                Select This CV
               </button>
             </div>
           </div>
@@ -407,7 +406,7 @@ const CVSelectionModal = ({
   );
 };
 
-// Compact CV Selector for Header
+// Compact CV Selector
 const CompactCVSelector = ({ 
   selectedCV, 
   availableCVs,
@@ -485,11 +484,10 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
   const { token } = useAuthStore();
   const { currentResume, loading, fetchResume } = useResumeStore();  
   const { 
-    connectedProviders, 
-     listGoogleDriveCVs, // Add this
-    canSaveToCloud, 
-    loadFromConnectedCloud,
-    saveToConnectedCloud 
+    listGoogleDriveCVs,
+    loadGoogleDriveCV,  // Add this method
+    canSaveToCloud,
+    sessionToken  
   } = useSessionStore();
   
   const { width } = useWindowSize();
@@ -532,231 +530,207 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
     }
   };
 
-  const getGoogleDriveFileContent = async (fileId) => {
-  try {
-    console.log('📁 Getting Google Drive file content for:', fileId);
-    
-    const contentResponse = await fetch(`${API_BASE_URL}/google-drive/file/${fileId}/content`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!contentResponse.ok) {
-      console.error('❌ Failed to fetch Google Drive file content:', contentResponse.status);
-      return null;
-    }
-    
-    // Try to get response as text first
-    const responseText = await contentResponse.text();
-    
-    // Try to parse as JSON
+  // Main function to load all available CVs
+  const loadAvailableCVs = async () => {
+    setIsLoadingCVs(true);
+    const cvs = [];
+
     try {
-      const jsonData = JSON.parse(responseText);
-      
-      // Handle different JSON structures
-      if (jsonData.content && typeof jsonData.content === 'string') {
+      console.log('🔍 Loading available CVs from all sources...');
+
+      // 1. Check for draft from NewResumeBuilder
+      const draftData = localStorage.getItem('cv_draft_for_customization');
+      if (draftData) {
         try {
-          return JSON.parse(jsonData.content);
-        } catch (e) {
-          return jsonData.content; // Return as string if can't parse
+          const parsed = JSON.parse(draftData);
+          console.log('📝 Found draft from CV builder:', parsed.title || 'Untitled');
+          cvs.push({
+            id: 'draft-customization',
+            source: 'draft',
+            title: parsed.title || 'Draft from CV Builder',
+            name: 'Current editing session',
+            content: parsed,
+            personal_info: parsed.personal_info,
+            priority: 1
+          });
+        } catch (error) {
+          console.error('Error parsing draft data:', error);
         }
       }
-      return jsonData;
-    } catch (jsonError) {
-      // If not JSON, return as text
-      console.log('⚠️ Response is not JSON, returning as text');
-      return responseText;
-    }
-  } catch (error) {
-    console.error('❌ Error fetching Google Drive file:', error);
-    return null;
-  }
-};
 
-// Also update the loadAvailableCVs function to handle the case where file content might be null:
-const loadAvailableCVs = async () => {
-  setIsLoadingCVs(true);
-  const cvs = [];
-
-  try {
-    console.log('🔍 Loading available CVs from all sources...');
-
-    // 1. Check for draft from NewResumeBuilder
-    const draftData = localStorage.getItem('cv_draft_for_customization');
-    if (draftData) {
-      try {
-        const parsed = JSON.parse(draftData);
-        console.log('📝 Found draft from CV builder:', parsed.title || 'Untitled');
-        cvs.push({
-          id: 'draft-customization',
-          source: 'draft',
-          title: parsed.title || 'Draft from CV Builder',
-          name: 'Current editing session',
-          content: parsed,
-          personal_info: parsed.personal_info,
-          priority: 1
-        });
-      } catch (error) {
-        console.error('Error parsing draft data:', error);
+      // 2. Check for recent local CV
+      const localCV = localStorage.getItem('cv_draft');
+      if (localCV) {
+        try {
+          const parsed = JSON.parse(localCV);
+          console.log('💾 Found local CV:', parsed.title || 'Untitled');
+          cvs.push({
+            id: 'local-draft-' + Date.now(),
+            source: 'local',
+            title: parsed.title || 'Local Draft',
+            name: 'Saved on this device',
+            content: parsed,
+            personal_info: parsed.personal_info,
+            priority: 3
+          });
+        } catch (error) {
+          console.error('Error parsing local CV:', error);
+        }
       }
-    }
 
-    // 2. Check for recent local CV
-    const localCV = localStorage.getItem('cv_draft');
-    // Local CV section - simplified
-if (localCV) {
-  try {
-    const parsed = JSON.parse(localCV);
-    console.log('💾 Found local CV:', parsed.title || 'Untitled');
-    cvs.push({
-      id: 'local-draft-' + Date.now(), // Unique ID
-      source: 'local',
-      title: parsed.title || 'Local Draft',
-      name: 'Saved on this device',
-      content: parsed,
-      personal_info: parsed.personal_info,
-      priority: 3
-    });
-  } catch (error) {
-    console.error('Error parsing local CV:', error);
-  }
-}
-
-    // 3. Load from Google Drive if connected
-    if (canSaveToCloud()) {
-      try {
-        console.log('☁️ Loading CVs from Google Drive using session store...');
-        const cloudCVs = await listGoogleDriveCVs();
-        
-        if (cloudCVs && cloudCVs.files && cloudCVs.files.length > 0) {
-          console.log(`📁 Found ${cloudCVs.files.length} Google Drive files`);
+      // 3. Load from Google Drive if connected - ENHANCED VERSION WITH BETTER LOGGING
+      if (canSaveToCloud()) {
+        try {
+          console.log('☁️ Loading CVs from Google Drive...');
+          console.log('☁️ Google Drive connection status:', canSaveToCloud());
           
-          // Fetch the actual content for each Google Drive file
-          for (const file of cloudCVs.files) {
-            try {
-              const fileContent = await getGoogleDriveFileContent(file.file_id);
-              
-             // In the Google Drive loading section of loadAvailableCVs:
-// Enhanced Google Drive processing
-if (cloudCVs && cloudCVs.files && cloudCVs.files.length > 0) {
-  console.log(`📁 Found ${cloudCVs.files.length} Google Drive files`);
-  
-  // Process files in parallel with Promise.all
-  const driveCVs = await Promise.all(
-    cloudCVs.files.map(async (file) => {
-      try {
-        const fileContent = await getGoogleDriveFileContent(file.file_id);
-        
-        if (!fileContent || fileContent.error) {
-          console.log(`⚠️ Skipping Google Drive file: ${file.name} - invalid content`);
-          return null;
-        }
-        
-        // Handle different content structures
-        let actualContent = fileContent;
-        if (typeof fileContent === 'object' && fileContent.content) {
-          actualContent = fileContent.content;
-        } else if (typeof fileContent === 'string') {
-          try {
-            actualContent = JSON.parse(fileContent);
-          } catch (parseError) {
-            console.log(`⚠️ Google Drive file is not valid JSON: ${file.name}`);
-            return null;
-          }
-        }
-        
-        return {
-          id: file.file_id,
-          source: 'cloud',
-          title: file.name?.replace('.json', '') || `Google Drive CV`,
-          name: file.name || 'Untitled',
-          content: actualContent,
-          modifiedTime: file.last_modified,
-          personal_info: actualContent.personal_info,
-          priority: 2
-        };
-      } catch (fileError) {
-        console.error(`❌ Error loading file ${file.file_id}:`, fileError);
-        return null;
-      }
-    })
-  );
-  
-  // Filter out null results and add to CVs array
-  const validDriveCVs = driveCVs.filter(cv => cv !== null);
-  cvs.push(...validDriveCVs);
-}
-            } catch (fileError) {
-              console.error(`❌ Error loading file ${file.file_id}:`, fileError);
+          const cloudData = await listGoogleDriveCVs();
+          console.log('☁️ Raw Google Drive response:', cloudData);
+          console.log('☁️ Is cloudData an array?', Array.isArray(cloudData));
+          console.log('☁️ cloudData length:', cloudData?.length);
+          
+          if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+            console.log(`📁 Processing ${cloudData.length} Google Drive files...`);
+            
+            // Process files in parallel with Promise.all
+            const driveCVPromises = cloudData.map(async (file, index) => {
+              try {
+                console.log(`📥 Processing Google Drive file ${index + 1}/${cloudData.length}:`, {
+                  name: file.name,
+                  id: file.file_id,
+                  size: file.size_bytes
+                });
+                
+                // Use the correct sessionStore method that calls the right endpoint
+                try {
+                  const fileContent = await loadGoogleDriveCV(file.file_id);
+                  console.log(`📥 File content loaded for ${file.name}:`, {
+                    hasContent: !!fileContent,
+                    contentType: typeof fileContent,
+                    isSuccess: fileContent?.success !== false
+                  });
+                  
+                  if (!fileContent || fileContent.error) {
+                    console.log(`⚠️ Skipping Google Drive file: ${file.name} - invalid content or error`);
+                    return null;
+                  }
+                  
+                  // The sessionStore method should return the parsed CV data directly
+                  let actualContent = fileContent;
+                  
+                  // If the response has a cv_data wrapper, extract it
+                  if (fileContent.cv_data) {
+                    actualContent = fileContent.cv_data;
+                  }
+                  
+                  console.log(`✅ Successfully processed Google Drive file: ${file.name}`, {
+                    hasPersonalInfo: !!actualContent?.personal_info,
+                    title: actualContent?.title,
+                    fullName: actualContent?.personal_info?.full_name
+                  });
+                  
+                  return {
+                    id: file.file_id,
+                    source: 'cloud',
+                    title: file.name?.replace('.json', '') || `Google Drive CV`,
+                    name: file.name || 'Untitled',
+                    content: actualContent,
+                    modifiedTime: file.last_modified,
+                    personal_info: actualContent.personal_info,
+                    priority: 2
+                  };
+                } catch (loadError) {
+                  console.error(`❌ Error loading content for ${file.name}:`, loadError);
+                  return null;
+                }
+                
+              } catch (fileError) {
+                console.error(`❌ Error processing Google Drive file ${file.file_id}:`, fileError);
+                return null;
+              }
+            });
+            
+            console.log(`🔄 Waiting for all ${driveCVPromises.length} Google Drive files to process...`);
+            const driveCVs = await Promise.all(driveCVPromises);
+            
+            // Filter out null results and add to CVs array
+            const validDriveCVs = driveCVs.filter(cv => cv !== null);
+            console.log(`✅ Successfully processed ${validDriveCVs.length}/${cloudData.length} Google Drive CVs`);
+            
+            if (validDriveCVs.length > 0) {
+              console.log('✅ Adding Google Drive CVs to list:', validDriveCVs.map(cv => ({
+                title: cv.title,
+                source: cv.source,
+                hasContent: !!cv.content
+              })));
+              cvs.push(...validDriveCVs);
+            } else {
+              console.warn('⚠️ No valid Google Drive CVs found after processing');
             }
+          } else {
+            console.log('ℹ️ No Google Drive files found or invalid response structure');
           }
+        } catch (error) {
+          console.error('❌ Error loading from Google Drive:', error);
+          console.error('❌ Error details:', {
+            message: error.message,
+            stack: error.stack
+          });
         }
-      } catch (error) {
-        console.error('❌ Error loading from Google Drive via session store:', error);
+      } else {
+        console.log('ℹ️ Google Drive not connected, skipping cloud CVs');
       }
-    }
 
-    // 4. Add current resume from API if exists
-    if (currentResume && currentResume.id) {
-      console.log('🌐 Found API resume:', currentResume.title || currentResume.id);
-      cvs.push({
-        id: currentResume.id,
-        source: 'api',
-        title: currentResume.title || `Resume ${currentResume.id}`,
-        name: 'From database',
-        content: currentResume,
-        personal_info: currentResume.personal_info,
-        priority: 2
+      // 4. Add current resume from API if exists
+      if (currentResume && currentResume.id) {
+        console.log('🌐 Found API resume:', currentResume.title || currentResume.id);
+        cvs.push({
+          id: currentResume.id,
+          source: 'api',
+          title: currentResume.title || `Resume ${currentResume.id}`,
+          name: 'From database',
+          content: currentResume,
+          personal_info: currentResume.personal_info,
+          priority: 2
+        });
+      }
+
+      // Sort by priority
+      cvs.sort((a, b) => a.priority - b.priority);
+
+      console.log(`✅ Loaded ${cvs.length} CVs total from all sources`);
+      
+      // Debug log
+      console.group('📋 Loaded CVs Summary');
+      cvs.forEach((cv, index) => {
+        console.log(`CV ${index + 1}:`, {
+          source: cv.source,
+          title: cv.title,
+          id: cv.id,
+          hasContent: !!cv.content,
+          contentType: typeof cv.content
+        });
       });
-    }
+      console.groupEnd();
 
-    // Sort by priority
-    cvs.sort((a, b) => a.priority - b.priority);
+      setAvailableCVs(cvs);
 
-    console.log(`✅ Loaded ${cvs.length} CVs total`);
-    setAvailableCVs(cvs);
-
-    // Auto-select the highest priority CV
-    if (cvs.length > 0 && !selectedCV) {
-      const priorityCV = cvs.find(cv => cv.content); // Find first CV with actual content
-      if (priorityCV) {
-        console.log('🎯 Auto-selecting CV:', priorityCV.title);
-        handleSelectCV(priorityCV);
+      // Auto-select the highest priority CV if none selected
+      if (cvs.length > 0 && !selectedCV) {
+        const priorityCV = cvs.find(cv => cv.content); // Find first CV with actual content
+        if (priorityCV) {
+          console.log('🎯 Auto-selecting CV:', priorityCV.title);
+          handleSelectCV(priorityCV);
+        }
       }
+
+    } catch (error) {
+      console.error('❌ Error loading available CVs:', error);
+      setLocalError('Failed to load available CVs');
+    } finally {
+      setIsLoadingCVs(false);
     }
- 
-debugCVs(cvs);
-setAvailableCVs(cvs);
-
-  } catch (error) {
-    console.error('❌ Error loading available CVs:', error);
-    setLocalError('Failed to load available CVs');
-  } finally {
-    setIsLoadingCVs(false);
-  }
-};
-
-// Add this function to debug CV loading
-const debugCVs = (cvs) => {
-  console.group('📋 Loaded CVs Summary');
-  cvs.forEach((cv, index) => {
-    console.log(`CV ${index + 1}:`, {
-      source: cv.source,
-      title: cv.title,
-      id: cv.id,
-      hasContent: !!cv.content,
-      contentType: typeof cv.content
-    });
-  });
-  console.groupEnd();
-  
-// Then call it after loading CVs:
-console.log(`✅ Loaded ${cvs.length} CVs total`);
-};
- 
-
+  };
 
   // Handle CV selection
   const handleSelectCV = (cv) => {
@@ -768,7 +742,7 @@ console.log(`✅ Loaded ${cvs.length} CVs total`);
     setShowCVModal(false);
   };
  
-// Enhanced initialization
+  // Enhanced initialization
   useEffect(() => {
     console.log('🔧 ResumeCustomizer: Initializing with enhanced CV selection...');
     
@@ -785,11 +759,6 @@ console.log(`✅ Loaded ${cvs.length} CVs total`);
       
       // Always load available CVs for selection
       await loadAvailableCVs();
-
-      // If no CVs found, show modal immediately
-      if (availableCVs.length === 0 && !resumeData) {
-        setShowCVModal(true);
-      }
     };
     
     initializeData();
@@ -872,32 +841,15 @@ console.log(`✅ Loaded ${cvs.length} CVs total`);
       let saveSuccess = false;
       let saveMessage = '';
 
-      // Try to save to cloud first if available
-      if (canSaveToCloud()) {
-        try {
-          console.log('☁️ Saving to Google Drive...');
-          const cloudResult = await saveToConnectedCloud(updatedData, 'google_drive');
-          if (cloudResult.success) {
-            saveSuccess = true;
-            saveMessage = 'Customizations saved to Google Drive!';
-            localStorage.setItem('cv_draft', JSON.stringify(updatedData));
-          }
-        } catch (cloudError) {
-          console.error('❌ Cloud save failed, falling back to local:', cloudError);
-        }
-      }
-
-      // If cloud save failed or not available, save locally
-      if (!saveSuccess) {
-        try {
-          console.log('💾 Saving locally...');
-          localStorage.setItem('cv_draft', JSON.stringify(updatedData));
-          saveSuccess = true;
-          saveMessage = 'Customizations saved locally!';
-        } catch (localError) {
-          console.error('❌ Local save failed:', localError);
-          throw new Error('Failed to save customizations');
-        }
+      // Try to save locally
+      try {
+        console.log('💾 Saving locally...');
+        localStorage.setItem('cv_draft', JSON.stringify(updatedData));
+        saveSuccess = true;
+        saveMessage = 'Customizations saved locally!';
+      } catch (localError) {
+        console.error('❌ Local save failed:', localError);
+        throw new Error('Failed to save customizations');
       }
 
       // If we have a resumeId, also try to save via API
@@ -925,10 +877,10 @@ console.log(`✅ Loaded ${cvs.length} CVs total`);
           });
       
           if (!response.ok) {
-            console.warn('⚠️ API save failed, but local/cloud save succeeded');
+            console.warn('⚠️ API save failed, but local save succeeded');
           }
         } catch (apiError) {
-          console.warn('⚠️ API save failed, but local/cloud save succeeded:', apiError);
+          console.warn('⚠️ API save failed, but local save succeeded:', apiError);
         }
       }
       
@@ -1034,8 +986,8 @@ console.log(`✅ Loaded ${cvs.length} CVs total`);
     );
   }
 
-  // Show CV selection modal if no CV selected and we have multiple options
-  if (!selectedCV && availableCVs.length > 1) {
+  // Show CV selection immediately if no CV data and we have CVs available
+  if (!resumeData && availableCVs.length > 0 && !showCVModal) {
     setShowCVModal(true);
   }
     
@@ -1436,9 +1388,11 @@ console.log(`✅ Loaded ${cvs.length} CVs total`);
         isLoading={isLoadingCVs}
         onRefresh={loadAvailableCVs}
         isDarkMode={isDarkMode}
+        title="Select CV to Customize"
+        subtitle="Choose which CV you'd like to customize"
       />
     </>
   );
 };
 
-export default ResumeCustomizer; 
+export default ResumeCustomizer;
