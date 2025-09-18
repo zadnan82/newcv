@@ -18,8 +18,7 @@ import Internships from '../builder/Internships';
 import Alert from '../../shared/Alert';  
 import ResumePreview from './ResumePreview';
 import PersonalInfo from '../builder/PersonalInfo';  
-import ResumeTitle from '../builder/ResumeTitle';
-import NewPhotoUpload from '../builder/NewPhotoUpload';
+import ResumeTitle from '../builder/ResumeTitle'; 
 
 // Import simplified components
 import useSessionStore from '../../../stores/sessionStore';

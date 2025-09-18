@@ -21,8 +21,7 @@ import ResumeTitle from '../builder/ResumeTitle';
 import EditPhotoUpload from '../builder/EditPhotoUpload';
 import { exportToPDF, printResumeFn } from './js/pdfExporterUtilsNew';
 import { exportToDocx } from './js/Exportdocx';
-import { exportResumeToDocxAlt } from './js/AltWordExport';
-import SaveButton from './SaveButton';
+import { exportResumeToDocxAlt } from './js/AltWordExport'; 
 import { CV_AI_ENDPOINTS } from '../../../config';
 
 const EditResumeBuilder = ({ darkMode }) => {
@@ -556,7 +555,7 @@ const EditResumeBuilder = ({ darkMode }) => {
                   }`}
                 >
                   <div className="py-1">
-                    <SaveButton  
+                    {/* <SaveButton  
                       formData={formData}
                       darkMode={darkMode}
                       isSaving={isSaving}
@@ -571,7 +570,7 @@ const EditResumeBuilder = ({ darkMode }) => {
                           ? 'hover:bg-gray-600' 
                           : 'hover:bg-gray-100'
                       }`}
-                    />
+                    /> */}
                     
                     <button
                       onClick={handleAIEnhancement}

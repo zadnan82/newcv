@@ -1,7 +1,6 @@
 // src/components/clouds/CloudSetup.jsx - Google Drive focused
 import React, { useState } from 'react';
-import { ArrowLeft, Shield, HardDrive, Cloud, CheckCircle } from 'lucide-react';
-import SimpleCloudConnect from './SimpleCloudConnect';
+import { ArrowLeft, Shield, HardDrive, Cloud, CheckCircle } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
 
 const CloudSetup = ({ darkMode }) => {
