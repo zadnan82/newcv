@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Shield, HardDrive, Cloud, CheckCircle } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
+import SimpleCloudConnect from './SimpleCloudConnect';
 
 const CloudSetup = ({ darkMode }) => {
   const navigate = useNavigate();
