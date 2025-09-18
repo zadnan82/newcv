@@ -122,6 +122,70 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
     return () => clearTimeout(timer);
   }, [loading]);
   
+
+  useEffect(() => {
+  // NEW: Handle data from NewResumeBuilder when no resumeId exists
+  if (!resumeId) {
+    console.log('No resumeId, checking for NewResumeBuilder data...');
+    
+    // Check for data from NewResumeBuilder
+    const draftData = localStorage.getItem('cv_draft_for_customization');
+    if (draftData) {
+      try {
+        const parsedData = JSON.parse(draftData);
+        console.log('Found NewResumeBuilder draft data:', parsedData);
+        
+        setResumeData(parsedData);
+        
+        // Set customization from the draft data if available
+        if (parsedData.customization) {
+          setSelectedTemplate(parsedData.customization.template || 'stockholm');
+          setCustomSettings({
+            accentColor: parsedData.customization.accent_color || '#6366f1',
+            fontFamily: parsedData.customization.font_family || 'Helvetica, Arial, sans-serif',
+            lineSpacing: parsedData.customization.line_spacing || 1.5,
+            headingsUppercase: parsedData.customization.headings_uppercase || false,
+            hideSkillLevel: parsedData.customization.hide_skill_level || false
+          });
+        }
+        
+        // Clear the draft data since we've loaded it
+        localStorage.removeItem('cv_draft_for_customization');
+        
+        setLocalError(null); // Clear any error
+      } catch (error) {
+        console.error('Error parsing NewResumeBuilder draft:', error);
+        setLocalError("Error loading CV data from editor.");
+      }
+    } else {
+      // No resumeId and no draft data
+      setLocalError("No resume data found. Please create a resume first or return from the CV builder.");
+    }
+  }
+}, [resumeId]); // Add resumeId as dependency
+
+// ALSO ADD this to handle going back to NewResumeBuilder:
+const handleBackToNewResumeBuilder = () => {
+  // Save current customizations back to NewResumeBuilder format
+  const updatedData = {
+    ...resumeData,
+    customization: {
+      template: selectedTemplate,
+      accent_color: customSettings.accentColor,
+      font_family: customSettings.fontFamily,
+      line_spacing: customSettings.lineSpacing,
+      headings_uppercase: customSettings.headingsUppercase,
+      hide_skill_level: customSettings.hideSkillLevel
+    }
+  };
+  
+  // Save to the draft that NewResumeBuilder will read
+  localStorage.setItem('cv_draft', JSON.stringify(updatedData));
+  
+  // Navigate back to NewResumeBuilder
+  navigate('/new-resume');
+};
+
   const updateSetting = (key, value) => {
     setCustomSettings(prev => ({
       ...prev,
@@ -224,26 +288,34 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
   }
     
   if (localError) {
-    return (
-      <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-black'}`}>
-        <div className={`text-center max-w-md p-5 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'}`}>
-          <div className={`mx-auto mb-3 flex items-center justify-center w-12 h-12 rounded-full ${isDarkMode ? 'bg-red-900' : 'bg-red-100'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isDarkMode ? 'text-red-500' : 'text-red-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-bold mb-2">{t('common.error')}</h2>
-          <p className="mb-4 text-sm">{localError}</p>
+  return (
+    <div className={`flex items-center justify-center h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-black'}`}>
+      <div className={`text-center max-w-md p-5 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'}`}>
+        <div className={`mx-auto mb-3 flex items-center justify-center w-12 h-12 rounded-full ${isDarkMode ? 'bg-red-900' : 'bg-red-100'}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isDarkMode ? 'text-red-500' : 'text-red-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h2 className="text-lg font-bold mb-2">{t('common.error')}</h2>
+        <p className="mb-4 text-sm">{localError}</p>
+        <div className="flex gap-2 justify-center">
           <button 
-            onClick={() => navigate('/resume')}
+            onClick={handleBackToNewResumeBuilder}
             className="px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-md hover:shadow-lg transition-shadow duration-300"
+          >
+            Back to CV Builder
+          </button>
+          <button 
+            onClick={() => navigate('/my-resumes')}
+            className="px-4 py-1.5 rounded-full bg-gray-500 text-white text-sm font-medium shadow-md hover:shadow-lg transition-shadow duration-300"
           >
             {t('resume.customizer.goBack')}
           </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
     
   if (!resumeData && !currentResume) {
     return (

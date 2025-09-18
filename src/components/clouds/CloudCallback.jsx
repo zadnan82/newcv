@@ -1,14 +1,8 @@
-// src/components/clouds/CloudCallback.jsx - Google Drive focused
+// src/components/clouds/CloudCallback.jsx - FIXED TO STOP INFINITE LOOPS
 import React, { useLayoutEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader, Shield } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
-
-// ABSOLUTE GLOBAL LOCK
-if (!window.__OAUTH_PROCESSED__) {
-  window.__OAUTH_PROCESSED__ = new Set();
-  window.__OAUTH_RESULTS__ = new Map();
-}
 
 const CloudCallback = ({ darkMode }) => {
   const { provider } = useParams();
@@ -18,134 +12,87 @@ const CloudCallback = ({ darkMode }) => {
   // Create unique key for this OAuth attempt
   const urlKey = `${provider}-${searchParams.get('success')}-${searchParams.get('error') || 'none'}`;
   
-  // State with immediate default from global cache
-  const [status, setStatus] = useState(() => {
-    const cached = window.__OAUTH_RESULTS__.get(urlKey);
-    return cached?.status || 'processing';
-  });
-  const [message, setMessage] = useState(() => {
-    const cached = window.__OAUTH_RESULTS__.get(urlKey);
-    return cached?.message || 'Processing Google Drive connection...';
-  });
+  // State
+  const [status, setStatus] = useState('processing');
+  const [message, setMessage] = useState('Processing Google Drive connection...');
+  const [processed, setProcessed] = useState(false);
 
   const { handleOAuthReturn } = useSessionStore();
 
-  // Use useLayoutEffect to run before React can duplicate
+  // Use useLayoutEffect to run before React renders
   useLayoutEffect(() => {
-    // Check if this exact URL combination was already processed
-    if (window.__OAUTH_PROCESSED__.has(urlKey)) {
-      console.log('Google Drive OAuth already processed for this URL, using cached result');
-      const cached = window.__OAUTH_RESULTS__.get(urlKey);
-      if (cached) {
-        setStatus(cached.status);
-        setMessage(cached.message);
-        if (cached.redirect) {
-          setTimeout(() => navigate(cached.redirect.path, cached.redirect.options), 1000);
-        }
-      }
-      return;
-    }
-
-    // Mark as processing to prevent other instances
-    window.__OAUTH_PROCESSED__.add(urlKey);
-    console.log('Processing Google Drive OAuth for:', urlKey);
+    // Prevent multiple processing
+    if (processed) return;
+    
+    console.log('🔧 CloudCallback: Processing OAuth return...');
+    setProcessed(true);
 
     const processCallback = async () => {
       const success = searchParams.get('success');
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
 
-      let result = { status: 'error', message: 'Unknown error' };
-
       if (error) {
-        result = {
-          status: 'error',
-          message: `Google Drive connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`
-        };
-      } else if (success === 'true') {
+        setStatus('error');
+        setMessage(`Google Drive connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`);
+        return;
+      }
+
+      if (success === 'true') {
         try {
-          // Set processing status
-          const processingResult = {
-            status: 'processing',
-            message: 'Verifying Google Drive connection...'
-          };
-          window.__OAUTH_RESULTS__.set(urlKey, processingResult);
           setStatus('processing');
           setMessage('Verifying Google Drive connection...');
 
-          // Wait for backend
+          // Wait for backend to process
           await new Promise(resolve => setTimeout(resolve, 2000));
 
-          // Try verification ONCE
+          // Try verification
           const verificationResult = await handleOAuthReturn('google_drive');
 
           if (verificationResult?.success) {
-            result = {
-              status: 'success',
-              message: `Successfully connected to Google Drive!`,
-              redirect: {
-                path: '/new-resume',
-                options: {
-                  replace: true,
-                  state: {
-                    message: `Google Drive connected! You can now save your CV to the cloud.`,
-                    provider: 'google_drive',
-                    email: verificationResult.email
-                  }
+            setStatus('success');
+            setMessage('Successfully connected to Google Drive!');
+            
+            // Redirect after success
+            setTimeout(() => {
+              navigate('/new-resume', {
+                replace: true,
+                state: {
+                  message: 'Google Drive connected! You can now save your CV to the cloud.',
+                  provider: 'google_drive',
+                  email: verificationResult.email
                 }
-              }
-            };
+              });
+            }, 2000);
           } else {
-            result = {
-              status: 'error',
-              message: 'Backend verification failed. OAuth completed but status check shows disconnected. You can try the "Continue Anyway" option.'
-            };
+            setStatus('error');
+            setMessage('Backend verification failed. You can try the "Continue Anyway" option.');
           }
         } catch (e) {
-          result = {
-            status: 'error',
-            message: `Verification error: ${e.message}`
-          };
+          setStatus('error');
+          setMessage(`Verification error: ${e.message}`);
         }
       } else {
-        result = {
-          status: 'error',
-          message: 'No success confirmation received'
-        };
-      }
-
-      // Cache the result globally
-      window.__OAUTH_RESULTS__.set(urlKey, result);
-      
-      // Update this component's state
-      setStatus(result.status);
-      setMessage(result.message);
-
-      // Handle redirect for success
-      if (result.redirect) {
-        setTimeout(() => {
-          navigate(result.redirect.path, result.redirect.options);
-        }, 2000);
+        setStatus('error');
+        setMessage('No success confirmation received');
       }
     };
 
     processCallback().catch(err => {
-      const errorResult = {
-        status: 'error',
-        message: `Processing error: ${err.message}`
-      };
-      window.__OAUTH_RESULTS__.set(urlKey, errorResult);
-      setStatus(errorResult.status);
-      setMessage(errorResult.message);
+      setStatus('error');
+      setMessage(`Processing error: ${err.message}`);
     });
 
-  }, [provider, urlKey, searchParams, navigate, handleOAuthReturn]);
+    // Cleanup function
+    return () => {
+      console.log('🔧 CloudCallback: Cleanup');
+    };
+  }, [processed, provider, searchParams, navigate, handleOAuthReturn]);
 
   const handleContinueAnyway = () => {
     // Force set provider as connected
     const store = useSessionStore.getState();
     if (store.connectedProviders && !store.connectedProviders.includes('google_drive')) {
-      // Manually update the store
       const newProviders = [...store.connectedProviders, 'google_drive'];
       useSessionStore.setState({ 
         connectedProviders: newProviders,
@@ -159,8 +106,9 @@ const CloudCallback = ({ darkMode }) => {
     }
     
     navigate('/new-resume', {
+      replace: true,
       state: {
-        message: `Assuming Google Drive is connected. Try saving to test.`,
+        message: 'Assuming Google Drive is connected. Try saving to test.',
         provider: 'google_drive',
         assumeConnected: true
       }
@@ -168,13 +116,12 @@ const CloudCallback = ({ darkMode }) => {
   };
 
   const handleRetry = () => {
-    // Clear the cache for this URL to allow retry
-    window.__OAUTH_PROCESSED__.delete(urlKey);
-    window.__OAUTH_RESULTS__.delete(urlKey);
-    navigate('/cloud-setup');
+    navigate('/cloud-setup', { replace: true });
   };
 
-  const handleGoHome = () => navigate('/');
+  const handleGoHome = () => {
+    navigate('/', { replace: true });
+  };
 
   return (
     <div className={`min-h-screen flex items-center justify-center ${
@@ -219,7 +166,7 @@ const CloudCallback = ({ darkMode }) => {
         <h1 className={`text-2xl font-bold mb-4 ${
           darkMode ? 'text-white' : 'text-gray-900'
         }`}>
-          {status === 'processing' && `Connecting to Google Drive...`}
+          {status === 'processing' && 'Connecting to Google Drive...'}
           {status === 'success' && 'Connection Successful!'}
           {status === 'error' && 'Connection Issue'}
         </h1>
@@ -233,31 +180,27 @@ const CloudCallback = ({ darkMode }) => {
 
         {/* Success Message */}
         {status === 'success' && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            darkMode ? 'bg-green-900/20 border border-green-700' : 'bg-green-50 border border-green-200'
-          }`}>
-            <div className="flex items-center justify-center">
-              <Shield className={`w-5 h-5 mr-2 ${
-                darkMode ? 'text-green-400' : 'text-green-600'
-              }`} />
-              <span className={`text-sm font-medium ${
-                darkMode ? 'text-green-300' : 'text-green-700'
-              }`}>
-                Your data stays in YOUR Google Drive account
-              </span>
+          <>
+            <div className={`mb-6 p-4 rounded-lg ${
+              darkMode ? 'bg-green-900/20 border border-green-700' : 'bg-green-50 border border-green-200'
+            }`}>
+              <div className="flex items-center justify-center">
+                <Shield className={`w-5 h-5 mr-2 ${
+                  darkMode ? 'text-green-400' : 'text-green-600'
+                }`} />
+                <span className={`text-sm font-medium ${
+                  darkMode ? 'text-green-300' : 'text-green-700'
+                }`}>
+                  Your data stays in YOUR Google Drive account
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Progress bar */}
-        {status === 'processing' && (
-          <div className={`w-full ${
-            darkMode ? 'bg-gray-700' : 'bg-gray-200'
-          } rounded-full h-2 mb-6`}>
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" 
-                 style={{ width: '70%' }}>
-            </div>
-          </div>
+            <p className={`text-sm ${
+              darkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>
+              Redirecting to resume builder...
+            </p>
+          </>
         )}
 
         {/* Error Actions */}
@@ -267,7 +210,7 @@ const CloudCallback = ({ darkMode }) => {
               onClick={handleContinueAnyway}
               className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              Continue Anyway (Override Backend Check)
+              Continue Anyway
             </button>
             <button
               onClick={handleRetry}
@@ -288,23 +231,14 @@ const CloudCallback = ({ darkMode }) => {
           </div>
         )}
 
-        {/* Success redirect */}
-        {status === 'success' && (
-          <p className={`text-sm ${
-            darkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}>
-            Redirecting to resume builder...
-          </p>
-        )}
-
-        {/* Debug */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className={`mt-6 p-3 rounded-lg text-xs ${
-            darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
-          }`}>
-            <div><strong>URL Key:</strong> {urlKey}</div>
-            <div><strong>Processed:</strong> {window.__OAUTH_PROCESSED__.has(urlKey) ? 'Yes' : 'No'}</div>
-            <div><strong>Cached:</strong> {window.__OAUTH_RESULTS__.has(urlKey) ? 'Yes' : 'No'}</div>
+        {/* Progress bar */}
+        {status === 'processing' && (
+          <div className={`w-full ${
+            darkMode ? 'bg-gray-700' : 'bg-gray-200'
+          } rounded-full h-2 mb-6`}>
+            <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" 
+                 style={{ width: '70%' }}>
+            </div>
           </div>
         )}
       </div>

@@ -1,24 +1,26 @@
+// src/Navbar.jsx - FIXED VERSION
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom'; 
 import { Menu, X, Moon, Sun, User, FileText, Settings, LogOut, FileSignature, ChevronDown, Shield, MessageSquare, LogIn, Cloud, CloudOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from './assets/logo.png';
 import logo2 from './assets/logo2.png';
-import useSessionStore from './stores/sessionStore'; // Updated import
+import useSessionStore from './stores/sessionStore';
 
 const Navbar = ({ darkMode, toggleDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation(); 
   
-  // Updated to use session store instead of auth store
- 
+  // Updated to use session store
   const { 
-  isSessionActive, 
-  connectedProviders,
-  clearSession,
-  initialize 
-} = useSessionStore();
+    isSessionActive, 
+    connectedProviders,
+    clearSession,
+    initialize,
+    googleDriveConnected,
+    backendAvailable
+  } = useSessionStore();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
@@ -56,12 +58,12 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     };
   }, [location]);
 
-  // Initialize session if not active
+  // Initialize session if not active and backend is available
   useEffect(() => {
-    if (!isSessionActive) {
+    if (backendAvailable && !isSessionActive) {
       initialize().catch(console.error);
     }
-  }, [isSessionActive, initialize]);
+  }, [backendAvailable, isSessionActive, initialize]);
 
   // Listen for cloud connection changes
   useEffect(() => {
@@ -91,7 +93,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   };
 
   const handleMyResumes = async () => {
-    if (!isSessionActive) {
+    if (backendAvailable && !isSessionActive) {
       try {
         await initialize();
       } catch (error) {
@@ -99,16 +101,12 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
       }
     }
     
-    if (hasConnectedProviders()) {
-      navigate('/my-resumes');
-    } else {
-      navigate('/cloud-setup');
-    }
+    navigate('/my-resumes');
     setMobileMenuOpen(false);
   };
 
   const handleCoverLetters = async () => {
-    if (!isSessionActive) {
+    if (backendAvailable && !isSessionActive) {
       try {
         await initialize();
       } catch (error) {
@@ -116,11 +114,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
       }
     }
     
-    if (hasConnectedProviders()) {
-      navigate('/cover-letters');
-    } else {
-      navigate('/cloud-setup');
-    }
+    navigate('/cover-letters');
     setMobileMenuOpen(false);
   };
  
@@ -149,101 +143,125 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
-  // Cloud status indicator component
- // Cloud status indicator component
-const CloudStatusIndicator = () => {
-  if (!isSessionActive) return null;
+  // FIXED: Cloud status indicator component
+  const CloudStatusIndicator = () => {
+    // Only show if backend is available
+    if (!backendAvailable) return null;
 
-  const cloudCount = connectedProviders.length;
-  const hasProviders = cloudCount > 0; // Fixed this line
+    const cloudCount = connectedProviders?.length || 0;
+    const hasProviders = cloudCount > 0;
 
-  return (
-    <div className="relative" ref={cloudStatusRef}>
-      <button 
-        onClick={() => setShowCloudStatus(!showCloudStatus)}
-        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-          hasProviders
-            ? darkMode 
-              ? 'hover:bg-green-800/20 text-green-400' 
-              : 'hover:bg-green-100 text-green-700'
-            : darkMode
-              ? 'hover:bg-red-800/20 text-red-400'
-              : 'hover:bg-red-100 text-red-600'
-        }`}
-        title={hasProviders ? `${cloudCount} cloud provider${cloudCount !== 1 ? 's' : ''} connected` : 'No cloud providers connected'}
-      >
-        {hasProviders ? (
-          <Cloud className="w-3 h-3" />
-        ) : (
-          <CloudOff className="w-3 h-3" />
-        )}
-        <span className="hidden sm:inline">
-          {hasProviders ? `${cloudCount}` : 'No Cloud'}
-        </span>
-        <ChevronDown className="w-3 h-3" />
-      </button>
-      
-      {/* Cloud status dropdown */}
-      {showCloudStatus && (
-        <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-2 w-48 rounded-lg shadow-xl z-20 ${
-          darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-        }`}>
-          <div className="px-3 py-1 border-b border-gray-200 dark:border-gray-700">
-            <p className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Cloud Storage Status
-            </p>
-          </div>
-          
-          {hasProviders ? (
-            <>
-              <div className="px-3 py-2">
-                <p className={`text-xs ${darkMode ? 'text-green-400' : 'text-green-600'} mb-2`}>
-                  ✓ {cloudCount} provider{cloudCount !== 1 ? 's' : ''} connected:
-                </p>
-                {connectedProviders.map(provider => (
-                  <div key={provider} className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-1`}>
-                    • {provider.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+    // Google Drive specific icon
+    const getProviderIcon = () => {
+      if (googleDriveConnected) {
+        return (
+          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
+          </svg>
+        );
+      }
+      return hasProviders ? <Cloud className="w-3 h-3" /> : <CloudOff className="w-3 h-3" />;
+    };
+
+    const getStatusText = () => {
+      if (googleDriveConnected) return 'Google Drive';
+      if (hasProviders) return `${cloudCount} Connected`;
+      return 'No Cloud';
+    };
+
+    const getStatusColor = () => {
+      if (googleDriveConnected) return darkMode ? 'text-green-400 hover:bg-green-800/20' : 'text-green-700 hover:bg-green-100';
+      if (hasProviders) return darkMode ? 'text-blue-400 hover:bg-blue-800/20' : 'text-blue-700 hover:bg-blue-100';
+      return darkMode ? 'text-gray-400 hover:bg-gray-800/20' : 'text-gray-500 hover:bg-gray-100';
+    };
+
+    return (
+      <div className="relative" ref={cloudStatusRef}>
+        <button 
+          onClick={() => setShowCloudStatus(!showCloudStatus)}
+          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${getStatusColor()}`}
+          title={hasProviders ? `Cloud storage connected` : 'No cloud storage connected'}
+        >
+          {getProviderIcon()}
+          <span className="hidden sm:inline">
+            {getStatusText()}
+          </span>
+          <ChevronDown className="w-3 h-3" />
+        </button>
+        
+        {/* Cloud status dropdown */}
+        {showCloudStatus && (
+          <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-2 w-64 rounded-lg shadow-xl z-20 ${
+            darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+          }`}>
+            <div className="px-3 py-1 border-b border-gray-200 dark:border-gray-700">
+              <p className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Cloud Storage Status
+              </p>
+            </div>
+            
+            {googleDriveConnected ? (
+              <>
+                <div className="px-3 py-2">
+                  <div className="flex items-center mb-2">
+                    <svg className="w-4 h-4 mr-2 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
+                    </svg>
+                    <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                      Google Drive Connected
+                    </span>
                   </div>
-                ))}
-              </div>
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
-                <button
-                  onClick={handleCloudSetup}
-                  className={`w-full text-left px-3 py-1 text-xs transition-colors ${
-                    darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
-                  }`}
-                >
-                  Manage Cloud Storage
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="px-3 py-2">
-                <p className={`text-xs ${darkMode ? 'text-red-400' : 'text-red-600'} mb-2`}>
-                  ⚠ No cloud storage connected
-                </p>
-                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
-                  Connect your cloud storage to save and access your CVs.
-                </p>
-              </div>
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
-                <button
-                  onClick={handleCloudSetup}
-                  className={`w-full text-left px-3 py-1 text-xs font-medium transition-colors ${
-                    darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
-                  }`}
-                >
-                  Connect Cloud Storage
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
+                    ✓ Your CVs sync across all devices
+                  </p>
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    ✓ Automatic backup enabled
+                  </p>
+                </div>
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                  <button
+                    onClick={handleCloudSetup}
+                    className={`w-full text-left px-3 py-1 text-xs transition-colors ${
+                      darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    Manage Cloud Storage
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="px-3 py-2">
+                  <div className="flex items-center mb-2">
+                    <CloudOff className={`w-4 h-4 mr-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                    <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      No Cloud Storage
+                    </span>
+                  </div>
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
+                    Your CVs are saved locally only
+                  </p>
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Connect cloud storage for device sync
+                  </p>
+                </div>
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                  <button
+                    onClick={handleCloudSetup}
+                    className={`w-full text-left px-3 py-1 text-xs font-medium transition-colors ${
+                      darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    Connect Cloud Storage
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md ${
@@ -311,8 +329,8 @@ const CloudStatusIndicator = () => {
                 <FileText className="w-3 h-3" /> {t('navigation.coverLetter')}
               </Link>
 
-              {/* Show these only when session is active */}
-              {isSessionActive && (
+              {/* Show these when backend is available */}
+              {backendAvailable && (
                 <>
                   <button
                     onClick={handleMyResumes}
@@ -406,8 +424,8 @@ const CloudStatusIndicator = () => {
               {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             
-            {/* Clear Session Button for Desktop (replaces Sign Out) */}
-            {isSessionActive && (
+            {/* Clear Session Button for Desktop */}
+            {backendAvailable && isSessionActive && (
               <button
                 onClick={handleSignOut}
                 className={`hidden md:flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
@@ -488,8 +506,8 @@ const CloudStatusIndicator = () => {
             <FileText className="w-4 h-4" /> {t('navigation.coverLetter')}
           </Link>
 
-          {/* Show session-dependent links */}
-          {isSessionActive && (
+          {/* Show session-dependent links when backend available */}
+          {backendAvailable && (
             <>
               <button
                 onClick={handleMyResumes}
@@ -531,16 +549,18 @@ const CloudStatusIndicator = () => {
                 <Cloud className="w-4 h-4" /> Cloud Storage
               </button>
               
-              <button
-                onClick={handleSignOut}
-                className={`w-full ${isRTL ? 'text-right' : 'text-left'} flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${
-                  darkMode
-                    ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
-                    : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
-                }`}
-              >
-                <LogOut className="w-4 h-4" /> Clear Session
-              </button>
+              {isSessionActive && (
+                <button
+                  onClick={handleSignOut}
+                  className={`w-full ${isRTL ? 'text-right' : 'text-left'} flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${
+                    darkMode
+                      ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                      : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
+                  }`}
+                >
+                  <LogOut className="w-4 h-4" /> Clear Session
+                </button>
+              )}
             </>
           )}
           

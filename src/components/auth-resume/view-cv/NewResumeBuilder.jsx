@@ -1,8 +1,8 @@
-// src/components/auth-resume/view-cv/NewResumeBuilder.jsx - FIXED Schema consistency
-import React, { useState, useEffect } from 'react';
+// src/components/auth-resume/view-cv/NewResumeBuilder.jsx - REWRITTEN CLEAN VERSION
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next'; 
-import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X, Save, HardDrive, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X, Save, HardDrive, Cloud, CheckCircle, AlertCircle, Loader2, Palette, Sparkles } from 'lucide-react';
 
 // Import components
 import Education from '../builder/Education';
@@ -24,6 +24,7 @@ import ResumeTitle from '../builder/ResumeTitle';
 import useSessionStore from '../../../stores/sessionStore';
 import SimpleCloudConnect from '../../clouds/SimpleCloudConnect';
 import Base64PhotoUpload from '../builder/Base64PhotoUpload';
+import StorageChoiceModal from './StorageChoiceModal';
 
 const NewResumeBuilder = ({ darkMode }) => {
   const navigate = useNavigate();
@@ -31,37 +32,18 @@ const NewResumeBuilder = ({ darkMode }) => {
   const { t } = useTranslation();
   const { resumeId: paramResumeId } = useParams();
   
-  // Use simplified session store
+  // Session store
   const { 
     connectedProviders,
     canSaveToCloud,
-    loading,
+    loading: sessionLoading,
     saveLocally,
-    saveToConnectedCloud
+    saveToConnectedCloud,
+    connectToCloudProvider
   } = useSessionStore();
   
-  const [activeSection, setActiveSection] = useState('personal');
-  const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [toast, setToast] = useState(null);
-  const [viewMode, setViewMode] = useState('edit');
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [localError, setLocalError] = useState(null);
-  const [showCloudSetup, setShowCloudSetup] = useState(false);
-  const [saveResult, setSaveResult] = useState(null);
-  const [saveType, setSaveType] = useState(null);
-  
-  // Show success message from cloud connection
-  useEffect(() => {
-    if (location.state?.message) {
-      showToast(location.state.message, 'success');
-      // Clear the state to prevent showing again
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state, navigate, location.pathname]);
-  
-  // FIXED: Blank resume template - matches backend schema exactly
-  const blankResumeTemplate = {
+  // Blank resume template - CONSTANT
+  const BLANK_RESUME_TEMPLATE = useMemo(() => ({
     title: "My Resume",
     is_public: false,
     customization: {
@@ -99,53 +81,145 @@ const NewResumeBuilder = ({ darkMode }) => {
     hobbies: [],
     courses: [],
     internships: [],
-    // IMPORTANT: Use 'photo' (singular) to match backend schema
     photo: { photolink: null }
-  };
+  }), []);
   
-  const [formData, setFormData] = useState(blankResumeTemplate);
-
-  // Initialize builder
+// Add this quick fix at the top of NewResumeBuilder component:
+  
+  // QUICK FIX: Clear any stuck OAuth processing flags on mount
   useEffect(() => {
-    console.log('🔧 NewResumeBuilder: Starting...');
+    // Clear any stuck OAuth processing from CloudCallback
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('/new-resume') && window.__OAUTH_PROCESSED__) {
+      // Clear the OAuth processing cache if we're in NewResumeBuilder
+      const keysToRemove = [];
+      for (const key of window.__OAUTH_PROCESSED__) {
+        if (key.includes('google_drive')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => {
+        window.__OAUTH_PROCESSED__.delete(key);
+        if (window.__OAUTH_RESULTS__) {
+          window.__OAUTH_RESULTS__.delete(key);
+        }
+      });
+      console.log('🧹 Cleared OAuth cache to prevent loops');
+    }
+  }, []);
+
+  // Component state
+  const [formData, setFormData] = useState(BLANK_RESUME_TEMPLATE);
+  const [activeSection, setActiveSection] = useState('personal');
+  const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [viewMode, setViewMode] = useState('edit');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [localError, setLocalError] = useState(null);
+  const [showCloudSetup, setShowCloudSetup] = useState(false);
+  const [saveResult, setSaveResult] = useState(null);
+  const [saveType, setSaveType] = useState(null);
+  const [showStorageChoice, setShowStorageChoice] = useState(false);
+  
+  // Auto-save refs
+  const autoSaveTimeoutRef = useRef(null);
+  const previousDataRef = useRef(null);
+  const isInitializedRef = useRef(false);
+  
+  // Media queries
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  const [isTabletView, setIsTabletView] = useState(window.innerWidth > 768 && window.innerWidth <= 1024);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 768);
+      setIsTabletView(window.innerWidth > 768 && window.innerWidth <= 1024);
+    };
     
-    if (paramResumeId && paramResumeId !== 'new') {
-      console.log('🔧 Loading existing resume:', paramResumeId);
-      // TODO: Load existing resume logic
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Sections configuration
+  const sections = useMemo(() => [
+    { id: 'title', name: t('resume.title.section', 'Resume Title'), component: ResumeTitle, dataKey: 'title' },
+    { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' },
+    { id: 'photo', name: t('resume.photo.title', 'Photo'), component: Base64PhotoUpload, dataKey: 'photo' }, 
+    { id: 'education', name: t('resume.education.title'), component: Education, dataKey: 'educations' },
+    { id: 'experience', name: t('resume.experience.title'), component: Experience, dataKey: 'experiences' },
+    { id: 'skills', name: t('resume.skills.title'), component: Skills, dataKey: 'skills' },
+    { id: 'languages', name: t('resume.languages.title'), component: Languages, dataKey: 'languages' },
+    { id: 'referrals', name: t('resume.references.title'), component: Referrals, dataKey: 'referrals' },
+    { id: 'custom', name: t('resume.custom_sections.title'), component: CustomSections, dataKey: 'custom_sections' },
+    { id: 'activities', name: t('resume.extracurricular.activity'), component: ExtracurricularActivities, dataKey: 'extracurriculars' },
+    { id: 'hobbies', name: t('resume.hobbies.title'), component: Hobbies, dataKey: 'hobbies' },
+    { id: 'courses', name: t('resume.courses.title'), component: Courses, dataKey: 'courses' },
+    { id: 'internships', name: t('resume.internships.title'), component: Internships, dataKey: 'internships' }
+  ], [t]);
+  
+  // Computed values
+  const hasUserStartedFilling = useMemo(() => {
+    return !!(
+      formData.personal_info?.full_name || 
+      formData.personal_info?.email ||
+      formData.experiences?.some(exp => exp?.company || exp?.position) ||
+      formData.educations?.some(edu => edu?.institution || edu?.degree)
+    );
+  }, [formData]);
+  
+  const CurrentSection = sections.find(s => s.id === activeSection)?.component || PersonalInfo;
+  
+  // Auto-save function
+  const autoSave = useCallback((data) => {
+    if (!isInitializedRef.current) return;
+    
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
     }
     
-    setIsLoading(false);
-  }, [paramResumeId]);
+    const currentDataString = JSON.stringify(data);
+    if (currentDataString === previousDataRef.current) return;
+    
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      try {
+        const autoSaveData = {
+          ...data,
+          _autoSave: {
+            timestamp: Date.now(),
+            version: '1.0'
+          }
+        };
+        
+        localStorage.setItem('cv_draft_autosave', JSON.stringify(autoSaveData));
+        localStorage.setItem('cv_draft', JSON.stringify(data)); // Keep existing functionality
+        previousDataRef.current = currentDataString;
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ Auto-saved CV draft');
+        }
+      } catch (error) {
+        console.error('❌ Auto-save failed:', error);
+      }
+    }, 300);
+  }, []);
   
-  const useMediaQuery = (query) => {
-    const [matches, setMatches] = useState(false);
+  // Auto-save whenever formData changes
+  useEffect(() => {
+    if (isInitializedRef.current) {
+      autoSave(formData);
+    }
+  }, [formData, autoSave]);
   
-    useEffect(() => {
-      const mediaQuery = window.matchMedia(query);
-      setMatches(mediaQuery.matches);
+  // Toast function
+  const showToast = useCallback((message, type) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
+  }, []);
   
-      const handler = (event) => setMatches(event.matches);
-      mediaQuery.addEventListener('change', handler);
-  
-      return () => {
-        mediaQuery.removeEventListener('change', handler);
-      };
-    }, [query]);
-  
-    return matches;
-  };
-  
-  const isMobileView = useMediaQuery('(max-width: 768px)');
-  const isTabletView = useMediaQuery('(min-width: 769px) and (max-width: 1024px)');   
-  
-  const hasUserStartedFilling = formData.personal_info?.full_name || 
-    formData.personal_info?.email ||
-    formData.experiences?.some(exp => exp?.company || exp?.position) ||
-    formData.educations?.some(edu => edu?.institution || edu?.degree);
-  
-  // FIXED: Updated formData function with proper schema handling
-  const updateFormData = (section, data) => {
-    console.log(`🔄 Updating section ${section} with:`, data);
+  // Update form data function
+  const updateFormData = useCallback((section, data) => {
+    console.log(`🔄 Updating section ${section}`);
     
     setFormData(prev => {
       let updatedData;
@@ -157,8 +231,6 @@ const NewResumeBuilder = ({ darkMode }) => {
       } else if (section === 'customization') {
         updatedData = { ...prev, customization: { ...prev.customization, ...data } };
       } else if (section === 'photo') {
-        // IMPORTANT: Handle photo field consistently
-        console.log('🖼️ Photo update received:', data);
         if (data && typeof data === 'object' && 'photolink' in data) {
           updatedData = { ...prev, photo: data };
         } else if (typeof data === 'string') {
@@ -166,7 +238,6 @@ const NewResumeBuilder = ({ darkMode }) => {
         } else {
           updatedData = { ...prev, photo: { photolink: null } };
         }
-        console.log('🖼️ Photo field after update:', updatedData.photo);
       } else if (section === 'personal_info') {
         updatedData = { 
           ...prev, 
@@ -176,68 +247,20 @@ const NewResumeBuilder = ({ darkMode }) => {
         updatedData = { ...prev, [section]: data };
       }
       
-      // Auto-save to localStorage as user types
-      localStorage.setItem('cv_draft', JSON.stringify(updatedData));
-      
-      // Log the final structure to help debug
-      console.log('📊 Updated form data structure:', {
-        title: updatedData.title,
-        hasPersonalInfo: !!updatedData.personal_info,
-        personalInfoFields: Object.keys(updatedData.personal_info || {}),
-        photoField: updatedData.photo,
-        sectionsCount: {
-          educations: updatedData.educations?.length || 0,
-          experiences: updatedData.experiences?.length || 0,
-          skills: updatedData.skills?.length || 0,
-          languages: updatedData.languages?.length || 0,
-          referrals: updatedData.referrals?.length || 0,
-          custom_sections: updatedData.custom_sections?.length || 0,
-          extracurriculars: updatedData.extracurriculars?.length || 0,
-          hobbies: updatedData.hobbies?.length || 0,
-          courses: updatedData.courses?.length || 0,
-          internships: updatedData.internships?.length || 0
-        }
-      });
-      
       return updatedData;
     });
-  };
+  }, []);
   
-  const showToast = (message, type) => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 5000);
-  }; 
+  // Navigation functions
+  const toggleViewMode = useCallback(() => {
+    setViewMode(prev => prev === 'edit' ? 'preview' : 'edit');
+  }, []);
   
-  // FIXED: Updated sections with photo component
-  const sections = [
-  { id: 'title', name: t('resume.title.section', 'Resume Title'), component: ResumeTitle, dataKey: 'title' },
-  { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' },
-  { id: 'photo', name: t('resume.photo.title', 'Photo'), component: Base64PhotoUpload, dataKey: 'photo' }, 
-  { id: 'education', name: t('resume.education.title'), component: Education, dataKey: 'educations' },
-  { id: 'experience', name: t('resume.experience.title'), component: Experience, dataKey: 'experiences' },
-  { id: 'skills', name: t('resume.skills.title'), component: Skills, dataKey: 'skills' },
-  { id: 'languages', name: t('resume.languages.title'), component: Languages, dataKey: 'languages' },
-  { id: 'referrals', name: t('resume.references.title'), component: Referrals, dataKey: 'referrals' },
-  { id: 'custom', name: t('resume.custom_sections.title'), component: CustomSections, dataKey: 'custom_sections' },
-  { id: 'activities', name: t('resume.extracurricular.activity'), component: ExtracurricularActivities, dataKey: 'extracurriculars' },
-  { id: 'hobbies', name: t('resume.hobbies.title'), component: Hobbies, dataKey: 'hobbies' },
-  { id: 'courses', name: t('resume.courses.title'), component: Courses, dataKey: 'courses' },
-  { id: 'internships', name: t('resume.internships.title'), component: Internships, dataKey: 'internships' }
-];
+  const toggleMobileNav = useCallback(() => {
+    setMobileNavOpen(prev => !prev);
+  }, []);
   
-  const CurrentSection = sections.find(s => s.id === activeSection)?.component || PersonalInfo;
-  
-  const toggleViewMode = () => {
-    setViewMode(viewMode === 'edit' ? 'preview' : 'edit');
-  };
-  
-  const toggleMobileNav = () => {
-    setMobileNavOpen(!mobileNavOpen);
-  };
-  
-  const navigateSection = (direction) => {
+  const navigateSection = useCallback((direction) => {
     const currentIndex = sections.findIndex(s => s.id === activeSection);
     const newIndex = 
       direction === 'next' 
@@ -245,10 +268,14 @@ const NewResumeBuilder = ({ darkMode }) => {
         : (currentIndex - 1 + sections.length) % sections.length;
     
     setActiveSection(sections[newIndex].id);
-  };
-
-  // FIXED: Save handlers with better error handling and schema validation
-  const handleSaveLocal = async () => {
+  }, [activeSection, sections]);
+  
+  // Save handlers
+  const clearAutoSave = useCallback(() => {
+    localStorage.removeItem('cv_draft_autosave');
+  }, []);
+  
+  const handleSaveLocal = useCallback(async () => {
     if (!hasUserStartedFilling) {
       showToast('Please add some information to your CV before saving.', 'error');
       return;
@@ -259,17 +286,12 @@ const NewResumeBuilder = ({ darkMode }) => {
     setSaveResult(null);
 
     try {
-      console.log('💾 Saving locally with data:', {
-        title: formData.title,
-        photoStructure: formData.photo,
-        sectionsCount: Object.keys(formData).filter(key => 
-          Array.isArray(formData[key]) && formData[key].length > 0
-        ).length
-      });
-      
       const result = await saveLocally(formData);
       setSaveResult(result);
       if (result.success) {
+        localStorage.setItem('last_save_method', 'local');
+        setShowStorageChoice(false);
+        clearAutoSave();
         showToast(result.message || 'CV saved locally!', 'success');
       } else {
         showToast(result.error || 'Failed to save locally', 'error');
@@ -284,101 +306,168 @@ const NewResumeBuilder = ({ darkMode }) => {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [hasUserStartedFilling, formData, saveLocally, showToast, clearAutoSave]);
 
-  const handleSaveCloud = async () => {
-  if (!hasUserStartedFilling) {
-    showToast('Please add some information to your CV before saving.', 'error');
-    return;
-  }
-
-  if (!canSaveToCloud()) {
-    setShowCloudSetup(true);
-    return;
-  }
-
-  setIsSaving(true);
-  setSaveType('cloud');
-  setSaveResult(null);
-
-  try {
-    // Log detailed information about the CV data being saved
-    const photoInfo = formData.photo?.photolink ? {
-      hasPhoto: true,
-      isBase64: formData.photo.photolink.startsWith('data:image'),
-      sizeKB: Math.round(formData.photo.photolink.length / 1024),
-      format: formData.photo.photolink.startsWith('data:image/jpeg') ? 'JPEG' : 
-              formData.photo.photolink.startsWith('data:image/png') ? 'PNG' : 'Unknown'
-    } : { hasPhoto: false };
-
-    console.log('☁️ Saving to cloud with data:', {
-      title: formData.title,
-      photoInfo,
-      sectionsCount: Object.keys(formData).filter(key => 
-        Array.isArray(formData[key]) && formData[key].length > 0
-      ).length,
-      fullDataSize: Math.round(JSON.stringify(formData).length / 1024) + 'KB'
-    });
-    
-    const result = await saveToConnectedCloud(formData, 'google_drive');
-    setSaveResult(result);
-    if (result.success) {
-      showToast(result.message || 'CV saved to Google Drive!', 'success');
-      
-      // Clear the draft since it's now saved to cloud
-      localStorage.removeItem('cv_draft');
-    } else {
-      showToast(result.error || 'Failed to save to cloud', 'error');
+  const handleSaveCloud = useCallback(async () => {
+    if (!hasUserStartedFilling) {
+      showToast('Please add some information to your CV before saving.', 'error');
+      return;
     }
-  } catch (error) {
-    const errorResult = {
-      success: false,
-      error: error.message || 'Failed to save to cloud'
-    };
-    setSaveResult(errorResult);
-    showToast(errorResult.error, 'error');
-  } finally {
-    setIsSaving(false);
-  }
-};
+
+    if (!canSaveToCloud()) {
+      setShowCloudSetup(true);
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveType('cloud');
+    setSaveResult(null);
+
+    try {
+      const result = await saveToConnectedCloud(formData, 'google_drive');
+      setSaveResult(result);
+      if (result.success) {
+        localStorage.setItem('last_save_method', 'cloud');
+        setShowStorageChoice(false);
+        clearAutoSave();
+        showToast(result.message || 'CV saved to Google Drive!', 'success');
+        localStorage.removeItem('cv_draft');
+      } else {
+        showToast(result.error || 'Failed to save to cloud', 'error');
+      }
+    } catch (error) {
+      const errorResult = {
+        success: false,
+        error: error.message || 'Failed to save to cloud'
+      };
+      setSaveResult(errorResult);
+      showToast(errorResult.error, 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [hasUserStartedFilling, formData, canSaveToCloud, saveToConnectedCloud, showToast, clearAutoSave]);
   
-  const Toast = ({ message, type, onClose }) => {
-    let displayMessage = message;
-    if (typeof message === 'object' && message !== null) {
+  const handleSave = useCallback(() => {
+    if (!hasUserStartedFilling) {
+      showToast('Please add some information to your CV before saving.', 'error');
+      return;
+    }
+
+    const lastSaveMethod = localStorage.getItem('last_save_method');
+    
+    if (lastSaveMethod === 'cloud' && canSaveToCloud()) {
+      handleSaveCloud();
+      return;
+    }
+    
+    if (lastSaveMethod === 'local') {
+      handleSaveLocal();
+      return;
+    }
+    
+    setShowStorageChoice(true);
+  }, [hasUserStartedFilling, canSaveToCloud, handleSaveCloud, handleSaveLocal, showToast]);
+  
+  const handleConnectCloud = useCallback(async (provider) => {
+    try {
+      setShowStorageChoice(false);
+      showToast('Redirecting to Google Drive...', 'info');
+      await connectToCloudProvider(provider);
+    } catch (error) {
+      console.error('❌ Cloud connection failed:', error);
+      showToast(`Failed to connect to ${provider}: ${error.message}`, 'error');
+      setShowStorageChoice(true);
+    }
+  }, [connectToCloudProvider, showToast]);
+  
+  const handleCustomizeTemplate = useCallback(() => {
+    // Save current data to localStorage so it persists when user comes back
+    localStorage.setItem('cv_draft_for_customization', JSON.stringify(formData));
+    navigate('/resume-customizer');
+  }, [formData, navigate]);
+  
+  const handleAIEnhancement = useCallback(() => {
+    // Save current data and navigate to AI enhancement
+    localStorage.setItem('cv_draft_for_ai', JSON.stringify(formData));
+    // Navigate to AI enhancement route (based on your CVAIEnhancement.jsx component)
+    navigate('/cv-ai-enhancement'); 
+  }, [formData, navigate]);
+  
+  const closeToast = useCallback(() => {
+    setToast(null);
+  }, []);
+  
+  // SINGLE useEffect for initialization and OAuth handling
+  useEffect(() => {
+    console.log('🔧 NewResumeBuilder: Initializing...');
+    
+  // Handle OAuth return message - PREVENT MULTIPLE PROCESSING
+    if (location.state?.message && !isInitializedRef.current) {
+      console.log('📨 OAuth return detected:', location.state.message);
+      
+      // Immediately mark as initialized to prevent reprocessing
+      isInitializedRef.current = true;
+      
+      // Show toast
+      showToast(location.state.message, 'success');
+      
+      // Clear state after a small delay to ensure component is stable
+      setTimeout(() => {
+        if (location.state?.message) {
+          navigate(location.pathname, { replace: true, state: {} });
+        }
+      }, 500);
+    }
+    
+    // Check for auto-saved data (only for new resumes and not already initialized)
+    if ((!paramResumeId || paramResumeId === 'new') && !isInitializedRef.current) {
       try {
-        displayMessage = JSON.stringify(message, null, 2);
-      } catch {
-        displayMessage = String(message);
+        const autoSavedData = localStorage.getItem('cv_draft_autosave');
+        if (autoSavedData) {
+          const parsed = JSON.parse(autoSavedData);
+          if (parsed._autoSave) {
+            const timeSinceAutoSave = Date.now() - parsed._autoSave.timestamp;
+            const minutesAgo = Math.floor(timeSinceAutoSave / (1000 * 60));
+            
+            // Only restore if recent and has meaningful content
+            if (timeSinceAutoSave < 24 * 60 * 60 * 1000 && 
+                (parsed.personal_info?.full_name || 
+                 parsed.experiences?.length > 0 || 
+                 parsed.educations?.length > 0)) {
+              
+              const { _autoSave, ...cleanData } = parsed;
+              setFormData(cleanData);
+              
+              const timeMsg = minutesAgo < 1 ? 'less than a minute ago' : `${minutesAgo} minute${minutesAgo !== 1 ? 's' : ''} ago`;
+              showToast(`Draft restored from ${timeMsg}`, 'info');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to restore auto-save:', error);
       }
     }
     
-    return (
-      <div 
-        className={`fixed top-4 right-4 z-50 px-4 py-2 rounded shadow-lg transition-all duration-300 max-w-md overflow-hidden
-          ${type === 'success' 
-            ? 'bg-green-500 text-white' 
-            : type === 'info'
-              ? 'bg-blue-500 text-white'
-              : 'bg-red-500 text-white'
-          }`}
-      >
-        <div className="flex justify-between items-center">
-          <span className="whitespace-normal break-words">{displayMessage}</span>
-          <button 
-            onClick={onClose} 
-            className="ml-4 text-white hover:text-gray-200 flex-shrink-0"
-          >
-            ×
-          </button>
-        </div>
-      </div>
-    );
-  }; 
+    // Mark as initialized if not already done
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+    }
+    
+    console.log('✅ NewResumeBuilder: Initialization complete');
+  }, []); // EMPTY DEPENDENCY ARRAY - Run only once on mount
   
-  const closeToast = () => {
-    setToast(null);
-  };
-
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, []);
+  
+  // Don't show loading screen after OAuth return or during normal operation
+  const isLoading = sessionLoading && !isInitializedRef.current;
+  
   if (isLoading) {
     return (
       <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-800 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-gray-800'}`}>
@@ -429,7 +518,7 @@ const NewResumeBuilder = ({ darkMode }) => {
               </div>
 
               <button 
-                onClick={handleSaveLocal}
+                onClick={handleSave}
                 disabled={isSaving || !hasUserStartedFilling}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center ${
                   isSaving || !hasUserStartedFilling
@@ -438,8 +527,38 @@ const NewResumeBuilder = ({ darkMode }) => {
                 }`}
               >
                 <Save size={16} className="mr-1" />
-                Save
+                {isSaving ? 'Saving...' : 'Save'}
               </button>
+
+              {/* Mobile Template & AI Buttons */}
+              <div className="flex gap-1">
+                <button 
+                  onClick={handleCustomizeTemplate}
+                  className={`p-2 rounded-md transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-gray-700 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20'
+                  }`}
+                  title="Change Template"
+                >
+                  <Palette size={16} />
+                </button>
+
+                <button 
+                  onClick={handleAIEnhancement}
+                  disabled={!hasUserStartedFilling}
+                  className={`p-2 rounded-md transition-all duration-300 ${
+                    !hasUserStartedFilling
+                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                      : darkMode 
+                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                        : 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 text-gray-700 hover:bg-gradient-to-r hover:from-yellow-500/20 hover:to-orange-500/20'
+                  }`}
+                  title="AI Enhancement"
+                >
+                  <Sparkles size={16} />
+                </button>
+              </div>
 
               <button 
                 onClick={toggleViewMode}
@@ -455,7 +574,7 @@ const NewResumeBuilder = ({ darkMode }) => {
           </div>
         )}
 
-        {/* Mobile Section Navigation (Slide-in Drawer) */}
+        {/* Mobile Section Navigation */}
         {isMobileView && mobileNavOpen && (
           <div className="fixed inset-0 z-30 bg-black bg-opacity-50" onClick={toggleMobileNav}>
             <div 
@@ -512,13 +631,12 @@ const NewResumeBuilder = ({ darkMode }) => {
               : 'bg-white/80 backdrop-blur-sm border-gray-200'
           } border rounded-xl shadow-lg flex flex-col`}
         >
-          {/* Section Navigation - Responsive Grid */}
+          {/* Section Navigation */}
           <div className={`mb-4 sticky top-0 z-10 pb-2 border-b ${
             darkMode 
               ? 'bg-gray-800 border-gray-700' 
               : 'bg-white/90 backdrop-blur-sm border-gray-200'
           }`}>
-            {/* Desktop & Tablet Navigation */}
             {!isMobileView && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1">
                 {sections.map((section) => (
@@ -539,7 +657,6 @@ const NewResumeBuilder = ({ darkMode }) => {
               </div>
             )}
 
-            {/* Mobile Section Title and Navigation */}
             {isMobileView && (
               <div className="flex items-center justify-between">
                 <button 
@@ -578,33 +695,32 @@ const NewResumeBuilder = ({ darkMode }) => {
             </Alert>
           )}
           
-          {/* Current Section Form - FIXED to handle all sections properly */}
+          {/* Current Section Form */}
           <div className="space-y-4 flex-grow">
-  {activeSection === 'title' ? (
-    <ResumeTitle
-      title={formData.title}
-      onChange={(value) => updateFormData('title', value)}
-      darkMode={darkMode}
-    />
-  ) : activeSection === 'photo' ? (
-    <Base64PhotoUpload
-      darkMode={darkMode}
-      data={formData.photo}
-      onChange={(data) => updateFormData('photo', data)}
-    />
-  ) : (
-    <CurrentSection
-      darkMode={darkMode}
-      data={formData[sections.find(s => s.id === activeSection)?.dataKey || 'personal_info']}
-      onChange={(data) => updateFormData(
-        sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
-        data
-      )}
-      // Pass token for AI features in PersonalInfo component
-      {...(activeSection === 'personal' ? { token: 'dummy_token' } : {})}
-    />
-  )}
-</div>
+            {activeSection === 'title' ? (
+              <ResumeTitle
+                title={formData.title}
+                onChange={(value) => updateFormData('title', value)}
+                darkMode={darkMode}
+              />
+            ) : activeSection === 'photo' ? (
+              <Base64PhotoUpload
+                darkMode={darkMode}
+                data={formData.photo}
+                onChange={(data) => updateFormData('photo', data)}
+              />
+            ) : (
+              <CurrentSection
+                darkMode={darkMode}
+                data={formData[sections.find(s => s.id === activeSection)?.dataKey || 'personal_info']}
+                onChange={(data) => updateFormData(
+                  sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
+                  data
+                )}
+                {...(activeSection === 'personal' ? { token: 'dummy_token' } : {})}
+              />
+            )}
+          </div>
           
           {/* Bottom Navigation Arrows */}
           <div className={`flex justify-between items-center py-3 px-4 mt-3 ${
@@ -667,90 +783,129 @@ const NewResumeBuilder = ({ darkMode }) => {
         >
           {/* Desktop Action Buttons */}
           {!isMobileView && (
-            <div className={`flex gap-2 p-2 border-b ${
+            <div className={`flex gap-3 p-3 border-b items-center justify-between ${
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
-              {/* Save Options */}
-              <div className="flex gap-2">
-                {/* Local Save Button */}
-                <button
-                  onClick={handleSaveLocal}
-                  disabled={isSaving || !hasUserStartedFilling}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
-                    isSaving && saveType === 'local'
-                      ? 'bg-blue-500 text-white cursor-not-allowed'
-                      : isSaving
-                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                      : !hasUserStartedFilling
-                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
-                  }`}
-                >
-                  {isSaving && saveType === 'local' ? (
-                    <>
-                      <Loader2 size={16} className="mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <HardDrive size={16} className="mr-2" />
-                      Save Local
-                    </>
-                  )}
-                </button>
-                
-                {/* Cloud Save Button */}
-                <button
-                  onClick={handleSaveCloud}
-                  disabled={isSaving || !hasUserStartedFilling}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
-                    isSaving && saveType === 'cloud'
-                      ? 'bg-purple-500 text-white cursor-not-allowed'
-                      : isSaving
-                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                      : !hasUserStartedFilling
-                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
-                  }`}
-                >
-                  {isSaving && saveType === 'cloud' ? (
-                    <>
-                      <Loader2 size={16} className="mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Cloud size={16} className="mr-2" />
-                      Save Cloud
-                    </>
-                  )}
-                </button>
-              </div>
               
-              {/* Storage status indicator */}
-              <div className="text-xs text-gray-500 flex items-center">
-                {canSaveToCloud() ? (
-                  <span className="flex items-center">
-                    <Cloud size={12} className="mr-1" />
-                    Cloud Ready
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <HardDrive size={12} className="mr-1" />
-                    Local Only
-                  </span>
-                )}
+              {/* Left Side - Save Actions */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || !hasUserStartedFilling}
+                  className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-300 flex items-center ${
+                    isSaving || !hasUserStartedFilling
+                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
+                  }`}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 size={18} className="mr-2 animate-spin" />
+                      {saveType === 'cloud' ? 'Saving to Cloud...' : saveType === 'local' ? 'Saving Locally...' : 'Saving...'}
+                    </>
+                  ) : (
+                    <>
+                      <Save size={18} className="mr-2" />
+                      Save CV
+                    </>
+                  )}
+                </button>
+
+                {/* Save Method Indicator */}
+                <div className="text-xs text-gray-500 flex items-center">
+                  {(() => {
+                    const lastMethod = localStorage.getItem('last_save_method');
+                    if (lastMethod === 'cloud' && canSaveToCloud()) {
+                      return (
+                        <span className="flex items-center text-purple-600">
+                          <Cloud size={12} className="mr-1" />
+                          Google Drive
+                        </span>
+                      );
+                    } else if (lastMethod === 'local') {
+                      return (
+                        <span className="flex items-center text-blue-600">
+                          <HardDrive size={12} className="mr-1" />
+                          This Device
+                        </span>
+                      );
+                    } else if (canSaveToCloud()) {
+                      return (
+                        <span className="flex items-center">
+                          <Cloud size={12} className="mr-1" />
+                          Choose destination
+                        </span>
+                      );
+                    } else {
+                      return (
+                        <span className="flex items-center">
+                          <HardDrive size={12} className="mr-1" />
+                          Local Only
+                        </span>
+                      );
+                    }
+                  })()}
+                </div>
               </div>
 
-              {/* Cloud Connect Button (if not connected) */}
-              {!canSaveToCloud() && !isMobileView && (
+              {/* Right Side - Enhancement Actions */}
+              <div className="flex items-center gap-2">
+                {/* Template Customization Button */}
                 <button
-                  onClick={() => setShowCloudSetup(true)}
-                  className="px-3 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                  onClick={handleCustomizeTemplate}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
+                    darkMode
+                      ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-purple-300 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-pink-600/30'
+                      : 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:bg-gradient-to-r hover:from-purple-200 hover:to-pink-200'
+                  }`}
+                  title="Customize your CV template and styling"
                 >
-                  Connect Cloud
+                  <Palette size={16} className="mr-2" />
+                  Customize Template
                 </button>
-              )}
+
+                {/* AI Enhancement Button */}
+                <button
+                  onClick={handleAIEnhancement}
+                  disabled={!hasUserStartedFilling}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
+                    !hasUserStartedFilling
+                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                      : darkMode
+                      ? 'bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-yellow-300 hover:bg-gradient-to-r hover:from-yellow-600/30 hover:to-orange-600/30'
+                      : 'bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 hover:bg-gradient-to-r hover:from-yellow-200 hover:to-orange-200'
+                  }`}
+                  title="Use AI to enhance your CV content"
+                >
+                  <Sparkles size={16} className="mr-2" />
+                  AI Enhance
+                </button>
+
+                {/* Change Save Location Button */}
+                {(localStorage.getItem('last_save_method') && hasUserStartedFilling) && (
+                  <button
+                    onClick={() => setShowStorageChoice(true)}
+                    disabled={isSaving}
+                    className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                      darkMode
+                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Change Location
+                  </button>
+                )}
+
+                {/* Cloud Connect Button (if not connected) */}
+                {!canSaveToCloud() && (
+                  <button
+                    onClick={() => setShowCloudSetup(true)}
+                    className="px-3 py-1.5 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                  >
+                    Connect Cloud
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -808,7 +963,22 @@ const NewResumeBuilder = ({ darkMode }) => {
         </div>
       </div>
 
-      {/* CLOUD SETUP MODAL */}
+      {/* Storage Choice Modal */}
+      {showStorageChoice && (
+        <StorageChoiceModal
+          isOpen={showStorageChoice}
+          onClose={() => setShowStorageChoice(false)}
+          onSaveLocal={handleSaveLocal}
+          onSaveCloud={handleSaveCloud}
+          onConnectCloud={handleConnectCloud}
+          canSaveToCloud={canSaveToCloud()}
+          darkMode={darkMode}
+          isSaving={isSaving}
+          saveType={saveType}
+        />
+      )}
+
+      {/* Cloud Setup Modal */}
       {showCloudSetup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className={`max-w-md w-full rounded-2xl ${
@@ -850,11 +1020,27 @@ const NewResumeBuilder = ({ darkMode }) => {
 
       {/* Toast Notification */}
       {toast && (
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={closeToast} 
-        />
+        <div 
+          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded shadow-lg transition-all duration-300 max-w-md overflow-hidden ${
+            toast.type === 'success' 
+              ? 'bg-green-500 text-white' 
+              : toast.type === 'info'
+                ? 'bg-blue-500 text-white'
+                : 'bg-red-500 text-white'
+          }`}
+        >
+          <div className="flex justify-between items-center">
+            <span className="whitespace-normal break-words">
+              {typeof toast.message === 'object' ? JSON.stringify(toast.message) : toast.message}
+            </span>
+            <button 
+              onClick={closeToast} 
+              className="ml-4 text-white hover:text-gray-200 flex-shrink-0"
+            >
+              ×
+            </button>
+          </div>
+        </div>
       )}
     </>
   );
