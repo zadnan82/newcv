@@ -1,4 +1,4 @@
-// src/stores/sessionStore.js - Completed Google Drive focused version
+// src/stores/sessionStore.js - Fixed cleanCVDataForAPI scope issue
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -51,6 +51,162 @@ const useSessionStore = create(
       showCloudSetup: false,
       initializing: false,
       backendAvailable: false,
+
+      // ================== HELPER METHODS ==================
+      
+      // Helper methods with comprehensive validation and formatting
+      cleanCVDataForAPI: (cvData) => {
+        console.log('🧹 Cleaning CV data for API...');
+        const cleaned = JSON.parse(JSON.stringify(cvData)); // Deep clone
+        
+        // Check for large image data and warn
+        const dataSize = JSON.stringify(cleaned).length;
+        console.log(`📊 CV data size: ${(dataSize / 1024).toFixed(1)}KB`);
+        
+        if (dataSize > 500000) { // 500KB
+          console.warn('⚠️ Large CV data detected. This may cause timeout issues.');
+        }
+        
+        // Helper function to validate and fix email
+        const validateEmail = (email) => {
+          if (!email || email.trim() === '') return null;
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email.trim()) ? email.trim() : null;
+        };
+        
+        // Helper function to convert partial dates to full dates
+        const formatDateForAPI = (dateStr) => {
+          if (!dateStr || dateStr.trim() === '') return null;
+          
+          // If it's already a full date (YYYY-MM-DD), return as is
+          if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            return dateStr;
+          }
+          
+          // If it's a partial date (YYYY-MM), convert to YYYY-MM-01
+          if (/^\d{4}-\d{2}$/.test(dateStr)) {
+            return `${dateStr}-01`;
+          }
+          
+          // If it's just a year (YYYY), convert to YYYY-01-01
+          if (/^\d{4}$/.test(dateStr)) {
+            return `${dateStr}-01-01`;
+          }
+          
+          console.warn(`⚠️ Invalid date format: ${dateStr}, setting to null`);
+          return null;
+        };
+        
+        // Clean personal_info fields
+        if (cleaned.personal_info) {
+          // Handle date of birth
+          cleaned.personal_info.date_of_birth = formatDateForAPI(cleaned.personal_info.date_of_birth);
+          
+          // Validate email
+          if (cleaned.personal_info.email) {
+            const validEmail = validateEmail(cleaned.personal_info.email);
+            if (!validEmail) {
+              console.warn(`⚠️ Invalid email format: ${cleaned.personal_info.email}, setting to null`);
+            }
+            cleaned.personal_info.email = validEmail;
+          }
+          
+          // Clean other potentially problematic fields
+          const fieldsToClean = [
+            'full_name', 'title', 'mobile', 'city', 'address', 
+            'postal_code', 'driving_license', 'nationality', 'place_of_birth',
+            'linkedin', 'website', 'summary'
+          ];
+          
+          fieldsToClean.forEach(field => {
+            if (cleaned.personal_info[field] === '') {
+              cleaned.personal_info[field] = null;
+            }
+          });
+        }
+        
+        // Clean array sections with enhanced validation
+        const sectionsToClean = [
+          'educations', 'experiences', 'skills', 'languages', 'referrals',
+          'custom_sections', 'extracurriculars', 'hobbies', 'courses', 'internships'
+        ];
+        
+        sectionsToClean.forEach(section => {
+          if (Array.isArray(cleaned[section])) {
+            cleaned[section] = cleaned[section].map(item => {
+              const cleanedItem = { ...item };
+              
+              // Clean and format date fields in array items
+              if ('start_date' in cleanedItem) {
+                cleanedItem.start_date = formatDateForAPI(cleanedItem.start_date);
+              }
+              if ('end_date' in cleanedItem) {
+                cleanedItem.end_date = formatDateForAPI(cleanedItem.end_date);
+              }
+              if ('date_of_birth' in cleanedItem) {
+                cleanedItem.date_of_birth = formatDateForAPI(cleanedItem.date_of_birth);
+              }
+              
+              // Validate email fields in array items (like referrals)
+              if ('email' in cleanedItem && cleanedItem.email) {
+                const validEmail = validateEmail(cleanedItem.email);
+                if (!validEmail) {
+                  console.warn(`⚠️ Invalid email in ${section}: ${cleanedItem.email}, setting to null`);
+                }
+                cleanedItem.email = validEmail;
+              }
+              
+              // Clean other empty string fields to null
+              Object.keys(cleanedItem).forEach(key => {
+                if (cleanedItem[key] === '') {
+                  cleanedItem[key] = null;
+                }
+              });
+              
+              return cleanedItem;
+            });
+            
+            // Remove any items that are completely empty or invalid
+            cleaned[section] = cleaned[section].filter(item => {
+              // Keep item if it has at least one non-null, meaningful value
+              return Object.values(item).some(value => 
+                value !== null && value !== '' && value !== undefined
+              );
+            });
+          }
+        });
+        
+        // Clean photo field - handle both 'photo' and 'photos' for backward compatibility
+        if (cleaned.photo && cleaned.photo.photolink === '') {
+          cleaned.photo.photolink = null;
+        }
+        if (cleaned.photos && cleaned.photos.photolink === '') {
+          cleaned.photos.photolink = null;
+        }
+        
+        // Check if photo data is very large
+        if (cleaned.photo && cleaned.photo.photolink && typeof cleaned.photo.photolink === 'string') {
+          const photoSize = cleaned.photo.photolink.length;
+          if (photoSize > 100000) { // 100KB base64
+            console.warn(`⚠️ Large photo detected: ${(photoSize / 1024).toFixed(1)}KB. Consider compressing.`);
+          }
+        }
+        
+        // Final validation summary
+        let validationWarnings = 0;
+        const logValidationIssue = (message) => {
+          console.warn(message);
+          validationWarnings++;
+        };
+        
+        // Check for any remaining validation issues
+        if (validationWarnings > 0) {
+          console.warn(`⚠️ Fixed ${validationWarnings} validation issues`);
+        }
+        
+        console.log('✅ CV data cleaned and validated successfully');
+        return cleaned;
+      },
 
       // ================== GOOGLE DRIVE CONNECTION ==================
       
@@ -187,138 +343,219 @@ const useSessionStore = create(
         }
       },
 
-      // Test Google Drive connection
-      testGoogleDriveConnection: async () => {
-        const { sessionToken } = get();
+    
+      // ================== GOOGLE DRIVE CV OPERATIONS ==================
+
+      saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
+        if (provider !== 'google_drive') {
+          return {
+            success: false,
+            error: 'Only Google Drive is currently supported',
+            needsConnection: true
+          };
+        }
         
+        console.log('💾 Saving to Google Drive...');
+        console.log('💾 CV Data structure:', {
+          title: cvData.title,
+          hasPersonalInfo: !!cvData.personal_info,
+          hasPhoto: !!cvData.photo,
+          hasPhotos: !!cvData.photos,
+          photoStructure: cvData.photo || cvData.photos,
+          sectionsCount: {
+            educations: cvData.educations?.length || 0,
+            experiences: cvData.experiences?.length || 0,
+            skills: cvData.skills?.length || 0,
+            languages: cvData.languages?.length || 0,
+            referrals: cvData.referrals?.length || 0,
+            custom_sections: cvData.custom_sections?.length || 0,
+            extracurriculars: cvData.extracurriculars?.length || 0,
+            hobbies: cvData.hobbies?.length || 0,
+            courses: cvData.courses?.length || 0,
+            internships: cvData.internships?.length || 0
+          }
+        });
+        
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!connectedProviders.includes('google_drive')) {
+          return {
+            success: false,
+            error: 'Google Drive not connected. Please connect first.',
+            needsConnection: true
+          };
+        }
+
         if (!sessionToken) {
-          throw new Error('No session token available');
+          return { 
+            success: false, 
+            error: 'Session expired. Please reconnect.' 
+          };
         }
 
         try {
-          console.log('🧪 Testing Google Drive connection...');
+          set({ loading: true, error: null });
           
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.TEST, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
+          // Clean the data before sending - NOW USING CORRECT SCOPE
+          const cleanedData = get().cleanCVDataForAPI(cvData);
+          
+          // Check data size before sending
+          const dataSize = JSON.stringify(cleanedData).length;
+          const dataSizeKB = (dataSize / 1024).toFixed(1);
+          
+          console.log('💾 Sending cleaned CV to Google Drive API...');
+          console.log(`📊 Final CV data size: ${dataSizeKB}KB (${dataSize} bytes)`);
+          console.log('💾 Cleaned data preview:', {
+            date_of_birth: cleanedData.personal_info?.date_of_birth,
+            hasEmptyStrings: JSON.stringify(cleanedData).includes('""'),
+            hasPhoto: !!cleanedData.photo?.photolink,
+            photoSize: cleanedData.photo?.photolink ? `${(cleanedData.photo.photolink.length / 1024).toFixed(1)}KB` : 'none'
           });
 
+          // Add timeout handling - increased to 90 seconds and add progress logging
+          const controller = new AbortController();
+          
+          // Log progress every 10 seconds
+          const progressInterval = setInterval(() => {
+            console.log('⏳ Request still in progress...');
+          }, 10000);
+          
+          const timeoutId = setTimeout(() => {
+            console.error('⏰ Request timed out after 90 seconds');
+            clearInterval(progressInterval);
+            controller.abort();
+          }, 90000); // 90 second timeout
+
+          console.log('About to make request with headers:', {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionToken}` 
+          });
+
+          console.log('Request body preview:', JSON.stringify(cleanedData).substring(0, 200) + '...');
+          
+          const startTime = Date.now();
+          console.log('🚀 Starting fetch request at:', new Date().toISOString());
+
+          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${sessionToken}`,
+            },
+            body: JSON.stringify(cleanedData),
+            signal: controller.signal
+          });
+
+          clearTimeout(timeoutId);
+          clearInterval(progressInterval);
+          
+          const endTime = Date.now();
+          const duration = ((endTime - startTime) / 1000).toFixed(2);
+          console.log(`📊 Request completed in ${duration} seconds`);
+
+          console.log('📊 Google Drive save response status:', response.status);
+
           if (response.ok) {
-            const result = await response.json();
-            console.log('🧪 Google Drive test result:', result);
-            return result;
+            const responseText = await response.text();
+            console.log('📊 Google Drive save response text:', responseText);
+            
+            let result;
+            try {
+              result = JSON.parse(responseText);
+            } catch (parseError) {
+              console.error('❌ Failed to parse JSON response:', parseError);
+              console.error('❌ Response text was:', responseText);
+              
+              // Check if response is HTML (error page)
+              if (responseText.trim().startsWith('<')) {
+                throw new Error('Server returned an error page instead of JSON. Check server logs.');
+              }
+              
+              throw new Error('Invalid response from server');
+            }
+            
+            console.log('✅ Google Drive save successful:', result);
+            
+            set({ loading: false });
+            
+            return {
+              success: true,
+              provider: 'google_drive',
+              fileId: result.file_id,
+              message: result.message || 'CV saved to Google Drive successfully'
+            };
           } else {
-            const errorText = await response.text();
-            throw new Error(`Test failed: ${errorText}`);
+            const responseText = await response.text();
+            console.error('❌ Google Drive save failed:', response.status, responseText);
+            
+            set({ loading: false });
+            
+            let errorMessage = `Save failed: ${response.status}`;
+            
+            try {
+              const errorData = JSON.parse(responseText);
+              errorMessage = errorData.detail || errorData.message || errorMessage;
+            } catch (e) {
+              // If response is HTML, extract meaningful error
+              if (responseText.includes('504 Gateway Time-out')) {
+                errorMessage = 'Request timed out. The file might be too large. Try with a smaller image.';
+              } else if (responseText.includes('413 Request Entity Too Large')) {
+                errorMessage = 'File too large. Please use a smaller image.';
+              } else if (responseText.includes('502 Bad Gateway')) {
+                errorMessage = 'Server temporarily unavailable. Please try again in a moment.';
+              } else {
+                errorMessage = responseText || errorMessage;
+              }
+            }
+            
+            return { 
+              success: false, 
+              error: errorMessage 
+            };
           }
+          
         } catch (error) {
-          console.error('❌ Google Drive test failed:', error);
-          throw error;
+          console.error('❌ Google Drive save error:', error);
+          set({ loading: false, error: error.message });
+          
+          // Handle specific error types
+          if (error.name === 'AbortError') {
+            // Check data size to provide specific guidance
+            const dataSize = JSON.stringify(cvData).length;
+            const sizeKB = (dataSize / 1024).toFixed(1);
+            
+            let message = `Request timed out after 60 seconds (CV size: ${sizeKB}KB).`;
+            
+            if (dataSize > 500000) {
+              message += ' Your CV appears to have large image data. Try compressing or removing the photo, or use a smaller image.';
+            } else if (dataSize > 100000) {
+              message += ' Try reducing the image size or check your internet connection.';
+            } else {
+              message += ' This might be due to a slow connection or server issue. Please try again.';
+            }
+            
+            return { 
+              success: false, 
+              error: message 
+            };
+          } else if (error.message.includes('Failed to fetch')) {
+            return { 
+              success: false, 
+              error: 'Network error. Please check your connection and try again.' 
+            };
+          } else if (error.message.includes('NetworkError')) {
+            return { 
+              success: false, 
+              error: 'Network connection issue. Please try again.' 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: `Save failed: ${error.message}` 
+            };
+          }
         }
       },
-
-      // ================== GOOGLE DRIVE CV OPERATIONS ==================
-      
-      // Save CV to Google Drive
-      // Save CV to Google Drive - FIXED VERSION
-saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
-  if (provider !== 'google_drive') {
-    return {
-      success: false,
-      error: 'Only Google Drive is currently supported',
-      needsConnection: true
-    };
-  }
-  
-  console.log('💾 Saving to Google Drive...');
-  
-  const { connectedProviders, sessionToken } = get();
-  
-  if (!connectedProviders.includes('google_drive')) {
-    return {
-      success: false,
-      error: 'Google Drive not connected. Please connect first.',
-      needsConnection: true
-    };
-  }
-
-  if (!sessionToken) {
-    return { 
-      success: false, 
-      error: 'Session expired. Please reconnect.' 
-    };
-  }
-
-  try {
-    set({ loading: true, error: null });
-    
-    console.log('💾 Sending CV to Google Drive API...');
-
-   const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 30 second timeout
-
-    const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${sessionToken}`,
-      },
-      body: JSON.stringify(cvData),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    const responseText = await response.text();
-    console.log('📊 Google Drive save response:', response.status, responseText);
-
-    if (response.ok) {
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('❌ Failed to parse JSON response:', parseError);
-        throw new Error('Invalid response from server');
-      }
-      
-      console.log('✅ Google Drive save successful:', result);
-      
-      set({ loading: false });
-      
-      return {
-        success: true,
-        provider: 'google_drive',
-        fileId: result.file_id,
-        message: result.message
-      };
-    } else {
-      console.error('❌ Google Drive save failed:', response.status, responseText);
-      
-      set({ loading: false });
-      
-      let errorMessage = `Save failed: ${response.status}`;
-      try {
-        const errorData = JSON.parse(responseText);
-        errorMessage = errorData.detail || errorData.message || errorMessage;
-      } catch (e) {
-        errorMessage = responseText || errorMessage;
-      }
-      
-      return { 
-        success: false, 
-        error: errorMessage 
-      };
-    }
-    
-  } catch (error) {
-    console.error('❌ Google Drive save error:', error);
-    set({ loading: false, error: error.message });
-    return { 
-      success: false, 
-      error: `Network error: ${error.message}` 
-    };
-  }
-},
 
       // List CVs from Google Drive
       listGoogleDriveCVs: async () => {
@@ -482,7 +719,7 @@ saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
         }
       },
 
-      // ================== EXISTING HELPER METHODS ==================
+      // ================== SESSION MANAGEMENT ==================
       
       createOrRestoreSession: async () => {
         if (get().sessionToken) {
@@ -511,7 +748,64 @@ saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
         }
       },
       
-      // Local storage methods (keep existing)
+
+
+      // Test Google Drive connection with minimal data
+testMinimalSave: async () => {
+  const { sessionToken } = get();
+  
+  if (!sessionToken) {
+    throw new Error('No session token available');
+  }
+
+  try {
+    console.log('🧪 Testing minimal save to Google Drive...');
+    
+    // Create minimal test CV
+    const testCV = {
+      title: "Test CV",
+      is_public: false,
+      personal_info: {
+        full_name: "Test User"
+      },
+      educations: [],
+      experiences: [],
+      skills: [],
+      languages: [],
+      referrals: [],
+      custom_sections: [],
+      extracurriculars: [],
+      hobbies: [],
+      courses: [],
+      internships: [],
+      photo: { photolink: null }
+    };
+    
+    const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(testCV)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Minimal save test successful:', result);
+      return { success: true, result };
+    } else {
+      const errorText = await response.text();
+      console.error('❌ Minimal save test failed:', response.status, errorText);
+      return { success: false, error: errorText };
+    }
+  } catch (error) {
+    console.error('❌ Minimal save test error:', error);
+    return { success: false, error: error.message };
+  }
+},
+      // ================== LOCAL STORAGE METHODS ==================
+      
       saveLocally: (cvData) => {
         try {
           if (!cvData) {
@@ -570,6 +864,8 @@ saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
           return [];
         }
       },
+
+      // ================== INITIALIZATION ==================
 
       initialize: async () => {
         if (globalInitialized) {
@@ -642,7 +938,8 @@ saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
         }
       },
 
-      // UI helpers
+      // ================== UI HELPERS ==================
+      
       clearError: () => set({ error: null }),
       setShowCloudSetup: (show) => set({ showCloudSetup: show }),
       

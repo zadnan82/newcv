@@ -1,4 +1,4 @@
-// src/components/auth-resume/view-cv/NewResumeBuilder.jsx - Updated with integrated save options
+// src/components/auth-resume/view-cv/NewResumeBuilder.jsx - FIXED Schema consistency
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next'; 
@@ -19,10 +19,12 @@ import Alert from '../../shared/Alert';
 import ResumePreview from './ResumePreview';
 import PersonalInfo from '../builder/PersonalInfo';  
 import ResumeTitle from '../builder/ResumeTitle';
+import NewPhotoUpload from '../builder/NewPhotoUpload';
 
 // Import simplified components
 import useSessionStore from '../../../stores/sessionStore';
 import SimpleCloudConnect from '../../clouds/SimpleCloudConnect';
+import Base64PhotoUpload from '../builder/Base64PhotoUpload';
 
 const NewResumeBuilder = ({ darkMode }) => {
   const navigate = useNavigate();
@@ -59,48 +61,48 @@ const NewResumeBuilder = ({ darkMode }) => {
     }
   }, [location.state, navigate, location.pathname]);
   
-  // Blank resume template
-  // Update the blankResumeTemplate to match CompleteCV schema
-const blankResumeTemplate = {
-  title: "My Resume",
-  is_public: false,
-  customization: {
-    template: "stockholm",
-    accent_color: "#1a5276",
-    font_family: "Helvetica, Arial, sans-serif",
-    line_spacing: 1.5,
-    headings_uppercase: false,
-    hide_skill_level: false,
-    language: "en"
-  },
-  personal_info: {
-    full_name: '',
-    title: '',
-    email: '',
-    mobile: '', 
-    city: '',
-    address: '',
-    postal_code: '',
-    driving_license: '',
-    nationality: '',
-    place_of_birth: '',
-    date_of_birth: '',
-    linkedin: '',
-    website: '',
-    summary: ''
-  },
-  educations: [],
-  experiences: [],
-  skills: [],
-  languages: [],
-  referrals: [],
-  custom_sections: [],
-  extracurriculars: [],
-  hobbies: [],
-  courses: [],
-  internships: [],
-  photo: { photolink: null }
-};
+  // FIXED: Blank resume template - matches backend schema exactly
+  const blankResumeTemplate = {
+    title: "My Resume",
+    is_public: false,
+    customization: {
+      template: "stockholm",
+      accent_color: "#1a5276",
+      font_family: "Helvetica, Arial, sans-serif",
+      line_spacing: 1.5,
+      headings_uppercase: false,
+      hide_skill_level: false,
+      language: "en"
+    },
+    personal_info: {
+      full_name: '',
+      title: '',
+      email: '',
+      mobile: '', 
+      city: '',
+      address: '',
+      postal_code: '',
+      driving_license: '',
+      nationality: '',
+      place_of_birth: '',
+      date_of_birth: '',
+      linkedin: '',
+      website: '',
+      summary: ''
+    },
+    educations: [],
+    experiences: [],
+    skills: [],
+    languages: [],
+    referrals: [],
+    custom_sections: [],
+    extracurriculars: [],
+    hobbies: [],
+    courses: [],
+    internships: [],
+    // IMPORTANT: Use 'photo' (singular) to match backend schema
+    photo: { photolink: null }
+  };
   
   const [formData, setFormData] = useState(blankResumeTemplate);
 
@@ -142,35 +144,65 @@ const blankResumeTemplate = {
     formData.experiences?.some(exp => exp?.company || exp?.position) ||
     formData.educations?.some(edu => edu?.institution || edu?.degree);
   
+  // FIXED: Updated formData function with proper schema handling
   const updateFormData = (section, data) => {
-  console.log(`Updating section ${section} with:`, data);
-  
-  setFormData(prev => {
-    let updatedData;
+    console.log(`🔄 Updating section ${section} with:`, data);
     
-    if (section === 'title') {
-      updatedData = { ...prev, title: data };
-    } else if (section === 'is_public') {
-      updatedData = { ...prev, is_public: data };
-    } else if (section === 'customization') {
-      updatedData = { ...prev, customization: { ...prev.customization, ...data } };
-    } else if (section === 'photo') {
-      updatedData = { ...prev, photo: data };
-    } else if (section === 'personal_info') {
-      updatedData = { 
-        ...prev, 
-        personal_info: { ...data }
-      };
-    } else {
-      updatedData = { ...prev, [section]: data };
-    }
-    
-    // Auto-save to localStorage as user types
-    localStorage.setItem('cv_draft', JSON.stringify(updatedData));
-    
-    return updatedData;
-  });
-};
+    setFormData(prev => {
+      let updatedData;
+      
+      if (section === 'title') {
+        updatedData = { ...prev, title: data };
+      } else if (section === 'is_public') {
+        updatedData = { ...prev, is_public: data };
+      } else if (section === 'customization') {
+        updatedData = { ...prev, customization: { ...prev.customization, ...data } };
+      } else if (section === 'photo') {
+        // IMPORTANT: Handle photo field consistently
+        console.log('🖼️ Photo update received:', data);
+        if (data && typeof data === 'object' && 'photolink' in data) {
+          updatedData = { ...prev, photo: data };
+        } else if (typeof data === 'string') {
+          updatedData = { ...prev, photo: { photolink: data } };
+        } else {
+          updatedData = { ...prev, photo: { photolink: null } };
+        }
+        console.log('🖼️ Photo field after update:', updatedData.photo);
+      } else if (section === 'personal_info') {
+        updatedData = { 
+          ...prev, 
+          personal_info: { ...prev.personal_info, ...data }
+        };
+      } else {
+        updatedData = { ...prev, [section]: data };
+      }
+      
+      // Auto-save to localStorage as user types
+      localStorage.setItem('cv_draft', JSON.stringify(updatedData));
+      
+      // Log the final structure to help debug
+      console.log('📊 Updated form data structure:', {
+        title: updatedData.title,
+        hasPersonalInfo: !!updatedData.personal_info,
+        personalInfoFields: Object.keys(updatedData.personal_info || {}),
+        photoField: updatedData.photo,
+        sectionsCount: {
+          educations: updatedData.educations?.length || 0,
+          experiences: updatedData.experiences?.length || 0,
+          skills: updatedData.skills?.length || 0,
+          languages: updatedData.languages?.length || 0,
+          referrals: updatedData.referrals?.length || 0,
+          custom_sections: updatedData.custom_sections?.length || 0,
+          extracurriculars: updatedData.extracurriculars?.length || 0,
+          hobbies: updatedData.hobbies?.length || 0,
+          courses: updatedData.courses?.length || 0,
+          internships: updatedData.internships?.length || 0
+        }
+      });
+      
+      return updatedData;
+    });
+  };
   
   const showToast = (message, type) => {
     setToast({ message, type });
@@ -179,11 +211,11 @@ const blankResumeTemplate = {
     }, 5000);
   }; 
   
+  // FIXED: Updated sections with photo component
   const sections = [
   { id: 'title', name: t('resume.title.section', 'Resume Title'), component: ResumeTitle, dataKey: 'title' },
- // { id: 'visibility', name: t('resume.visibility.title', 'Visibility'), component: ResumeVisibility, dataKey: 'is_public' },
-  //{ id: 'customization', name: t('resume.customization.title', 'Customization'), component: ResumeCustomization, dataKey: 'customization' },
-  { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' }, 
+  { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' },
+  { id: 'photo', name: t('resume.photo.title', 'Photo'), component: Base64PhotoUpload, dataKey: 'photo' }, 
   { id: 'education', name: t('resume.education.title'), component: Education, dataKey: 'educations' },
   { id: 'experience', name: t('resume.experience.title'), component: Experience, dataKey: 'experiences' },
   { id: 'skills', name: t('resume.skills.title'), component: Skills, dataKey: 'skills' },
@@ -193,8 +225,7 @@ const blankResumeTemplate = {
   { id: 'activities', name: t('resume.extracurricular.activity'), component: ExtracurricularActivities, dataKey: 'extracurriculars' },
   { id: 'hobbies', name: t('resume.hobbies.title'), component: Hobbies, dataKey: 'hobbies' },
   { id: 'courses', name: t('resume.courses.title'), component: Courses, dataKey: 'courses' },
-  { id: 'internships', name: t('resume.internships.title'), component: Internships, dataKey: 'internships' },
-  //{ id: 'photo', name: t('resume.photo.title', 'Photo'), component: PhotoUpload, dataKey: 'photo' }
+  { id: 'internships', name: t('resume.internships.title'), component: Internships, dataKey: 'internships' }
 ];
   
   const CurrentSection = sections.find(s => s.id === activeSection)?.component || PersonalInfo;
@@ -217,7 +248,7 @@ const blankResumeTemplate = {
     setActiveSection(sections[newIndex].id);
   };
 
-  // INTEGRATED SAVE HANDLERS
+  // FIXED: Save handlers with better error handling and schema validation
   const handleSaveLocal = async () => {
     if (!hasUserStartedFilling) {
       showToast('Please add some information to your CV before saving.', 'error');
@@ -229,6 +260,14 @@ const blankResumeTemplate = {
     setSaveResult(null);
 
     try {
+      console.log('💾 Saving locally with data:', {
+        title: formData.title,
+        photoStructure: formData.photo,
+        sectionsCount: Object.keys(formData).filter(key => 
+          Array.isArray(formData[key]) && formData[key].length > 0
+        ).length
+      });
+      
       const result = await saveLocally(formData);
       setSaveResult(result);
       if (result.success) {
@@ -249,39 +288,60 @@ const blankResumeTemplate = {
   };
 
   const handleSaveCloud = async () => {
-    if (!hasUserStartedFilling) {
-      showToast('Please add some information to your CV before saving.', 'error');
-      return;
-    }
+  if (!hasUserStartedFilling) {
+    showToast('Please add some information to your CV before saving.', 'error');
+    return;
+  }
 
-    if (!canSaveToCloud()) {
-      setShowCloudSetup(true);
-      return;
-    }
+  if (!canSaveToCloud()) {
+    setShowCloudSetup(true);
+    return;
+  }
 
-    setIsSaving(true);
-    setSaveType('cloud');
-    setSaveResult(null);
+  setIsSaving(true);
+  setSaveType('cloud');
+  setSaveResult(null);
 
-    try {
-      const result = await saveToConnectedCloud(formData, 'google_drive');
-      setSaveResult(result);
-      if (result.success) {
-        showToast(result.message || 'CV saved to Google Drive!', 'success');
-      } else {
-        showToast(result.error || 'Failed to save to cloud', 'error');
-      }
-    } catch (error) {
-      const errorResult = {
-        success: false,
-        error: error.message || 'Failed to save to cloud'
-      };
-      setSaveResult(errorResult);
-      showToast(errorResult.error, 'error');
-    } finally {
-      setIsSaving(false);
+  try {
+    // Log detailed information about the CV data being saved
+    const photoInfo = formData.photo?.photolink ? {
+      hasPhoto: true,
+      isBase64: formData.photo.photolink.startsWith('data:image'),
+      sizeKB: Math.round(formData.photo.photolink.length / 1024),
+      format: formData.photo.photolink.startsWith('data:image/jpeg') ? 'JPEG' : 
+              formData.photo.photolink.startsWith('data:image/png') ? 'PNG' : 'Unknown'
+    } : { hasPhoto: false };
+
+    console.log('☁️ Saving to cloud with data:', {
+      title: formData.title,
+      photoInfo,
+      sectionsCount: Object.keys(formData).filter(key => 
+        Array.isArray(formData[key]) && formData[key].length > 0
+      ).length,
+      fullDataSize: Math.round(JSON.stringify(formData).length / 1024) + 'KB'
+    });
+    
+    const result = await saveToConnectedCloud(formData, 'google_drive');
+    setSaveResult(result);
+    if (result.success) {
+      showToast(result.message || 'CV saved to Google Drive!', 'success');
+      
+      // Clear the draft since it's now saved to cloud
+      localStorage.removeItem('cv_draft');
+    } else {
+      showToast(result.error || 'Failed to save to cloud', 'error');
     }
-  };
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      error: error.message || 'Failed to save to cloud'
+    };
+    setSaveResult(errorResult);
+    showToast(errorResult.error, 'error');
+  } finally {
+    setIsSaving(false);
+  }
+};
   
   const Toast = ({ message, type, onClose }) => {
     let displayMessage = message;
@@ -519,25 +579,33 @@ const blankResumeTemplate = {
             </Alert>
           )}
           
-          {/* Current Section Form */}
+          {/* Current Section Form - FIXED to handle all sections properly */}
           <div className="space-y-4 flex-grow">
-            {activeSection === 'title' ? (
-              <ResumeTitle
-                title={formData.title}
-                onChange={(value) => updateFormData('title', value)}
-                darkMode={darkMode}
-              />
-            ) : (
-              <CurrentSection
-                darkMode={darkMode}
-                data={formData[sections.find(s => s.id === activeSection)?.dataKey || 'personal_info']}
-                onChange={(data) => updateFormData(
-                  sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
-                  data
-                )}
-              />
-            )}
-          </div>
+  {activeSection === 'title' ? (
+    <ResumeTitle
+      title={formData.title}
+      onChange={(value) => updateFormData('title', value)}
+      darkMode={darkMode}
+    />
+  ) : activeSection === 'photo' ? (
+    <Base64PhotoUpload
+      darkMode={darkMode}
+      data={formData.photo}
+      onChange={(data) => updateFormData('photo', data)}
+    />
+  ) : (
+    <CurrentSection
+      darkMode={darkMode}
+      data={formData[sections.find(s => s.id === activeSection)?.dataKey || 'personal_info']}
+      onChange={(data) => updateFormData(
+        sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
+        data
+      )}
+      // Pass token for AI features in PersonalInfo component
+      {...(activeSection === 'personal' ? { token: 'dummy_token' } : {})}
+    />
+  )}
+</div>
           
           {/* Bottom Navigation Arrows */}
           <div className={`flex justify-between items-center py-3 px-4 mt-3 ${
