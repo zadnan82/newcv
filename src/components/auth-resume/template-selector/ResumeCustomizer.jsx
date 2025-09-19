@@ -15,10 +15,12 @@ import useResumeStore from '../../../stores/resumeStore';
 import useSessionStore from '../../../stores/sessionStore';
 import ResumeQRCode from '../public-cv/ResumeQRCode';
 import PublicToggle from './PublicToggle';
-import SaveCustomizationsButton from './SaveCustomizationsButton'; 
+import SaveCustomizationsButton from './CustomizationManager'; 
 import { exportToDocx } from '../view-cv/js/Exportdocx';
 import SaveConfirmationModal from './SaveConfirmationModal';
 import API_BASE_URL from '../../../config';
+import PublicCVManager from './PublicCVManager';
+import CustomizationManager from './CustomizationManager';
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
@@ -1286,45 +1288,32 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                   
                   {/* Save customizations */}
                   <div className="mb-4">
-                    <SaveCustomizationsButton 
-                      resumeId={resumeId} 
-                      selectedTemplate={selectedTemplate}
-                      customSettings={customSettings}
-                      isDarkMode={isDarkMode}
-                      isRTL={isRTL}
-                      onSaveSuccess={(data) => {
-                        console.log("Customizations saved successfully:", data);
-                      }}
-                    />
-                  </div>
+  <CustomizationManager 
+    selectedTemplate={selectedTemplate}
+    customSettings={customSettings}
+    isDarkMode={isDarkMode}
+    onUpdatePreview={(changes) => {
+      // This updates the preview when user clicks "Apply"
+      console.log('Applied customizations:', changes);
+    }}
+  />
+</div>
+                
+{/* Replace existing PublicToggle with PublicCVManager */}
+<div className="mb-4">
+  <PublicCVManager 
+    formData={resumeData}
+    selectedTemplate={selectedTemplate}
+    customSettings={customSettings}
+    isDarkMode={isDarkMode}
+    onPublishSuccess={(url) => {
+      console.log("CV published successfully:", url);
+      // Optional: show a toast notification
+    }}
+  />
+</div>
                   
-                  {/* Public toggle */}
-                  <div className="mb-4">
-                    <PublicToggle 
-                      resumeId={resumeId}
-                      isPublic={currentResume?.is_public || false}
-                      isDarkMode={isDarkMode}
-                      isRTL={isRTL}
-                    />
-                  </div>
                   
-                  {/* QR Code */}
-                  <div className="mb-4">
-                    <ResumeQRCode 
-                      resumeId={resumeId}
-                      customSettings={{
-                        template: selectedTemplate,
-                        accentColor: customSettings.accentColor,
-                        fontFamily: customSettings.fontFamily,
-                        lineSpacing: customSettings.lineSpacing,
-                        headingsUppercase: customSettings.headingsUppercase,
-                        hideSkillLevel: customSettings.hideSkillLevel
-                      }}
-                      isDarkMode={isDarkMode}
-                      isRTL={isRTL}
-                      userData={resumeData || currentResume}
-                    />
-                  </div>
                 </div>
               )}
             </div>

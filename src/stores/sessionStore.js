@@ -319,6 +319,95 @@ const useSessionStore = create(
 
       // ================== GOOGLE DRIVE CV OPERATIONS ==================
 
+
+
+   updateConnectedCloudCV: async (cvData, fileId, provider = 'google_drive') => {
+  const { connectedProviders, sessionToken } = get();
+  
+  // Validate session token first
+  if (!sessionToken) {
+    return { 
+      success: false, 
+      error: 'Session expired. Please reconnect.' 
+    };
+  }
+
+  // Check if provider is connected
+  if (!connectedProviders.includes(provider)) {
+    return {
+      success: false,
+      error: `${provider.replace('_', ' ').toUpperCase()} not connected. Please connect first.`,
+      needsConnection: true
+    };
+  }
+
+  // Validate required parameters
+  if (!fileId) {
+    return {
+      success: false,
+      error: 'File ID is required for updates'
+    };
+  }
+
+  if (!cvData || Object.keys(cvData).length === 0) {
+    return {
+      success: false,
+      error: 'CV data is required for updates'
+    };
+  }
+
+  console.log(`🔄 Updating CV in ${provider}...`, { fileId, title: cvData.title });
+
+  try {
+     if (provider === 'google_drive') {
+    // FIXED: Call the UPDATE function with fileId
+    const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.UPDATE(fileId), {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`
+      },
+      body: JSON.stringify(cvData)
+    });
+
+      // Handle non-OK responses
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { error: `HTTP error ${response.status}: ${response.statusText}` };
+        }
+        throw new Error(errorData.error || 'Failed to update CV in Google Drive');
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Google Drive update failed');
+      }
+
+      return {
+        success: true,
+        file_id: result.file_id || fileId,
+        message: result.message || 'CV updated in Google Drive successfully',
+        provider: 'google_drive'
+      };
+    }
+
+    throw new Error(`Update not supported for provider: ${provider}`);
+
+  } catch (error) {
+    console.error('❌ Update to connected cloud failed:', error);
+    return {
+      success: false,
+      error: error.message,
+      provider
+    };
+  }
+},
+
+
       saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
         if (provider !== 'google_drive') {
           return {
@@ -881,6 +970,37 @@ const useSessionStore = create(
           return false;
         }
       },
+
+ 
+// ================== PROVIDER PREFERENCE METHODS ==================
+
+getPreferredProvider: () => {
+  const { connectedProviders, googleDriveConnected } = get();
+  
+  // Return the preferred provider for CV operations
+  if (googleDriveConnected && connectedProviders.includes('google_drive')) {
+    return 'google_drive';
+  }
+  
+  // Fallback to local storage
+  return 'local';
+},
+
+setPreferredProvider: (provider) => {
+  // For now, this is mainly for future extensibility
+  // We could store user preference in localStorage
+  if (provider === 'google_drive' && !get().canSaveToCloud()) {
+    console.warn('Cannot set Google Drive as preferred - not connected');
+    return false;
+  }
+  
+  localStorage.setItem('preferred_cv_provider', provider);
+  return true;
+},
+
+getStoredPreferredProvider: () => {
+  return localStorage.getItem('preferred_cv_provider') || 'local';
+},
 
       // ================== UI HELPERS ==================
       

@@ -37,6 +37,7 @@
     "mammoth": "^1.9.0",
     "openai": "^4.82.0",
     "pagedjs": "^0.4.3",
+    "pako": "^2.1.0",
     "papaparse": "^5.5.2",
     "pdfjs-dist": "^3.4.120",
     "qrcode.react": "^4.2.0",

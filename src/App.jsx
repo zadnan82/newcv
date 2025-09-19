@@ -33,6 +33,9 @@ import useSessionStore from './stores/sessionStore';
 import CloudSetup from './components/clouds/CloudSetup';
 import CloudCallback from './components/clouds/CloudCallback';
 import CloudConnected from './components/clouds/CloudConnected';  
+import ErrorBoundary from './components/shared/ErrorBoundary';
+import TestCV from './TestCV';
+import CVAIEnhancement from './components/auth-resume/view-cv/CVAIEnhancement';
 
 // ============ START OF HTTPS ENFORCEMENT ============
 (() => { 
@@ -222,15 +225,13 @@ function App() {
   
         <Routes>
           {/* Public Resume Routes - No Navbar/Footer */}
-          <Route path="/cv/:userName/:userId/:resumeId" element={<PublicResumeViewer />} />
-          <Route path="/cv/:resumeId" element={<PublicResumeViewer />} />
+           <Route path="/cv/view" element={<PublicResumeViewer />} />
+        
           
           {/* Cloud OAuth Callbacks */}
           <Route path="/cloud/callback/:provider" element={<CloudCallback darkMode={darkMode} />} /> 
           <Route path="/cloud/connected" element={<CloudConnected darkMode={darkMode} />} />
-
-          {/* Legacy route for backward compatibility */}
-          <Route path="/resume/:resumeId" element={<CV darkMode={darkMode} />} />
+ 
 
           {/* All other routes with Navbar and Footer */}
           <Route path="*" element={
@@ -244,18 +245,23 @@ function App() {
                 <Route path="/cookies" element={<CookiePolicy darkMode={darkMode} />} />
                 <Route path="/contact" element={<Contact darkMode={darkMode} />} />
                 <Route path="/feedback" element={<FeedbackPage darkMode={darkMode} />} />
-                <Route path="/rc-public" element={<RCPublic darkMode={darkMode} />} />
+                
+                <Route path="/rc-public" element={<RCPublic darkMode={darkMode} />} />  
+                
+                
+         
 
                 {/* =============== CORE FEATURES (Always Available - Local First) =============== */}
                 
                 {/* Resume Building - Always available with local storage */}
-                <Route path="/new-resume" element={<NewResumeBuilder darkMode={darkMode} />} />
-                <Route path="/edit-resume/:resumeId" element={<EditResumeBuilder darkMode={darkMode} />} />
-                
+                <Route path="/new-resume" element={<NewResumeBuilder darkMode={darkMode} />} /> 
+                <Route path="/edit-resume" element={<EditResumeBuilder darkMode={darkMode} />} />
                 {/* Resume Customization - Always available */}
                 <Route path="/resume-customizer" element={<ResumeCustomizer darkMode={darkMode} />} />
                 <Route path="/resume-preview" element={<ResumePreview darkMode={darkMode} />} />
                 
+                <Route path="/cv-ai-enhancement" element={<CVAIEnhancement darkMode={darkMode} />} />
+
                 {/* Cover Letter - Available locally, enhanced with cloud */}
                 <Route path="/cover-letter" element={<CoverLetter darkMode={darkMode} />} />
                 <Route path="/cover-letter/:id/edit" element={<CoverLetterEditor darkMode={darkMode} />} />

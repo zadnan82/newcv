@@ -3,51 +3,71 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import TemplateRenderer from '../template-selector/TemplateRenderer'; 
 import logoImg from '../../../assets/logo.png';
 import logo2 from '../../../assets/logo2.png';
-import useResumeStore from '../../../stores/resumeStore';  
+import useResumeStore from '../../../stores/resumeStore';
+import { decompressCV, hasEncodedCV } from '../../../utils/cvEncoder';
 
 const PublicResumeViewer = () => {
   const [resumeData, setResumeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPublicView, setIsPublicView] = useState(false);
   const { userName, userId, resumeId } = useParams(); 
   const { fetchResume, currentResume, loading: storeLoading, error: storeError } = useResumeStore(); 
   const dataFetchedRef = useRef(false); 
   const location = useLocation();
+  
+  // Handle both old query params AND new encoded data
   const queryParams = new URLSearchParams(location.search); 
-  const customSettings = {
+  const defaultSettings = {
     template: queryParams.get('template') || 'stockholm',
     accentColor: queryParams.get('color') || '#6366f1',
     fontFamily: queryParams.get('font') || 'Helvetica, Arial, sans-serif',
     lineSpacing: parseFloat(queryParams.get('spacing')) || 1.5,
     headingsUppercase: queryParams.get('uppercase') === 'true',
     hideSkillLevel: queryParams.get('hideSkill') === 'true'
-  }; 
-  const memoizedSettings = useRef(customSettings);
+  };
   
   useEffect(() => {
-    // Only fetch if we haven't already
     if (dataFetchedRef.current) return;
     
     const getResumeData = async () => {
       setLoading(true);
+      setError(null);
+      
       try {
-        // Make sure resumeId is valid before fetching
+        // NEW: Check if this is an encoded public CV first
+        if (hasEncodedCV(location)) {
+          console.log('📖 Loading encoded public CV...');
+          
+          const encodedData = location.hash.substring(1);
+          const cvData = decompressCV(encodedData);
+          
+          setResumeData(cvData);
+          setIsPublicView(true);
+          
+          // Set page title
+          if (cvData.personal_info?.full_name) {
+            document.title = `${cvData.personal_info.full_name} - Resume`;
+          }
+          
+          dataFetchedRef.current = true;
+          console.log('✅ Encoded CV loaded successfully');
+          return;
+        }
+        
+        // OLD: Fallback to database lookup for legacy URLs
         if (!resumeId) {
           throw new Error('Resume ID is missing');
         }
         
-        // Fetch the resume from the store
         await fetchResume(resumeId);
         
-        // If there's an error from the store, throw it
         if (storeError) {
           throw new Error(storeError);
         }
         
-        // Get the current resume directly from the store
         const storeResume = useResumeStore.getState().currentResume;
         
-        // If currentResume is not available, throw an error
         if (!storeResume) {
           throw new Error('Resume not found');
         }
@@ -85,30 +105,29 @@ const PublicResumeViewer = () => {
           courses: storeResume.courses || [],
           internships: storeResume.internships || [],
           photos: storeResume.photos || { photolink: null },
-          template: storeResume.customization?.template || memoizedSettings.current.template,
+          template: storeResume.customization?.template || defaultSettings.template,
           customization: {
-            accent_color: storeResume.customization?.accent_color || memoizedSettings.current.accentColor,
-            font_family: storeResume.customization?.font_family || memoizedSettings.current.fontFamily,
-            line_spacing: storeResume.customization?.line_spacing || memoizedSettings.current.lineSpacing,
+            accent_color: storeResume.customization?.accent_color || defaultSettings.accentColor,
+            font_family: storeResume.customization?.font_family || defaultSettings.fontFamily,
+            line_spacing: storeResume.customization?.line_spacing || defaultSettings.lineSpacing,
             headings_uppercase: storeResume.customization?.headings_uppercase !== undefined 
               ? storeResume.customization.headings_uppercase 
-              : memoizedSettings.current.headingsUppercase,
+              : defaultSettings.headingsUppercase,
             hide_skill_level: storeResume.customization?.hide_skill_level !== undefined 
               ? storeResume.customization.hide_skill_level 
-              : memoizedSettings.current.hideSkillLevel
+              : defaultSettings.hideSkillLevel
           }
         };
         
         setResumeData(processedData);
-        setError(null);
-        
-        // Mark that we've fetched the data
+        setIsPublicView(false);
         dataFetchedRef.current = true;
         
         // Set document title with person's name
         if (processedData.personal_info?.full_name) {
           document.title = `${processedData.personal_info.full_name} - Resume`;
         }
+        
       } catch (err) {
         console.error("Error fetching resume:", err);
         setError(`${err.message}`);
@@ -118,12 +137,7 @@ const PublicResumeViewer = () => {
     };
     
     getResumeData();
-    
-    // Cleanup function
-    return () => {
-      dataFetchedRef.current = false;
-    };
-  }, [resumeId, fetchResume, storeError]);  
+  }, [resumeId, fetchResume, storeError, location.hash]);  
 
   const Logo = () => {
     return (
@@ -133,7 +147,6 @@ const PublicResumeViewer = () => {
           alt="Resume Builder Logo" 
           className="h-6 w-auto mr-2" 
           onError={(e) => {
-            // Fallback to text-based logo if image fails to load
             e.target.style.display = 'none';
             e.target.nextElementSibling.style.display = 'none';
             e.target.parentNode.innerHTML = `
@@ -208,11 +221,11 @@ const PublicResumeViewer = () => {
   }
    
   const finalCustomSettings = {
-    accentColor: resumeData.customization.accent_color,
-    fontFamily: resumeData.customization.font_family,
-    lineSpacing: resumeData.customization.line_spacing,
-    headingsUppercase: resumeData.customization.headings_uppercase,
-    hideSkillLevel: resumeData.customization.hide_skill_level
+    accentColor: resumeData.customization?.accent_color || defaultSettings.accentColor,
+    fontFamily: resumeData.customization?.font_family || defaultSettings.fontFamily,
+    lineSpacing: resumeData.customization?.line_spacing || defaultSettings.lineSpacing,
+    headingsUppercase: resumeData.customization?.headings_uppercase !== undefined ? resumeData.customization.headings_uppercase : defaultSettings.headingsUppercase,
+    hideSkillLevel: resumeData.customization?.hide_skill_level !== undefined ? resumeData.customization.hide_skill_level : defaultSettings.hideSkillLevel
   };
   
   return (
@@ -234,7 +247,13 @@ const PublicResumeViewer = () => {
             </Link>
           </div>
           
-          <div className="text-xs">
+          <div className="text-xs flex items-center">
+            {isPublicView && (
+              <div className="flex items-center mr-4 px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                <span>Public View</span>
+              </div>
+            )}
             <span className="text-gray-600 mr-1">Viewing:</span>
             <span className="font-medium text-gray-900">{resumeData.personal_info?.full_name || 'Resume'}</span>
           </div>
@@ -254,7 +273,7 @@ const PublicResumeViewer = () => {
       <main className="flex-grow flex flex-col items-center relative z-10">
         <div className="bg-white/90 backdrop-blur-sm shadow-md max-w-4xl w-full my-4 mx-auto">
           <TemplateRenderer
-            templateId={resumeData.template}
+            templateId={resumeData.customization?.template || resumeData.template || 'stockholm'}
             formData={resumeData}
             customSettings={finalCustomSettings}
             darkMode={false}

@@ -387,11 +387,46 @@ const NewResumeBuilder = ({ darkMode }) => {
   }, [formData, navigate]);
   
   const handleAIEnhancement = useCallback(() => {
-    // Save current data and navigate to AI enhancement
-    localStorage.setItem('cv_draft_for_ai', JSON.stringify(formData));
-    // Navigate to AI enhancement route (based on your CVAIEnhancement.jsx component)
-    navigate('/cv-ai-enhancement'); 
-  }, [formData, navigate]);
+  // Check if user has meaningful content
+  const hasContent = !!(
+    formData.personal_info?.full_name ||
+    formData.personal_info?.summary ||
+    formData.experiences?.length > 0 ||
+    formData.educations?.length > 0 ||
+    formData.skills?.length > 0
+  );
+
+  if (!hasContent) {
+    showToast('Please add some personal information, work experience, or skills before using AI enhancement.', 'error');
+    return;
+  }
+
+  try {
+    const aiEnhancementData = {
+      ...formData,
+      _prepared_for_ai: {
+        timestamp: Date.now(),
+        source: 'NewResumeBuilder',
+        content_summary: {
+          has_name: !!formData.personal_info?.full_name,
+          has_summary: !!formData.personal_info?.summary,
+          experiences_count: formData.experiences?.length || 0,
+          skills_count: formData.skills?.length || 0
+        }
+      }
+    };
+    
+    localStorage.setItem('cv_draft_for_ai', JSON.stringify(aiEnhancementData));
+    localStorage.setItem('cv_draft', JSON.stringify(formData));
+    
+    console.log('🤖 Navigating to AI enhancement');
+    navigate('/cv-ai-enhancement');
+    
+  } catch (error) {
+    console.error('❌ Failed to prepare CV for AI:', error);
+    showToast('Failed to prepare CV for AI enhancement', 'error');
+  }
+}, [formData, navigate, showToast]);
   
   const closeToast = useCallback(() => {
     setToast(null);

@@ -112,6 +112,8 @@ export const FEEDBACK_ENDPOINTS = {
 };
 
 
+// config.js - Update the GOOGLE_DRIVE_ENDPOINTS section
+
 export const GOOGLE_DRIVE_ENDPOINTS = {
   PROVIDERS: `${API_BASE_URL}/api/google-drive/providers`,
   CONNECT: `${API_BASE_URL}/api/google-drive/connect`,
@@ -120,7 +122,8 @@ export const GOOGLE_DRIVE_ENDPOINTS = {
   SAVE: `${API_BASE_URL}/api/google-drive/save`,
   LIST: `${API_BASE_URL}/api/google-drive/list`,
   LOAD: (fileId) => `${API_BASE_URL}/api/google-drive/load/${fileId}`,
-  DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/delete/${fileId}`,
+  DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/delete/${fileId}`, 
+  UPDATE: (fileId) => `${API_BASE_URL}/api/google-drive/update-file/${fileId}`,
   DISCONNECT: `${API_BASE_URL}/api/google-drive/disconnect`,
   DEBUG: `${API_BASE_URL}/api/google-drive/debug`
 };

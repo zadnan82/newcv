@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, useSearchParams, useParams } from 'react-router-dom'; 
+import { useNavigate, useLocation, useParams } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next'; 
 import useAuthStore from '../../../stores/authStore';
-import useResumeStore from '../../../stores/resumeStore';
+import useSessionStore from '../../../stores/sessionStore';
 import Education from '../builder/Education';
 import Experience from '../builder/Experience';
 import Skills from '../builder/Skills';
@@ -15,7 +15,7 @@ import Courses from '../builder/Courses';
 import Internships from '../builder/Internships'; 
 import Alert from '../../shared/Alert';  
 import ResumePreview from './ResumePreview';
-import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X, Download, Printer, FileSpreadsheet, Save, LogIn, Sparkles } from 'lucide-react';
+import { Eye, Edit, ChevronLeft, ChevronRight, Menu, X, Download, Printer, FileSpreadsheet, Save, LogIn, Sparkles, HardDrive, Cloud } from 'lucide-react';
 import PersonalInfo from '../builder/PersonalInfo';  
 import ResumeTitle from '../builder/ResumeTitle';
 import EditPhotoUpload from '../builder/EditPhotoUpload';
@@ -26,92 +26,121 @@ import { CV_AI_ENDPOINTS } from '../../../config';
 
 const EditResumeBuilder = ({ darkMode }) => {
   const navigate = useNavigate();
-  const { resumeId: paramResumeId } = useParams();
-  const location = useLocation(); 
+  const location = useLocation();
   const { token } = useAuthStore();
+  
+  // Use sessionStore instead of resumeStore
   const { 
-    currentResume, 
-    updateResume, 
-    loading, 
-    error: storeError,
-    fetchResume,
-    setCurrentResume,
-    isEditingLocally,
-    saveToLocalStorage
-  } = useResumeStore();
+    canSaveToCloud, 
+    saveLocally, 
+    saveToConnectedCloud,
+    loadGoogleDriveCV,
+    updateConnectedCloudCV,  // Add this line
+    googleDriveConnected 
+    
+  } = useSessionStore();
+  
   const [activeSection, setActiveSection] = useState('personal'); 
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null); 
   const [viewMode, setViewMode] = useState('edit');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // New state for mobile action menu
-  const [authToken, setAuthToken] = useState(token); 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localError, setLocalError] = useState(null);
-  const stateResumeId = location.state?.resumeId;
-  const resumeId = paramResumeId || stateResumeId || 'default_resume';
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams(); 
-  const [formData, setFormData] = useState(currentResume || {});
+  const [formData, setFormData] = useState({});
   const { isAuthenticated } = useAuthStore();
   const userIsAuthenticated = isAuthenticated();
   const htmlResumeRef = useRef(null);
   const [usageInfo, setUsageInfo] = useState(null);
+  const [cvSource, setCvSource] = useState('local'); // 'local', 'draft', 'cloud'
+  const [originalCvId, setOriginalCvId] = useState(null);
   
   // Resume Preview Action States
   const [isPdfExporting, setIsPdfExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isDocxExporting, setIsDocxExporting] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-   
+
   useEffect(() => {
-    const fetchResumeData = async () => {
-      if (resumeId && resumeId !== 'default_resume') {
-        try {
-          setIsLoading(true);
-          
-          // Track if it's already been fetched to avoid multiple fetch calls
-          const alreadyFetched = 
-            currentResume && 
-            currentResume.id.toString() === resumeId.toString();
-            
-          if (!alreadyFetched) {
-            await fetchResume(resumeId);
-          }
-          
-          // Set form data from the current resume
-          if (currentResume) {
-            setFormData(currentResume);
-          }
-          
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Error fetching resume:", error);
-          setLocalError("Could not load the resume. Please try again.");
-          setIsLoading(false);
+  const loadCVData = async () => {
+    try {
+      setIsLoading(true);
+      console.log('📖 Loading CV for editing...');
+      
+      let cvData = null;
+      let source = 'local';
+      let cvId = null;
+      
+      const stateData = location.state;
+      
+      // Get explicit source information from navigation state
+      if (stateData?.editSource === 'cloud' && stateData?.originalFileId) {
+        // Editing a cloud CV
+        console.log('☁️ Loading specific cloud CV for editing:', stateData.originalFileId);
+        cvData = await loadGoogleDriveCV(stateData.originalFileId);
+        
+        if (cvData) {
+          source = 'cloud';
+          cvId = stateData.originalFileId;
+          console.log('✅ Loaded specific cloud CV for editing');
+        }
+      } else if (stateData?.editSource === 'local') {
+        // Editing a local CV
+        const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
+        cvData = localCVs.find(cv => cv.id === stateData.cvId);
+        
+        if (cvData) {
+          source = 'local';
+          cvId = stateData.cvId;
         }
       } else {
-        setIsLoading(false);
+        // Fallback to draft loading (existing logic)
+        const draft = localStorage.getItem('cv_draft');
+        if (draft) {
+          const parsed = JSON.parse(draft);
+          
+          // Check the draft's source tracking
+          if (parsed._edit_source === 'cloud' && parsed._original_cloud_id) {
+            cvData = parsed;
+            source = 'cloud';
+            cvId = parsed._original_cloud_id;
+          } else if (parsed._edit_source === 'local' && parsed._original_local_id) {
+            cvData = parsed;
+            source = 'local'; 
+            cvId = parsed._original_local_id;
+          } else {
+            cvData = parsed;
+            source = 'draft';
+          }
+        }
       }
-    };
-    
-    fetchResumeData();
-    // Only include resumeId to avoid re-fetching when currentResume changes
-  }, [resumeId, fetchResume]);
- 
-  useEffect(() => {
-    if (!isLoading && !currentResume) {
-      navigate('/my-resumes');
+      
+      if (!cvData) {
+        throw new Error('No CV data found');
+      }
+      
+      setFormData(cvData);
+      setCvSource(source);
+      setOriginalCvId(cvId);
+      
+      console.log(`✅ Loaded CV for editing: ${cvData.title} (source: ${source}, id: ${cvId})`);
+      
+    } catch (error) {
+      console.error('❌ Error loading CV:', error);
+      setLocalError('Failed to load CV. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  }, [currentResume, navigate, isLoading]);
-   
-  useEffect(() => {
-    if (currentResume) {
-      setFormData(currentResume);
-    }
-  }, [currentResume]);
+  };
   
+  loadCVData();
+}, [location.state]);
+
   const checkUsageLimit = async () => {
+    if (!token) return;
+    
     try {
       const response = await fetch(CV_AI_ENDPOINTS.USAGE_LIMIT, {
         headers: {
@@ -151,80 +180,155 @@ const EditResumeBuilder = ({ darkMode }) => {
   
     return matches;
   };
+
   const isMobileView = useMediaQuery('(max-width: 768px)');
   const isTabletView = useMediaQuery('(min-width: 769px) and (max-width: 1024px)');   
+  
   const hasUserStartedFilling = formData.personal_info?.full_name || 
     formData.personal_info?.email ||
     formData.experiences?.some(exp => exp?.company || exp?.position) ||
     formData.educations?.some(edu => edu?.institution || edu?.degree);
-   
+
+  // Auto-save functionality - save to draft every few seconds
   useEffect(() => {
-    if (storeError) {
-      setLocalError(storeError);
+    if (hasUserStartedFilling && formData) {
+      const saveTimeout = setTimeout(() => {
+        try {
+          localStorage.setItem('cv_draft', JSON.stringify(formData));
+          console.log('💾 Auto-saved to draft');
+        } catch (error) {
+          console.error('❌ Auto-save failed:', error);
+        }
+      }, 2000); // Save after 2 seconds of inactivity
+
+      return () => clearTimeout(saveTimeout);
     }
-  }, [storeError]);
- 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isLoading) { 
-        setIsLoading(false); 
-      }
-    }, 5000);
-    
-    return () => clearTimeout(timer);
-  }, [isLoading]);
+  }, [formData, hasUserStartedFilling]);
 
-  // Auto-save functionality
-  useEffect(() => {
-    if (hasUserStartedFilling && formData && isEditingLocally) {
-      let saveTimeout;
-
-      const currentDataStr = JSON.stringify(formData);
-      const previousDataStr = useRef(null).current;
-      const savedDataStr = localStorage.getItem('resumeFormData');
-
-      if (currentDataStr !== previousDataStr && currentDataStr !== savedDataStr) {
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-          saveToLocalStorage();
-          useRef(null).current = currentDataStr;
-        }, 1000);
-      }
-
-      return () => {
-        clearTimeout(saveTimeout);
-      };
-    }
-  }, [formData, hasUserStartedFilling, isEditingLocally, saveToLocalStorage]);
- 
   const updateFormData = (section, data) => {
-    //console.log(`Updating form data for section "${section}":`, data);
+    console.log(`Updating form data for section "${section}":`, data);
     
     setFormData(prev => {
       if (section === 'title') {
-        // For title, we're updating a string value directly at the root level
-        return {
-          ...prev,
-          title: data
-        };
+        return { ...prev, title: data };
       } else if (section === 'photos') {
-        // Special handling for photos section with consistent format
         console.log('Updating photos in formData:', data);
-        
-        return {
-          ...prev,
-          photos: data  // This will be { photolink: url } from EditPhotoUpload
-        };
+        return { ...prev, photos: data };
       } else {
-        // For other sections, we're updating an object or array
-        return {
-          ...prev,
-          [section]: data
-        };
+        return { ...prev, [section]: data };
       }
     });
   };
+
+  // Save CV function - supports local and cloud saving
+const handleSaveCV = async (saveToCloud = false) => {
+  if (!formData) return;
   
+  try {
+    setIsSaving(true);
+    console.log('💾 Saving CV...', { saveToCloud, source: cvSource, originalCvId });
+    
+    // Add metadata
+    const cvToSave = {
+      ...formData,
+      updated_at: new Date().toISOString(),
+      _metadata: {
+        source: cvSource,
+        originalId: originalCvId,
+        lastEdited: Date.now()
+      }
+    };
+    
+    let result;
+    
+    if (saveToCloud && canSaveToCloud()) {
+      // Save to Google Drive
+      if (cvSource === 'cloud' && originalCvId) {
+        // UPDATE existing cloud file
+        console.log('📝 Updating existing cloud file:', originalCvId);
+        result = await updateConnectedCloudCV(cvToSave, originalCvId, 'google_drive');
+        
+        if (result.success) {
+          showToast('CV updated in Google Drive successfully!', 'success');
+          // Keep the same originalCvId since we're updating the same file
+        }
+      } else {
+        // CREATE new cloud file
+        console.log('📝 Creating new cloud file');
+        result = await saveToConnectedCloud(cvToSave, 'google_drive');
+        
+        if (result.success) {
+          showToast('CV saved to Google Drive successfully!', 'success');
+          setCvSource('cloud');
+          setOriginalCvId(result.file_id);
+        }
+      }
+    } else {
+      // Save locally (existing logic remains the same)
+      if (cvSource === 'local' && originalCvId) {
+        // UPDATE existing local CV
+        console.log('📝 Updating existing local CV:', originalCvId);
+        
+        try {
+          const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
+          const cvIndex = localCVs.findIndex(cv => cv.id === originalCvId);
+          
+          if (cvIndex !== -1) {
+            // Update existing CV
+            localCVs[cvIndex] = { ...cvToSave, id: originalCvId };
+            localStorage.setItem('local_cvs', JSON.stringify(localCVs));
+            
+            result = { success: true, message: 'CV updated locally' };
+            showToast('CV updated locally successfully!', 'success');
+          } else {
+            // CV not found in local storage, create new one
+            result = await saveLocally(cvToSave);
+            
+            if (result.success) {
+              showToast('CV saved locally successfully!', 'success');
+              setCvSource('local');
+              setOriginalCvId(cvToSave.id);
+            }
+          }
+        } catch (error) {
+          console.error('Error updating local CV:', error);
+          // Fallback to creating new one
+          result = await saveLocally(cvToSave);
+          
+          if (result.success) {
+            showToast('CV saved locally successfully!', 'success');
+            setCvSource('local');
+            setOriginalCvId(cvToSave.id);
+          }
+        }
+      } else {
+        // CREATE new local CV
+        console.log('📝 Creating new local CV');
+        result = await saveLocally(cvToSave);
+        
+        if (result.success) {
+          showToast('CV saved locally successfully!', 'success');
+          setCvSource('local');
+          setOriginalCvId(cvToSave.id);
+        }
+      }
+    }
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Save failed');
+    }
+    
+    // Update all relevant drafts
+    localStorage.setItem('cv_draft', JSON.stringify(cvToSave));
+    localStorage.setItem('cv_draft_for_customization', JSON.stringify(cvToSave));
+    
+  } catch (error) {
+    console.error('❌ Save failed:', error);
+    showToast(`Failed to save: ${error.message}`, 'error');
+  } finally {
+    setIsSaving(false);
+  }
+};
   const showToast = (message, type) => {
     setToast({ message, type });
     setTimeout(() => {
@@ -252,12 +356,12 @@ const EditResumeBuilder = ({ darkMode }) => {
 
   const toggleViewMode = () => {
     setViewMode(viewMode === 'edit' ? 'preview' : 'edit');
-    setMobileMenuOpen(false); // Close the mobile menu when toggling views
+    setMobileMenuOpen(false);
   };
 
   const toggleMobileNav = () => {
     setMobileNavOpen(!mobileNavOpen);
-    setMobileMenuOpen(false); // Close the action menu when opening nav
+    setMobileMenuOpen(false);
   };
   
   const navigateSection = (direction) => {
@@ -270,22 +374,23 @@ const EditResumeBuilder = ({ darkMode }) => {
     setActiveSection(sections[newIndex].id);
   };
 
-  // Function to handle HTML Resume reference
   const handleHTMLResumeRef = (ref) => {
     htmlResumeRef.current = ref;
   };
 
-  // Resume action functions
   const handleLoginRedirect = () => {
     localStorage.setItem('tempResumeData', JSON.stringify(formData));
     navigate('/login', { state: { returnTo: location.pathname } });
   };
 
-  const handleCustomize = (currentResume) => {
-    
-    navigate('/resume-customizer', { 
-      state: { resumeId: currentResume.id } 
-    });
+  const handleCustomize = () => {
+    // Save current CV to customization draft
+    localStorage.setItem('cv_draft_for_customization', JSON.stringify(formData));
+    navigate('/resume-customizer');
+  };
+
+  const handleBackToDashboard = () => {
+    navigate('/my-resumes');
   };
 
   const handleExportPDF = async () => {
@@ -372,18 +477,30 @@ const EditResumeBuilder = ({ darkMode }) => {
   };
 
   const handleAIEnhancement = () => {
-    if (!userIsAuthenticated) {
-      showToast(t('settings.not_authenticated', 'You must be logged in'), 'error');
-      setShowAuthModal(true);
+    if (!hasUserStartedFilling) {
+      showToast('Please add some information to your CV before using AI enhancement.', 'error');
       return;
     }
 
-    // Navigate to AI Enhancement page with current resume data
-    navigate('/cv-ai-enhancement', { 
-      state: { 
-        resumeId: formData?.id || formData?.server_id 
-      } 
-    });
+    // Save current data for AI enhancement
+    try {
+      const aiData = {
+        ...formData,
+        _prepared_for_ai: {
+          timestamp: Date.now(),
+          source: 'EditResumeBuilder'
+        }
+      };
+      
+      localStorage.setItem('cv_draft_for_ai', JSON.stringify(aiData));
+      localStorage.setItem('cv_draft', JSON.stringify(formData)); // Keep main draft updated
+      
+      navigate('/cv-ai-enhancement');
+    } catch (error) {
+      console.error('❌ Failed to prepare CV for AI enhancement:', error);
+      showToast('Failed to prepare CV for AI enhancement', 'error');
+    }
+    
     setMobileMenuOpen(false);
   };
 
@@ -402,7 +519,6 @@ const EditResumeBuilder = ({ darkMode }) => {
   }, [mobileMenuOpen]);
 
   const Toast = ({ message, type, onClose }) => {
-    // If message is an object or array, stringify it properly
     let displayMessage = message;
     if (typeof message === 'object' && message !== null) {
       try {
@@ -468,12 +584,72 @@ const EditResumeBuilder = ({ darkMode }) => {
     );
   };
 
+  // Save Button Component
+  const SaveButton = () => (
+    <div className="flex gap-2">
+      <button
+        onClick={() => handleSaveCV(false)}
+        disabled={isSaving}
+        className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
+          isSaving
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105'
+        }`}
+        title="Save locally"
+      >
+        <HardDrive size={14} />
+        <span>{isSaving ? 'Saving...' : 'Save'}</span>
+      </button>
+
+      {canSaveToCloud() && (
+        <button
+          onClick={() => handleSaveCV(true)}
+          disabled={isSaving}
+          className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
+            isSaving
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
+          }`}
+          title="Save to Google Drive"
+        >
+          <Cloud size={14} />
+          <span>{isSaving ? 'Saving...' : 'Drive'}</span>
+        </button>
+      )}
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-800 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-gray-800'}`}>
+      <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-gray-800'}`}>
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-          <p>{t('common.loading', 'Loading...')}</p>
+          <p>{t('common.loading', 'Loading CV...')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (localError && !formData.title) {
+    return (
+      <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
+        <div className={`text-center max-w-md p-8 rounded-xl shadow-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-white/90 text-gray-800'}`}>
+          <h2 className="text-xl font-bold mb-4">Error Loading CV</h2>
+          <p className="mb-6">{localError}</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={handleBackToDashboard}
+              className="px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={() => navigate('/new-resume')}
+              className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700"
+            >
+              Create New CV
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -491,11 +667,9 @@ const EditResumeBuilder = ({ darkMode }) => {
           <div className="absolute top-0 -right-48 w-96 h-96 rounded-full bg-pink-600/20 mix-blend-multiply filter blur-3xl"></div>
           <div className="absolute -bottom-48 left-48 w-96 h-96 rounded-full bg-blue-600/20 mix-blend-multiply filter blur-3xl"></div>
           <div className="absolute -bottom-48 right-48 w-96 h-96 rounded-full bg-purple-600/20 mix-blend-multiply filter blur-3xl"></div>
-          
         </div>
       )}
-      
-  
+
       {/* Mobile View Mode Switcher with Action Dropdown */}
       {isMobileView && (
         <div className={`sticky top-0 z-20 w-full py-2 border-b mb-2 ${
@@ -515,13 +689,19 @@ const EditResumeBuilder = ({ darkMode }) => {
             >
               {mobileNavOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-  
-            <div className="text-center text-lg font-semibold">
-              {viewMode === 'edit' ? t('editor.edit_resume') : t('editor.preview_resume')}
+
+            <div className="text-center">
+              <div className="text-lg font-semibold">
+                {viewMode === 'edit' ? 'Edit CV' : 'Preview CV'}
+              </div>
+              {cvSource && (
+                <div className="text-xs text-gray-500">
+                  Source: {cvSource === 'cloud' ? 'Google Drive' : cvSource === 'draft' ? 'Draft' : 'Local'}
+                </div>
+              )}
             </div>
-  
+
             <div className="relative mobile-menu-container">
-              {/* Action menu button */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className={`p-2 mr-2 rounded-md ${
@@ -529,11 +709,10 @@ const EditResumeBuilder = ({ darkMode }) => {
                     ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                     : 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-gray-700 hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20'
                 }`}
-              >
+              > 
                 <FileSpreadsheet size={20} />
               </button>
-  
-              {/* View mode toggle button */}
+
               <button 
                 onClick={toggleViewMode}
                 className={`p-2 rounded-md ${
@@ -544,7 +723,7 @@ const EditResumeBuilder = ({ darkMode }) => {
               >
                 {viewMode === 'edit' ? <Eye size={20} /> : <Edit size={20} />}
               </button>
-  
+
               {/* Dropdown menu */}
               {mobileMenuOpen && (
                 <div 
@@ -555,22 +734,9 @@ const EditResumeBuilder = ({ darkMode }) => {
                   }`}
                 >
                   <div className="py-1">
-                    {/* <SaveButton  
-                      formData={formData}
-                      darkMode={darkMode}
-                      isSaving={isSaving}
-                      setIsSaving={setIsSaving}
-                      showToast={showToast}
-                      isLocalDraft={isEditingLocally}
-                      forceCreate={location.pathname.includes('/new-resume')}
-                      userIsAuthenticated={userIsAuthenticated}
-                      onLoginRequired={() => setShowAuthModal(true)}
-                      className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
-                        darkMode 
-                          ? 'hover:bg-gray-600' 
-                          : 'hover:bg-gray-100'
-                      }`}
-                    /> */}
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <SaveButton />
+                    </div>
                     
                     <button
                       onClick={handleAIEnhancement}
@@ -578,11 +744,11 @@ const EditResumeBuilder = ({ darkMode }) => {
                         darkMode 
                           ? 'hover:bg-gray-600' 
                           : 'hover:bg-gray-100'
-                      } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
-                      disabled={!userIsAuthenticated}
+                      } ${!hasUserStartedFilling ? 'opacity-50' : ''}`}
+                      disabled={!hasUserStartedFilling}
                     >
                       <Sparkles size={16} />
-                      {t('navigation.aiEnhancement', 'AI Enhancement')}
+                      AI Enhancement
                     </button>
                     
                     <button
@@ -595,7 +761,7 @@ const EditResumeBuilder = ({ darkMode }) => {
                       disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                     >
                       <Download size={16} />
-                      {isPdfExporting ? t('resume.customizer.export.exporting') : t('preview.export_as_pdf')}
+                      {isPdfExporting ? 'Exporting...' : 'Export PDF'}
                     </button>
                     
                     <button
@@ -608,7 +774,7 @@ const EditResumeBuilder = ({ darkMode }) => {
                       disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                     >
                       <FileSpreadsheet size={16} />
-                      {isDocxExporting ? t('resume.customizer.export.exporting') : t('preview.export_as_docx')}
+                      {isDocxExporting ? 'Exporting...' : 'Export Word'}
                     </button>
                     
                     <button
@@ -621,17 +787,18 @@ const EditResumeBuilder = ({ darkMode }) => {
                       disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                     >
                       <Printer size={16} />
-                      {isPrinting ? t('common.preparing') : t('preview.print_resume')}
+                      {isPrinting ? 'Preparing...' : 'Print'}
                     </button>
+                    
                     <button 
-                      onClick={() => handleCustomize(currentResume)}
+                      onClick={handleCustomize}
                       className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
                         darkMode 
                           ? 'hover:bg-gray-600' 
                           : 'hover:bg-gray-100'
-                      } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
+                      }`}
                     > 
-                      {t('resumeDashboard.buttons.customize', 'Customize')}
+                      Customize Template
                     </button>
                    
                   </div>
@@ -641,14 +808,17 @@ const EditResumeBuilder = ({ darkMode }) => {
           </div>
         </div>
       )}
-   {usageInfo && isMobileView &&(
-  <div className={`mb-3 text-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-    {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
-      remaining: usageInfo.remaining,
-      limit: usageInfo.limit
-    })}
-  </div>
-)}
+
+      {/* Usage Info */}
+      {usageInfo && isMobileView && (
+        <div className={`mb-3 text-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
+            remaining: usageInfo.remaining,
+            limit: usageInfo.limit
+          })}
+        </div>
+      )}
+
       {/* Mobile Section Navigation (Slide-in Drawer) */}
       {isMobileView && mobileNavOpen && (
         <div className="fixed inset-0 z-30 bg-black bg-opacity-50" onClick={toggleMobileNav}>
@@ -663,7 +833,7 @@ const EditResumeBuilder = ({ darkMode }) => {
             <div className={`flex justify-between items-center mb-4 border-b pb-2 ${
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
-              <h3 className="font-bold text-lg">{t('editor.resume_sections')}</h3>
+              <h3 className="font-bold text-lg">CV Sections</h3>
               <button onClick={toggleMobileNav}>
                 <X size={20} />
               </button>
@@ -693,7 +863,7 @@ const EditResumeBuilder = ({ darkMode }) => {
           </div>
         </div>
       )}
-  
+
       {/* Left Side - Form (hidden on mobile when in preview mode) */}
       <div 
         className={`relative z-10 ${
@@ -706,14 +876,27 @@ const EditResumeBuilder = ({ darkMode }) => {
             : 'bg-white/80 backdrop-blur-sm border-gray-200'
         } border rounded-xl shadow-lg flex flex-col`}
       >
- {usageInfo && !isMobileView &&(
-  <div className={`mb-3 text-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-    {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
-      remaining: usageInfo.remaining,
-      limit: usageInfo.limit
-    })}
-  </div>
-)}
+        {/* Usage Info */}
+        {usageInfo && !isMobileView && (
+          <div className={`mb-3 text-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
+              remaining: usageInfo.remaining,
+              limit: usageInfo.limit
+            })}
+          </div>
+        )}
+
+        {/* CV Source Info */}
+        <div className={`mb-2 text-center text-xs px-3 py-1 rounded-full ${
+          cvSource === 'cloud' ? 'bg-blue-100 text-blue-700' :
+          cvSource === 'draft' ? 'bg-yellow-100 text-yellow-700' :
+          'bg-green-100 text-green-700'
+        }`}>
+          {cvSource === 'cloud' && <><Cloud size={12} className="inline mr-1" /> Google Drive</>}
+          {cvSource === 'draft' && <><FileSpreadsheet size={12} className="inline mr-1" /> Draft</>}
+          {cvSource === 'local' && <><HardDrive size={12} className="inline mr-1" /> Local Storage</>}
+          {cvSource === 'new' && <><FileSpreadsheet size={12} className="inline mr-1" /> New CV</>}
+        </div>
         
         {/* Section Navigation - Responsive Grid */}
         <div className={`mb-4 sticky top-0 z-10 pb-2 border-b ${
@@ -742,7 +925,7 @@ const EditResumeBuilder = ({ darkMode }) => {
               ))}
             </div>
           )}
-  
+
           {/* Mobile Section Title and Navigation */}
           {isMobileView && (
             <div className="flex items-center justify-between">
@@ -793,17 +976,17 @@ const EditResumeBuilder = ({ darkMode }) => {
           ) : (
             <CurrentSection
               darkMode={darkMode}
-              data={formData[sections.find(s => s.id === activeSection)?.dataKey || 'photo']}
+              data={formData[sections.find(s => s.id === activeSection)?.dataKey || 'photos']}
               onChange={(data) => updateFormData(
                 sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
                 data
               )}
-              token={authToken}
+              token={token}
             />
           )}
         </div>
         
-        {/* Bottom Navigation Arrows - with Gradient Styling */}
+        {/* Bottom Navigation Arrows */}
         <div className={`flex justify-between items-center py-3 px-4 mt-3 ${
           darkMode 
             ? 'bg-gray-700 text-gray-300' 
@@ -814,7 +997,7 @@ const EditResumeBuilder = ({ darkMode }) => {
             className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
           >
             <ChevronLeft size={16} />
-            <span className="hidden sm:inline"> {t('prod1.sections.previous')}</span>
+            <span className="hidden sm:inline">Previous</span>
           </button>
           
           <div className="text-sm font-medium">
@@ -826,12 +1009,12 @@ const EditResumeBuilder = ({ darkMode }) => {
                 {viewMode === 'edit' ? (
                   <>
                     <Eye size={16} />
-                    <span>{t('actions.preview', 'Preview')}</span>
+                    <span>Preview</span>
                   </>
                 ) : (
                   <>
                     <Edit size={16} />
-                    <span>{t('common.edit', 'Edit')}</span>
+                    <span>Edit</span>
                   </>
                 )}
               </button>
@@ -844,13 +1027,13 @@ const EditResumeBuilder = ({ darkMode }) => {
             onClick={() => navigateSection('next')}
             className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
           >
-            <span className="hidden sm:inline"> {t('prod1.sections.next')}</span>
+            <span className="hidden sm:inline">Next</span>
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
      
-      {/* Right Side - Preview (hidden on mobile when in edit mode) */}
+      {/* Right Side - Preview */}
       <div 
         className={`relative z-10 ${
           isMobileView 
@@ -862,90 +1045,77 @@ const EditResumeBuilder = ({ darkMode }) => {
             : 'bg-white/80 backdrop-blur-sm border-gray-200'
         } flex flex-col rounded-xl shadow-lg overflow-hidden`}
       >
-        {/* Desktop Action Buttons - Moved from ResumePreview to here */}
+        {/* Desktop Action Buttons */}
         {!isMobileView && (
           <div className="flex gap-2 p-2 border-b">
-            <SaveButton  
-              formData={formData}
-              darkMode={darkMode}
-              isSaving={isSaving}
-              setIsSaving={setIsSaving}
-              showToast={showToast}
-              isLocalDraft={isEditingLocally}
-              forceCreate={location.pathname.includes('/new-resume')}
-              userIsAuthenticated={userIsAuthenticated}
-              onLoginRequired={() => setShowAuthModal(true)} 
-            />
+            <SaveButton />
             
             <button
               onClick={handleAIEnhancement}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                darkMode 
-                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105' 
-                  : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
-              } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
-              title={userIsAuthenticated ? t('common.ai_enhancement', 'AI Enhancement') : t('settings.not_authenticated', 'Login required')}
-              disabled={!userIsAuthenticated}
+                !hasUserStartedFilling
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:shadow-lg hover:shadow-yellow-500/20 hover:scale-105'
+              }`}
+              title={hasUserStartedFilling ? 'AI Enhancement' : 'Add content first'}
+              disabled={!hasUserStartedFilling}
             >
               <Sparkles size={14} />
-              <span>{t('common.ai', 'AI')}</span>
+              <span>AI</span>
             </button>
             
             <button
               onClick={handleExportPDF}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                darkMode 
-                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105' 
+                !userIsAuthenticated || isPdfExporting || isPrinting || isDocxExporting || isSaving
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
-              } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
-              title={userIsAuthenticated ? t('preview.export_as_pdf') : t('settings.not_authenticated', 'Login required')}
-              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
+              }`}
+              title={userIsAuthenticated ? 'Export PDF' : 'Login required'}
+              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
             >
               <Download size={14} />
-              <span>{isPdfExporting ? t('resume.customizer.export.exporting') : t('preview.pdf')}</span>
+              <span>{isPdfExporting ? 'Exporting...' : 'PDF'}</span>
             </button>
             
             <button
               onClick={handleWordExport}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                darkMode 
-                  ? 'bg-gradient-to-r from-pink-600 to-blue-600 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105' 
+                !userIsAuthenticated || isPdfExporting || isPrinting || isDocxExporting || isSaving
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-pink-600 to-blue-600 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105'
-              } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
-              title={userIsAuthenticated ? t('preview.export_as_docx') : t('settings.not_authenticated', 'Login required')}
-              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
+              }`}
+              title={userIsAuthenticated ? 'Export Word' : 'Login required'}
+              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
             >
               <FileSpreadsheet size={14} />
-              <span>{isDocxExporting ? t('resume.customizer.export.exporting') : t('resume.customizer.export.word')}</span>
+              <span>{isDocxExporting ? 'Exporting...' : 'Word'}</span>
             </button>
             
             <button
               onClick={handlePrint}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                darkMode 
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105' 
+                !userIsAuthenticated || isPdfExporting || isPrinting || isDocxExporting || isSaving
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
-              } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
-              title={userIsAuthenticated ? t('preview.print_resume') : t('settings.not_authenticated', 'Login required')}
-              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
+              }`}
+              title={userIsAuthenticated ? 'Print' : 'Login required'}
+              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
             >
               <Printer size={14} />
-              <span>{isPrinting ? t('common.preparing') : t('preview.print_resume')}</span>
+              <span>{isPrinting ? 'Preparing...' : 'Print'}</span>
             </button>
 
             <button
-                      onClick={() => handleCustomize(currentResume)}
-                      className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                        darkMode 
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105' 
-                          : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
-                      } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
-                    > 
-                      {t('resumeDashboard.buttons.customize')}
-                    </button>
+              onClick={handleCustomize}
+              className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-green-600 to-teal-600 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105"
+              title="Customize template and styling"
+            >
+              <span>Style</span>
+            </button>
           </div>
         )}
-  
+
         <div className="flex-grow overflow-auto flex flex-col">
           <ResumePreview
             formData={{
@@ -966,7 +1136,7 @@ const EditResumeBuilder = ({ darkMode }) => {
             hideButtons={true}
           />
           
-          {/* Bottom Navigation Arrows for Preview Mode - with Gradient Styling */}
+          {/* Bottom Navigation for Preview Mode */}
           {viewMode === 'preview' && (
             <div className="mt-auto flex justify-between items-center py-3 px-4 m-2 rounded-lg bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5">
               <button 
@@ -974,24 +1144,26 @@ const EditResumeBuilder = ({ darkMode }) => {
                 className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
               >
                 <Edit size={16} />
-                <span>{t('common.edit', 'Edit')}</span>
+                <span>Edit</span>
               </button>
               
               <button 
                 onClick={handleExportPDF}
                 disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
-                className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 ${
-                  (isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated) ? 'opacity-70 cursor-not-allowed' : ''
+                className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
+                  isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
                 }`}
               >
                 <Download size={16} />
-                <span>{isPdfExporting ? t('resume.customizer.export.exporting') : t('preview.export_as_pdf', 'Export PDF')}</span>
+                <span>{isPdfExporting ? 'Exporting...' : 'Export PDF'}</span>
               </button>
             </div>
           )}
         </div>
       </div>
-  
+
       {/* Toast Notification */}
       {toast && (
         <Toast 
@@ -1000,7 +1172,7 @@ const EditResumeBuilder = ({ darkMode }) => {
           onClose={closeToast} 
         />
       )}
-  
+
       {/* Auth Modal */}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
