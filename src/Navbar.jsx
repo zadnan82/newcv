@@ -118,12 +118,23 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     setMobileMenuOpen(false);
   };
  
-  const isActive = (path) => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
-  };
+ const isActive = (path) => {
+  if (path === '/') {
+    return location.pathname === '/';
+  }
+  
+  // Handle exact matches for similar paths
+  if (path === '/cover-letter') {
+    return location.pathname === '/cover-letter';
+  }
+  
+  if (path === '/cover-letters') {
+    return location.pathname.startsWith('/cover-letters');
+  }
+  
+  // Default behavior for other paths
+  return location.pathname.startsWith(path);
+};
  
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },

@@ -263,9 +263,11 @@ function App() {
                 <Route path="/cv-ai-enhancement" element={<CVAIEnhancement darkMode={darkMode} />} />
 
                 {/* Cover Letter - Available locally, enhanced with cloud */}
-                <Route path="/cover-letter" element={<CoverLetter darkMode={darkMode} />} />
-                <Route path="/cover-letter/:id/edit" element={<CoverLetterEditor darkMode={darkMode} />} />
+                <Route path="/cover-letter" element={<CoverLetter darkMode={darkMode} />} /> 
                 
+ 
+                <Route path="/cover-letter/:id/edit" element={<CoverLetterEditor darkMode={darkMode} />} />
+                <Route path="/cover-letters/:id/edit" element={<CoverLetterEditor darkMode={darkMode} />} />
                 {/* Job Matching - Works with local CVs too */}
                 <Route path="/job-matching" element={<JobMatching darkMode={darkMode} />} />
 

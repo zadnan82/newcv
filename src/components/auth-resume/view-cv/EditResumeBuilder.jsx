@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom'; 
-import { useTranslation } from 'react-i18next'; 
-import useAuthStore from '../../../stores/authStore';
+import { useTranslation } from 'react-i18next';  
 import useSessionStore from '../../../stores/sessionStore';
 import Education from '../builder/Education';
 import Experience from '../builder/Experience';

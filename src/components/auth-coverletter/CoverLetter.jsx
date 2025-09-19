@@ -277,37 +277,39 @@ const CoverLetter = ({ darkMode }) => {
 
   // NEW: Handle saving cover letter (local-first with optional cloud sync)
   const handleSaveCoverLetter = async (saveToCloud = false) => {
-    if (!generatedCoverLetterData) {
-      toast.error('No cover letter to save. Please generate one first.');
-      return;
-    }
+  if (!generatedCoverLetterData) {
+    toast.error('No cover letter to save. Please generate one first.');
+    return;
+  }
 
-    try {
-      setIsSaving(true);
-      console.log('💾 Saving cover letter...', saveToCloud ? 'to cloud' : 'locally');
-      
-      const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud);
-      
-      if (result.success) {
-        const message = saveToCloud && result.cloudResult 
-          ? 'Cover letter saved locally and to Google Drive!' 
-          : 'Cover letter saved locally!';
-        
-        toast.success(message);
-        console.log('✅ Cover letter saved successfully');
-        
-        // Clear the generated data since it's now saved
-        setGeneratedCoverLetterData(null);
+  try {
+    setIsSaving(true);
+    
+    const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud);
+    
+    if (result.success) {
+      if (saveToCloud) {
+        // User clicked "Save to Drive"
+        if (result.cloudResult?.success) {
+          toast.success('Cover letter saved locally and to Google Drive!');
+        } else {
+          toast.success('Cover letter saved locally! (Google Drive sync failed)');
+        }
       } else {
-        throw new Error(result.error || 'Save failed');
+        // User clicked "Save Locally"
+        toast.success('Cover letter saved locally!');
       }
-    } catch (error) {
-      console.error('❌ Save failed:', error);
-      toast.error(`Failed to save: ${error.message}`);
-    } finally {
-      setIsSaving(false);
+    } else {
+      throw new Error(result.error || 'Save failed');
     }
-  };
+  } catch (error) {
+    console.error('Save failed:', error);
+    toast.error(`Failed to save: ${error.message}`);
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   // Handle task polling for async generation
   useEffect(() => {

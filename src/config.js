@@ -1,5 +1,5 @@
-// config.js - Updated for development mode with localhost backend
-import useAuthStore from './stores/authStore';
+// config.js - FIXED with clean cover letter endpoints
+//import useAuthStore from './stores/authStore';
 
 // ================== ENVIRONMENT DETECTION ==================
 const isDevelopment = process.env.NODE_ENV === 'development' || 
@@ -31,7 +31,7 @@ export const CLOUD_ENDPOINTS = {
   REFRESH_TOKENS: `${API_BASE_URL}/api/cloud/refresh-tokens`,
 };
 
-// ================== UPDATED RESUME ENDPOINTS ==================
+// ================== RESUME ENDPOINTS (CVs) ==================
 export const RESUME_ENDPOINTS = {
   LIST: `${API_BASE_URL}/api/resume/`,
   GET_BY_ID: `${API_BASE_URL}/api/resume/`,
@@ -69,7 +69,6 @@ export const SESSION_ENDPOINTS = {
 };
 
 // ================== DEPRECATED - OLD AUTH ENDPOINTS ==================
-// These are kept for backward compatibility during migration
 export const AUTH_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/auth/token`,
   REGISTER: `${API_BASE_URL}/auth/register`,
@@ -102,35 +101,53 @@ export const FEEDBACK_ENDPOINTS = {
   ADMIN_DELETE: (id) => `${API_BASE_URL}/feedback/admin/${id}`,
 };
 
-
-
-// ================== COVER LETTER ENDPOINTS ==================
-
+// ================== FIXED COVER LETTER ENDPOINTS - CLEAN SEPARATION ==================
 export const COVER_LETTER_ENDPOINTS = {
+  // Generation endpoint (still uses the original cover letter API)
   GENERATE: `${API_BASE_URL}/api/cover-letter/generate`,
+  
+  // CLEAN Google Drive endpoints for cover letters (separate from CVs)
+  LIST: `${API_BASE_URL}/api/google-drive/cover-letters`,
+  LOAD: (id) => `${API_BASE_URL}/api/google-drive/cover-letters/${id}`,
+  DELETE: (id) => `${API_BASE_URL}/api/google-drive/cover-letters/${id}`,
+  UPDATE: (id) => `${API_BASE_URL}/api/google-drive/cover-letters/${id}`,
+  
+  // Legacy endpoints (may still be used by generation process)
   BASE: `${API_BASE_URL}/api/cover-letter/`,
   ALL: `${API_BASE_URL}/api/cover-letter/list-cover-letters`,
-  UPDATE: (id) =>  `${API_BASE_URL}/api/cover-letter/update/${id}`,
+  LEGACY_UPDATE: (id) => `${API_BASE_URL}/api/cover-letter/update/${id}`,
   BY_ID: (id) => `${API_BASE_URL}/api/cover-letter/${id}`,
   TASK_STATUS: (taskId) => `${API_BASE_URL}/api/cover-letter/task-status/${taskId}`,
-  DELETE: (id) => `${API_BASE_URL}/api/cover-letter/delete/${id}`,
+  LEGACY_DELETE: (id) => `${API_BASE_URL}/api/cover-letter/delete/${id}`,
   SAVE: `${API_BASE_URL}/api/cover-letter/save`,    
 };
 
-// config.js - Update the GOOGLE_DRIVE_ENDPOINTS section
-
+// ================== GOOGLE DRIVE ENDPOINTS (CVs) ==================
 export const GOOGLE_DRIVE_ENDPOINTS = {
   PROVIDERS: `${API_BASE_URL}/api/google-drive/providers`,
   CONNECT: `${API_BASE_URL}/api/google-drive/connect`,
   STATUS: `${API_BASE_URL}/api/google-drive/status`,
   TEST: `${API_BASE_URL}/api/google-drive/test`,
+  
+  // CV-specific endpoints
   SAVE: `${API_BASE_URL}/api/google-drive/save`,
   LIST: `${API_BASE_URL}/api/google-drive/list`,
   LOAD: (fileId) => `${API_BASE_URL}/api/google-drive/load/${fileId}`,
   DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/delete/${fileId}`, 
   UPDATE: (fileId) => `${API_BASE_URL}/api/google-drive/update-file/${fileId}`,
+  
+  // Generic endpoints
   DISCONNECT: `${API_BASE_URL}/api/google-drive/disconnect`,
-  DEBUG: `${API_BASE_URL}/api/google-drive/debug`
+  DEBUG: `${API_BASE_URL}/api/google-drive/debug`,
+  
+  // Cover letter specific endpoints (separate from CVs)
+  COVER_LETTERS: {
+    LIST: `${API_BASE_URL}/api/google-drive/cover-letters`,
+    LOAD: (fileId) => `${API_BASE_URL}/api/google-drive/cover-letters/${fileId}`,
+    DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/cover-letters/${fileId}`,
+    UPDATE: (fileId) => `${API_BASE_URL}/api/google-drive/cover-letters/${fileId}`,
+    SAVE: `${API_BASE_URL}/api/google-drive/save-cover-letter`,
+  }
 };
 
 // ================== UTILITY FUNCTIONS ==================
