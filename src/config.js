@@ -53,16 +53,7 @@ export const AI_ENDPOINTS = {
   SUGGEST_SKILLS: `${API_BASE_URL}/api/ai/suggest-skills`,
   ANALYZE_JOB: `${API_BASE_URL}/api/ai/analyze-job-match`,
   MODELS: `${API_BASE_URL}/api/ai/models`,
-};
-
-// ================== COVER LETTER ENDPOINTS ==================
-export const COVER_LETTER_ENDPOINTS = {
-  LIST: `${API_BASE_URL}/api/cover-letter/`,
-  GENERATE: `${API_BASE_URL}/api/cover-letter/generate`,
-  GET_BY_ID: `${API_BASE_URL}/api/cover-letter/`,
-  DELETE: `${API_BASE_URL}/api/cover-letter/`,
-  CUSTOMIZE: `${API_BASE_URL}/api/cover-letter/customize`,
-};
+}; 
 
 // ================== DEVELOPMENT OAUTH REDIRECT URLS ==================
 export const getOAuthRedirectUrl = (provider) => { 
@@ -111,6 +102,20 @@ export const FEEDBACK_ENDPOINTS = {
   ADMIN_DELETE: (id) => `${API_BASE_URL}/feedback/admin/${id}`,
 };
 
+
+
+// ================== COVER LETTER ENDPOINTS ==================
+
+export const COVER_LETTER_ENDPOINTS = {
+  GENERATE: `${API_BASE_URL}/api/cover-letter/generate`,
+  BASE: `${API_BASE_URL}/api/cover-letter/`,
+  ALL: `${API_BASE_URL}/api/cover-letter/list-cover-letters`,
+  UPDATE: (id) =>  `${API_BASE_URL}/api/cover-letter/update/${id}`,
+  BY_ID: (id) => `${API_BASE_URL}/api/cover-letter/${id}`,
+  TASK_STATUS: (taskId) => `${API_BASE_URL}/api/cover-letter/task-status/${taskId}`,
+  DELETE: (id) => `${API_BASE_URL}/api/cover-letter/delete/${id}`,
+  SAVE: `${API_BASE_URL}/api/cover-letter/save`,    
+};
 
 // config.js - Update the GOOGLE_DRIVE_ENDPOINTS section
 
