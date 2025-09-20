@@ -3,18 +3,20 @@ import React, { useLayoutEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader, Shield } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
+import { useTranslation } from 'react-i18next';
 
 const CloudCallback = ({ darkMode }) => {
   const { provider } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   // Create unique key for this OAuth attempt
   const urlKey = `${provider}-${searchParams.get('success')}-${searchParams.get('error') || 'none'}`;
   
   // State
   const [status, setStatus] = useState('processing');
-  const [message, setMessage] = useState('Processing Google Drive connection...');
+  const [message, setMessage] = useState(t('cloud.processing_connection'));
   const [processed, setProcessed] = useState(false);
 
   const { handleOAuthReturn } = useSessionStore();
@@ -34,14 +36,14 @@ const CloudCallback = ({ darkMode }) => {
 
       if (error) {
         setStatus('error');
-        setMessage(`Google Drive connection failed: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`);
+        setMessage(`${t('cloud.connection_failed')}: ${error}${errorDescription ? ` - ${errorDescription}` : ''}`);
         return;
       }
 
       if (success === 'true') {
         try {
           setStatus('processing');
-          setMessage('Verifying Google Drive connection...');
+          setMessage(t('cloud.verifying_connection'));
 
           // Wait for backend to process
           await new Promise(resolve => setTimeout(resolve, 2000));
@@ -51,14 +53,14 @@ const CloudCallback = ({ darkMode }) => {
 
           if (verificationResult?.success) {
             setStatus('success');
-            setMessage('Successfully connected to Google Drive!');
+            setMessage(t('cloud.connection_successful'));
             
             // Redirect after success
             setTimeout(() => {
               navigate('/new-resume', {
                 replace: true,
                 state: {
-                  message: 'Google Drive connected! You can now save your CV to the cloud.',
+                  message: t('cloud.connected_save_to_cloud'),
                   provider: 'google_drive',
                   email: verificationResult.email
                 }
@@ -66,28 +68,28 @@ const CloudCallback = ({ darkMode }) => {
             }, 2000);
           } else {
             setStatus('error');
-            setMessage('Backend verification failed. You can try the "Continue Anyway" option.');
+            setMessage(t('cloud.verification_failed'));
           }
         } catch (e) {
           setStatus('error');
-          setMessage(`Verification error: ${e.message}`);
+          setMessage(`${t('cloud.verification_error')}: ${e.message}`);
         }
       } else {
         setStatus('error');
-        setMessage('No success confirmation received');
+        setMessage(t('cloud.no_success_confirmation'));
       }
     };
 
     processCallback().catch(err => {
       setStatus('error');
-      setMessage(`Processing error: ${err.message}`);
+      setMessage(`${t('cloud.processing_error')}: ${err.message}`);
     });
 
     // Cleanup function
     return () => {
       console.log('🔧 CloudCallback: Cleanup');
     };
-  }, [processed, provider, searchParams, navigate, handleOAuthReturn]);
+  }, [processed, provider, searchParams, navigate, handleOAuthReturn, t]);
 
   const handleContinueAnyway = () => {
     // Force set provider as connected
@@ -108,7 +110,7 @@ const CloudCallback = ({ darkMode }) => {
     navigate('/new-resume', {
       replace: true,
       state: {
-        message: 'Assuming Google Drive is connected. Try saving to test.',
+        message: t('cloud.assuming_connected'),
         provider: 'google_drive',
         assumeConnected: true
       }
@@ -166,9 +168,9 @@ const CloudCallback = ({ darkMode }) => {
         <h1 className={`text-2xl font-bold mb-4 ${
           darkMode ? 'text-white' : 'text-gray-900'
         }`}>
-          {status === 'processing' && 'Connecting to Google Drive...'}
-          {status === 'success' && 'Connection Successful!'}
-          {status === 'error' && 'Connection Issue'}
+          {status === 'processing' && t('cloud.connecting_title')}
+          {status === 'success' && t('cloud.connection_successful_title')}
+          {status === 'error' && t('cloud.connection_issue_title')}
         </h1>
 
         {/* Message */}
@@ -191,14 +193,14 @@ const CloudCallback = ({ darkMode }) => {
                 <span className={`text-sm font-medium ${
                   darkMode ? 'text-green-300' : 'text-green-700'
                 }`}>
-                  Your data stays in YOUR Google Drive account
+                  {t('cloud.data_stays_in_your_drive')}
                 </span>
               </div>
             </div>
             <p className={`text-sm ${
               darkMode ? 'text-gray-400' : 'text-gray-500'
             }`}>
-              Redirecting to resume builder...
+              {t('cloud.redirecting_to_builder')}
             </p>
           </>
         )}
@@ -210,13 +212,13 @@ const CloudCallback = ({ darkMode }) => {
               onClick={handleContinueAnyway}
               className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              Continue Anyway
+              {t('cloud.continue_anyway')}
             </button>
             <button
               onClick={handleRetry}
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Try Again
+              {t('cloud.try_again')}
             </button>
             <button
               onClick={handleGoHome}
@@ -226,7 +228,7 @@ const CloudCallback = ({ darkMode }) => {
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
-              Back to Home
+              {t('common.back')} {t('navigation.home')}
             </button>
           </div>
         )}

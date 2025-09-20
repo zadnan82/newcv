@@ -1,6 +1,6 @@
-// src/components/modals/StorageChoiceModal.jsx - NEW COMPONENT
 import React from 'react';
 import { X, HardDrive, Cloud, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const StorageChoiceModal = ({ 
   isOpen, 
@@ -11,8 +11,10 @@ const StorageChoiceModal = ({
   darkMode,
   isSaving,
   saveType,
-  onConnectCloud // NEW: Add connect cloud handler
+  onConnectCloud
 }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -21,10 +23,9 @@ const StorageChoiceModal = ({
         darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'
       } shadow-2xl p-6 transform transition-all`}>
         
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Where would you like to save your CV?
+            {t('cloud.where_save_cv', 'Where would you like to save your CV?')}
           </h3>
           <button 
             onClick={onClose}
@@ -37,10 +38,8 @@ const StorageChoiceModal = ({
           </button>
         </div>
 
-        {/* Storage Options */}
         <div className="space-y-3">
           
-          {/* Google Drive Option */}
           {canSaveToCloud ? (
             <button
               onClick={onSaveCloud}
@@ -65,12 +64,12 @@ const StorageChoiceModal = ({
                   <h4 className={`font-semibold ${
                     darkMode ? 'text-white' : 'text-gray-800'
                   }`}>
-                    Save to Google Drive
+                    {t('cloud.save_to_google_drive', 'Save to Google Drive')}
                   </h4>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    Access from any device • Automatic backup
+                    {t('cloud.access_any_device_backup', 'Access from any device • Automatic backup')}
                   </p>
                 </div>
               </div>
@@ -87,7 +86,6 @@ const StorageChoiceModal = ({
               </div>
             </button>
           ) : (
-            // Google Drive - Not Connected
             <div className={`w-full p-4 rounded-xl border-2 border-dashed ${
               darkMode 
                 ? 'border-gray-600 bg-gray-700/50' 
@@ -106,12 +104,12 @@ const StorageChoiceModal = ({
                     <h4 className={`font-semibold ${
                       darkMode ? 'text-white' : 'text-gray-800'
                     }`}>
-                      Google Drive
+                      {t('cloud.google_drive')}
                     </h4>
                     <p className={`text-sm ${
                       darkMode ? 'text-gray-300' : 'text-gray-600'
                     }`}>
-                      Access from any device • Automatic backup
+                      {t('cloud.access_any_device_backup')}
                     </p>
                   </div>
                 </div>
@@ -120,13 +118,12 @@ const StorageChoiceModal = ({
                   className="px-3 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
                   disabled={isSaving}
                 >
-                  Connect
+                  {t('cloud.connect', 'Connect')}
                 </button>
               </div>
             </div>
           )}
 
-          {/* OneDrive Option - Coming Soon */}
           <div className={`w-full p-4 rounded-xl border-2 border-dashed opacity-60 ${
             darkMode 
               ? 'border-gray-700 bg-gray-800/50' 
@@ -137,7 +134,6 @@ const StorageChoiceModal = ({
                 <div className={`p-3 rounded-lg mr-4 ${
                   darkMode ? 'bg-blue-900/20' : 'bg-blue-100/50'
                 }`}>
-                  {/* OneDrive Icon */}
                   <svg className={`w-6 h-6 ${
                     darkMode ? 'text-blue-400/60' : 'text-blue-600/60'
                   }`} viewBox="0 0 24 24" fill="currentColor">
@@ -148,12 +144,12 @@ const StorageChoiceModal = ({
                   <h4 className={`font-semibold ${
                     darkMode ? 'text-white/60' : 'text-gray-800/60'
                   }`}>
-                    OneDrive
+                    {t('cloud.onedrive', 'OneDrive')}
                   </h4>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300/60' : 'text-gray-600/60'
                   }`}>
-                    Microsoft integration • Office sync
+                    {t('cloud.microsoft_integration', 'Microsoft integration • Office sync')}
                   </p>
                 </div>
               </div>
@@ -162,12 +158,11 @@ const StorageChoiceModal = ({
                   ? 'bg-gray-700 text-gray-400' 
                   : 'bg-gray-200 text-gray-500'
               }`}>
-                Coming Soon
+                {t('cloud.coming_soon', 'Coming Soon')}
               </span>
             </div>
           </div>
 
-          {/* Dropbox Option - Coming Soon */}
           <div className={`w-full p-4 rounded-xl border-2 border-dashed opacity-60 ${
             darkMode 
               ? 'border-gray-700 bg-gray-800/50' 
@@ -178,7 +173,6 @@ const StorageChoiceModal = ({
                 <div className={`p-3 rounded-lg mr-4 ${
                   darkMode ? 'bg-blue-900/20' : 'bg-blue-100/50'
                 }`}>
-                  {/* Dropbox Icon */}
                   <svg className={`w-6 h-6 ${
                     darkMode ? 'text-blue-400/60' : 'text-blue-600/60'
                   }`} viewBox="0 0 24 24" fill="currentColor">
@@ -189,12 +183,12 @@ const StorageChoiceModal = ({
                   <h4 className={`font-semibold ${
                     darkMode ? 'text-white/60' : 'text-gray-800/60'
                   }`}>
-                    Dropbox
+                    {t('cloud.dropbox', 'Dropbox')}
                   </h4>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300/60' : 'text-gray-600/60'
                   }`}>
-                    File sharing focused • Team collaboration
+                    {t('cloud.file_sharing_collaboration', 'File sharing focused • Team collaboration')}
                   </p>
                 </div>
               </div>
@@ -203,12 +197,11 @@ const StorageChoiceModal = ({
                   ? 'bg-gray-700 text-gray-400' 
                   : 'bg-gray-200 text-gray-500'
               }`}>
-                Coming Soon
+                {t('cloud.coming_soon')}
               </span>
             </div>
           </div>
 
-          {/* Local Storage Option */}
           <button
             onClick={onSaveLocal}
             disabled={isSaving}
@@ -232,12 +225,12 @@ const StorageChoiceModal = ({
                 <h4 className={`font-semibold ${
                   darkMode ? 'text-white' : 'text-gray-800'
                 }`}>
-                  Save to This Device
+                  {t('cloud.save_to_device', 'Save to This Device')}
                 </h4>
                 <p className={`text-sm ${
                   darkMode ? 'text-gray-300' : 'text-gray-600'
                 }`}>
-                  Private • Works offline • This device only
+                  {t('cloud.private_offline_device_only', 'Private • Works offline • This device only')}
                 </p>
               </div>
             </div>
@@ -254,19 +247,17 @@ const StorageChoiceModal = ({
             </div>
           </button> 
 
-          {/* Separator */}
           <div className="relative">
             <div className={`absolute inset-0 flex items-center ${darkMode ? '' : ''}`}>
               <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
             </div>
             <div className="relative flex justify-center text-sm">
               <span className={`px-2 ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'}`}>
-                or
+                {t('revamp.or')}
               </span>
             </div>
           </div>
 
-          {/* Connect More Clouds Section */}
           {!canSaveToCloud && (
             <div className={`p-3 rounded-lg ${
               darkMode ? 'bg-blue-900/10 border border-blue-800/30' : 'bg-blue-50 border border-blue-200'
@@ -274,25 +265,24 @@ const StorageChoiceModal = ({
               <p className={`text-sm font-medium mb-2 ${
                 darkMode ? 'text-blue-300' : 'text-blue-800'
               }`}>
-                💡 Connect cloud storage for device sync
+                {t('cloud.connect_cloud_device_sync_tip', '💡 Connect cloud storage for device sync')}
               </p>
               <p className={`text-xs ${
                 darkMode ? 'text-blue-400' : 'text-blue-600'
               }`}>
-                Your CV will be accessible from any device with your account
+                {t('cloud.cv_accessible_any_device', 'Your CV will be accessible from any device with your account')}
               </p>
             </div>
           )}
         </div>
 
-        {/* Footer Note */}
         <div className={`mt-6 p-3 rounded-lg ${
           darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
         }`}>
           <p className={`text-xs text-center ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>
-            💡 Your work is auto-saved as you type - you won't lose anything!
+            {t('cloud.auto_saved_tip', '💡 Your work is auto-saved as you type - you won\'t lose anything!')}
           </p>
         </div>
 

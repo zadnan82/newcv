@@ -749,8 +749,7 @@
       "invalid_response": "Geçersiz yanıt formatı alındı. Yeniden deneniyor...",
       "empty_response": "Model boş yanıt verdi. Yeniden deneniyor...",
       "unexpected": "Beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
-      "generation": "Ön yazı oluşturulamadı",
-      "no_content": "Ön yazı verisi alınamadı",
+      "generation": "Ön yazı oluşturulamadı", 
       "requiredFields": "Lütfen tüm zorunlu alanları doldurun",
       "selectResume": "Lütfen bir özgeçmiş yükleyin veya hesabınızdan bir özgeçmiş seçin"
     },
@@ -1006,151 +1005,6 @@
       "edit": "Düzenle",
       "customize": "Özelleştir",
       "delete": "Sil"
-    }
-  },
-  "privacy": {
-    "title": "Gizlilik Politikası",
-    "lastUpdated": "Son Güncelleme",
-    "updateDate": "4 Nisan 2025",
-    "intro": "CVATI (\"biz\", \"bizim\" veya \"bize\") gizliliğinizi korumaya kararlıdır. Bu Gizlilik Politikası, özgeçmiş oluşturma hizmetimizi kullandığınızda bilgilerinizi nasıl topladığımızı, kullandığımızı, açıkladığımızı ve koruduğumuzu açıklar.",
-    "collection": {
-      "title": "Topladığımız Bilgiler",
-      "desc": "Hizmetimizi kullanırken gönüllü olarak bize sağladığınız kişisel bilgileri topluyoruz, bunlar şunları içerir:",
-      "personal": "Kişisel detaylar (ad, e-posta adresi, telefon numarası)",
-      "professional": "Profesyonel bilgiler (iş deneyimi, beceriler, eğitim)",
-      "optional": "İsteğe bağlı bilgiler (doğum tarihi, milliyet, adres, fotoğraf)",
-      "account": "Hesap kimlik bilgileri",
-      "usage": "Kullanım verileri ve hizmetle etkileşimler"
-    },
-    "use": {
-      "title": "Bilgilerinizi Nasıl Kullanıyoruz",
-      "desc": "Bilgilerinizi aşağıdaki amaçlarla kullanıyoruz:",
-      "provide": "Hizmetimizi sağlamak ve sürdürmek",
-      "improve": "Hizmetimizi ve kullanıcı deneyimini iyileştirmek",
-      "communicate": "Hizmet güncellemeleri hakkında sizinle iletişim kurmak",
-      "ai": "Yapay Zeka destekli özgeçmiş ve ön yazı oluşturmak",
-      "security": "Güvenliği sağlamak ve dolandırıcılığı önlemek",
-      "legal": "Yasal yükümlülüklere uymak"
-    },
-    "sharing": {
-      "title": "Bilgi Paylaşımı ve Açıklaması",
-      "desc": "Bilgilerinizi şunlarla paylaşabiliriz:",
-      "service": "Hizmet sağlayıcılar (bulut depolama, görüntü barındırma, analitik)",
-      "legal": "Kanun gerektirdiğinde yasal makamlar",
-      "business": "Açık rızanız ile iş ortakları",
-      "note": "Görüntü depolamak için Cloudinary kullanıyoruz. Yüklediğiniz fotoğraflar Cloudinary'nin gizlilik politikasına tabidir."
-    },
-    "storage": {
-      "title": "Veri Depolama ve Güvenlik",
-      "desc": "Kişisel bilgilerinizi korumak için uygun güvenlik önlemleri uyguluyoruz. Ancak, İnternet üzerinden hiçbir iletim yöntemi %100 güvenli değildir ve mutlak güvenliği garanti edemeyiz.",
-      "retention": "Kişisel bilgilerinizi hesabınız aktif olduğu sürece veya size hizmet sağlamak için gerekli olduğu sürece saklıyoruz. Verilerinizin silinmesini her zaman talep edebilirsiniz."
-    },
-    "rights": {
-      "title": "Veri Haklarınız",
-      "desc": "GDPR ve diğer geçerli veri koruma yasaları kapsamında, kişisel verilerinizle ilgili aşağıdaki haklara sahipsiniz:",
-      "access": "Kişisel verilerinize erişim hakkı",
-      "rectify": "Yanlış verileri düzeltme hakkı",
-      "delete": "Silinme hakkı (\"unutulma hakkı\")",
-      "restrict": "İşlemeyi kısıtlama hakkı",
-      "portability": "Veri taşınabilirliği hakkı",
-      "object": "İşlemeye itiraz etme hakkı",
-      "exercise": "Bu hakları kullanmak için uygulamamızdaki hesap ayarlarını kullanabilir veya doğrudan bizimle iletişime geçebilirsiniz."
-    },
-    "cookies": {
-      "title": "Çerezler ve Benzer Teknolojiler",
-      "desc": "Web sitemizde deneyiminizi geliştirmek, kullanımı analiz etmek ve pazarlama çabalarımıza yardımcı olmak için çerezler ve benzer izleme teknolojileri kullanıyoruz. Tarayıcı ayarlarınız aracılığıyla çerezleri kontrol edebilirsiniz."
-    },
-    "ai": {
-      "title": "Yapay Zeka ile Oluşturulan İçerik",
-      "desc": "Hizmetimiz, özgeçmiş içeriği ve ön yazı oluşturmak için Yapay Zeka kullanır. Sağladığınız veriler, kişiselleştirilmiş içerik oluşturmak için Yapay Zeka sistemlerimiz tarafından işlenebilir. Veri işleme sırasında verilerinizi korumak için önlemler alıyoruz ve açık izniniz olmadan kişisel verilerinizi Yapay Zeka modellerini eğitmek için kullanmıyoruz."
-    },
-    "children": {
-      "title": "Çocukların Gizliliği",
-      "desc": "Hizmetimiz 16 yaşın altındaki kişilere yönelik değildir. Ebeveyn izni olmadan bir çocuğun bize kişisel bilgiler sağladığını fark ederseniz, lütfen bizimle iletişime geçin."
-    },
-    "changes": {
-      "title": "Bu Gizlilik Politikasında Yapılan Değişiklikler",
-      "desc": "Gizlilik Politikamızı zaman zaman güncelleyebiliriz. Herhangi bir değişikliği bu sayfada yeni Gizlilik Politikasını yayınlayarak ve \"Son Güncelleme\" tarihini güncelleyerek size bildireceğiz."
-    },
-    "contact": {
-      "title": "Bize Ulaşın",
-      "desc": "Bu Gizlilik Politikası hakkında herhangi bir sorunuz varsa, lütfen bizimle şu adresten iletişime geçin:",
-      "email": "privacy@cvati.com"
-    }
-  },
-  "terms": {
-    "title": "Kullanım Şartları ve Koşulları",
-    "lastUpdated": "Son Güncelleme",
-    "updateDate": "4 Nisan 2025",
-    "intro": "CVATI'ye hoş geldiniz. Bu Kullanım Şartları ve Koşulları, özgeçmiş oluşturma hizmetimiz ve web sitemizin kullanımını düzenler. CVATI'ye erişerek veya kullanarak, bu Şartları kabul etmiş olursunuz.",
-    "definitions": {
-      "title": "1. Tanımlar",
-      "service": "\"Hizmet\"",
-      "serviceDesc": "CVATI web sitesi ve özgeçmiş oluşturma uygulamasını ifade eder.",
-      "content": "\"İçerik\"",
-      "contentDesc": "Hizmetimiz aracılığıyla oluşturulan, yüklenen veya üretilen özgeçmişler, ön yazılar ve diğer materyalleri ifade eder.",
-      "user": "\"Kullanıcı\"",
-      "userDesc": "Hizmetimize erişen veya kullanan herhangi bir birey.",
-      "account": "\"Hesap\"",
-      "accountDesc": "Hizmetimiz içindeki kayıtlı kullanıcı profili."
-    },
-    "accounts": {
-      "title": "2. Kullanıcı Hesapları",
-      "registration": "Bizimle bir hesap oluştururken, doğru, eksiksiz ve güncel bilgiler sağlamanız gerekir. Şifrenizi korumaktan ve hesabınız altında gerçekleşen tüm faaliyetlerden siz sorumlusunuz.",
-      "terminate": "Bu Şartların ihlali de dahil olmak üzere herhangi bir nedenle, hesabınızı derhal, önceden bildirimde bulunmaksızın sonlandırma veya askıya alma hakkını saklı tutarız."
-    },
-    "use": {
-      "title": "3. Kabul Edilebilir Kullanım",
-      "desc": "Hizmetimizi yalnızca yasal amaçlar için ve bu Şartlara uygun olarak kullanmayı kabul edersiniz. Aşağıdakileri yapmamayı kabul edersiniz:",
-      "false": "Herhangi bir yanlış veya yanıltıcı bilgi sağlamak",
-      "impersonate": "Herhangi bir kişi veya kuruluşun kimliğine bürünmek",
-      "infringe": "Herhangi bir patent, ticari marka, ticari sır, telif hakkı veya diğer mülkiyet haklarını ihlal etmek",
-      "harmful": "Virüs veya diğer zararlı kodları yüklemek",
-      "interfere": "Hizmeti veya sunucuları engellemek veya bozmak",
-      "automated": "Hizmete erişmek veya onu kullanmak için otomatik yöntemler kullanmak"
-    },
-    "content": {
-      "title": "4. İçerik Sahipliği ve Lisans",
-      "ownership": "Hizmetimiz aracılığıyla oluşturduğunuz herhangi bir özgeçmiş, ön yazı veya diğer içeriklerin tüm sahiplik haklarını saklı tutarsınız. Ancak, yalnızca Hizmetimizi sağlamak ve geliştirmek amacıyla içeriğinizi kullanmak, çoğaltmak ve görüntülemek için münhasır olmayan, dünya çapında, telif ücretsiz bir lisans verirsiniz.",
-      "responsibility": "Hizmet aracılığıyla oluşturduğunuz, yüklediğiniz veya erişilebilir hale getirdiğiniz tüm içeriklerden yalnızca siz sorumlusunuz. Özgeçmişlerinizde yer alan tüm bilgileri kullanma hakkınız olduğunu ve içeriğin herhangi bir yasayı veya üçüncü taraf haklarını ihlal etmediğini beyan ve garanti edersiniz."
-    },
-    "ai": {
-      "title": "5. Yapay Zeka ile Oluşturulan İçerik",
-      "desc": "Hizmetimiz, özgeçmiş ve ön yazı oluşturmada yapay zekadan yardım alır. Şunları kabul edersiniz ki:",
-      "accuracy": "Yapay zeka ile oluşturulan içerik her zaman doğru veya özel ihtiyaçlarınıza uygun olmayabilir",
-      "review": "Kullanmadan önce tüm yapay zeka ile oluşturulan içerikleri gözden geçirmeli ve düzenlemelisiniz",
-      "responsibility": "Özgeçmiş veya ön yazınızdaki tüm içeriklerden, yapay zeka ile oluşturulan bölümler dahil, nihai olarak siz sorumlusunuz"
-    },
-    "disclaimer": {
-      "title": "6. Garanti Reddi",
-      "desc": "Hizmetimiz \"olduğu gibi\" ve \"mevcut olduğu şekliyle\" sağlanır, açık veya zımni herhangi bir garanti içermez, bunlar arasında ancak bunlarla sınırlı olmamak üzere, pazarlanabilirlik, belirli bir amaca uygunluk veya ihlal olmama zımni garantileri de bulunur.",
-      "success": "Hizmetimizin size istihdam veya mülakat sağlayacağını garanti etmeyiz. Özgeçmiş ve ön yazıların etkinliği, kontrolümüz dışındaki birçok faktöre bağlıdır."
-    },
-    "limitation": {
-      "title": "7. Sorumluluk Sınırlaması",
-      "desc": "Kanunların izin verdiği azami ölçüde, CVATI, yöneticileri, çalışanları veya acenteleri hiçbir durumda dolaylı, cezai, arızi, özel, dolaylı veya örnek niteliğinde zararlardan, kar kaybı, iyi niyet, kullanım, veri veya diğer maddi olmayan kayıplar dahil, bu Hizmetin kullanımından veya kullanamamasından kaynaklanan zararlardan sorumlu tutulamaz."
-    },
-    "privacy": {
-      "title": "8. Gizlilik Politikası",
-      "desc": "Hizmetimizin kullanımı ayrıca Gizlilik Politikamıza tabidir ve bu politika atıf yoluyla bu Şartlara dahil edilmiştir. Kişisel bilgilerinize ilişkin uygulamalarımızı anlamak için Gizlilik Politikamızı incelemenizi rica ederiz."
-    },
-    "termination": {
-      "title": "9. Sonlandırma",
-      "userRight": "Hizmetteki talimatları izleyerek hesabınızı her zaman sonlandırabilirsiniz. Tüm verileriniz Gizlilik Politikamıza uygun olarak silinecektir.",
-      "ourRight": "Bu Şartların ihlali de dahil olmak üzere herhangi bir nedenle hesabınızı derhal, önceden bildirimde bulunmaksızın ve herhangi bir yükümlülük altına girmeksizin sonlandırma veya askıya alma hakkını saklı tutarız. Sonlandırma üzerine, Hizmeti kullanma hakkınız derhal sona erecektir."
-    },
-    "changes": {
-      "title": "10. Şartlarda Değişiklikler",
-      "desc": "İşbu Şartları her zaman değiştirme veya yenileme hakkını saklı tutarız. Revizyonun önemli olması durumunda, yeni şartların yürürlüğe girmesinden en az 30 gün önce bildirimde bulunacağız. Herhangi bir revizyonun yürürlüğe girmesinden sonra Hizmetimize erişmeye veya onu kullanmaya devam ederek, revize edilmiş şartları kabul etmiş olursunuz."
-    },
-    "governing": {
-      "title": "11. Yönetici Hukuk",
-      "desc": "İşbu Şartlar, çatışan hukuk hükümleri dikkate alınmaksızın, [Ülkeniz/Eyaletiniz] kanunlarına göre yorumlanacak ve düzenlenecektir."
-    },
-    "contact": {
-      "title": "12. Bize Ulaşın",
-      "desc": "Bu Şartlar hakkında herhangi bir sorunuz varsa, lütfen bizimle şu adresten iletişime geçin:",
-      "email": "legal@cvati.com"
     }
   }, 
   "cookiePolicy": {
@@ -1479,7 +1333,7 @@
     "fileUpload": {
       "notImplemented": "Not: Gelişmiş dosya ayrıştırma henüz uygulanmadı. En doğru analiz için lütfen özgeçmiş metninizi manuel olarak kopyalayıp yapıştırın."
     },
-
+    
     "errors": {
       "jobDescriptionRequired": "📝 Eşleştirme analizi yapabilmemiz için iş tanımına ihtiyacımız var. Şirketin iş ilanından kopyalayın.",
       "resumeRequired": "📄 Lütfen niteliklerinizi analiz edebilmemiz için özgeçmiş içeriğinizi sağlayın.",
@@ -1505,6 +1359,647 @@
       "ai_suggestion": "AI Önerisi:",
       "apply_suggestion": "Öneriyi Uygula",
       "discard": "Reddet"
+    }
+  },
+  "cloud": {
+    "no_signups_required": "Kayıt Gerekmiyor",
+    "instant_access": "Anında Erişim",
+    "instant_access_desc": "Hemen oluşturmaya başlayın. Kayıt yok, engel yok, sadece şu anda CV'nizi oluşturun.",
+    "local_first_design": "Yerel Öncelikli Tasarım",
+    "local_first_desc": "Tamamen cihazınızda çalışın. Yerel olarak kaydedin veya ihtiyacınız olduğunda bulut depolamaya yükseltin.",
+    "optional_cloud_upgrade": "İsteğe Bağlı Bulut Yükseltmesi",
+    "optional_cloud_desc": "CV'lerinize birden fazla cihazdan erişmek istediğinizde bulut depolamanızı bağlayın.",
+    "your_choice": "Sizin Seçiminiz",
+    "your_choice_desc": "Gizlilik için yerel olarak veya kolaylık için bulutta kaydedin. Siz karar verin.",
+    "no_lock_in": "Kilitlenme Yok",
+    "no_lock_in_desc": "İstediğiniz zaman yerel ve bulut depolama arasında geçiş yapın. Verileriniz, seçiminiz.",
+    "instant_preview": "Anında Önizleme",
+    "instant_preview_desc": "CV'nizi farklı şablonlarda hemen görün, bekleme yok.",
+    "privacy_first": "Gizlilik Öncelikli",
+    "privacy_first_desc": "AI özelliklerini kullanmayı seçmediğiniz sürece verilerinizi asla görmeyiz.",
+    "start_building_choose_later": "Oluşturmaya Başlayın. Depolamayı Sonra Seçin.",
+    "no_signups_desc": "Kayıt yok. Engel yok. Şu anda profesyonel CV'nizi oluşturmaya başlayın. Yerel olarak kaydedin veya ihtiyacınız olduğunda bulut depolamayı bağlayın.",
+    "ready_local_cloud_connected": "Hazır: Yerel + Bulut Depolama (Bağlı)",
+    "ready_local_cloud_available": "Hazır: Yerel Depolama • Bulut Mevcut",
+    "professional_templates_desc": "Her yerde çalışan profesyonel şablonlar. Herhangi bir tasarımla hemen oluşturmaya başlayın, sonra cihazınızda veya bulut depolamada kaydedin.",
+    "no_signup_required": "Kayıt gerekmiyor - hemen başlayın",
+    "save_local_upgrade_cloud": "Yerel olarak kaydedin veya sonra buluta yükseltin",
+    "beautifully_designed": "ve güzel tasarlanmış",
+    "start_building_now": "Şimdi Oluşturmaya Başlayın",
+    "local_first_cloud_when_needed": "Yerel Öncelikli. İhtiyaç Duyduğunuzda Bulut.",
+    "start_immediately_choose_storage": "Cihazınızda hemen başlayın, sonra depolama seçeneğinizi belirleyin.",
+    "start_immediately_no_signup": "Hemen başlayın. Kayıt gerekmiyor. Kaydederken depolama seçeneğinizi belirleyin.",
+    "your_data_your_choice": "Verileriniz, Seçiminiz",
+    "work_way_you_want": "İstediğiniz şekilde çalışın. Yerel gizlilik veya bulut kolaylığı - siz karar verin.",
+    "simple_flexible_control": "Basit, esnek ve veri kontrolünü size bırakır.",
+    "choose_template_start_creating": "Bir şablon seçin ve CV'nizi hemen oluşturmaya başlayın. Kayıt yok, engel yok.",
+    "choose_storage": "Depolama Seçin",
+    "when_ready_save_choose": "Kaydetmeye hazır olduğunuzda, yerel depolama veya cihaz senkronizasyonu için bulut bağlantısını seçin.",
+    "access_anywhere": "Her Yerden Erişim",
+    "local_files_device_cloud_sync": "Yerel dosyalar cihazınızda kalır. Bulut dosyalar tüm cihazlarınızda otomatik senkronize olur.",
+    "people_love_flexibility": "İnsanlar esnekliği ve anında erişimi seviyor.",
+    "start_immediately_no_signup_connect": "Hemen başlayın - kayıt gerekmiyor. Gizlilik için yerel olarak kaydedin veya kolaylık için bulut depolamayı bağlayın.",
+    "ready_local_cloud_storage_available": "Hazır: Yerel + Bulut Depolama Mevcut",
+    "ready_local_storage_cloud_optional": "Hazır: Yerel Depolama • Bulut İsteğe Bağlı",
+    "tip_connect_cloud_storage": "💡 İpucu: CV'lerinize herhangi bir cihazdan erişmek için bulut depolamayı bağlayın",
+    "google_drive": "Google Drive",
+    "connected_count": "{count} Bağlı",
+    "no_cloud": "Bulut Yok",
+    "cloud_storage_connected": "Bulut depolama bağlı",
+    "no_cloud_storage_connected": "Bulut depolama bağlı değil",
+    "cloud_storage_status": "Bulut Depolama Durumu",
+    "google_drive_connected": "Google Drive Bağlı",
+    "cvs_sync_devices": "✓ CV'leriniz tüm cihazlarda senkronize oluyor",
+    "automatic_backup_enabled": "✓ Otomatik yedekleme etkin",
+    "manage_cloud_storage": "Bulut Depolamayı Yönet",
+    "no_cloud_storage": "Bulut Depolama Yok",
+    "cvs_saved_locally_only": "CV'leriniz sadece yerel olarak kaydedildi",
+    "connect_cloud_device_sync": "Cihaz senkronizasyonu için bulut depolamayı bağlayın",
+    "connect_cloud_storage": "Bulut Depolamayı Bağla",
+    "clear_session_cloud_connections": "Mevcut oturumu ve bulut bağlantılarını temizle",
+    "clear_session": "Oturumu Temizle",
+    "cloud_storage": "Bulut Depolama",
+    "source": "Kaynak",
+    "local": "Yerel",
+    "draft": "Taslak",
+    "this_device": "Bu Cihaz",
+    "choose_destination": "Hedef seçin",
+    "local_only": "Sadece Yerel",
+    "change_location": "Konumu Değiştir",
+    "connect_cloud": "Bulut Bağla",
+    "save_cv": "CV Kaydet",
+    "base64_info": "Resim maksimum gizlilik için doğrudan CV dosyanızda saklanacak.",
+    "processing": "İşleniyor...",
+    "compressed_too_large": "Resim sıkıştırmadan sonra hala çok büyük. Lütfen daha küçük bir resim kullanın.",
+    "remove_error": "Fotoğraf kaldırılırken hata. Lütfen tekrar deneyin.",
+    "unsaved_changes_save_before_leaving": "Kaydedilmemiş değişiklikleriniz var. Ayrılmadan önce kaydetmek istiyor musunuz?",
+    "unsaved_changes": "Kaydedilmemiş değişiklikler",
+    "save_locally": "Yerel Olarak Kaydet",
+    "save_to_drive": "Drive'a Kaydet",
+    "your_cv": "CV'niz",
+    "where_save_cv": "CV'nizi nereye kaydetmek istiyorsunuz?",
+    "save_to_google_drive": "Google Drive'a Kaydet",
+    "access_any_device_backup": "Herhangi bir cihazdan erişim • Otomatik yedekleme",
+    "connect": "Bağlan",
+    "onedrive": "OneDrive",
+    "microsoft_integration": "Microsoft entegrasyonu • Office senkronizasyonu",
+    "coming_soon": "Yakında",
+    "dropbox": "Dropbox",
+    "file_sharing_collaboration": "Dosya paylaşımı odaklı • Takım işbirliği",
+    "save_to_device": "Bu Cihaza Kaydet",
+    "private_offline_device_only": "Özel • Çevrimdışı çalışır • Sadece bu cihaz",
+    "connect_cloud_device_sync_tip": "💡 Cihaz senkronizasyonu için bulut depolamayı bağlayın",
+    "cv_accessible_any_device": "CV'niz hesabınızla herhangi bir cihazdan erişilebilir olacak",
+    "auto_saved_tip": "💡 Çalışmanız yazarken otomatik kaydediliyor - hiçbir şey kaybetmeyeceksiniz!",
+    "current_work_session": "Mevcut Çalışma Oturumu",
+    "saved_locally": "Yerel Olarak Kaydedildi",
+    "from": "şuradan",
+    "no_cv_selected": "CV seçilmedi",
+    "customizing": "Özelleştiriliyor",
+    "cvs_available": "CV'ler mevcut",
+    "preview_apply": "Önizle ve Uygula",
+    "changes_previewed_live": "Değişiklikleriniz canlı önizleniyor. CV'nizi güncellemek için bunları uygulayın.",
+    "apply_customizations": "Özelleştirmeleri Uygula",
+    "how_it_works": "Nasıl çalışır",
+    "changes_previewed_instantly": "Değişiklikler anında önizleniyor",
+    "click_apply_save": "CV'nize kaydetmek için \"Uygula\"ya tıklayın",
+    "use_publish_shareable": "Paylaşılabilir bağlantı oluşturmak için \"Yayınla\"yı kullanın",
+    "published_links_styling": "Yayınlanan bağlantılar stilinizi içerir",
+    "lock_in": "Kilitlenme Yok",
+    "no_session_title": "Oturum Kurulmadı",
+    "sign_in_to_access": "Ön yazılarınıza erişmek ve kariyer araç setinizi oluşturmaya başlamak için lütfen giriş yapın!",
+    "sign_in_to_get_started": "Başlamak İçin Giriş Yapın",
+    "tip_connect_google_drive": "İpucu: Ön yazılarınızı cihazlar arasında senkronize etmek için Google Drive'ı bağlayın!",
+    "connect_google_drive": "Google Drive'ı Bağla",
+    "connect_drive_to_save": "AI tarafından oluşturulan ön yazılarınızı kaydetmek ve erişmek için Google Drive'ınızı bağlayın",
+    "tip_google_drive_integration": "İpucu: Google Drive entegrasyonu ön yazılarınıza her yerden erişmenizi sağlar!",
+    "from_google_drive": "Google Drive'dan",
+    "access_saved_cvs": "kaydedilmiş CV'lerinize erişmek için",
+    "stored_in_google_drive": "Google Drive'da Depolandı",
+    "stored_in_local_storage": "Yerel Depolamada Depolandı",
+    "drive": "Drive",
+    "connect_drive_to_edit": "Ön yazıları düzenlemek için Google Drive'ı bağlayın",
+    "current_draft": "Mevcut Taslak",
+    "local_storage": "Yerel Depolama",
+    "local_storage_only": "Sadece yerel depolama",
+    "connect_google_drive_sync": "Cihazlar arasında senkronize etmek için Google Drive'ı bağlayın",
+    "processing_connection": "Google Drive bağlantısı işleniyor...",
+    "connection_failed": "Google Drive bağlantısı başarısız",
+    "verifying_connection": "Google Drive bağlantısı doğrulanıyor...",
+    "connection_successful": "Google Drive'a başarıyla bağlandı!",
+    "connected_save_to_cloud": "Google Drive bağlandı! Artık CV'nizi buluta kaydedebilirsiniz.",
+    "verification_failed": "Arka uç doğrulaması başarısız oldu. \"Yine de Devam Et\" seçeneğini deneyebilirsiniz.",
+    "verification_error": "Doğrulama hatası",
+    "no_success_confirmation": "Başarı onayı alınmadı",
+    "processing_error": "İşleme hatası",
+    "assuming_connected": "Google Drive'ın bağlı olduğu varsayılıyor. Test etmek için kaydetmeyi deneyin.",
+    "connecting_title": "Google Drive'a bağlanıyor...",
+    "connection_successful_title": "Bağlantı Başarılı!",
+    "connection_issue_title": "Bağlantı Sorunu",
+    "data_stays_in_your_drive": "Verileriniz KENDİ Google Drive hesabınızda kalır",
+    "redirecting_to_builder": "Özgeçmiş oluşturucuya yönlendiriliyor...",
+    "continue_anyway": "Yine de Devam Et",
+    "try_again": "Tekrar Dene",
+    "provider_connected": "{{provider}} hesabınız başarıyla bağlandı.",
+    "continue_to_create": "Özgeçmiş Oluşturmaya Devam Et",
+    "can_now_save_access": "Artık özgeçmişlerinizi buluttan kaydedebilir ve erişebilirsiniz.",
+    "cloud_storage_setup": "Bulut Depolama Kurulumu",
+    "cvs_automatically_saved": "CV'leriniz otomatik olarak Google Drive'ınıza kaydediliyor",
+    "access_cvs_any_device": "Google hesabınızla CV'lerinize herhangi bir cihazdan erişin",
+    "why_google_drive": "Neden Google Drive?",
+    "google_drive_benefits": "Google Drive zaten güvendiğiniz güvenli, güvenilir bulut depolama sunar. CV'leriniz uçtan uca güvenlikle doğrudan hesabınızda saklanır.",
+    "local_storage_always_available": "Yerel Depolama Her Zaman Mevcut",
+    "can_save_locally": "CV'lerinizi her zaman tarayıcınızda yerel olarak kaydedebilirsiniz. Google Drive bağlantısı bulut yedeklemesi ve senkronizasyonu için isteğe bağlıdır.",
+    "local_works_offline": "💡 Yerel depolama internet bağlantısı olmadan bile çalışır",
+    "can_save_cvs_to_drive": "Artık CV'lerinizi doğrudan Google Drive'ınıza kaydedebilirsiniz",
+    "save_cvs_securely": "CV'lerinizi kendi Google Drive hesabınızda güvenli bir şekilde kaydedin",
+    "connecting": "Bağlanıyor",
+    "privacy_protected": "Gizlilik Korumalı",
+    "never_access_files": "CV'leriniz doğrudan Google Drive'ınıza kaydediliyor - dosyalarınıza asla erişmiyoruz",
+    "publish_failed": "CV yayınlama başarısız",
+    "share_resume_text": "{{name}} özgeçmişine göz atın",
+    "this_person": "bu kişi",
+    "qr_complexity_unknown": "Karmaşıklık tahmin edilemiyor",
+    "public_cv_qr_title": "Herkese Açık CV ve QR Kodu",
+    "public_link_description": "Herkesin hesap gerektirmeden CV'nizi görüntüleyebileceği herkese açık bir bağlantı oluşturun.",
+    "publishing": "Yayınlanıyor",
+    "publish_cv_publicly": "CV'yi Herkese Açık Yayınla",
+    "published_successfully": "Başarıyla Yayınlandı",
+    "public_url_label": "Herkese Açık URL ({{count}} karakter)",
+    "copy_url": "URL'yi Kopyala",
+    "open_new_tab": "Yeni sekmede aç",
+    "share": "Paylaş",
+    "hide_qr": "QR'yi Gizle",
+    "show_qr": "QR'yi Göster",
+    "download_qr": "QR'yi İndir",
+    "unpublish_cv": "CV Yayınını Kaldır",
+    "no_login_required": "Giriş Gerekmiyor!",
+    "platform_works_without_accounts": "Platformumuz kullanıcı hesapları olmadan çalışır.",
+    "start_building_connect_optional": "CV'nizi hemen oluşturmaya başlayın, sonra isteğe bağlı olarak cihazlar arası senkronizasyon için bulut depolamayı bağlayın.",
+    "start_building_cv": "CV Oluşturmaya Başlayın",
+    "no_registration_needed": "Kayıt Gerekmiyor!",
+    "jump_straight_building": "Doğrudan CV oluşturmaya atlayın.",
+    "data_stays_cloud_storage": "Verileriniz kaydetmeyi seçtiğinizde kendi bulut depolama alanınızda kalır.",
+    "start_building": "Oluşturmaya Başla",
+    "manage_storage_options": "Yerel ve bulut depolama seçeneklerinizi yönetin",
+    "resume_template": "Özgeçmiş Şablonu",
+    "choose_file": "Dosya seç",
+    "optional": "İsteğe bağlı",
+    "saving_locally": "Yerel olarak kaydediliyor ..",
+    "saving_to_cloud": "Buluta kaydediliyor ..",
+    "select_local_cv": "-- Yerel Depolamadan bir CV seçin --",
+    "from_local_storage": "Cihazınızın depolama alanından",
+    "found_cvs": "{{count}} CV bulundu ",
+    "search_cv_placeholder": "CV başlığı veya ismine göre arayın...",
+    "no_cvs_match_search": "Hiçbir CV aramanızla eşleşmiyor",
+    "no_cvs_found": "CV bulunamadı",
+    "try_different_search": "Farklı bir arama terimi deneyin",
+    "create_cv_first": "Onunla çalışmak için önce bir CV oluşturun",
+    "cvs_count": "CV{{count, plural, one {} other {ler}}}",
+    "my_saved_cvs": "Kaydedilmiş CV'lerim",
+    "unknown_source": "Bilinmeyen Kaynak",
+    "no_name": "İsim yok",
+    "cv_number": "CV {{number}}",
+    "current_editing_session": "Mevcut düzenleme oturumu",
+    "saved_on_device": "Bu cihazda kaydedildi",
+    "selected": "Seçildi",
+    "select_this_cv": "Bu CV'yi Seç",
+    "saved": "Kaydedildi",
+    "select_cv": "CV Seç",
+    "available": "mevcut",
+    "refresh_cv_list": "CV listesini yenile",
+    "draft_from_builder": "CV Oluşturucudan taslak",
+    "local_draft": "Yerel Taslak",
+    "google_drive_cv": "Google Drive CV",
+    "resume_id": "Özgeçmiş {{id}}",
+    "from_database": "Veritabanından",
+    "failed_load_cvs": "Mevcut CV'ler yüklenemedi",
+    "searching_cvs": "CV'leriniz aranıyor...",
+    "customizations_saved_locally": "Özelleştirmeler yerel olarak kaydedildi!",
+    "failed_save_customizations": "Özelleştirmeler kaydedilemedi",
+    "back_to_cv_builder": "CV Oluşturucuya Geri Dön",
+    "create_cv_to_customize": "Özelleştirilecek CV bulamadık. Önce bir tane oluşturun!",
+    "create_new_cv": "Yeni CV Oluştur",
+    "select_cv_to_customize": "Özelleştirilecek CV'yi Seçin",
+    "choose_cv_to_customize": "Hangi CV'yi özelleştirmek istediğinizi seçin"
+  },
+  "terms": {
+    "title": "Şartlar ve Koşullar",
+    "subtitle": "CVati kullanımı için açık şartlar. Haklarınız, sorumluluklarımız ve beklentiler.",
+    "effective_date": "Yürürlük Tarihi",
+    "date": "Aralık 2024",
+    "agreement": {
+      "title": "Şartları Kabul",
+      "content": "CVati'ye erişerek ve kullanarak, bu anlaşmanın şart ve hükümlerini kabul etmiş ve bunlara bağlı kalmayı kabul etmiş olursunuz. Yukarıdaki kurallara uymayı kabul etmiyorsanız, lütfen bu hizmeti kullanmayın."
+    },
+    "service": {
+      "title": "Hizmet Açıklaması",
+      "what_we_provide": {
+        "title": "Sunduklarımız"
+      },
+      "cv_builder": "Profesyonel CV/özgeçmiş oluşturma araçları",
+      "templates": "Çoklu özelleştirilebilir şablonlar",
+      "local_storage": "Yerel depolama yetenekleri",
+      "cloud_integration": "İsteğe bağlı bulut depolama entegrasyonu",
+      "export_features": "Dışa aktarma ve indirme özellikleri",
+      "no_signup": {
+        "title": "Kayıt Gerekmiyor",
+        "description": "CVati kayıt gerektirmeyen bir modelle çalışır. Hesap oluşturmadan tüm temel özellikleri hemen kullanabilirsiniz. Bulut depolama bağlantısı isteğe bağlı ve kullanıcı kontrolündedir."
+      }
+    },
+    "responsibilities": {
+      "title": "Kullanıcı Sorumlulukları",
+      "acceptable_use": {
+        "title": "Kabul Edilebilir Kullanım"
+      },
+      "lawful_use": "Hizmeti sadece yasal amaçlar için kullanın",
+      "accurate_info": "CV'lerinizde doğru bilgi sağlayın",
+      "no_harmful_content": "Zararlı veya saldırgan içerik yüklemeyin",
+      "respect_others": "Fikri mülkiyet haklarına saygı gösterin",
+      "prohibited": {
+        "title": "Yasaklı Faaliyetler"
+      },
+      "no_reverse_engineering": "Hizmeti tersine mühendislik veya kopyalama",
+      "no_automated_access": "Otomatik veri toplama veya kazıma",
+      "no_interference": "Hizmet operasyonlarına müdahale",
+      "no_malicious_use": "Hizmeti kötü niyetli amaçlar için kullanma"
+    },
+    "data_privacy": {
+      "title": "Veri ve Gizlilik",
+      "ownership": {
+        "title": "Veri Sahipliğiniz",
+        "description": "CVati kullanarak oluşturduğunuz tüm içeriğin tam sahipliğini ve kontrolünü elinde tutarsınız. CV içeriğiniz, kişisel bilgileriniz veya yüklediğiniz materyaller üzerinde hiçbir hak iddia etmiyoruz."
+      },
+      "local_storage": {
+        "title": "Yerel Depolama",
+        "description": "Yerel olarak depolanan veriler cihazınızda kalır ve sunucularımıza iletilmez."
+      },
+      "cloud_storage": {
+        "title": "Bulut Depolama",
+        "description": "Bulut depolama isteğe bağlıdır ve iptal edilebilir izinlerle kendi Google Drive hesabınızı kullanır."
+      }
+    },
+    "availability": {
+      "title": "Hizmet Kullanılabilirliği",
+      "uptime": {
+        "title": "Hizmet Çalışma Süresi",
+        "description": "Yüksek hizmet kullanılabilirliğini korumaya çalışıyoruz ancak %100 çalışma süresini garanti edemeyiz. Planlanmış bakımlar mümkün olduğunda önceden duyurulacaktır."
+      },
+      "local_functionality": {
+        "title": "Yerel İşlevsellik",
+        "description": "Temel CV oluşturma özellikleri cihazınızda yerel olarak çalışır ve internet bağlantısı gerektirmez. Bulut özellikleri internet erişimi gerektirir."
+      }
+    },
+    "limitations": {
+      "title": "Sınırlamalar ve Feragatnameler",
+      "warranty": {
+        "title": "Garanti Yok",
+        "description": "CVati açık veya zımni hiçbir garanti olmaksızın \"olduğu gibi\" sunulur. Hizmetin hatasız, güvenli veya sürekli kullanılabilir olacağını garanti etmiyoruz."
+      },
+      "liability": {
+        "title": "Sorumluluk Sınırlaması",
+        "description": "Hizmetimizi kullanma veya kullanamama sonucu ortaya çıkan hiçbir zarardan sorumlu değiliz."
+      },
+      "third_party": {
+        "title": "Üçüncü Taraf Hizmetleri",
+        "description": "Üçüncü taraf hizmetlerle entegrasyon (Google Drive gibi) onların şartlarına ve kullanılabilirliğine tabidir."
+      }
+    },
+    "modifications": {
+      "title": "Hizmet ve Şartlarda Değişiklikler",
+      "service_changes": {
+        "title": "Hizmet Değişiklikleri",
+        "description": "Hizmetin herhangi bir bölümünü istediğimiz zaman değiştirme, askıya alma veya durdurma hakkını saklı tutarız. Önemli değişiklikler mümkün olduğunda makul bildirimle yapılacaktır."
+      },
+      "terms_changes": {
+        "title": "Şart Değişiklikleri",
+        "description": "Bu şartlar zaman zaman güncellenebilir. Değişikliklerden sonra hizmeti kullanmaya devam etmek yeni şartları kabul etmek anlamına gelir."
+      }
+    },
+    "termination": {
+      "title": "Sonlandırma",
+      "by_user": {
+        "title": "Sizin Tarafınızdan Sonlandırma",
+        "description": "Hizmeti istediğiniz zaman kullanmayı durdurabilirsiniz. Yerel olarak depolanan verileriniz cihazınızda kalır. Bulut depolama izinlerini bağımsız olarak iptal edebilirsiniz."
+      },
+      "by_us": {
+        "title": "Bizim Tarafımızdan Sonlandırma",
+        "description": "Şartlar ihlal edilirse erişimi kısıtlayabiliriz. Mümkün olduğunda bildirimde bulunacağız ve verilerinizi almanız için makul süre vereceğiz."
+      }
+    },
+    "legal": {
+      "title": "Yasal Bilgiler",
+      "contact": {
+        "title": "İletişim Bilgileri",
+        "email": {
+          "label": "E-posta",
+          "address": "legal@cvati.com"
+        },
+        "response": {
+          "label": "Yanıt Süresi",
+          "time": "48 saat içinde"
+        }
+      },
+      "governing_law": {
+        "title": "Geçerli Hukuk",
+        "description": "Bu şartlar geçerli yasalar uyarınca yönetilir ve yorumlanır. Herhangi bir anlaşmazlık uygun yasal kanallar aracılığıyla çözülecektir."
+      }
+    },
+    "acceptance": {
+      "title": "Şartları Kabul",
+      "description": "CVati'yi kullanarak, bu Şartlar ve Koşulları okuduğunuzu, anladığınızı ve bunlara bağlı kalmayı kabul ettiğinizi onaylarsınız.",
+      "effective": "Bu şartlar hizmeti kullanımınızdan hemen sonra yürürlüğe girer",
+      "questions": "Bu Şartlar Hakkında Sorularınız mı Var?"
+    }
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "subtitle": "Gizliliğiniz önemlidir. Verilerinizi şeffaflık ve özenle nasıl işlediğimizi öğrenin.",
+    "last_updated": "Son Güncelleme",
+    "date": "Aralık 2024",
+    "introduction": {
+      "title": "Giriş",
+      "content": "CVati'ye hoş geldiniz. Bu Gizlilik Politikası, CV/özgeçmiş oluşturma uygulamamızı ve hizmetlerimizi kullandığınızda bilgilerinizi nasıl topladığımızı, kullandığımızı, ifşa ettiğimizi ve koruduğumuzu açıklar. Lütfen bu gizlilik politikasını dikkatle okuyun. Bu gizlilik politikasının şartlarını kabul etmiyorsanız, lütfen uygulamaya erişmeyin."
+    },
+    "collection": {
+      "title": "Topladığımız Bilgiler",
+      "personal": {
+        "title": "Sağladığınız Kişisel Bilgiler",
+        "description": "Hizmetimizi kullandığınızda, gönüllü olarak sağladığınız aşağıdaki kişisel bilgileri toplayabiliriz:"
+      },
+      "cv_content": "CV/Özgeçmiş İçeriği",
+      "personal_info": "Kişisel bilgiler (ad, e-posta, telefon, adres)",
+      "professional_info": "Mesleki bilgiler (iş deneyimi, eğitim, beceriler)",
+      "personal_details": "Kişisel detaylar (doğum tarihi, milliyet)",
+      "photos": "Profil fotoğrafları ve resimler",
+      "references": "Referanslar ve iletişim bilgileri",
+      "account_info": "Hesap Bilgileri",
+      "session_tokens": "Kimlik doğrulama için oturum belirteçleri",
+      "preferences": "Kullanıcı tercihleri ve ayarları",
+      "usage_data": "Uygulama kullanım verileri",
+      "automatic": {
+        "title": "Otomatik Toplanan Bilgiler"
+      },
+      "device_info": "Cihaz bilgileri (tarayıcı türü, işletim sistemi)",
+      "analytics": "Kullanım analitiği ve uygulama performans verileri",
+      "session_data": "Oturum verileri ve kimlik doğrulama belirteçleri",
+      "local_storage": "Çevrimdışı işlevsellik için yerel depolama verileri"
+    },
+    "usage": {
+      "title": "Bilgilerinizi Nasıl Kullanırız",
+      "primary": {
+        "title": "Birincil Hizmetler"
+      },
+      "cv_creation": "CV oluşturma ve düzenleme",
+      "template_application": "Şablon uygulama ve özelleştirme",
+      "data_storage": "Veri depolama (yerel ve bulut)",
+      "document_generation": "Belge oluşturma ve dışa aktarma",
+      "service": {
+        "title": "Hizmet İyileştirme"
+      },
+      "app_improvement": "Uygulama iyileştirme ve optimizasyon",
+      "technical_support": "Teknik destek ve sorun giderme",
+      "security": "Güvenlik ve dolandırıcılığı önleme",
+      "analytics": "Kullanım analitiği (anonimleştirilmiş)"
+    },
+    "storage": {
+      "title": "Veri Depolama Seçenekleri",
+      "local": {
+        "title": "Yerel Depolama (Varsayılan)",
+        "device_only": "Veriler sadece cihazınızda kalır",
+        "no_transmission": "Sunucularımıza veri iletimi yok",
+        "full_privacy": "Tam gizlilik ve kontrol",
+        "browser_storage": "Tarayıcı yerel depolama kullanır"
+      },
+      "cloud": {
+        "title": "Bulut Depolama (İsteğe Bağlı)",
+        "google_drive": "Google Drive entegrasyonu",
+        "encrypted": "İletim ve dinlenmede şifrelenmiş veri",
+        "user_control": "Kullanıcı kontrollü bağlantı",
+        "revocable": "İzinler istediğiniz zaman iptal edilebilir"
+      }
+    },
+    "sharing": {
+      "title": "Veri Paylaşımı ve İfşası",
+      "no_selling": {
+        "title": "Verilerinizi Satmıyoruz",
+        "description": "Kişisel bilgilerinizi asla üçüncü taraflara satmaz, kiralamaz veya takas etmeyiz. CV verileriniz özel kalır ve kontrolünüz altındadır."
+      },
+      "limited": {
+        "title": "Sınırlı Paylaşım Senaryoları"
+      },
+      "legal_compliance": "Yasal zorunluluk olduğunda yasal uyum",
+      "security_protection": "Haklarımızın ve güvenliğimizin korunması",
+      "service_providers": "Güvenilir hizmet sağlayıcılar (sıkı anlaşmalarla)",
+      "user_consent": "Sadece açık onayınızla"
+    },
+    "rights": {
+      "title": "Haklarınız ve Seçimleriniz",
+      "access": {
+        "title": "Erişim ve Kontrol",
+        "view": "Tüm depolanmış verilerinizi görüntüleme",
+        "edit": "Bilgilerinizi düzenleme veya güncelleme",
+        "delete": "Verilerinizi istediğiniz zaman silme",
+        "export": "Verilerinizi dışa aktarma (taşınabilirlik)"
+      },
+      "storage": {
+        "title": "Depolama Seçimleri",
+        "local_only": "Verileri sadece yerel tutma",
+        "cloud_connect": "Bulut depolamayı bağlama/kesme",
+        "revoke": "Bulut izinlerini iptal etme",
+        "migrate": "Depolama seçenekleri arasında geçiş yapma"
+      }
+    },
+    "security": {
+      "title": "Güvenlik Önlemleri",
+      "encryption": {
+        "title": "Şifreleme",
+        "description": "Tüm veri iletimi HTTPS şifrelemesi kullanır"
+      },
+      "access": {
+        "title": "Erişim Kontrolü",
+        "description": "Güvenli kimlik doğrulama ve oturum yönetimi"
+      },
+      "monitoring": {
+        "title": "İzleme",
+        "description": "Sürekli güvenlik izleme ve güncellemeler"
+      }
+    },
+    "contact": {
+      "title": "Bizimle İletişim",
+      "description": "Bu Gizlilik Politikası veya veri uygulamalarımız hakkında sorularınız varsa, lütfen bizimle iletişime geçin:",
+      "email": {
+        "title": "E-posta",
+        "address": "privacy@cvati.com"
+      },
+      "response": {
+        "title": "Yanıt Süresi",
+        "time": "48 saat içinde yanıt veririz"
+      }
+    },
+    "updates": {
+      "title": "Politika Güncellemeleri",
+      "description": "Bu Gizlilik Politikasını zaman zaman güncelleyebiliriz. Yeni Gizlilik Politikasını bu sayfada yayınlayarak ve \"Son Güncelleme\" tarihini güncelleyerek herhangi bir değişiklik hakkında sizi bilgilendireceğiz.",
+      "notification": "Güncellemelerden Haberdar Olun"
+    }
+  },
+  "cookies2": {
+    "title": "Çerez Politikası",
+    "subtitle": "CVati'nin deneyiminizi geliştirmek için çerezleri ve benzer teknolojileri nasıl kullandığını öğrenin.",
+    "last_updated": "Son Güncelleme",
+    "date": "Eylül 2025",
+    "message": "Deneyiminizi geliştirmek için çerezler kullanıyoruz. Bu siteyi ziyaret etmeye devam ederek çerez kullanımımızı kabul etmiş olursunuz.",
+    "learnMore": "Daha fazla bilgi",
+    "decline": "Reddet",
+    "accept": "Kabul Et",
+    
+    "what_are": {
+      "title": "Çerezler Nedir?",
+      "description": "Çerezler, bir web sitesini ziyaret ettiğinizde cihazınızda saklanan küçük metin dosyalarıdır. Web sitelerinin tercihlerinizi hatırlamasına ve tarama deneyiminizi geliştirmesine yardımcı olurlar.",
+      "how_work": {
+        "title": "Nasıl Çalışırlar",
+        "description": "Çerezler ziyaretiniz hakkında bilgileri saklar ve web sitesine geri döndüğünüzde sizi tanıyabilir."
+      },
+      "your_control": {
+        "title": "Kontrolünüz",
+        "description": "Çerezleri istediğiniz zaman tarayıcı ayarlarınız aracılığıyla kontrol edebilir ve silebilirsiniz."
+      }
+    },
+    
+    "how_we_use": {
+      "title": "CVati Çerezleri Nasıl Kullanır",
+      "minimal_approach": {
+        "title": "Minimal Çerez Yaklaşımı",
+        "description": "CVati gizlilik öncelikli bir yaklaşım benimser ve minimal çerez kullanır. Çoğu işlevsellik çerezler olmadan çalışır ve bunları yalnızca temel özellikler için gerekli olduğunda kullanırız."
+      },
+      "purposes": {
+        "title": "Çerezleri Şunlar İçin Kullanırız:"
+      },
+      "essential": {
+        "title": "Temel İşlevler",
+        "session": "Oturum yönetimi ve kimlik doğrulama",
+        "preferences": "Tercihlerinizi hatırlama (karanlık mod, dil)",
+        "local_storage": "Yerel depolama işlevselliği"
+      },
+      "analytics": {
+        "title": "Analitik (İsteğe Bağlı)",
+        "usage": "Uygulamanın nasıl kullanıldığını anlama",
+        "performance": "Performans izleme",
+        "improvements": "İyileştirme alanlarını belirleme"
+      }
+    },
+    
+    "types": {
+      "title": "Kullandığımız Çerez Türleri",
+      "essential": {
+        "title": "Temel Çerezler (Gerekli)",
+        "status": "Her Zaman Aktif",
+        "description": "Bu çerezler web sitesinin düzgün çalışması için gereklidir ve devre dışı bırakılamaz.",
+        "session": {
+          "title": "Oturum Çerezleri",
+          "description": "Uygulamayı kullanırken oturumunuzu sürdürür"
+        },
+        "preferences": {
+          "title": "Tercih Çerezleri",
+          "description": "Karanlık mod gibi ayarlarınızı hatırlar"
+        },
+        "consent": {
+          "title": "Onay Çerezleri",
+          "description": "Çerez tercihlerinizi hatırlar"
+        }
+      },
+      "analytics": {
+        "title": "Analitik Çerezler (İsteğe Bağlı)",
+        "status": "Kullanıcı Seçimi",
+        "description": "Bu çerezler web sitemizi nasıl kullandığınızı anlamamıza yardımcı olur, böylece onu geliştirebiliriz.",
+        "usage": {
+          "title": "Kullanım Analitiği",
+          "description": "En çok hangi özelliklerin kullanıldığını takip eder"
+        },
+        "performance": {
+          "title": "Performans İzleme",
+          "description": "Uygulama hızını ve güvenilirliğini izler"
+        }
+      },
+      "marketing": {
+        "title": "Pazarlama/Reklam Çerezleri",
+        "status": "Kullanılmıyor",
+        "description": "CVati pazarlama veya reklam çerezleri kullanmaz. Sizi reklam amaçlı takip etmez veya verilerinizi reklamcılarla paylaşmaz."
+      }
+    },
+    
+    "third_party": {
+      "title": "Üçüncü Taraf Hizmetler",
+      "description": "İsteğe bağlı hizmetleri bağlamayı seçtiğinizde, bunlar kendi çerezlerini ayarlayabilir:",
+      "google_drive": {
+        "title": "Google Drive Entegrasyonu",
+        "description": "Google Drive'ı bağladığınızda, Google kendi gizlilik politikasına göre çerezler ayarlayabilir."
+      },
+      "analytics_service": {
+        "title": "Analitik Hizmeti",
+        "description": "Etkinleştirilirse, analitik sağlayıcımız kullanım kalıplarını takip etmek için çerezler ayarlayabilir."
+      }
+    },
+    
+    "managing": {
+      "title": "Çerez Tercihlerinizi Yönetme",
+      "your_choices": {
+        "title": "Seçimleriniz"
+      },
+      "banner_choice": {
+        "title": "Çerez Bildirimi",
+        "description": "CVati'yi ilk ziyaret ettiğinizde isteğe bağlı çerezleri kabul edin veya reddedin."
+      },
+      "browser_settings": {
+        "title": "Tarayıcı Ayarları",
+        "description": "Çerezleri tarayıcı ayarlarınız aracılığıyla kontrol edin - tüm çerezleri engelleyin, silin veya yönetin."
+      },
+      "browser_instructions": {
+        "title": "Tarayıcıya Özel Talimatlar"
+      },
+      "browsers": {
+        "chrome": "Chrome ayarlarında çerezleri yönetin",
+        "firefox": "Firefox ayarlarında çerezleri yönetin",
+        "safari": "Safari ayarlarında çerezleri yönetin",
+        "edge": "Edge ayarlarında çerezleri yönetin",
+        "opera": "Opera ayarlarında çerezleri yönetin",
+        "mobile": "Mobil tarayıcı ayarlarında çerezleri yönetin"
+      }
+    },
+    
+    "impact": {
+      "title": "Çerezleri Devre Dışı Bırakmanın Etkisi",
+      "essential_disabled": {
+        "title": "Temel Çerezler Devre Dışı Bırakılırsa",
+        "sessions": "Oturum yönetimi düzgün çalışmayabilir",
+        "preferences": "Tercihleriniz (karanlık mod, dil) kaydedilmez",
+        "cloud_sync": "Bulut depolama senkronizasyonu etkilenebilir"
+      },
+      "analytics_disabled": {
+        "title": "Analitik Çerezler Devre Dışı Bırakılırsa",
+        "functionality": "Tüm işlevsellik tamamen kullanılabilir kalır",
+        "improvements": "Uygulamayı geliştirmek için içgörüler toplayamayız",
+        "issues": "Teknik sorunları tespit etmek ve çözmek daha zor olur"
+      }
+    },
+    
+    "contact": {
+      "title": "Çerezler Hakkında Sorularınız mı Var?",
+      "description": "Çerez kullanımımız veya bu Çerez Politikası hakkında herhangi bir sorunuz varsa, lütfen bizimle iletişime geçin:",
+      "email": {
+        "title": "E-posta",
+        "address": "cookies@cvati.com"
+      },
+      "response": {
+        "title": "Yanıt Süresi",
+        "time": "48 saat içinde yanıt veriyoruz"
+      }
+    },
+    
+    "updates": {
+      "title": "Çerez Politikası Güncellemeleri",
+      "description": "Bu Çerez Politikasını zaman zaman güncelleyebiliriz. Yeni politikayı bu sayfada yayınlayarak herhangi bir değişikliği size bildireceğiz.",
+      "stay_informed": "Güncellemeler Hakkında Bilgi Sahibi Olun"
     }
   }
   }

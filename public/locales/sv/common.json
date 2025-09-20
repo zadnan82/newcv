@@ -1006,152 +1006,7 @@
       "customize": "Anpassa",
       "delete": "Radera"
     }
-  },
-  "privacy": {
-    "title": "Integritetspolicy",
-    "lastUpdated": "Senast uppdaterad",
-    "updateDate": "4 april 2025",
-    "intro": "CVATI (\"vi\", \"vår\" eller \"oss\") är engagerade i att skydda din integritet. Denna integritetspolicy förklarar hur vi samlar in, använder, avslöjar och skyddar din information när du använder vår CV-byggningstjänst.",
-    "collection": {
-      "title": "Information vi samlar in",
-      "desc": "Vi samlar in personlig information som du frivilligt tillhandahåller när du använder vår tjänst, inklusive:",
-      "personal": "Personuppgifter (namn, e-postadress, telefonnummer)",
-      "professional": "Professionell information (arbetslivserfarenhet, färdigheter, utbildning)",
-      "optional": "Valfri information (födelsedatum, nationalitet, adress, foto)",
-      "account": "Kontouppgifter",
-      "usage": "Användningsdata och interaktioner med vår tjänst"
-    },
-    "use": {
-      "title": "Hur vi använder din information",
-      "desc": "Vi använder din information för följande ändamål:",
-      "provide": "För att tillhandahålla och upprätthålla vår tjänst",
-      "improve": "För att förbättra vår tjänst och användarupplevelse",
-      "communicate": "För att kommunicera med dig om tjänstuppdateringar",
-      "ai": "För att tillhandahålla AI-förbättrad CV- och personligt brev-generering",
-      "security": "För att säkerställa säkerhet och förhindra bedrägerier",
-      "legal": "För att uppfylla rättsliga skyldigheter"
-    },
-    "sharing": {
-      "title": "Informationsdelning och avslöjande",
-      "desc": "Vi kan dela din information med:",
-      "service": "Tjänsteleverantörer (molnlagring, bildlagring, analys)",
-      "legal": "Rättsliga myndigheter när det krävs enligt lag",
-      "business": "Affärspartners med ditt uttryckliga samtycke",
-      "note": "Vi använder Cloudinary för bildlagring och bearbetning. Dina uppladdade foton omfattas också av Cloudinarys integritetspolicy."
-    },
-    "storage": {
-      "title": "Datalagring och säkerhet",
-      "desc": "Vi implementerar lämpliga säkerhetsåtgärder för att skydda din personliga information. Dock är ingen överföringsmetod via internet 100% säker, och vi kan inte garantera absolut säkerhet.",
-      "retention": "Vi behåller din personliga information så länge ditt konto är aktivt eller så länge det behövs för att tillhandahålla dig tjänster. Du kan när som helst begära radering av dina data."
-    },
-    "rights": {
-      "title": "Dina datarättigheter",
-      "desc": "Enligt GDPR och andra tillämpliga dataskyddslagar har du rättigheter gällande dina personuppgifter, inklusive:",
-      "access": "Rätt att få tillgång till dina personuppgifter",
-      "rectify": "Rätt att korrigera felaktiga uppgifter",
-      "delete": "Rätt till radering (\"rätten att bli bortglömd\")",
-      "restrict": "Rätt att begränsa behandling",
-      "portability": "Rätt till dataportabilitet",
-      "object": "Rätt att invända mot behandling",
-      "exercise": "För att utöva dessa rättigheter kan du använda kontoinställningarna i vår applikation eller kontakta oss direkt."
-    },
-    "cookies": {
-      "title": "Cookies och liknande tekniker",
-      "desc": "Vi använder cookies och liknande spårningsteknologier för att förbättra din upplevelse på vår webbplats, analysera användning och hjälpa till med våra marknadsföringsinsatser. Du kan kontrollera cookies via dina webbläsarinställningar."
-    },
-    "ai": {
-      "title": "AI-genererat innehåll",
-      "desc": "Vår tjänst använder AI för att hjälpa till att generera CV-innehåll och personliga brev. Data du tillhandahåller kan bearbetas av våra AI-system för att generera personanpassat innehåll. Vi implementerar åtgärder för att skydda dina data under AI-bearbetning och använder inte dina personuppgifter för att träna våra AI-modeller utan uttryckligt samtycke."
-    },
-    "children": {
-      "title": "Barns integritet",
-      "desc": "Vår tjänst riktar sig inte till personer under 16 år. Om du är medveten om att en minderårig har lämnat oss personlig information utan föräldrars samtycke, vänligen kontakta oss."
-    },
-    "changes": {
-      "title": "Ändringar i denna integritetspolicy",
-      "desc": "Vi kan uppdatera vår integritetspolicy från tid till annan. Vi kommer att meddela dig om eventuella ändringar genom att publicera den nya integritetspolicyn på denna sida och uppdatera datumet för \"Senast uppdaterad\"."
-    },
-    "contact": {
-      "title": "Kontakta oss",
-      "desc": "Om du har några frågor om denna integritetspolicy, vänligen kontakta oss på:",
-      "email": "privacy@cvati.com"
-    }
-  },
-  "terms": {
-    "title": "Användarvillkor",
-    "lastUpdated": "Senast uppdaterad",
-    "updateDate": "4 april 2025",
-    "intro": "Välkommen till CVATI. Dessa användarvillkor reglerar din användning av vår CV-byggningstjänst och webbplats. Genom att använda CVATI godkänner du att följa dessa villkor.",
-    "definitions": {
-      "title": "1. Definitioner",
-      "service": "\"Tjänst\"",
-      "serviceDesc": "Avser CVATI:s webbplats och CV-byggapplikation.",
-      "content": "\"Innehåll\"",
-      "contentDesc": "Avser CV:n, personliga brev och annat material som skapats, laddats upp eller genererats via vår tjänst.",
-      "user": "\"Användare\"",
-      "userDesc": "Alla individer som använder vår tjänst.",
-      "account": "\"Konto\"",
-      "accountDesc": "En registrerad användarprofil inom vår tjänst."
-    },
-    "accounts": {
-      "title": "2. Användarkonton",
-      "registration": "När du skapar ett konto hos oss måste du ange korrekt, fullständig och aktuell information. Du är ansvarig för att skydda ditt lösenord och för alla aktiviteter som sker under ditt konto.",
-      "terminate": "Vi förbehåller oss rätten att avsluta eller stänga av ditt konto omedelbart, utan föregående meddelande eller ansvar, av vilken anledning som helst, inklusive brott mot dessa villkor."
-    },
-    "use": {
-      "title": "3. Godtagbar användning",
-      "desc": "Du godkänner att endast använda vår tjänst för lagliga ändamål och i enlighet med dessa villkor. Du godkänner att inte:",
-      "false": "Tillhandahålla falsk eller vilseledande information",
-      "impersonate": "Utge dig för att vara någon annan person eller enhet",
-      "infringe": "Inkräkta på patent, varumärken, affärshemligheter, upphovsrätter eller andra äganderätter",
-      "harmful": "Ladda upp virus eller annan skadlig kod",
-      "interfere": "Störa eller avbryta tjänsten eller servrar",
-      "automated": "Använda automatiserade metoder för att få åtkomst till eller använda tjänsten"
-    },
-    "content": {
-      "title": "4. Innehållsägandeskap och licens",
-      "ownership": "Du behåller alla äganderätter till CV:n, personliga brev eller annat innehåll du skapar genom vår tjänst. Du ger oss dock en icke-exklusiv, global, royaltyfri licens att använda, reproducera och visa ditt innehåll enbart i syfte att tillhandahålla och förbättra vår tjänst.",
-      "responsibility": "Du är ensam ansvarig för allt innehåll du skapar, laddar upp eller på annat sätt gör tillgängligt genom tjänsten. Du representerar och garanterar att du har rätt att använda all information som ingår i dina CV:n och att innehållet inte bryter mot några lagar eller tredje parts rättigheter."
-    },
-    "ai": {
-      "title": "5. AI-Genererat innehåll",
-      "desc": "Vår tjänst använder artificiell intelligens för att hjälpa till att skapa CV:n och personliga brev. Du erkänner att:",
-      "accuracy": "AI-genererat innehåll kanske inte alltid är korrekt eller lämpligt för dina specifika behov",
-      "review": "Du bör granska och redigera allt AI-genererat innehåll innan du använder det",
-      "responsibility": "Du är ytterst ansvarig för allt innehåll i ditt CV eller personliga brev, inklusive AI-genererade delar"
-    },
-    "disclaimer": {
-      "title": "6. Friskrivning från garantier",
-      "desc": "Vår tjänst tillhandahålls \"i befintligt skick\" och \"som tillgänglig\" utan någon garanti av något slag, vare sig uttrycklig eller underförstådd, inklusive men inte begränsat till underförstådda garantier för säljbarhet, lämplighet för ett visst ändamål eller icke-intrång.",
-      "success": "Vi garanterar inte att vår tjänst hjälper dig att säkra anställning eller intervjuer. Effektiviteten hos CV:n och personliga brev beror på många faktorer utanför vår kontroll."
-    },
-    "limitation": {
-      "title": "7. Ansvarsbegränsning",
-      "desc": "I den maximala utsträckning som tillåts enligt lag, ska CVATI, dess direktörer, anställda eller agenter inte vara ansvariga för några indirekta, straffande, tillfälliga, särskilda, följdskador eller exemplariska skador, inklusive utan begränsning skador för förlust av vinst, goodwill, användning, data eller andra immateriella förluster, som uppstår genom användning av eller oförmåga att använda denna tjänst."
-    },
-    "privacy": {
-      "title": "8. Integritetspolicy",
-      "desc": "Din användning av vår tjänst regleras också av vår integritetspolicy, som införlivas i dessa villkor genom referens. Vänligen granska vår integritetspolicy för att förstå våra rutiner gällande din personliga information."
-    },
-    "termination": {
-      "title": "9. Uppsägning",
-      "userRight": "Du kan avsluta ditt konto när som helst genom att följa instruktionerna i tjänsten. All din data kommer att raderas i enlighet med vår integritetspolicy.",
-      "ourRight": "Vi kan avsluta eller stänga av ditt konto omedelbart, utan föregående meddelande eller ansvar, av vilken anledning som helst, inklusive brott mot dessa villkor. Vid uppsägning upphör din rätt att använda tjänsten omedelbart."
-    },
-    "changes": {
-      "title": "10. Ändringar av villkor",
-      "desc": "Vi förbehåller oss rätten att ändra eller ersätta dessa villkor när som helst. Om en ändring är väsentlig kommer vi att ge minst 30 dagars varsel innan några nya villkor träder i kraft. Genom att fortsätta använda vår tjänst efter att några ändringar har trätt i kraft, godkänner du att vara bunden av de reviderade villkoren."
-    },
-    "governing": {
-      "title": "11. Gällande lag",
-      "desc": "Dessa villkor ska regleras av och tolkas i enlighet med lagarna i [Ditt land/stat], utan hänsyn till dess lagkonfliktbestämmelser."
-    },
-    "contact": {
-      "title": "12. Kontakta oss",
-      "desc": "Om du har några frågor om dessa villkor, vänligen kontakta oss på:",
-      "email": "info@cvati.com"
-    }
-  },
+  }, 
   "cookiePolicy": {
     "title": "Cookiepolicy",
     "lastUpdated": "Senast uppdaterad",
@@ -1504,6 +1359,647 @@
       "ai_suggestion": "AI-förbättringsförslag:",
       "apply_suggestion": "Tillämpa förslag",
       "discard": "Avvisa"
+    }
+  }, 
+  "cloud": {
+    "no_signups_required": "Ingen Registrering Krävs",
+    "instant_access": "Omedelbar Tillgång",
+    "instant_access_desc": "Börja bygga omedelbart. Ingen registrering, inga hinder, bara skapa ditt CV just nu.",
+    "local_first_design": "Lokal-först Design",
+    "local_first_desc": "Arbeta helt på din enhet. Spara lokalt eller uppgradera till molnlagring när du behöver det.",
+    "optional_cloud_upgrade": "Valfri Molnuppgradering",
+    "optional_cloud_desc": "Anslut din molnlagring när du vill komma åt dina CV:n från flera enheter.",
+    "your_choice": "Ditt Val",
+    "your_choice_desc": "Spara lokalt för integritet eller i molnet för bekvämlighet. Du bestämmer.",
+    "no_lock_in": "Ingen Inlåsning",
+    "no_lock_in_desc": "Växla mellan lokal och molnlagring när som helst. Din data, ditt val.",
+    "instant_preview": "Omedelbar Förhandsgranskning",
+    "instant_preview_desc": "Se ditt CV i olika mallar omedelbart, ingen väntan.",
+    "privacy_first": "Integritet Först",
+    "privacy_first_desc": "Vi ser aldrig din data såvida du inte väljer att använda AI-funktioner.",
+    "start_building_choose_later": "Börja Bygga. Välj Lagring Senare.",
+    "no_signups_desc": "Ingen registrering. Inga hinder. Bara börja skapa ditt professionella CV just nu. Spara lokalt eller anslut molnlagring när du behöver det.",
+    "ready_local_cloud_connected": "Klar: Lokal + Molnlagring (Ansluten)",
+    "ready_local_cloud_available": "Klar: Lokal Lagring • Moln Tillgängligt",
+    "professional_templates_desc": "Professionella mallar som fungerar överallt. Börja bygga omedelbart med vilken design som helst, spara sedan på din enhet eller molnlagring.",
+    "no_signup_required": "Ingen registrering krävs - börja omedelbart",
+    "save_local_upgrade_cloud": "Spara lokalt eller uppgradera till moln senare",
+    "beautifully_designed": "och vackert designad",
+    "start_building_now": "Börja Bygga Nu",
+    "local_first_cloud_when_needed": "Lokal Först. Moln När Du Behöver Det.",
+    "start_immediately_choose_storage": "Börja bygga omedelbart på din enhet, välj sedan ditt lagringsalternativ.",
+    "start_immediately_no_signup": "Börja omedelbart. Ingen registrering krävs. Välj ditt lagringsalternativ när du sparar.",
+    "your_data_your_choice": "Din Data, Ditt Val",
+    "work_way_you_want": "Arbeta som du vill. Lokal integritet eller molnbekvämlighet - du bestämmer.",
+    "simple_flexible_control": "Enkel, flexibel och ger dig kontroll över din data.",
+    "choose_template_start_creating": "Välj en mall och börja skapa ditt CV omedelbart. Ingen registrering, inga hinder.",
+    "choose_storage": "Välj Lagring",
+    "when_ready_save_choose": "När du är redo att spara, välj lokal lagring eller anslut ditt moln för enhetssynkronisering.",
+    "access_anywhere": "Kom Åt Överallt",
+    "local_files_device_cloud_sync": "Lokala filer stannar på din enhet. Molnfiler synkroniseras automatiskt över alla dina enheter.",
+    "people_love_flexibility": "Folk älskar flexibiliteten och omedelbar tillgång.",
+    "start_immediately_no_signup_connect": "Börja omedelbart - ingen registrering krävs. Spara lokalt för integritet eller anslut molnlagring för bekvämlighet.",
+    "ready_local_cloud_storage_available": "Klar: Lokal + Molnlagring Tillgänglig",
+    "ready_local_storage_cloud_optional": "Klar: Lokal Lagring • Moln Valfritt",
+    "tip_connect_cloud_storage": "💡 Tips: Anslut molnlagring för att komma åt dina CV:n från vilken enhet som helst",
+    "google_drive": "Google Drive",
+    "connected_count": "{count} Ansluten",
+    "no_cloud": "Inget Moln",
+    "cloud_storage_connected": "Molnlagring ansluten",
+    "no_cloud_storage_connected": "Ingen molnlagring ansluten",
+    "cloud_storage_status": "Molnlagringsstatus",
+    "google_drive_connected": "Google Drive Ansluten",
+    "cvs_sync_devices": "✓ Dina CV:n synkroniseras över alla enheter",
+    "automatic_backup_enabled": "✓ Automatisk säkerhetskopiering aktiverad",
+    "manage_cloud_storage": "Hantera Molnlagring",
+    "no_cloud_storage": "Ingen Molnlagring",
+    "cvs_saved_locally_only": "Dina CV:n sparas endast lokalt",
+    "connect_cloud_device_sync": "Anslut molnlagring för enhetssynkronisering",
+    "connect_cloud_storage": "Anslut Molnlagring",
+    "clear_session_cloud_connections": "Rensa nuvarande session och molnanslutningar",
+    "clear_session": "Rensa Session",
+    "cloud_storage": "Molnlagring",
+    "source": "Källa",
+    "local": "Lokal",
+    "draft": "Utkast",
+    "this_device": "Denna Enhet",
+    "choose_destination": "Välj destination",
+    "local_only": "Endast Lokalt",
+    "change_location": "Ändra Plats",
+    "connect_cloud": "Anslut Moln",
+    "save_cv": "Spara CV",
+    "base64_info": "Bilden kommer att lagras direkt i din CV-fil för maximal integritet.",
+    "processing": "Bearbetar...",
+    "compressed_too_large": "Bilden är fortfarande för stor efter komprimering. Använd en mindre bild.",
+    "remove_error": "Fel vid borttagning av foto. Försök igen.",
+    "unsaved_changes_save_before_leaving": "Du har osparade ändringar. Vill du spara innan du lämnar?",
+    "unsaved_changes": "Osparade ändringar",
+    "save_locally": "Spara Lokalt",
+    "save_to_drive": "Spara till Drive",
+    "your_cv": "Ditt CV",
+    "where_save_cv": "Var vill du spara ditt CV?",
+    "save_to_google_drive": "Spara till Google Drive",
+    "access_any_device_backup": "Åtkomst från vilken enhet som helst • Automatisk säkerhetskopiering",
+    "connect": "Anslut",
+    "onedrive": "OneDrive",
+    "microsoft_integration": "Microsoft-integration • Office-synkronisering",
+    "coming_soon": "Kommer Snart",
+    "dropbox": "Dropbox",
+    "file_sharing_collaboration": "Fildelningsfokuserad • Teamsamarbete",
+    "save_to_device": "Spara till Denna Enhet",
+    "private_offline_device_only": "Privat • Fungerar offline • Endast denna enhet",
+    "connect_cloud_device_sync_tip": "💡 Anslut molnlagring för enhetssynkronisering",
+    "cv_accessible_any_device": "Ditt CV kommer att vara tillgängligt från vilken enhet som helst med ditt konto",
+    "auto_saved_tip": "💡 Ditt arbete sparas automatiskt medan du skriver - du kommer inte förlora något!",
+    "current_work_session": "Nuvarande Arbetssession",
+    "saved_locally": "Sparat Lokalt",
+    "from": "från",
+    "no_cv_selected": "Inget CV valt",
+    "customizing": "Anpassar",
+    "cvs_available": "CV:n tillgängliga",
+    "preview_apply": "Förhandsgranska & Tillämpa",
+    "changes_previewed_live": "Dina ändringar förhandsgranskas live. Tillämpa dem för att uppdatera ditt CV.",
+    "apply_customizations": "Tillämpa Anpassningar",
+    "how_it_works": "Så här fungerar det",
+    "changes_previewed_instantly": "Ändringar förhandsgranskas omedelbart",
+    "click_apply_save": "Klicka \"Tillämpa\" för att spara till ditt CV",
+    "use_publish_shareable": "Använd \"Publicera\" för att skapa delbar länk",
+    "published_links_styling": "Publicerade länkar inkluderar din stil",
+    "lock_in": "Ingen Inlåsning",
+    "no_session_title": "Ingen Session Etablerad",
+    "sign_in_to_access": "Vänligen logga in för att komma åt dina följebrev och börja bygga ditt karriärverktyg!",
+    "sign_in_to_get_started": "Logga In För Att Komma Igång",
+    "tip_connect_google_drive": "Tips: Anslut Google Drive för att synkronisera dina följebrev över enheter!",
+    "connect_google_drive": "Anslut Google Drive",
+    "connect_drive_to_save": "Anslut din Google Drive för att spara och komma åt dina AI-genererade följebrev",
+    "tip_google_drive_integration": "Tips: Google Drive-integration låter dig komma åt dina följebrev från var som helst!",
+    "from_google_drive": "Från Google Drive",
+    "access_saved_cvs": "för att komma åt dina sparade CV:n",
+    "stored_in_google_drive": "Lagrat i Google Drive",
+    "stored_in_local_storage": "Lagrat i Lokal Lagring",
+    "drive": "Drive",
+    "connect_drive_to_edit": "Anslut Google Drive för att redigera följebrev",
+    "current_draft": "Nuvarande Utkast",
+    "local_storage": "Lokal Lagring",
+    "local_storage_only": "Endast lokal lagring",
+    "connect_google_drive_sync": "Anslut Google Drive för att synkronisera över enheter",
+    "processing_connection": "Bearbetar Google Drive-anslutning...",
+    "connection_failed": "Google Drive-anslutning misslyckades",
+    "verifying_connection": "Verifierar Google Drive-anslutning...",
+    "connection_successful": "Framgångsrikt ansluten till Google Drive!",
+    "connected_save_to_cloud": "Google Drive ansluten! Du kan nu spara ditt CV till molnet.",
+    "verification_failed": "Backend-verifiering misslyckades. Du kan prova alternativet \"Fortsätt Ändå\".",
+    "verification_error": "Verifieringsfel",
+    "no_success_confirmation": "Ingen framgångsbekräftelse mottagen",
+    "processing_error": "Bearbetningsfel",
+    "assuming_connected": "Antar att Google Drive är ansluten. Försök spara för att testa.",
+    "connecting_title": "Ansluter till Google Drive...",
+    "connection_successful_title": "Anslutning Lyckad!",
+    "connection_issue_title": "Anslutningsproblem",
+    "data_stays_in_your_drive": "Din data stannar i DITT Google Drive-konto",
+    "redirecting_to_builder": "Omdirigerar till CV-byggare...",
+    "continue_anyway": "Fortsätt Ändå",
+    "try_again": "Försök Igen",
+    "provider_connected": "Ditt {{provider}}-konto har anslutits framgångsrikt.",
+    "continue_to_create": "Fortsätt Till Skapa CV",
+    "can_now_save_access": "Du kan nu spara och komma åt dina CV:n från molnet.",
+    "cloud_storage_setup": "Molnlagringsinställning",
+    "cvs_automatically_saved": "Dina CV:n sparas automatiskt till din Google Drive",
+    "access_cvs_any_device": "Kom åt dina CV:n från vilken enhet som helst med ditt Google-konto",
+    "why_google_drive": "Varför Google Drive?",
+    "google_drive_benefits": "Google Drive erbjuder säker, pålitlig molnlagring som du redan litar på. Dina CV:n lagras direkt i ditt konto med end-to-end-säkerhet.",
+    "local_storage_always_available": "Lokal Lagring Alltid Tillgänglig",
+    "can_save_locally": "Du kan alltid spara dina CV:n lokalt i din webbläsare. Google Drive-anslutning är valfri för molnsäkerhetskopiering och synkronisering.",
+    "local_works_offline": "💡 Lokal lagring fungerar även utan internetanslutning",
+    "can_save_cvs_to_drive": "Du kan nu spara dina CV:n direkt till din Google Drive",
+    "save_cvs_securely": "Spara dina CV:n säkert till ditt eget Google Drive-konto",
+    "connecting": "Ansluter",
+    "privacy_protected": "Integritet Skyddad",
+    "never_access_files": "Dina CV:n sparas direkt till din Google Drive - vi kommer aldrig åt dina filer",
+    "publish_failed": "Misslyckades att publicera CV",
+    "share_resume_text": "Kolla in {{name}} CV",
+    "this_person": "denna person",
+    "qr_complexity_unknown": "Kan inte uppskatta komplexitet",
+    "public_cv_qr_title": "Offentligt CV & QR-kod",
+    "public_link_description": "Skapa en offentlig länk som vem som helst kan komma åt för att se ditt CV. Inget konto krävs för tittare.",
+    "publishing": "Publicerar",
+    "publish_cv_publicly": "Publicera CV Offentligt",
+    "published_successfully": "Publicerat Framgångsrikt",
+    "public_url_label": "Offentlig URL ({{count}} tecken)",
+    "copy_url": "Kopiera URL",
+    "open_new_tab": "Öppna i ny flik",
+    "share": "Dela",
+    "hide_qr": "Dölj QR",
+    "show_qr": "Visa QR",
+    "download_qr": "Ladda ner QR",
+    "unpublish_cv": "Avpublicera CV",
+    "no_login_required": "Ingen Inloggning Krävs!",
+    "platform_works_without_accounts": "Vår plattform fungerar utan användarkonton.",
+    "start_building_connect_optional": "Börja bygga ditt CV omedelbart, anslut sedan valfritt molnlagring för synkronisering över enheter.",
+    "start_building_cv": "Börja Bygga Ditt CV",
+    "no_registration_needed": "Ingen Registrering Behövs!",
+    "jump_straight_building": "Hoppa direkt in i att bygga ditt CV.",
+    "data_stays_cloud_storage": "Din data stannar i din egen molnlagring när du väljer att spara.",
+    "start_building": "Börja Bygga",
+    "manage_storage_options": "Hantera dina lokala och molnlagringsalternativ",
+    "resume_template": "CV-mall",
+    "choose_file": "Välj fil",
+    "optional": "Valfri",
+    "saving_locally": "Sparar lokalt ..",
+    "saving_to_cloud": "Sparar till moln ..",
+    "select_local_cv": "-- Välj ett CV från Lokal Lagring --",
+    "from_local_storage": "Från din enhets lagring",
+    "found_cvs": "Hittade {{count}} CV",
+    "search_cv_placeholder": "Sök efter CV-titel eller namn...",
+    "no_cvs_match_search": "Inga CV:n matchar din sökning",
+    "no_cvs_found": "Inga CV:n hittades",
+    "try_different_search": "Prova ett annat sökord",
+    "create_cv_first": "Skapa ett CV först för att arbeta med det",
+    "cvs_count": "CV{{count, plural, one {} other {}}}",
+    "my_saved_cvs": "Mina Sparade CV:n",
+    "unknown_source": "Okänd Källa",
+    "no_name": "Inget namn",
+    "cv_number": "CV {{number}}",
+    "current_editing_session": "Nuvarande redigeringssession",
+    "saved_on_device": "Sparat på denna enhet",
+    "selected": "Vald",
+    "select_this_cv": "Välj Detta CV",
+    "saved": "Sparat",
+    "select_cv": "Välj CV",
+    "available": "tillgänglig",
+    "refresh_cv_list": "Uppdatera CV-lista",
+    "draft_from_builder": "Utkast från CV-byggare",
+    "local_draft": "Lokalt Utkast",
+    "google_drive_cv": "Google Drive CV",
+    "resume_id": "CV {{id}}",
+    "from_database": "Från databas",
+    "failed_load_cvs": "Misslyckades att ladda tillgängliga CV:n",
+    "searching_cvs": "Söker efter dina CV:n...",
+    "customizations_saved_locally": "Anpassningar sparade lokalt!",
+    "failed_save_customizations": "Misslyckades att spara anpassningar",
+    "back_to_cv_builder": "Tillbaka till CV-byggare",
+    "create_cv_to_customize": "Vi kunde inte hitta några CV:n att anpassa. Skapa ett först!",
+    "create_new_cv": "Skapa Nytt CV",
+    "select_cv_to_customize": "Välj CV att Anpassa",
+    "choose_cv_to_customize": "Välj vilket CV du vill anpassa"
+  },
+  "terms": {
+    "title": "Villkor och Bestämmelser",
+    "subtitle": "Tydliga villkor för att använda CVati. Dina rättigheter, vårt ansvar och vad du kan förvänta dig.",
+    "effective_date": "Gäller Från",
+    "date": "December 2024",
+    "agreement": {
+      "title": "Avtal om Villkor",
+      "content": "Genom att komma åt och använda CVati accepterar och godkänner du att vara bunden av villkoren och bestämmelserna i detta avtal. Om du inte godkänner att följa ovanstående, vänligen använd inte denna tjänst."
+    },
+    "service": {
+      "title": "Tjänstbeskrivning",
+      "what_we_provide": {
+        "title": "Vad Vi Tillhandahåller"
+      },
+      "cv_builder": "Professionella CV/meritforteckningsbyggverktyg",
+      "templates": "Flera anpassningsbara mallar",
+      "local_storage": "Lokal lagringsfunktion",
+      "cloud_integration": "Valfri molnlagringsintegration",
+      "export_features": "Export- och nedladdningsfunktioner",
+      "no_signup": {
+        "title": "Ingen Registrering Krävs",
+        "description": "CVati fungerar på en modell utan registrering. Du kan använda alla huvudfunktioner omedelbart utan att skapa ett konto. Molnlagringsanslutning är valfri och användarkontrollerad."
+      }
+    },
+    "responsibilities": {
+      "title": "Användaransvar",
+      "acceptable_use": {
+        "title": "Acceptabel Användning"
+      },
+      "lawful_use": "Använd tjänsten endast för lagliga ändamål",
+      "accurate_info": "Tillhandahåll korrekt information i dina CV:n",
+      "no_harmful_content": "Ladda inte upp skadligt eller stötande innehåll",
+      "respect_others": "Respektera immaterialrättigheter",
+      "prohibited": {
+        "title": "Förbjudna Aktiviteter"
+      },
+      "no_reverse_engineering": "Reverse engineering eller kopiering av tjänsten",
+      "no_automated_access": "Automatiserad datainsamling eller skrapning",
+      "no_interference": "Störning av tjänstens verksamhet",
+      "no_malicious_use": "Användning av tjänsten för skadliga ändamål"
+    },
+    "data_privacy": {
+      "title": "Data och Integritet",
+      "ownership": {
+        "title": "Ditt Dataägarskap",
+        "description": "Du behåller fullt ägarskap och kontroll över allt innehåll du skapar med CVati. Vi gör inga anspråk på rättigheter till ditt CV-innehåll, personlig information eller uppladdade material."
+      },
+      "local_storage": {
+        "title": "Lokal Lagring",
+        "description": "Data som lagras lokalt förblir på din enhet och överförs inte till våra servrar."
+      },
+      "cloud_storage": {
+        "title": "Molnlagring",
+        "description": "Molnlagring är valfri och använder ditt eget Google Drive-konto med återkallbara behörigheter."
+      }
+    },
+    "availability": {
+      "title": "Tjänsttillgänglighet",
+      "uptime": {
+        "title": "Tjänstens Drifttid",
+        "description": "Vi strävar efter att upprätthålla hög tjänsttillgänglighet men kan inte garantera 100% drifttid. Planerat underhåll kommer att meddelas i förväg när det är möjligt."
+      },
+      "local_functionality": {
+        "title": "Lokal Funktionalitet",
+        "description": "Grundläggande CV-byggfunktioner fungerar lokalt på din enhet och kräver inte internetanslutning. Molnfunktioner kräver internetåtkomst."
+      }
+    },
+    "limitations": {
+      "title": "Begränsningar och Ansvarsfriskrivningar",
+      "warranty": {
+        "title": "Ingen Garanti",
+        "description": "CVati tillhandahålls \"som det är\" utan några garantier, uttryckliga eller underförstådda. Vi garanterar inte att tjänsten kommer att vara felfri, säker eller kontinuerligt tillgänglig."
+      },
+      "liability": {
+        "title": "Ansvarsbegränsning",
+        "description": "Vi är inte ansvariga för några skador som uppstår från användning eller oförmåga att använda vår tjänst."
+      },
+      "third_party": {
+        "title": "Tredjepartstjänster",
+        "description": "Integration med tredjepartstjänster (som Google Drive) är föremål för deras villkor och tillgänglighet."
+      }
+    },
+    "modifications": {
+      "title": "Ändringar av Tjänst och Villkor",
+      "service_changes": {
+        "title": "Tjänständringar",
+        "description": "Vi förbehåller oss rätten att ändra, pausa eller avbryta vilken del av tjänsten som helst när som helst. Vi kommer att ge rimlig varning om betydande ändringar när det är möjligt."
+      },
+      "terms_changes": {
+        "title": "Villkorsändringar",
+        "description": "Dessa villkor kan uppdateras från tid till annan. Fortsatt användning av tjänsten efter ändringar utgör godkännande av de nya villkoren."
+      }
+    },
+    "termination": {
+      "title": "Uppsägning",
+      "by_user": {
+        "title": "Uppsägning av Dig",
+        "description": "Du kan sluta använda tjänsten när som helst. Din lokalt lagrade data förblir på din enhet. Du kan återkalla molnlagringsbehörigheter oberoende."
+      },
+      "by_us": {
+        "title": "Uppsägning av Oss",
+        "description": "Vi kan begränsa åtkomst om villkor överträds. Vi kommer att ge meddelande när det är möjligt och rimlig tid att hämta din data."
+      }
+    },
+    "legal": {
+      "title": "Juridisk Information",
+      "contact": {
+        "title": "Kontaktinformation",
+        "email": {
+          "label": "E-post",
+          "address": "legal@cvati.com"
+        },
+        "response": {
+          "label": "Svarstid",
+          "time": "Inom 48 timmar"
+        }
+      },
+      "governing_law": {
+        "title": "Tillämplig Lag",
+        "description": "Dessa villkor styrs av och tolkas i enlighet med tillämplig lag. Eventuella tvister kommer att lösas genom lämpliga juridiska kanaler."
+      }
+    },
+    "acceptance": {
+      "title": "Godkännande av Villkor",
+      "description": "Genom att använda CVati erkänner du att du har läst, förstått och godkänner att vara bunden av dessa Villkor och Bestämmelser.",
+      "effective": "Dessa villkor träder i kraft omedelbart vid din användning av tjänsten",
+      "questions": "Frågor Om Dessa Villkor?"
+    }
+  },
+  "privacy": {
+    "title": "Integritetspolicy",
+    "subtitle": "Din integritet är viktig. Lär dig hur vi hanterar din data med transparens och omsorg.",
+    "last_updated": "Senast Uppdaterad",
+    "date": "December 2024",
+    "introduction": {
+      "title": "Introduktion",
+      "content": "Välkommen till CVati. Denna Integritetspolicy förklarar hur vi samlar in, använder, avslöjar och skyddar din information när du använder vår CV/meritforteckningsbyggapplikation och tjänster. Vänligen läs denna integritetspolicy noggrant. Om du inte godkänner villkoren i denna integritetspolicy, vänligen kom inte åt applikationen."
+    },
+    "collection": {
+      "title": "Information Vi Samlar In",
+      "personal": {
+        "title": "Personlig Information Du Tillhandahåller",
+        "description": "När du använder vår Tjänst kan vi samla in följande personliga information som du frivilligt tillhandahåller:"
+      },
+      "cv_content": "CV/Meritforteckningsinnehåll",
+      "personal_info": "Personlig information (namn, e-post, telefon, adress)",
+      "professional_info": "Professionell information (arbetslivserfarenhet, utbildning, färdigheter)",
+      "personal_details": "Personliga detaljer (födelsedatum, nationalitet)",
+      "photos": "Profilfoton och bilder",
+      "references": "Referenser och kontaktinformation",
+      "account_info": "Kontoinformation",
+      "session_tokens": "Sessionstokens för autentisering",
+      "preferences": "Användarpreferenser och inställningar",
+      "usage_data": "Applikationsanvändningsdata",
+      "automatic": {
+        "title": "Automatiskt Insamlad Information"
+      },
+      "device_info": "Enhetsinformation (webbläsartyp, operativsystem)",
+      "analytics": "Användningsanalys och applikationsprestandadata",
+      "session_data": "Sessionsdata och autentiseringstokens",
+      "local_storage": "Lokal lagringsdata för offline-funktionalitet"
+    },
+    "usage": {
+      "title": "Hur Vi Använder Din Information",
+      "primary": {
+        "title": "Primära Tjänster"
+      },
+      "cv_creation": "CV-skapande och redigering",
+      "template_application": "Malltillämpning och anpassning",
+      "data_storage": "Datalagring (lokal och moln)",
+      "document_generation": "Dokumentgenerering och export",
+      "service": {
+        "title": "Tjänstförbättring"
+      },
+      "app_improvement": "Applikationsförbättring och optimering",
+      "technical_support": "Teknisk support och felsökning",
+      "security": "Säkerhet och bedrägeriprevention",
+      "analytics": "Användningsanalys (anonymiserad)"
+    },
+    "storage": {
+      "title": "Datalagringsalternativ",
+      "local": {
+        "title": "Lokal Lagring (Standard)",
+        "device_only": "Data stannar endast på din enhet",
+        "no_transmission": "Ingen dataöverföring till våra servrar",
+        "full_privacy": "Fullständig integritet och kontroll",
+        "browser_storage": "Använder webbläsarens lokala lagring"
+      },
+      "cloud": {
+        "title": "Molnlagring (Valfri)",
+        "google_drive": "Google Drive-integration",
+        "encrypted": "Data krypterad under transport och vila",
+        "user_control": "Användarkontrollerad anslutning",
+        "revocable": "Återkallbara behörigheter när som helst"
+      }
+    },
+    "sharing": {
+      "title": "Datadelning och Avslöjande",
+      "no_selling": {
+        "title": "Vi Säljer Inte Din Data",
+        "description": "Vi säljer, hyr eller handlar aldrig med din personliga information till tredje parter. Din CV-data förblir privat och under din kontroll."
+      },
+      "limited": {
+        "title": "Begränsade Delningsscenarier"
+      },
+      "legal_compliance": "Juridisk efterlevnad när det krävs enligt lag",
+      "security_protection": "Skydd av våra rättigheter och säkerhet",
+      "service_providers": "Betrodda tjänsteleverantörer (med strikta avtal)",
+      "user_consent": "Endast med ditt uttryckliga samtycke"
+    },
+    "rights": {
+      "title": "Dina Rättigheter och Val",
+      "access": {
+        "title": "Åtkomst och Kontroll",
+        "view": "Visa all din lagrade data",
+        "edit": "Redigera eller uppdatera din information",
+        "delete": "Radera din data när som helst",
+        "export": "Exportera din data (portabilitet)"
+      },
+      "storage": {
+        "title": "Lagringsval",
+        "local_only": "Behåll data endast lokalt",
+        "cloud_connect": "Anslut/koppla från molnlagring",
+        "revoke": "Återkalla molnbehörigheter",
+        "migrate": "Migrera mellan lagringsalternativ"
+      }
+    },
+    "security": {
+      "title": "Säkerhetsåtgärder",
+      "encryption": {
+        "title": "Kryptering",
+        "description": "All dataöverföring använder HTTPS-kryptering"
+      },
+      "access": {
+        "title": "Åtkomstkontroll",
+        "description": "Säker autentisering och sessionshantering"
+      },
+      "monitoring": {
+        "title": "Övervakning",
+        "description": "Kontinuerlig säkerhetsövervakning och uppdateringar"
+      }
+    },
+    "contact": {
+      "title": "Kontakta Oss",
+      "description": "Om du har några frågor om denna Integritetspolicy eller våra datapraxis, vänligen kontakta oss:",
+      "email": {
+        "title": "E-post",
+        "address": "privacy@cvati.com"
+      },
+      "response": {
+        "title": "Svarstid",
+        "time": "Vi svarar inom 48 timmar"
+      }
+    },
+    "updates": {
+      "title": "Policyuppdateringar",
+      "description": "Vi kan uppdatera denna Integritetspolicy från tid till annan. Vi kommer att meddela dig om eventuella ändringar genom att publicera den nya Integritetspolicyn på denna sida och uppdatera datumet för \"Senast Uppdaterad\".",
+      "notification": "Få Meddelanden om Uppdateringar"
+    }
+  },
+  "cookies2": {
+    "title": "Cookiepolicy",
+    "subtitle": "Lär dig om hur CVati använder cookies och liknande teknologier för att förbättra din upplevelse.",
+    "last_updated": "Senast uppdaterad",
+    "date": "September 2025",
+    "message": "Vi använder cookies för att förbättra din upplevelse. Genom att fortsätta besöka denna webbplats godkänner du vår användning av cookies.",
+    "learnMore": "Läs mer",
+    "decline": "Avböj",
+    "accept": "Acceptera",
+    
+    "what_are": {
+      "title": "Vad är cookies?",
+      "description": "Cookies är små textfiler som lagras på din enhet när du besöker en webbplats. De hjälper webbplatser att komma ihåg dina preferenser och förbättra din surfupplevelse.",
+      "how_work": {
+        "title": "Hur de fungerar",
+        "description": "Cookies lagrar information om ditt besök och kan känna igen dig när du återvänder till webbplatsen."
+      },
+      "your_control": {
+        "title": "Din kontroll",
+        "description": "Du kan kontrollera och radera cookies via dina webbläsarinställningar när som helst."
+      }
+    },
+    
+    "how_we_use": {
+      "title": "Hur CVati använder cookies",
+      "minimal_approach": {
+        "title": "Minimal cookie-användning",
+        "description": "CVati följer en integritetsfokuserad approach och använder minimala cookies. De flesta funktioner fungerar utan cookies, och vi använder dem endast när det är nödvändigt för kärnfunktioner."
+      },
+      "purposes": {
+        "title": "Vi använder cookies för:"
+      },
+      "essential": {
+        "title": "Väsentliga funktioner",
+        "session": "Sessionshantering och autentisering",
+        "preferences": "Komma ihåg dina preferenser (mörkt läge, språk)",
+        "local_storage": "Lokal lagringsfunktionalitet"
+      },
+      "analytics": {
+        "title": "Analytics (Valfritt)",
+        "usage": "Förstå hur appen används",
+        "performance": "Prestandaövervakning",
+        "improvements": "Identifiera områden för förbättring"
+      }
+    },
+    
+    "types": {
+      "title": "Typer av cookies vi använder",
+      "essential": {
+        "title": "Väsentliga cookies (Obligatoriska)",
+        "status": "Alltid aktiva",
+        "description": "Dessa cookies är nödvändiga för att webbplatsen ska fungera korrekt och kan inte inaktiveras.",
+        "session": {
+          "title": "Sessionscookies",
+          "description": "Upprätthåller din session när du använder appen"
+        },
+        "preferences": {
+          "title": "Preferenscookies",
+          "description": "Kommer ihåg dina inställningar som mörkt läge"
+        },
+        "consent": {
+          "title": "Samtyckes-cookies",
+          "description": "Kommer ihåg dina cookie-preferenser"
+        }
+      },
+      "analytics": {
+        "title": "Analytics-cookies (Valfria)",
+        "status": "Användarval",
+        "description": "Dessa cookies hjälper oss förstå hur du använder vår webbplats så att vi kan förbättra den.",
+        "usage": {
+          "title": "Användningsanalys",
+          "description": "Spåra vilka funktioner som används mest"
+        },
+        "performance": {
+          "title": "Prestandaövervakning",
+          "description": "Övervaka apphastighet och tillförlitlighet"
+        }
+      },
+      "marketing": {
+        "title": "Marknadsförings-/reklamcookies",
+        "status": "Används ej",
+        "description": "CVati använder inte marknadsförings- eller reklamcookies. Vi spårar dig inte för reklamändamål eller delar data med annonsörer."
+      }
+    },
+    
+    "third_party": {
+      "title": "Tredjepartstjänster",
+      "description": "När du väljer att ansluta valfria tjänster kan de sätta sina egna cookies:",
+      "google_drive": {
+        "title": "Google Drive-integration",
+        "description": "När du ansluter Google Drive kan Google sätta cookies enligt deras integritetspolicy."
+      },
+      "analytics_service": {
+        "title": "Analystjänst",
+        "description": "Om aktiverad kan vår analysleverantör sätta cookies för att spåra användningsmönster."
+      }
+    },
+    
+    "managing": {
+      "title": "Hantera dina cookie-preferenser",
+      "your_choices": {
+        "title": "Dina val"
+      },
+      "banner_choice": {
+        "title": "Cookie-banner",
+        "description": "Acceptera eller avböj valfria cookies när du först besöker CVati."
+      },
+      "browser_settings": {
+        "title": "Webbläsarinställningar",
+        "description": "Kontrollera cookies via dina webbläsarinställningar - blockera, radera eller hantera alla cookies."
+      },
+      "browser_instructions": {
+        "title": "Webbläsarspecifika instruktioner"
+      },
+      "browsers": {
+        "chrome": "Hantera cookies i Chrome-inställningar",
+        "firefox": "Hantera cookies i Firefox-inställningar",
+        "safari": "Hantera cookies i Safari-inställningar",
+        "edge": "Hantera cookies i Edge-inställningar",
+        "opera": "Hantera cookies i Opera-inställningar",
+        "mobile": "Hantera cookies i mobila webbläsarinställningar"
+      }
+    },
+    
+    "impact": {
+      "title": "Påverkan av att inaktivera cookies",
+      "essential_disabled": {
+        "title": "Om väsentliga cookies inaktiveras",
+        "sessions": "Sessionshantering kanske inte fungerar korrekt",
+        "preferences": "Dina preferenser (mörkt läge, språk) kommer inte sparas",
+        "cloud_sync": "Molnlagringssynkronisering kan påverkas"
+      },
+      "analytics_disabled": {
+        "title": "Om analytics-cookies inaktiveras",
+        "functionality": "All funktionalitet förblir fullt tillgänglig",
+        "improvements": "Vi kan inte samla insikter för att förbättra appen",
+        "issues": "Svårare att identifiera och åtgärda tekniska problem"
+      }
+    },
+    
+    "contact": {
+      "title": "Frågor om cookies?",
+      "description": "Om du har några frågor om vår användning av cookies eller denna cookiepolicy, vänligen kontakta oss:",
+      "email": {
+        "title": "E-post",
+        "address": "cookies@cvati.com"
+      },
+      "response": {
+        "title": "Svarstid",
+        "time": "Vi svarar inom 48 timmar"
+      }
+    },
+    
+    "updates": {
+      "title": "Uppdateringar av cookiepolicy",
+      "description": "Vi kan uppdatera denna cookiepolicy från tid till annan. Vi kommer att meddela dig om eventuella ändringar genom att publicera den nya policyn på denna sida.",
+      "stay_informed": "Håll dig informerad om uppdateringar"
     }
   }
 }

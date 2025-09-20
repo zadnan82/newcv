@@ -7,45 +7,65 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Get the saved language preference or default to browser language
 const savedLanguage = localStorage.getItem('preferredLanguage');
 
+// Function to convert regional codes to base language
+const getBaseLanguage = (lng) => {
+  if (!lng) return 'en';
+  return lng.split('-')[0]; // Convert 'en-GB' to 'en'
+};
+
 i18n
-  // Load translation using http -> see /public/locales
   .use(Backend)
-  // Detect user language
   .use(LanguageDetector)
-  // Pass the i18n instance to react-i18next
   .use(initReactI18next)
-  // init i18next
   .init({
     fallbackLng: 'en',
     debug: process.env.NODE_ENV === 'development',
     
     // Language detection options
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage', 'navigator', 'htmlTag'],
       lookupLocalStorage: 'preferredLanguage',
       caches: ['localStorage'],
     },
     
-    // Language to use if detection fails
-    lng: savedLanguage || undefined,
+    // Force base language - this is the key fix!
+    lng: getBaseLanguage(savedLanguage),
     
     interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
+      escapeValue: false,
     },
     
-    // IMPORTANT: Change this path for HashRouter
+    // Load path
     backend: {
-      loadPath: './locales/{{lng}}/{{ns}}.json', // Use relative path with ./ instead of /
+      loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
+    
+    // Handle language variants
+    load: 'languageOnly',
+    supportedLngs: ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ar', 'fa', 'tr', 'ur', 'sv', 'pl'],
+    nonExplicitSupportedLngs: true,
     
     // Default namespace
     ns: ['common'],
     defaultNS: 'common',
     
-    // Use react's Suspense
     react: {
       useSuspense: true,
     },
+    
+    // Better error handling
+    parseMissingKeyHandler: (key) => {
+      console.warn(`Missing translation: ${key}`);
+      return key;
+    }
   });
+
+// Override the language change to always use base language
+i18n.on('languageChanged', (lng) => {
+  const baseLng = getBaseLanguage(lng);
+  if (lng !== baseLng) {
+    i18n.changeLanguage(baseLng);
+  }
+});
 
 export default i18n;

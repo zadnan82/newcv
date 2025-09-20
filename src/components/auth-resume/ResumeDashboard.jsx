@@ -50,13 +50,13 @@ const ResumeDashboard = ({ darkMode }) => {
             const cv = {
               id: `cloud_${file.file_id}`, // Prefix with cloud_
               source: 'cloud',
-              title: displayName || 'Google Drive CV',
+              title: displayName || t('cloud.google_drive'),
               updated_at: file.last_modified,
               personal_info: { 
-                full_name: displayName || 'Untitled CV'
+                full_name: displayName || t('common.untitled')
               },
               sourceIcon: Cloud,
-              sourceLabel: 'Google Drive',
+              sourceLabel: t('cloud.google_drive'),
               sourceColor: 'text-blue-500',
               sourceBgColor: 'bg-blue-500',
               cloudFile: file,
@@ -89,7 +89,7 @@ const ResumeDashboard = ({ darkMode }) => {
           source: 'local',
           id: cv.id || `local_${Date.now()}`,
           sourceIcon: HardDrive,
-          sourceLabel: 'Local Storage',
+          sourceLabel: t('cloud.local_storage'),
           sourceColor: 'text-green-500',
           sourceBgColor: 'bg-green-500'
         });
@@ -113,10 +113,10 @@ const ResumeDashboard = ({ darkMode }) => {
             ...parsed,
             id: 'current_draft',
             source: 'draft',
-            title: parsed.title || 'Current Draft',
+            title: parsed.title || t('cloud.current_draft'),
             updated_at: new Date().toISOString(),
             sourceIcon: FileText,
-            sourceLabel: 'Current Draft',
+            sourceLabel: t('cloud.current_draft'),
             sourceColor: 'text-purple-500',
             sourceBgColor: 'bg-purple-500'
           });
@@ -328,11 +328,11 @@ const ResumeDashboard = ({ darkMode }) => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'Unknown';
+    if (!dateString) return t('common.notSpecified');
     
     try {
       const date = new Date(dateString);
-      if (isNaN(date)) return 'Unknown';
+      if (isNaN(date)) return t('common.notSpecified');
       
       const locale = localStorage.getItem('i18nextLng') || 'en-US';
       return new Intl.DateTimeFormat(locale, {
@@ -341,7 +341,7 @@ const ResumeDashboard = ({ darkMode }) => {
         day: 'numeric'
       }).format(date);
     } catch (error) {
-      return 'Unknown';
+      return t('common.notSpecified');
     }
   };
 
@@ -360,7 +360,7 @@ const ResumeDashboard = ({ darkMode }) => {
       <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-          <p className="text-sm">{t('resumeDashboard.loading', 'Loading your resumes...')}</p>
+          <p className="text-sm">{t('resumeDashboard.loading')}</p>
         </div>
       </div>
     );
@@ -381,9 +381,9 @@ const ResumeDashboard = ({ darkMode }) => {
             darkMode ? 'bg-gray-800/90 text-white border-gray-700' : 'bg-white/90 text-gray-800 border-gray-200'
           }`}>
             <FileText size={64} className="mx-auto mb-4 text-purple-500" />
-            <h1 className="text-2xl font-bold mb-3">No CVs Found</h1>
+            <h1 className="text-2xl font-bold mb-3">{t('resumeDashboard.noResumes.title')}</h1>
             <p className="mb-6 text-gray-600">
-              Start building your professional resume and take the next step in your career!
+              {t('resumeDashboard.noResumes.description')}
             </p>
             
             <button
@@ -391,17 +391,17 @@ const ResumeDashboard = ({ darkMode }) => {
               className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-medium shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex items-center gap-2 mx-auto"
             >
               <Plus size={20} />
-              Create Your First Resume
+              {t('resumeDashboard.buttons.startBuilding')}
             </button>
             
             {!canSaveToCloud() && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                <p className="text-blue-700 mb-2">💡 <strong>Tip:</strong> Connect Google Drive to sync your CVs across devices!</p>
+                <p className="text-blue-700 mb-2">{t('cloud.tip_connect_google_drive')}</p>
                 <button
                   onClick={() => navigate('/cloud-setup')}
                   className="text-blue-600 underline hover:text-blue-800"
                 >
-                  Connect Google Drive
+                  {t('cloud.connect_google_drive')}
                 </button>
               </div>
             )}
@@ -425,10 +425,10 @@ const ResumeDashboard = ({ darkMode }) => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-              My CVs & Resumes
+              {t('resumeDashboard.title')}
             </h1>
             <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Found {allCVs.length} CVs • Last updated {formatTime(lastRefreshTime)}
+              {t('cloud.cvs_available')}: {allCVs.length} • {t('common.lastRefresh')} {formatTime(lastRefreshTime)}
             </p>
           </div>
           
@@ -441,7 +441,7 @@ const ResumeDashboard = ({ darkMode }) => {
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg text-white'
               }`}
-              title="Refresh"
+              title={t('common.refresh')}
             >
               <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
             </button>
@@ -451,7 +451,7 @@ const ResumeDashboard = ({ darkMode }) => {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-medium shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
             >
               <Plus size={18} />
-              New Resume
+              {t('resumeDashboard.buttons.createNew')}
             </button>
           </div>
         </div>
@@ -481,7 +481,7 @@ const ResumeDashboard = ({ darkMode }) => {
                     <h3 className={`text-base font-semibold truncate ${
                       darkMode ? 'text-white' : 'text-gray-800'
                     }`}>
-                      {cv.title || 'Untitled Resume'}
+                      {cv.title || t('common.untitled')}
                     </h3>
                     <div className={`flex items-center text-xs ${cv.sourceColor}`}>
                       <SourceIcon size={14} />
@@ -508,7 +508,7 @@ const ResumeDashboard = ({ darkMode }) => {
                       darkMode ? 'text-gray-500' : 'text-gray-400'
                     }`} />
                     <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      CV Preview
+                      {t('resumeDashboard.preview')}
                     </p>
                   </div>
                 </div>
@@ -519,46 +519,46 @@ const ResumeDashboard = ({ darkMode }) => {
                     <button
                       onClick={() => handleView(cv)}
                       className="group flex flex-col items-center justify-center gap-1 p-2 rounded-md bg-gradient-to-r from-blue-600/10 to-blue-600/5 hover:from-blue-600/20 hover:to-blue-600/10 transition-all duration-300"
-                      title="View"
+                      title={t('common.view')}
                     >
                       <Eye size={14} className="text-blue-600 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600">View</span>
+                      <span className="text-xs text-gray-600">{t('common.view')}</span>
                     </button>
                     
                     <button
                       onClick={() => handleEdit(cv)}
                       className="group flex flex-col items-center justify-center gap-1 p-2 rounded-md bg-gradient-to-r from-green-600/10 to-green-600/5 hover:from-green-600/20 hover:to-green-600/10 transition-all duration-300"
-                      title="Edit"
+                      title={t('common.edit')}
                     >
                       <Edit size={14} className="text-green-600 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600">Edit</span>
+                      <span className="text-xs text-gray-600">{t('common.edit')}</span>
                     </button>
                     
                     <button
                       onClick={() => handleCustomize(cv)}
                       className="group flex flex-col items-center justify-center gap-1 p-2 rounded-md bg-gradient-to-r from-purple-600/10 to-purple-600/5 hover:from-purple-600/20 hover:to-purple-600/10 transition-all duration-300"
-                      title="Customize"
+                      title={t('resume.customizer.title')}
                     >
                       <Settings size={14} className="text-purple-600 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600">Style</span>
+                      <span className="text-xs text-gray-600">{t('resume.customizer.templates.styling')}</span>
                     </button>
                     
                     <button
                       onClick={() => handleDownload(cv)}
                       className="group flex flex-col items-center justify-center gap-1 p-2 rounded-md bg-gradient-to-r from-indigo-600/10 to-indigo-600/5 hover:from-indigo-600/20 hover:to-indigo-600/10 transition-all duration-300"
-                      title="Download"
+                      title={t('common.download')}
                     >
                       <Download size={14} className="text-indigo-600 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600">Save</span>
+                      <span className="text-xs text-gray-600">{t('common.save')}</span>
                     </button>
                     
                     <button
                       onClick={() => handleDelete(cv)}
                       className="group flex flex-col items-center justify-center gap-1 p-2 rounded-md bg-gradient-to-r from-red-600/10 to-red-600/5 hover:from-red-600/20 hover:to-red-600/10 transition-all duration-300"
-                      title="Delete"
+                      title={t('common.delete')}
                     >
                       <Trash size={14} className="text-red-600 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600">Delete</span>
+                      <span className="text-xs text-gray-600">{t('common.delete')}</span>
                     </button>
                   </div>
                 </div>
@@ -574,7 +574,7 @@ const ResumeDashboard = ({ darkMode }) => {
               darkMode ? 'bg-green-900/20 text-green-400' : 'bg-green-100 text-green-700'
             }`}>
               <Cloud size={16} />
-              <span className="text-sm">Google Drive connected</span>
+              <span className="text-sm">{t('cloud.google_drive_connected')}</span>
             </div>
           ) : (
             <div className="space-y-2">
@@ -582,14 +582,14 @@ const ResumeDashboard = ({ darkMode }) => {
                 darkMode ? 'bg-yellow-900/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700'
               }`}>
                 <HardDrive size={16} />
-                <span className="text-sm">Local storage only</span>
+                <span className="text-sm">{t('cloud.local_storage_only')}</span>
               </div>
               <div>
                 <button
                   onClick={() => navigate('/cloud-setup')}
                   className="text-blue-600 hover:text-blue-800 text-sm underline"
                 >
-                  Connect Google Drive to sync across devices
+                  {t('cloud.connect_google_drive_sync')}
                 </button>
               </div>
             </div>

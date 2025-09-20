@@ -11,7 +11,6 @@ const Base64PhotoUpload = ({ darkMode, data = {}, onChange }) => {
   useEffect(() => {
     console.log('Base64PhotoUpload - Data received:', data);
     
-    // Handle different data formats
     let photoUrl = '';
     
     if (data && typeof data === 'object' && data.photolink) {
@@ -35,8 +34,6 @@ const Base64PhotoUpload = ({ darkMode, data = {}, onChange }) => {
     });
   };
 
-  // Update Base64PhotoUpload.jsx with better size optimization
-
 const resizeImage = (file, maxWidth = 600, maxHeight = 600, quality = 0.7) => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
@@ -44,10 +41,8 @@ const resizeImage = (file, maxWidth = 600, maxHeight = 600, quality = 0.7) => {
     const img = new Image();
 
     img.onload = () => {
-      // Calculate new dimensions - more aggressive resizing
       let { width, height } = img;
       
-      // Always resize if image is larger than max dimensions
       const ratio = Math.min(maxWidth / width, maxHeight / height);
       
       if (ratio < 1) {
@@ -55,23 +50,18 @@ const resizeImage = (file, maxWidth = 600, maxHeight = 600, quality = 0.7) => {
         height = Math.floor(height * ratio);
       }
 
-      // Set canvas dimensions
       canvas.width = width;
       canvas.height = height;
 
-      // Use better image rendering
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       
-      // Draw and compress
       ctx.drawImage(img, 0, 0, width, height);
       
-      // Try different qualities to get under size limit
-      const targetSizeKB = 200; // Target 200KB for Base64
+      const targetSizeKB = 200;
       let currentQuality = quality;
       let base64 = canvas.toDataURL('image/jpeg', currentQuality);
       
-      // Reduce quality if still too large
       while (base64.length / 1024 > targetSizeKB && currentQuality > 0.3) {
         currentQuality -= 0.1;
         base64 = canvas.toDataURL('image/jpeg', currentQuality);
@@ -87,23 +77,20 @@ const resizeImage = (file, maxWidth = 600, maxHeight = 600, quality = 0.7) => {
   });
 };
 
-// Update the handlePhotoChange function in Base64PhotoUpload
 const handlePhotoChange = async (e) => {
   const file = e.target.files[0];
   setUploadError('');
   
   if (!file) return;
 
-  // Validate file type
   const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    setUploadError(t('resume.photo.invalid_type', 'Please upload a valid image file (JPG, PNG, GIF, or WebP)'));
+    setUploadError(t('resume.photo.invalid_type'));
     return;
   }
 
-  // Validate file size (10MB limit for processing, but we'll compress it down)
   if (file.size > 10 * 1024 * 1024) {
-    setUploadError(t('resume.photo.size_limit', 'Photo size should be less than 10MB'));
+    setUploadError(t('resume.photo.size_limit'));
     return;
   }
 
@@ -112,29 +99,24 @@ const handlePhotoChange = async (e) => {
   try {
     console.log('Processing image file:', file.name, 'Original size:', Math.round(file.size / 1024), 'KB');
     
-    // More aggressive resizing for smaller final size
     const base64Image = await resizeImage(file, 600, 600, 0.7);
     
     const finalSizeKB = Math.round(base64Image.length / 1024);
     console.log('Image converted to base64, final size:', finalSizeKB, 'KB');
     
-    // Check final size
-    if (base64Image.length > 500 * 1024) { // 500KB limit for Base64
-      setUploadError(t('resume.photo.compressed_too_large', 'Image is still too large after compression. Please use a smaller image.'));
+    if (base64Image.length > 500 * 1024) {
+      setUploadError(t('cloud.compressed_too_large'));
       return;
     }
     
-    // Update component state
     setCurrentPhotoUrl(base64Image);
-    
-    // Update parent with base64 data
     onChange({ photolink: base64Image });
     
     console.log('✅ Photo successfully converted to base64 and saved, size:', finalSizeKB, 'KB');
     
   } catch (error) {
     console.error('❌ Error processing photo:', error);
-    setUploadError(t('resume.photo.processing_error', 'Error processing photo. Please try a different image.'));
+    setUploadError(t('resume.photo.process_error'));
   } finally {
     setIsProcessing(false);
   }
@@ -145,13 +127,9 @@ const handlePhotoChange = async (e) => {
       setIsProcessing(true);
       setUploadError('');
       
-      // Clear component state
       setCurrentPhotoUrl('');
-      
-      // Update parent with empty photolink
       onChange({ photolink: null });
       
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -160,7 +138,7 @@ const handlePhotoChange = async (e) => {
       
     } catch (error) {
       console.error('❌ Error removing photo:', error);
-      setUploadError(t('resume.photo.remove_error', 'Error removing photo. Please try again.'));
+      setUploadError(t('cloud.remove_error'));
     } finally {
       setIsProcessing(false);
     }
@@ -181,7 +159,7 @@ const handlePhotoChange = async (e) => {
       <h3 className={`text-sm font-semibold mb-4 ${
         darkMode ? 'text-white' : 'text-gray-800'
       }`}>
-        {t('resume.photo.title', 'Profile Photo')}
+        {t('resume.photo.title')}
       </h3>
 
       <div className="space-y-3">
@@ -190,11 +168,11 @@ const handlePhotoChange = async (e) => {
             <div className="relative">
               <img 
                 src={currentPhotoUrl} 
-                alt={t('resume.photo.alt', 'Profile')}
+                alt={t('resume.photo.alt')}
                 className="w-20 h-20 rounded-md object-cover border shadow-md"
                 onError={(e) => {
                   console.error('Image display error:', e);
-                  setUploadError('Error displaying image');
+                  setUploadError(t('common.error'));
                 }}
               />
               <button
@@ -202,7 +180,7 @@ const handlePhotoChange = async (e) => {
                 onClick={removePhoto}
                 disabled={isProcessing}
                 className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors shadow-md disabled:opacity-50"
-                aria-label={t('resume.photo.remove_photo', 'Remove photo')}
+                aria-label={t('resume.photo.remove_photo')}
               >
                 ×
               </button>
@@ -226,8 +204,8 @@ const handlePhotoChange = async (e) => {
                 } text-white rounded-full transition-all duration-300 shadow-md`}
               >
                 {isProcessing 
-                  ? t('resume.photo.processing', 'Processing...') 
-                  : t('resume.photo.change', 'Change Photo')}
+                  ? t('cloud.processing') 
+                  : t('resume.photo.change')}
               </label>
             </div>
           </div>
@@ -251,8 +229,8 @@ const handlePhotoChange = async (e) => {
               } text-white rounded-full transition-all duration-300 shadow-md`}
             >
               {isProcessing 
-                ? t('resume.photo.processing', 'Processing...') 
-                : t('resume.photo.upload', 'Upload Photo')}
+                ? t('cloud.processing') 
+                : t('resume.photo.upload')}
             </label>
           </div>
         )}
@@ -279,9 +257,9 @@ const handlePhotoChange = async (e) => {
         <div className={`text-xs ${
           darkMode ? 'text-gray-400' : 'text-gray-500'
         }`}>
-          <p>{t('resume.photo.max_size', 'Maximum size: 5MB')}</p>
+          <p>{t('resume.photo.max_size')}</p>
           <p className="mt-1">
-            {t('resume.photo.base64_info', 'Image will be stored directly in your CV file for maximum privacy.')}
+            {t('cloud.base64_info')}
           </p>
         </div>
       </div>

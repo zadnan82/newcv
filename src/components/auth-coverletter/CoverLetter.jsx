@@ -2,26 +2,28 @@ import React, { useState, useEffect, useRef } from 'react';
 import Alert from './Alert';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast'; // Add toast for notifications
+import toast from 'react-hot-toast';
 import useCoverLetterStore from '../../stores/coverLetterStore';
-import useSessionStore from '../../stores/sessionStore'; // FIXED: Use session store instead of auth store
+import useSessionStore from '../../stores/sessionStore';
 
 const CoverLetter = ({ darkMode }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   
-  // FIXED: Use session store for Google Drive CVs
+  // Session store for both local and cloud CVs
   const {
     listGoogleDriveCVs,
     loadGoogleDriveCV,
+    loadLocalCVs,
     googleDriveConnected,
-    sessionToken
+    sessionToken,
+    localCVs
   } = useSessionStore();
   
   const {
     generateCoverLetter,
-    saveCoverLetter, // Add save functionality
+    saveCoverLetter,
     formatCoverLetter,
     isLoading: coverLetterLoading,
     error: coverLetterError,
@@ -33,10 +35,12 @@ const CoverLetter = ({ darkMode }) => {
   
   const [cvFile, setCvFile] = useState(null);
   const [googleDriveCVs, setGoogleDriveCVs] = useState([]);
+  const [localStorageCVs, setLocalStorageCVs] = useState([]);
   const [selectedCV, setSelectedCV] = useState(null);
+  const [selectedCVSource, setSelectedCVSource] = useState(''); // 'local', 'google-drive', or 'upload'
   const [generatedLetter, setGeneratedLetter] = useState('');
-  const [generatedCoverLetterData, setGeneratedCoverLetterData] = useState(null); // Store the full AI response
-  const [isSaving, setIsSaving] = useState(false); // Separate loading state for saving
+  const [generatedCoverLetterData, setGeneratedCoverLetterData] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [alertType, setAlertType] = useState('error');
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [progressStatus, setProgressStatus] = useState('');
@@ -52,14 +56,24 @@ const CoverLetter = ({ darkMode }) => {
 
   const isLoading = coverLetterLoading;
 
-  // FIXED: Load Google Drive CVs on component mount
+  // Load both local and Google Drive CVs on component mount
   useEffect(() => {
-    const loadCVs = async () => {
+    const loadAllCVs = async () => {
+      // Load local CVs
+      try {
+        const localCVsData = loadLocalCVs();
+        console.log('📱 Loaded local CVs:', localCVsData);
+        setLocalStorageCVs(localCVsData || []);
+      } catch (error) {
+        console.error('❌ Failed to load local CVs:', error);
+      }
+
+      // Load Google Drive CVs if connected
       if (googleDriveConnected && sessionToken) {
         try {
           console.log('📋 Loading Google Drive CVs...');
           const cvs = await listGoogleDriveCVs();
-          console.log('✅ Loaded CVs:', cvs);
+          console.log('✅ Loaded Google Drive CVs:', cvs);
           setGoogleDriveCVs(cvs || []);
         } catch (error) {
           console.error('❌ Failed to load Google Drive CVs:', error);
@@ -67,32 +81,45 @@ const CoverLetter = ({ darkMode }) => {
       }
     };
 
-    loadCVs();
-  }, [googleDriveConnected, sessionToken, listGoogleDriveCVs]);
+    loadAllCVs();
+  }, [googleDriveConnected, sessionToken, listGoogleDriveCVs, loadLocalCVs]);
 
-  // Handle CV selection from Google Drive
-  const handleGoogleDriveSelection = async (fileId) => {
+  // Handle CV selection from any source
+  const handleCVSelection = async (source, cvId) => {
     try {
-      console.log('📥 Loading selected CV:', fileId);
-      setSelectedResumeId(fileId);
+      console.log(`📥 Loading selected CV from ${source}:`, cvId);
+      setSelectedResumeId(cvId);
+      setSelectedCVSource(source);
       
-      const cvData = await loadGoogleDriveCV(fileId);
+      let cvData = null;
+      
+      if (source === 'google-drive') {
+        cvData = await loadGoogleDriveCV(cvId);
+      } else if (source === 'local') {
+        // Find the CV in local storage
+        const localCV = localStorageCVs.find(cv => cv.id === cvId);
+        if (localCV) {
+          cvData = localCV;
+        } else {
+          throw new Error('Local CV not found');
+        }
+      }
+      
       console.log('✅ CV loaded:', cvData);
-      
       setSelectedCV(cvData);
       
       // Auto-fill form with CV data
-      if (cvData.personal_info) {
+      if (cvData && cvData.personal_info) {
         setFormData(prev => ({
           ...prev,
           fullName: cvData.personal_info.full_name || '',
           email: cvData.personal_info.email || '',
-          phone: cvData.personal_info.mobile || ''
+          phone: cvData.personal_info.mobile || cvData.personal_info.phone || ''
         }));
       }
     } catch (error) {
       console.error('❌ Failed to load CV:', error);
-      alert('Failed to load selected CV. Please try again.');
+      toast.error('Failed to load selected CV. Please try again.');
     }
   };
 
@@ -100,7 +127,8 @@ const CoverLetter = ({ darkMode }) => {
   const handleFileUpload = (e) => {
     if (e.target.files[0]) {
       setCvFile(e.target.files[0]);
-      setSelectedResumeId(''); // Clear Google Drive selection
+      setSelectedResumeId('');
+      setSelectedCVSource('upload');
       setSelectedCV(null);
     }
   };
@@ -117,7 +145,7 @@ const CoverLetter = ({ darkMode }) => {
     }));
   };
 
-  // FIXED: Handle cover letter generation with proper data
+  // Handle cover letter generation with proper data
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearCoverLetterError();
@@ -125,28 +153,28 @@ const CoverLetter = ({ darkMode }) => {
     
     // Validate inputs
     if (!selectedResumeId && !cvFile) {
-      alert('Please select a CV from Google Drive or upload a file');
+      toast.error(t('CoverLetter.alerts.selectResume', 'Please select a CV or upload a file'));
       return;
     }
 
     if (!formData.jobDescription.trim()) {
-      alert('Please provide a job description');
+      toast.error(t('CoverLetter.alerts.requiredFields', 'Please provide a job description'));
       return;
     }
 
     if (!formData.jobTitle.trim()) {
-      alert('Please provide a job title');
+      toast.error(t('CoverLetter.alerts.requiredFields', 'Please provide a job title'));
       return;
     }
 
     if (!formData.companyName.trim()) {
-      alert('Please provide a company name');
+      toast.error(t('CoverLetter.alerts.requiredFields', 'Please provide a company name'));
       return;
     }
 
     try {
       console.log('🚀 Starting cover letter generation...');
-      setProgressStatus('Generating your cover letter...');
+      setProgressStatus(t('CoverLetter.form.generating', 'Generating your cover letter...'));
       
       // Create FormData for the API request
       const formDataToSend = new FormData();
@@ -158,13 +186,17 @@ const CoverLetter = ({ darkMode }) => {
       formDataToSend.append('recipient_name', formData.hiringManager.trim());
       formDataToSend.append('recipient_title', '');
       
-      // Add CV source
-      if (selectedResumeId) {
+      // Add CV source based on selection
+      if (selectedCVSource === 'google-drive' && selectedResumeId) {
         formDataToSend.append('resume_id', selectedResumeId);
         console.log('📄 Using Google Drive CV:', selectedResumeId);
-      } else if (cvFile) {
+      } else if (selectedCVSource === 'local' && selectedCV) {
+        // For local CVs, we need to send the CV data as JSON
+        formDataToSend.append('resume_data', JSON.stringify(selectedCV));
+        console.log('💾 Using local CV:', selectedCV.title || selectedCV.id);
+      } else if (selectedCVSource === 'upload' && cvFile) {
         formDataToSend.append('resume_file', cvFile);
-        console.log('📁 Using uploaded file:', cvFile.name);
+        console.log('📎 Using uploaded file:', cvFile.name);
       }
 
       // Optional fields
@@ -179,8 +211,7 @@ const CoverLetter = ({ darkMode }) => {
         handleCoverLetterResult(response);
       } else if (response.task_id) {
         console.log('⏳ Cover letter generation started (async):', response.task_id);
-        setProgressStatus('Cover letter generation started. Please wait...');
-        // Polling will be handled by the existing useEffect
+        setProgressStatus(t('CoverLetter.form.generating', 'Cover letter generation started. Please wait...'));
       } else {
         throw new Error('No cover letter content received');
       }
@@ -189,11 +220,11 @@ const CoverLetter = ({ darkMode }) => {
       setAlertType('error');
       setGeneratedLetter('');
       setProgressStatus('');
-      alert(`Failed to generate cover letter: ${error.message}`);
+      toast.error(t('CoverLetter.errors.generation', 'Failed to generate cover letter') + `: ${error.message}`);
     }
   };
 
-  // FIXED: Handle cover letter result and format for display
+  // Handle cover letter result and format for display
   const handleCoverLetterResult = (result) => {
     try {
       console.log("📝 Processing cover letter result:", result);
@@ -212,7 +243,8 @@ const CoverLetter = ({ darkMode }) => {
         is_favorite: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        resume_id: selectedResumeId || null
+        resume_id: selectedCVSource === 'google-drive' ? selectedResumeId : null,
+        cv_source: selectedCVSource
       });
       
       let letterContent = '';
@@ -275,41 +307,38 @@ const CoverLetter = ({ darkMode }) => {
     }
   };
 
-  // NEW: Handle saving cover letter (local-first with optional cloud sync)
+  // Handle saving cover letter (local-first with optional cloud sync)
   const handleSaveCoverLetter = async (saveToCloud = false) => {
-  if (!generatedCoverLetterData) {
-    toast.error('No cover letter to save. Please generate one first.');
-    return;
-  }
+    if (!generatedCoverLetterData) {
+      toast.error(t('CoverLetter.errors.generation', 'No cover letter to save. Please generate one first.'));
+      return;
+    }
 
-  try {
-    setIsSaving(true);
-    
-    const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud);
-    
-    if (result.success) {
-      if (saveToCloud) {
-        // User clicked "Save to Drive"
-        if (result.cloudResult?.success) {
-          toast.success('Cover letter saved locally and to Google Drive!');
+    try {
+      setIsSaving(true);
+      
+      const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud);
+      
+      if (result.success) {
+        if (saveToCloud) {
+          if (result.cloudResult?.success) {
+            toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally and to Google Drive!'));
+          } else {
+            toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally! (Google Drive sync failed)'));
+          }
         } else {
-          toast.success('Cover letter saved locally! (Google Drive sync failed)');
+          toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally!'));
         }
       } else {
-        // User clicked "Save Locally"
-        toast.success('Cover letter saved locally!');
+        throw new Error(result.error || 'Save failed');
       }
-    } else {
-      throw new Error(result.error || 'Save failed');
+    } catch (error) {
+      console.error('Save failed:', error);
+      toast.error(t('CoverLetter.errors.generation', 'Failed to save') + `: ${error.message}`);
+    } finally {
+      setIsSaving(false);
     }
-  } catch (error) {
-    console.error('Save failed:', error);
-    toast.error(`Failed to save: ${error.message}`);
-  } finally {
-    setIsSaving(false);
-  }
-};
-
+  };
 
   // Handle task polling for async generation
   useEffect(() => {
@@ -334,7 +363,7 @@ const CoverLetter = ({ darkMode }) => {
             clearInterval(interval);
             setProgressStatus('');
             setAlertType('error');
-            alert(result.error || 'Cover letter generation failed');
+            toast.error(result.error || t('CoverLetter.errors.generation', 'Cover letter generation failed'));
           }
         } catch (error) {
           console.error('❌ Task polling error:', error);
@@ -366,30 +395,65 @@ const CoverLetter = ({ darkMode }) => {
               {/* CV Selection Section */}
               <div className="mb-4">
                 <h3 className="text-sm font-semibold mb-2">
-                  Select Your CV
+                  {t('common.select_file', 'Select Your CV')}
                 </h3>
                 
+                {/* Local Storage CVs */}
+                {localStorageCVs.length > 0 && (
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1">
+                      💾 {t('cloud.from_local_storage', 'From Local Storage')}
+                    </label>
+                    <select
+                      value={selectedCVSource === 'local' ? selectedResumeId : ''}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleCVSelection('local', e.target.value);
+                        }
+                      }}
+                      className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                    >
+                      <option value="">{t('cloud.select_local_cv', '-- Select a CV from Local Storage --')}</option>
+                      {localStorageCVs.map(cv => (
+                        <option key={cv.id} value={cv.id}>
+                          {cv.title || cv.personal_info?.full_name || 'Untitled CV'} 
+                          {cv.lastModified && ` (${new Date(cv.lastModified).toLocaleDateString()})`}
+                        </option>
+                      ))}
+                    </select>
+                    {selectedCVSource === 'local' && selectedCV && (
+                      <p className="text-xs text-green-600 mt-1">
+                        ✓ {t('common.selected', 'Selected')}: {selectedCV.title || 'Local CV'}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Google Drive CVs */}
                 {googleDriveConnected && googleDriveCVs.length > 0 && (
                   <div className="mb-3">
                     <label className="block text-xs font-medium mb-1">
-                      From Google Drive
+                      ☁️ {t('cloud.from_google_drive', 'From Google Drive')}
                     </label>
                     <select
-                      value={selectedResumeId}
-                      onChange={(e) => handleGoogleDriveSelection(e.target.value)}
+                      value={selectedCVSource === 'google-drive' ? selectedResumeId : ''}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleCVSelection('google-drive', e.target.value);
+                        }
+                      }}
                       className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
                     >
-                      <option value="">-- Select a CV from Google Drive --</option>
+                      <option value="">{t('CoverLetter.form.select_resume', '-- Select a CV from Google Drive --')}</option>
                       {googleDriveCVs.map(cv => (
                         <option key={cv.file_id} value={cv.file_id}>
                           {cv.name}
                         </option>
                       ))}
                     </select>
-                    {selectedCV && (
+                    {selectedCVSource === 'google-drive' && selectedCV && (
                       <p className="text-xs text-green-600 mt-1">
-                        ✓ Selected: {selectedCV.title}
+                        ✓ {t('common.selected', 'Selected')}: {selectedCV.title}
                       </p>
                     )}
                   </div>
@@ -398,7 +462,7 @@ const CoverLetter = ({ darkMode }) => {
                 {/* Upload Option */}
                 <div className="mb-3">
                   <label className="block text-xs font-medium mb-1">
-                    Or upload a CV file
+                    📎 {t('CoverLetter.form.upload_cv', 'Or upload a CV file')}
                   </label>
                   <input
                     ref={fileInputRef}
@@ -416,21 +480,29 @@ const CoverLetter = ({ darkMode }) => {
                         : `${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                     } hover:bg-gray-100 transition-colors`}
                   >
-                    {cvFile ? `✓ ${cvFile.name}` : 'Choose File'}
+                    {cvFile ? `✓ ${cvFile.name}` : t('cloud.choose_file', 'Choose File')}
                   </button>
                 </div>
                 
-                {!googleDriveConnected && (
-                  <p className="text-xs text-amber-600 mb-2">
-                    💡 <a href="/cloud-setup" className="underline">Connect Google Drive</a> to access your saved CVs
-                  </p>
-                )}
+                {/* Help text */}
+                <div className="text-xs space-y-1">
+                  {localStorageCVs.length > 0 && (
+                    <p className="text-blue-600">
+                      💡 {localStorageCVs.length} CV{localStorageCVs.length !== 1 ? 's' : ''} available locally
+                    </p>
+                  )}
+                  {!googleDriveConnected && (
+                    <p className="text-amber-600">
+                      💡 <a href="/cloud-setup" className="underline">{t('cloud.connect_google_drive', 'Connect Google Drive')}</a> {t('cloud.access_saved_cvs', 'to access your cloud CVs')}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Personal Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="block text-xs font-medium mb-1">Full Name</label>
+                  <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.full_name', 'Full Name')}</label>
                   <input
                     type="text"
                     name="fullName"
@@ -441,7 +513,7 @@ const CoverLetter = ({ darkMode }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1">Email</label>
+                  <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.email', 'Email')}</label>
                   <input
                     type="email"
                     name="email"
@@ -456,7 +528,7 @@ const CoverLetter = ({ darkMode }) => {
               {/* Job Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="block text-xs font-medium mb-1">Company Name *</label>
+                  <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.company_name', 'Company Name')} *</label>
                   <input
                     type="text"
                     name="companyName"
@@ -467,7 +539,7 @@ const CoverLetter = ({ darkMode }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1">Job Title *</label>
+                  <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.job_title', 'Job Title')} *</label>
                   <input
                     type="text"
                     name="jobTitle"
@@ -480,7 +552,7 @@ const CoverLetter = ({ darkMode }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium mb-1">Hiring Manager (optional)</label>
+                <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.hiring_manager', 'Hiring Manager')} ({t('cloud.optional', 'optional')})</label>
                 <input
                   type="text"
                   name="hiringManager"
@@ -491,7 +563,7 @@ const CoverLetter = ({ darkMode }) => {
               </div>
               
               <div>
-                <label className="block text-xs font-medium mb-1">Job Description *</label>
+                <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.job_description', 'Job Description')} *</label>
                 <textarea
                   name="jobDescription"
                   value={formData.jobDescription}
@@ -499,7 +571,7 @@ const CoverLetter = ({ darkMode }) => {
                   required
                   rows={4}
                   className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
-                  placeholder="Paste the job description here..."
+                  placeholder={t('CoverLetter.form.jobDescription_placeholder', 'Paste the job description here...')}
                 />
               </div>
 
@@ -515,10 +587,10 @@ const CoverLetter = ({ darkMode }) => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                     </svg>
-                    {progressStatus || 'Generating...'}
+                    {progressStatus || t('CoverLetter.form.generating', 'Generating...')}
                   </span>
                 ) : (
-                  'Generate Cover Letter with AI'
+                  t('CoverLetter.form.generate_button', 'Generate Cover Letter with AI')
                 )}
               </button>
 
@@ -532,7 +604,7 @@ const CoverLetter = ({ darkMode }) => {
           {/* Preview Section */}
           <div className={`${darkMode ? 'bg-gray-800 text-white' : 'bg-white/80 backdrop-blur-sm'} rounded-lg shadow-lg p-4`}>
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-bold">Preview</h2>
+              <h2 className="text-base font-bold">{t('CoverLetter.preview.title', 'Preview')}</h2>
               
               {generatedLetter && (
                 <div className="flex space-x-1.5">
@@ -540,7 +612,7 @@ const CoverLetter = ({ darkMode }) => {
                     onClick={() => navigator.clipboard.writeText(generatedLetter)}
                     className="px-2 py-1 text-xs bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
                   >
-                    Copy
+                    {t('common.copy', 'Copy')}
                   </button>
                   <button 
                     onClick={() => {
@@ -554,9 +626,9 @@ const CoverLetter = ({ darkMode }) => {
                     }}
                     className="px-2 py-1 text-xs bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded hover:shadow-lg"
                   >
-                    Download
+                    {t('common.download', 'Download')}
                   </button>
-                  {/* NEW: Local and Cloud Save buttons */}
+                  {/* Save buttons */}
                   {generatedCoverLetterData && (
                     <>
                       <button 
@@ -570,10 +642,10 @@ const CoverLetter = ({ darkMode }) => {
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                             </svg>
-                            Saving...
+                            {t('common.saving', 'Saving...')}
                           </span>
                         ) : (
-                          '💾 Save Locally'
+                          t('cloud.save_locally', '💾 Save Locally')
                         )}
                       </button>
                       
@@ -589,10 +661,10 @@ const CoverLetter = ({ darkMode }) => {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                               </svg>
-                              Saving...
+                              {t('common.saving', 'Saving...')}
                             </span>
                           ) : (
-                            '☁️ Save to Drive'
+                            t('cloud.save_to_drive', '☁️ Save to Drive')
                           )}
                         </button>
                       )}
@@ -604,7 +676,7 @@ const CoverLetter = ({ darkMode }) => {
                     to="/cover-letters"
                     className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700"
                   >
-                    📋 View All
+                    {t('coverLetters.title', '📋 View All')}
                   </Link>
                 </div>
               )}
@@ -621,7 +693,7 @@ const CoverLetter = ({ darkMode }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <p className="text-xs">
-                    {progressStatus || 'Your AI-generated cover letter will appear here'}
+                    {progressStatus || t('CoverLetter.preview.empty_state', 'Your AI-generated cover letter will appear here')}
                   </p>
                 </div>
               </div>

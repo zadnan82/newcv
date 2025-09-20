@@ -14,22 +14,20 @@ const SaveConfirmationModal = ({
   
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop/overlay */}
       <div 
         className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
         onClick={onClose}
       ></div>
       
-      {/* Modal content */}
       <div className={`relative z-10 p-4 rounded-lg shadow-xl max-w-sm w-full mx-4 ${
         isDarkMode ? 'bg-gray-800 text-white' : 'bg-white/90 backdrop-blur-sm text-gray-800'
       }`}>
         <h3 className="text-sm font-medium mb-3">
-          {t('resume.customizer.saveCustomizations.title', 'Save Customizations')}
+          {t('resume.customizer.saveCustomizations.title')}
         </h3>
         
         <p className="mb-4 text-xs">
-          {t('resume.customizer.saveCustomizations.message', 'Would you like to save your customizations before continuing?')}
+          {t('resume.customizer.saveCustomizations.message')}
         </p>
         
         <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
@@ -41,7 +39,7 @@ const SaveConfirmationModal = ({
                 : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
             }`}
           >
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </button>
           
           <button
@@ -52,7 +50,7 @@ const SaveConfirmationModal = ({
                 : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:shadow-sm hover:shadow-purple-500/20'
             } text-white`}
           >
-            {t('resume.customizer.saveCustomizations.continue', 'Continue Without Saving')}
+            {t('resume.customizer.saveCustomizations.continue')}
           </button>
           
           <button
@@ -63,7 +61,7 @@ const SaveConfirmationModal = ({
                 : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-sm hover:shadow-purple-500/20'
             } text-white`}
           >
-            {t('resume.customizer.saveCustomizations.save', 'Save & Continue')}
+            {t('resume.customizer.saveCustomizations.save')}
           </button>
         </div>
       </div>

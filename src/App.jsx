@@ -105,16 +105,20 @@ import CVAIEnhancement from './components/auth-resume/view-cv/CVAIEnhancement';
 })();
 
 // Simple Loading Component
-const AppLoading = ({ darkMode }) => (
-  <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mb-4"></div>
-      <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-        Loading CV Platform...
-      </p>
+const AppLoading = ({ darkMode }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mb-4"></div>
+        <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          {t('common.loading')}
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Main Layout Component
 const MainLayout = ({ children, darkMode, toggleDarkMode }) => (
@@ -129,7 +133,7 @@ const MainLayout = ({ children, darkMode, toggleDarkMode }) => (
 );
 
 function App() {
-  const { i18n } = useTranslation();  
+  const { t, i18n } = useTranslation();  
   const [darkMode, setDarkMode] = useState(() => {
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme !== null) {
@@ -286,14 +290,14 @@ function App() {
                 <Route path="/login" element={
                   <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center max-w-md">
-                      <h2 className="text-2xl font-bold mb-4">No Login Required!</h2>
-                      <p className="mb-4">Our platform works without user accounts.</p>
-                      <p className="mb-6">Start building your CV immediately, then optionally connect cloud storage for sync across devices.</p>
+                      <h2 className="text-2xl font-bold mb-4">{t('cloud.no_login_required', 'No Login Required!')}</h2>
+                      <p className="mb-4">{t('cloud.platform_works_without_accounts', 'Our platform works without user accounts.')}</p>
+                      <p className="mb-6">{t('cloud.start_building_connect_optional', 'Start building your CV immediately, then optionally connect cloud storage for sync across devices.')}</p>
                       <button 
                         onClick={() => window.location.href = '/new-resume'}
                         className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                       >
-                        Start Building Your CV
+                        {t('cloud.start_building_cv', 'Start Building Your CV')}
                       </button>
                     </div>
                   </div>
@@ -302,14 +306,14 @@ function App() {
                 <Route path="/register" element={
                   <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center max-w-md">
-                      <h2 className="text-2xl font-bold mb-4">No Registration Needed!</h2>
-                      <p className="mb-4">Jump straight into building your CV.</p>
-                      <p className="mb-6">Your data stays in your own cloud storage when you choose to save.</p>
+                      <h2 className="text-2xl font-bold mb-4">{t('cloud.no_registration_needed', 'No Registration Needed!')}</h2>
+                      <p className="mb-4">{t('cloud.jump_straight_building', 'Jump straight into building your CV.')}</p>
+                      <p className="mb-6">{t('cloud.data_stays_cloud_storage', 'Your data stays in your own cloud storage when you choose to save.')}</p>
                       <button 
                         onClick={() => window.location.href = '/new-resume'}
                         className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                       >
-                        Start Building
+                        {t('cloud.start_building', 'Start Building')}
                       </button>
                     </div>
                   </div>
@@ -319,20 +323,20 @@ function App() {
                 <Route path="/settings" element={
                   <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center max-w-md">
-                      <h2 className="text-2xl font-bold mb-4">Storage Settings</h2>
-                      <p className="mb-6">Manage your local and cloud storage options</p>
+                      <h2 className="text-2xl font-bold mb-4">{t('settings.title')}</h2>
+                      <p className="mb-6">{t('cloud.manage_storage_options', 'Manage your local and cloud storage options')}</p>
                       <div className="space-y-3">
                         <button 
                           onClick={() => window.location.href = '/my-resumes'}
                           className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                         >
-                          View My CVs
+                          {t('navigation.myResumes')}
                         </button>
                         <button 
                           onClick={() => window.location.href = '/cloud-setup'}
                           className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                         >
-                          Manage Cloud Storage
+                          {t('cloud.manage_cloud_storage')}
                         </button>
                       </div>
                     </div>

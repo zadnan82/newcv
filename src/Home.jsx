@@ -1,4 +1,4 @@
-// src/Home.jsx - SIMPLIFIED VERSION - No complex store functions
+// src/Home.jsx - FIXED VERSION with proper translations
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next';
@@ -18,14 +18,12 @@ const Home = ({ darkMode }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   
-  // SIMPLIFIED - Just get what we actually need
   const { 
     connectedProviders,
     localCVs,
     canSaveToCloud
   } = useSessionStore();
 
-  // SIMPLIFIED handlers - no complex logic
   const handleCreateResumeClick = () => {
     navigate('/new-resume');
   };
@@ -42,11 +40,16 @@ const Home = ({ darkMode }) => {
     navigate('/my-resumes');
   };
 
-  // Template carousel (same as before)
+  // Template carousel
   const [currentIndex, setCurrentIndex] = useState(1);
   const templates = [temp1, temp2, temp3, temp4, temp5, temp6];
   const templateNames = [
-    "Minimalist", "Professional", "Creative", "Executive", "Modern", "Classic"
+    t('resume.templateSelector.categories.minimalist', 'Minimalist'), 
+    t('resume.templateSelector.categories.professional', 'Professional'), 
+    t('resume.templateSelector.categories.creative', 'Creative'), 
+    t('resume.templateSelector.categories.elegant', 'Elegant'), 
+    t('resume.templateSelector.categories.modern', 'Modern'), 
+    t('resume.templateSelector.categories.classic', 'Classic')
   ];
 
   const nextTemplate = () => {
@@ -68,84 +71,83 @@ const Home = ({ darkMode }) => {
     return index;
   };
 
-  // SIMPLIFIED status indicators
   const hasCloudStorage = connectedProviders && connectedProviders.length > 0;
   const hasLocalCVs = localCVs && localCVs.length > 0;
-  const totalCVs = (localCVs?.length || 0) + (hasCloudStorage ? 1 : 0); // Simplified count
+  const totalCVs = (localCVs?.length || 0) + (hasCloudStorage ? 1 : 0);
 
   // Updated testimonials focusing on flexibility
   const testimonials = [
     {
       name: "Alex Johnson",
       role: t('revamp.testimonials.role1', 'Software Engineer'),
-      content: "Love that I can start building immediately and choose where to save later. No signup hassle!",
+      content: t('revamp.testimonials.content1'),
       rating: 5
     },
     {
       name: "Sarah Williams", 
       role: t('revamp.testimonials.role2', 'Marketing Specialist'),
-      content: "Built my CV locally first, then connected Google Drive when I needed it on my phone. Perfect!",
+      content: t('revamp.testimonials.content2'),
       rating: 5
     },
     {
       name: "Michael Chen",
       role: t('revamp.testimonials.role3', 'Data Analyst'), 
-      content: "Finally, a CV platform that doesn't force me to create an account. Just works!",
+      content: t('revamp.testimonials.content3'),
       rating: 5
     }
   ];
   
-  // Updated stats
+  // Stats
   const stats = [
-    { label: "CVs Created", value: "15,000+" },
-    { label: "No Signups Required", value: "100%" },
-    { label: "Instant Access", value: "0 seconds" },
-    { label: "User Satisfaction", value: "98%" }
+    { label: t('prod1.stats.resumes_created', 'CVs Created'), value: "15,000+" },
+    { label: t('cloud.no_signups_required', 'No Signups Required'), value: "100%" },
+    { label: t('cloud.instant_access', 'Instant Access'), value: "0 seconds" },
+    { label: t('prod1.stats.interview_rate', 'User Satisfaction'), value: "98%" }
   ];
 
-  // Updated features - emphasizing local-first approach
+  // Main features
   const mainFeatures = [
     {
       icon: <Smartphone className="h-6 w-6" />,
-      title: "Instant Access",
-      description: "Start building immediately. No signup, no barriers, just create your CV right now.",
+      title: t('cloud.instant_access', 'Instant Access'),
+      description: t('cloud.instant_access_desc', 'Start building immediately. No signup, no barriers, just create your CV right now.'),
       color: "purple"
     },
     {
       icon: <HardDrive className="h-6 w-6" />,
-      title: "Local-First Design", 
-      description: "Work entirely on your device. Save locally or upgrade to cloud storage when you need it.",
+      title: t('cloud.local_first_design', 'Local-First Design'), 
+      description: t('cloud.local_first_desc', 'Work entirely on your device. Save locally or upgrade to cloud storage when you need it.'),
       color: "pink"
     },
     {
       icon: <Cloud className="h-6 w-6" />,
-      title: "Optional Cloud Upgrade",
-      description: "Connect your cloud storage when you want to access your CVs from multiple devices.",
+      title: t('cloud.optional_cloud_upgrade', 'Optional Cloud Upgrade'),
+      description: t('cloud.optional_cloud_desc', 'Connect your cloud storage when you want to access your CVs from multiple devices.'),
       color: "blue"
     }
   ];
 
-  // Updated secondary features
+  // Secondary features
   const secondaryFeatures = [
     {
       icon: <Target className="h-5 w-5" />,
-      title: "Your Choice",
-      description: "Save locally for privacy or to cloud for convenience. You decide."
+      title: t('cloud.your_choice', 'Your Choice'),
+      description: t('cloud.your_choice_desc', 'Save locally for privacy or to cloud for convenience. You decide.')
     },
     {
       icon: <Briefcase className="h-5 w-5" />,
-      title: "No Lock-in",
-      description: "Switch between local and cloud storage anytime. Your data, your choice."
+      title: t('cloud.no_lock_in', 'No Lock-in'),
+      description: t('cloud.no_lock_in_desc', 'Switch between local and cloud storage anytime. Your data, your choice.')
     },
     {
       icon: <BarChart className="h-5 w-5" />,
-      title: "Instant Preview",
-      description: "See your CV in different templates immediately, no waiting."
+      title: t('cloud.instant_preview', 'Instant Preview'),
+      description: t('cloud.instant_preview_desc', 'See your CV in different templates immediately, no waiting.')
     },
     {
       icon: <Users className="h-5 w-5" />,
-      title: "Privacy First",
-      description: "We never see your data unless you choose to use AI features."
+      title: t('cloud.privacy_first', 'Privacy First'),
+      description: t('cloud.privacy_first_desc', 'We never see your data unless you choose to use AI features.')
     }
   ];
   
@@ -177,17 +179,16 @@ const Home = ({ darkMode }) => {
           </div>
           
           <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 leading-relaxed`}>
-            Start Building. Choose Storage Later.
+            {t('cloud.start_building_choose_later', 'Start Building. Choose Storage Later.')}
           </h1>
           
           <p className={`text-base md:text-lg max-w-2xl mx-auto mb-8 ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
           } leading-relaxed`}>
-            No signups. No barriers. Just start creating your professional CV right now. 
-            Save locally or connect cloud storage when you need it.
+            {t('cloud.no_signups_desc', 'No signups. No barriers. Just start creating your professional CV right now. Save locally or connect cloud storage when you need it.')}
           </p>
 
-          {/* SIMPLIFIED Current Capabilities Badge */}
+          {/* Current Capabilities Badge */}
           <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 ${
             hasCloudStorage 
               ? darkMode ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-green-100 text-green-700 border border-green-200'
@@ -195,8 +196,8 @@ const Home = ({ darkMode }) => {
           }`}>
             <CheckCircle className="w-4 h-4 mr-2" />
             {hasCloudStorage 
-              ? `Ready: Local + Cloud Storage (Connected)` 
-              : 'Ready: Local Storage • Cloud Available'
+              ? t('cloud.ready_local_cloud_connected', 'Ready: Local + Cloud Storage (Connected)') 
+              : t('cloud.ready_local_cloud_available', 'Ready: Local Storage • Cloud Available')
             }
           </div>
 
@@ -220,7 +221,7 @@ const Home = ({ darkMode }) => {
                     >
                       <img 
                         src={templates[getTemplateIndex(-1)]} 
-                        alt={`Resume Template ${getTemplateIndex(-1) + 1}`}
+                        alt={t('cloud.resume_template', `Resume Template ${getTemplateIndex(-1) + 1}`)}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -240,7 +241,7 @@ const Home = ({ darkMode }) => {
                     >
                       <img 
                         src={templates[currentIndex]} 
-                        alt={`Featured Resume Template ${currentIndex + 1}`}
+                        alt={t('cloud.resume_template', `Featured Resume Template ${currentIndex + 1}`)}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -256,7 +257,7 @@ const Home = ({ darkMode }) => {
                     >
                       <img 
                         src={templates[getTemplateIndex(1)]} 
-                        alt={`Resume Template ${getTemplateIndex(1) + 1}`}
+                        alt={t('cloud.resume_template', `Resume Template ${getTemplateIndex(1) + 1}`)}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -272,7 +273,7 @@ const Home = ({ darkMode }) => {
                     {/* Navigation Arrows */}
                     <button 
                       className="absolute left-2 top-1/2 -translate-y-1/2 z-20 size-8 rounded-full bg-white/80 shadow-md flex items-center justify-center hover:bg-white transition-all duration-200"
-                      aria-label="Previous template"
+                      aria-label={t('prod1.sections.previous', 'Previous template')}
                       onClick={(e) => {
                         e.stopPropagation();
                         prevTemplate();
@@ -282,7 +283,7 @@ const Home = ({ darkMode }) => {
                     </button>
                     <button 
                       className="absolute right-2 top-1/2 -translate-y-1/2 z-20 size-8 rounded-full bg-white/80 shadow-md flex items-center justify-center hover:bg-white transition-all duration-200"
-                      aria-label="Next template"
+                      aria-label={t('prod1.sections.next', 'Next template')}
                       onClick={(e) => {
                         e.stopPropagation();
                         nextTemplate();
@@ -303,26 +304,25 @@ const Home = ({ darkMode }) => {
                   </div>
                   
                   <h2 className={`text-2xl md:text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                    {templateNames[currentIndex]} Template
+                    {templateNames[currentIndex]} {t('resume.customizer.templates.title', 'Template')}
                   </h2>
                   
                   <p className={`text-sm md:text-base mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Professional templates that work everywhere. Start building immediately with any design, 
-                    then save to your device or cloud storage.
+                    {t('cloud.professional_templates_desc', 'Professional templates that work everywhere. Start building immediately with any design, then save to your device or cloud storage.')}
                   </p>
                   
                   <ul className={`mb-6 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     <li className="flex items-center gap-2 mb-2">
                       <CheckCircle className="size-4 text-green-500" />
-                      No signup required - start immediately
+                      {t('cloud.no_signup_required', 'No signup required - start immediately')}
                     </li>
                     <li className="flex items-center gap-2 mb-2">
                       <CheckCircle className="size-4 text-green-500" />
-                      Save locally or upgrade to cloud later
+                      {t('cloud.save_local_upgrade_cloud', 'Save locally or upgrade to cloud later')}
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="size-4 text-green-500" />
-                      ATS-friendly and beautifully designed
+                      {t('home.features.ats', 'ATS-friendly')} {t('cloud.beautifully_designed', 'and beautifully designed')}
                     </li>
                   </ul>
                   
@@ -337,7 +337,7 @@ const Home = ({ darkMode }) => {
                             'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white hover:shadow-purple-400/20'
                         }`}
                       >
-                        <span className="text-base mr-2">Browse All Templates</span>
+                        <span className="text-base mr-2">{t('revamp.exploreTemplatesButton', 'Browse All Templates')}</span>
                         <ArrowRight size={16} />
                       </button>
                       
@@ -345,7 +345,7 @@ const Home = ({ darkMode }) => {
                         onClick={handleCreateResumeClick}
                         className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 flex items-center justify-center"
                       >
-                        <span className="text-base mr-2">Start Building Now</span>
+                        <span className="text-base mr-2">{t('cloud.start_building_now', 'Start Building Now')}</span>
                         <ArrowRight size={16} />
                       </button>
                     </div>
@@ -362,12 +362,12 @@ const Home = ({ darkMode }) => {
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              Local-First. Cloud When You Need It.
+              {t('cloud.local_first_cloud_when_needed', 'Local-First. Cloud When You Need It.')}
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              Start building immediately on your device, then choose your storage option.
+              {t('cloud.start_immediately_choose_storage', 'Start building immediately on your device, then choose your storage option.')}
             </p>
           </div>
           
@@ -416,12 +416,12 @@ const Home = ({ darkMode }) => {
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              Create Professional Documents
+              {t('prod1.sections.job_winning_documents', 'Create Professional Documents')}
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              Start immediately. No signup required. Choose your storage option when you save.
+              {t('cloud.start_immediately_no_signup', 'Start immediately. No signup required. Choose your storage option when you save.')}
             </p>
           </div>
           
@@ -437,12 +437,12 @@ const Home = ({ darkMode }) => {
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              Your Data, Your Choice
+              {t('cloud.your_data_your_choice', 'Your Data, Your Choice')}
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              Work the way you want. Local privacy or cloud convenience - you decide.
+              {t('cloud.work_way_you_want', 'Work the way you want. Local privacy or cloud convenience - you decide.')}
             </p>
           </div>
           
@@ -488,12 +488,12 @@ const Home = ({ darkMode }) => {
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              How It Works
+              {t('prod1.sections.how_it_works', 'How It Works')}
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              Simple, flexible, and puts you in control of your data.
+              {t('cloud.simple_flexible_control', 'Simple, flexible, and puts you in control of your data.')}
             </p>
           </div>
           
@@ -508,9 +508,9 @@ const Home = ({ darkMode }) => {
                   1
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Start Building</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('prod1.steps.enter_details.title', 'Start Building')}</h3>
               <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Choose a template and start creating your CV immediately. No signup, no barriers.
+                {t('cloud.choose_template_start_creating', 'Choose a template and start creating your CV immediately. No signup, no barriers.')}
               </p>
             </div>
             
@@ -524,9 +524,9 @@ const Home = ({ darkMode }) => {
                   2
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Choose Storage</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('cloud.choose_storage', 'Choose Storage')}</h3>
               <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                When ready to save, choose local storage or connect your cloud for device sync.
+                {t('cloud.when_ready_save_choose', 'When ready to save, choose local storage or connect your cloud for device sync.')}
               </p>
             </div>
             
@@ -540,9 +540,9 @@ const Home = ({ darkMode }) => {
                   3
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Access Anywhere</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('cloud.access_anywhere', 'Access Anywhere')}</h3>
               <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Local files stay on your device. Cloud files sync across all your devices automatically.
+                {t('cloud.local_files_device_cloud_sync', 'Local files stay on your device. Cloud files sync across all your devices automatically.')}
               </p>
             </div>
           </div>
@@ -554,12 +554,12 @@ const Home = ({ darkMode }) => {
             <h2 className={`text-2xl md:text-3xl font-bold mb-3 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              What Our Users Say
+              {t('prod1.sections.what_users_say', 'What Our Users Say')}
             </h2>
             <p className={`max-w-2xl mx-auto text-sm md:text-base ${
               darkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
-              People love the flexibility and instant access.
+              {t('cloud.people_love_flexibility', 'People love the flexibility and instant access.')}
             </p>
           </div>
           
@@ -598,7 +598,7 @@ const Home = ({ darkMode }) => {
           </div>
         </section>
 
-        {/* Final CTA - SIMPLIFIED */}
+        {/* Final CTA */}
         <section className="text-center">
           <div className={`max-w-3xl mx-auto p-8 rounded-2xl ${
             darkMode 
@@ -615,16 +615,16 @@ const Home = ({ darkMode }) => {
               <h2 className={`text-2xl md:text-3xl font-bold mb-4 ${
                 darkMode ? 'text-white' : 'text-gray-800'
               }`}>
-                Ready to Build Your Professional CV?
+                {t('home.cta.title', 'Ready to Build Your Professional CV?')}
               </h2>
               
               <p className={`text-sm md:text-base max-w-xl mx-auto mb-6 ${
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>
-                Start immediately - no signup required. Save locally for privacy or connect cloud storage for convenience.
+                {t('cloud.start_immediately_no_signup_connect', 'Start immediately - no signup required. Save locally for privacy or connect cloud storage for convenience.')}
               </p>
               
-              {/* SIMPLIFIED status indicator */}
+              {/* Status indicator */}
               <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-6 ${
                 hasCloudStorage 
                   ? darkMode ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-green-100 text-green-700 border border-green-200'
@@ -632,8 +632,8 @@ const Home = ({ darkMode }) => {
               }`}>
                 <CheckCircle className="w-4 h-4 mr-2" />
                 {hasCloudStorage 
-                  ? `Ready: Local + Cloud Storage Available`
-                  : 'Ready: Local Storage • Cloud Optional'
+                  ? t('cloud.ready_local_cloud_storage_available', 'Ready: Local + Cloud Storage Available')
+                  : t('cloud.ready_local_storage_cloud_optional', 'Ready: Local Storage • Cloud Optional')
                 }
               </div>
               
@@ -642,7 +642,7 @@ const Home = ({ darkMode }) => {
                   onClick={handleCreateResumeClick}
                   className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-medium shadow-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 flex items-center justify-center"
                 >
-                  <span className="text-base mr-2">Start Building Now</span>
+                  <span className="text-base mr-2">{t('cloud.start_building_now', 'Start Building Now')}</span>
                   <ArrowRight size={16} />
                 </button>
                 
@@ -656,19 +656,19 @@ const Home = ({ darkMode }) => {
                 >
                   <span className="text-base mr-2">
                     {hasLocalCVs || hasCloudStorage 
-                      ? `View My CVs ${totalCVs > 0 ? `(${totalCVs})` : ''}` 
-                      : 'Browse Templates'
+                      ? `${t('navigation.myResumes', 'View My CVs')} ${totalCVs > 0 ? `(${totalCVs})` : ''}` 
+                      : t('revamp.browse', 'Browse Templates')
                     }
                   </span>
                   <ArrowRight size={16} />
                 </button>
               </div>
               
-              {/* SIMPLIFIED suggestions */}
+              {/* Tip */}
               {!hasCloudStorage && (
                 <div className="mt-6">
                   <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-3`}>
-                    💡 Tip: Connect cloud storage to access your CVs from any device
+                    {t('cloud.tip_connect_cloud_storage', '💡 Tip: Connect cloud storage to access your CVs from any device')}
                   </p>
                 </div>
               )}

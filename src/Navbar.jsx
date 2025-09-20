@@ -1,4 +1,4 @@
-// src/Navbar.jsx - FIXED VERSION
+// src/Navbar.jsx - FIXED VERSION with proper translations
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom'; 
 import { Menu, X, Moon, Sun, User, FileText, Settings, LogOut, FileSignature, ChevronDown, Shield, MessageSquare, LogIn, Cloud, CloudOff } from 'lucide-react';
@@ -175,9 +175,9 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     };
 
     const getStatusText = () => {
-      if (googleDriveConnected) return 'Google Drive';
-      if (hasProviders) return `${cloudCount} Connected`;
-      return 'No Cloud';
+      if (googleDriveConnected) return t('cloud.google_drive');
+      if (hasProviders) return t('cloud.connected_count', { count: cloudCount });
+      return t('cloud.no_cloud');
     };
 
     const getStatusColor = () => {
@@ -191,7 +191,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         <button 
           onClick={() => setShowCloudStatus(!showCloudStatus)}
           className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${getStatusColor()}`}
-          title={hasProviders ? `Cloud storage connected` : 'No cloud storage connected'}
+          title={hasProviders ? t('cloud.cloud_storage_connected') : t('cloud.no_cloud_storage_connected')}
         >
           {getProviderIcon()}
           <span className="hidden sm:inline">
@@ -207,7 +207,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
           }`}>
             <div className="px-3 py-1 border-b border-gray-200 dark:border-gray-700">
               <p className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Cloud Storage Status
+                {t('cloud.cloud_storage_status')}
               </p>
             </div>
             
@@ -219,14 +219,14 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
                     </svg>
                     <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
-                      Google Drive Connected
+                      {t('cloud.google_drive_connected')}
                     </span>
                   </div>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
-                    ✓ Your CVs sync across all devices
+                    {t('cloud.cvs_sync_devices')}
                   </p>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    ✓ Automatic backup enabled
+                    {t('cloud.automatic_backup_enabled')}
                   </p>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
@@ -236,7 +236,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
                     }`}
                   >
-                    Manage Cloud Storage
+                    {t('cloud.manage_cloud_storage')}
                   </button>
                 </div>
               </>
@@ -246,14 +246,14 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                   <div className="flex items-center mb-2">
                     <CloudOff className={`w-4 h-4 mr-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                     <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      No Cloud Storage
+                      {t('cloud.no_cloud_storage')}
                     </span>
                   </div>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
-                    Your CVs are saved locally only
+                    {t('cloud.cvs_saved_locally_only')}
                   </p>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Connect cloud storage for device sync
+                    {t('cloud.connect_cloud_device_sync')}
                   </p>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
@@ -263,7 +263,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
                     }`}
                   >
-                    Connect Cloud Storage
+                    {t('cloud.connect_cloud_storage')}
                   </button>
                 </div>
               </>
@@ -311,7 +311,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
                 }`}
               >
-                <FileText className="w-3 h-3" /> {t('revamp.browse')}
+                <FileText className="w-3 h-3" /> {t('revamp.browse', 'Browse')}
               </Link>
 
               <Link 
@@ -324,7 +324,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
                 }`}
               >
-                <FileSignature className="w-3 h-3" /> {t('resumeDashboard.buttons.createNew')}
+                <FileSignature className="w-3 h-3" /> {t('resumeDashboard.buttons.createNew', 'Create Resume')}
               </Link>
 
               <Link 
@@ -337,7 +337,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
                 }`}
               >
-                <FileText className="w-3 h-3" /> {t('navigation.coverLetter')}
+                <FileText className="w-3 h-3" /> {t('navigation.coverLetter', 'Cover Letter')}
               </Link>
 
               {/* Show these when backend is available */}
@@ -353,7 +353,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                           : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
                     }`}
                   >
-                    <FileText className="w-3 h-3" /> {t('navigation.myResumes')}
+                    <FileText className="w-3 h-3" /> {t('navigation.myResumes', 'My Resumes')}
                   </button>
                   
                   <button
@@ -425,7 +425,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             {/* Dark Mode Toggle Button */}
             <button 
               onClick={toggleDarkMode}
-              aria-label={darkMode ? t('app.theme.light') : t('app.theme.dark')}
+              aria-label={darkMode ? t('app.theme.light', 'Light Mode') : t('app.theme.dark', 'Dark Mode')}
               className={`p-1.5 rounded-full transition-colors focus:outline-none ${
                 darkMode 
                   ? 'text-yellow-300 hover:bg-gray-800' 
@@ -444,9 +444,9 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                     ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
                     : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
                 }`}
-                title="Clear current session and cloud connections"
+                title={t('cloud.clear_session_cloud_connections')}
               >
-                <LogOut className="w-3 h-3" /> Clear Session
+                <LogOut className="w-3 h-3" /> {t('cloud.clear_session')}
               </button>
             )}
             
@@ -454,7 +454,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-1.5 rounded-full focus:outline-none transition-colors"
-              aria-label={t('navigation.toggleMenu')}
+              aria-label={t('navigation.toggleMenu', 'Toggle Menu')}
               ref={menuRef}
             >
               {mobileMenuOpen ? 
@@ -486,7 +486,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                   : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
             }`}
           >
-            <FileText className="w-4 h-4" /> {t('revamp.browse')}
+            <FileText className="w-4 h-4" /> {t('revamp.browse', 'Browse')}
           </Link>
 
           <Link 
@@ -500,7 +500,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                   : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
             }`}
           >
-            <FileSignature className="w-4 h-4" /> {t('resumeDashboard.buttons.createNew')}
+            <FileSignature className="w-4 h-4" /> {t('resumeDashboard.buttons.createNew', 'Create Resume')}
           </Link>
 
           <Link 
@@ -514,7 +514,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                   : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
             }`}
           >
-            <FileText className="w-4 h-4" /> {t('navigation.coverLetter')}
+            <FileText className="w-4 h-4" /> {t('navigation.coverLetter', 'Cover Letter')}
           </Link>
 
           {/* Show session-dependent links when backend available */}
@@ -530,7 +530,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
                 }`}
               >
-                <FileText className="w-4 h-4" /> {t('navigation.myResumes')}
+                <FileText className="w-4 h-4" /> {t('navigation.myResumes', 'My Resumes')}
               </button>
               
               <button
@@ -557,7 +557,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
                 }`}
               >
-                <Cloud className="w-4 h-4" /> Cloud Storage
+                <Cloud className="w-4 h-4" /> {t('cloud.cloud_storage', 'Cloud Storage')}
               </button>
               
               {isSessionActive && (
@@ -569,7 +569,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
                   }`}
                 >
-                  <LogOut className="w-4 h-4" /> Clear Session
+                  <LogOut className="w-4 h-4" /> {t('cloud.clear_session')}
                 </button>
               )}
             </>

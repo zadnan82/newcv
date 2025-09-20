@@ -18,6 +18,7 @@ import SaveConfirmationModal from './SaveConfirmationModal';
 import API_BASE_URL from '../../../config';
 import PublicCVManager from './PublicCVManager';
 import CustomizationManager from './CustomizationManager';
+import useAuthStore from '../../../stores/authStore';
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
@@ -110,11 +111,11 @@ const CVSelectionModal = ({
 
   const getSourceLabel = (source) => {
     switch (source) {
-      case 'draft': return 'Current Work Session';
-      case 'local': return 'Saved Locally';
-      case 'cloud': return 'Google Drive';
-      case 'api': return 'My Saved CVs';
-      default: return 'Unknown Source';
+      case 'draft': return t('cloud.current_work_session');
+      case 'local': return t('cloud.saved_locally');
+      case 'cloud': return t('cloud.google_drive');
+      case 'api': return t('cloud.my_saved_cvs');
+      default: return t('cloud.unknown_source');
     }
   };
 
@@ -138,7 +139,7 @@ const CVSelectionModal = ({
   };
 
   const getCVPreview = (cv) => {
-    const name = cv.personal_info?.full_name || cv.content?.personal_info?.full_name || 'No name';
+    const name = cv.personal_info?.full_name || cv.content?.personal_info?.full_name || t('cloud.no_name');
     const title = cv.personal_info?.title || cv.content?.personal_info?.title || '';
     const email = cv.personal_info?.email || cv.content?.personal_info?.email || '';
     
@@ -160,7 +161,7 @@ const CVSelectionModal = ({
               {title}
             </h2>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              {subtitle}. Found {availableCVs.length} CV{availableCVs.length !== 1 ? 's' : ''}.
+              {subtitle}. {t('cloud.found_cvs', { count: availableCVs.length })}.
             </p>
           </div>
           
@@ -173,7 +174,7 @@ const CVSelectionModal = ({
                   ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
               }`}
-              title="Refresh CV list"
+              title={t('common.refresh')}
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
@@ -200,7 +201,7 @@ const CVSelectionModal = ({
               }`} />
               <input
                 type="text"
-                placeholder="Search by CV title or name..."
+                placeholder={t('cloud.search_cv_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
@@ -240,17 +241,17 @@ const CVSelectionModal = ({
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-500 border-t-transparent mx-auto mb-4"></div>
-                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Loading CVs...</p>
+                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>{t('common.loading')}...</p>
               </div>
             </div>
           ) : Object.keys(filteredGroupedCVs).length === 0 ? (
             <div className="text-center py-12">
               <FileText className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
               <p className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {searchTerm ? 'No CVs match your search' : 'No CVs found'}
+                {searchTerm ? t('cloud.no_cvs_match_search') : t('cloud.no_cvs_found')}
               </p>
               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                {searchTerm ? 'Try a different search term' : 'Create a CV first to work with it'}
+                {searchTerm ? t('cloud.try_different_search') : t('cloud.create_cv_first')}
               </p>
             </div>
           ) : (
@@ -265,7 +266,7 @@ const CVSelectionModal = ({
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {cvs.length} CV{cvs.length !== 1 ? 's' : ''}
+                      {cvs.length} {t('cloud.cvs_count', { count: cvs.length })}
                     </span>
                   </div>
 
@@ -294,7 +295,7 @@ const CVSelectionModal = ({
                               <h4 className={`font-medium truncate ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                               }`}>
-                                {cv.title || cv.name || `CV ${index + 1}`}
+                                {cv.title || cv.name || t('cloud.cv_number', { number: index + 1 })}
                               </h4>
                               {preview.name && (
                                 <p className={`text-sm truncate ${
@@ -330,8 +331,8 @@ const CVSelectionModal = ({
                                     {formatDate(cv.modifiedTime)}
                                   </div>
                                 )}
-                                {source === 'draft' && 'Current editing session'}
-                                {source === 'local' && 'Saved on this device'}
+                                {source === 'draft' && t('cloud.current_editing_session')}
+                                {source === 'local' && t('cloud.saved_on_device')}
                                 {source === 'api' && `ID: ${cv.id}`}
                               </span>
                               
@@ -343,9 +344,10 @@ const CVSelectionModal = ({
                               }`}>
                                 {getSourceIcon(source)}
                                 <span className="ml-1">
-                                  {source === 'cloud' ? 'Drive' : 
-                                   source === 'draft' ? 'Draft' : 
-                                   source === 'local' ? 'Local' : 'Saved'}
+                                  {source === 'cloud' ? t('cloud.drive') : 
+                                   source === 'draft' ? t('cloud.draft') : 
+                                   source === 'local' ? t('cloud.local') : 
+                                   t('cloud.saved')}
                                 </span>
                               </div>
                             </div>
@@ -366,12 +368,12 @@ const CVSelectionModal = ({
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {selectedCV ? (
                 <>
-                  Selected: <strong>{selectedCV.title || selectedCV.name || 'Untitled CV'}</strong>
-                  {' from '}
+                  {t('cloud.selected')}: <strong>{selectedCV.title || selectedCV.name || t('common.untitled')}</strong>
+                  {' '}{t('cloud.from')}{' '}
                   <strong>{getSourceLabel(selectedCV.source)}</strong>
                 </>
               ) : (
-                'No CV selected'
+                t('cloud.no_cv_selected')
               )}
             </p>
             
@@ -384,7 +386,7 @@ const CVSelectionModal = ({
                     : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
                 }`}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onClose}
@@ -395,7 +397,7 @@ const CVSelectionModal = ({
                     : 'bg-gray-400 text-gray-600 cursor-not-allowed'
                 }`}
               >
-                Select This CV
+                {t('cloud.select_this_cv')}
               </button>
             </div>
           </div>
@@ -412,6 +414,8 @@ const CompactCVSelector = ({
   onOpenModal, 
   isDarkMode 
 }) => {
+  const { t } = useTranslation();
+
   const getSourceIcon = (source) => {
     switch (source) {
       case 'draft': return <FileText className="w-4 h-4 text-purple-500" />;
@@ -424,11 +428,11 @@ const CompactCVSelector = ({
 
   const getSourceLabel = (source) => {
     switch (source) {
-      case 'draft': return 'Draft';
-      case 'local': return 'Local';
-      case 'cloud': return 'Drive';
-      case 'api': return 'Saved';
-      default: return 'Unknown';
+      case 'draft': return t('cloud.draft');
+      case 'local': return t('cloud.local');
+      case 'cloud': return t('cloud.drive');
+      case 'api': return t('cloud.saved');
+      default: return t('cloud.unknown_source');
     }
   };
 
@@ -443,7 +447,7 @@ const CompactCVSelector = ({
         }`}
       >
         <FileText className="w-4 h-4 mr-2" />
-        <span className="text-sm">Select CV ({availableCVs.length} available)</span>
+        <span className="text-sm">{t('cloud.select_cv')} ({availableCVs.length} {t('cloud.available')})</span>
       </button>
     );
   }
@@ -461,11 +465,9 @@ const CompactCVSelector = ({
         {getSourceIcon(selectedCV.source)}
         <div className="ml-2 min-w-0">
           <div className="text-sm font-medium truncate">
-            {selectedCV.title || selectedCV.name || 'Untitled CV'}
+            {selectedCV.title || selectedCV.name || t('common.untitled')}
           </div>
-          <div className={`text-xs truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            {getSourceLabel(selectedCV.source)} • {selectedCV.personal_info?.full_name || 'No name'}
-          </div>
+          
         </div>
       </div>
       <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />
@@ -546,8 +548,8 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
           cvs.push({
             id: 'draft-customization',
             source: 'draft',
-            title: parsed.title || 'Draft from CV Builder',
-            name: 'Current editing session',
+            title: parsed.title || t('cloud.draft_from_builder'),
+            name: t('cloud.current_editing_session'),
             content: parsed,
             personal_info: parsed.personal_info,
             priority: 1
@@ -566,8 +568,8 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
           cvs.push({
             id: 'local-draft-' + Date.now(),
             source: 'local',
-            title: parsed.title || 'Local Draft',
-            name: 'Saved on this device',
+            title: parsed.title || t('cloud.local_draft'),
+            name: t('cloud.saved_on_device'),
             content: parsed,
             personal_info: parsed.personal_info,
             priority: 3
@@ -631,8 +633,8 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                   return {
                     id: file.file_id,
                     source: 'cloud',
-                    title: file.name?.replace('.json', '') || `Google Drive CV`,
-                    name: file.name || 'Untitled',
+                    title: file.name?.replace('.json', '') || t('cloud.google_drive_cv'),
+                    name: file.name || t('common.untitled'),
                     content: actualContent,
                     modifiedTime: file.last_modified,
                     personal_info: actualContent.personal_info,
@@ -686,8 +688,8 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
         cvs.push({
           id: currentResume.id,
           source: 'api',
-          title: currentResume.title || `Resume ${currentResume.id}`,
-          name: 'From database',
+          title: currentResume.title || t('cloud.resume_id', { id: currentResume.id }),
+          name: t('cloud.from_database'),
           content: currentResume,
           personal_info: currentResume.personal_info,
           priority: 2
@@ -725,7 +727,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
 
     } catch (error) {
       console.error('❌ Error loading available CVs:', error);
-      setLocalError('Failed to load available CVs');
+      setLocalError(t('cloud.failed_load_cvs'));
     } finally {
       setIsLoadingCVs(false);
     }
@@ -769,14 +771,14 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
       const apiCV = {
         id: currentResume.id,
         source: 'api',
-        title: currentResume.title || `Resume ${currentResume.id}`,
-        name: 'From database',
+        title: currentResume.title || t('cloud.resume_id', { id: currentResume.id }),
+        name: t('cloud.from_database'),
         content: currentResume,
         personal_info: currentResume.personal_info
       };
       handleSelectCV(apiCV);
     }
-  }, [currentResume, resumeData]);
+  }, [currentResume, resumeData, t]);
   
   useEffect(() => {
     setSidebarVisible(!isMobile);
@@ -845,10 +847,10 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
         console.log('💾 Saving locally...');
         localStorage.setItem('cv_draft', JSON.stringify(updatedData));
         saveSuccess = true;
-        saveMessage = 'Customizations saved locally!';
+        saveMessage = t('cloud.customizations_saved_locally');
       } catch (localError) {
         console.error('❌ Local save failed:', localError);
-        throw new Error('Failed to save customizations');
+        throw new Error(t('cloud.failed_save_customizations'));
       }
 
       // If we have a resumeId, also try to save via API
@@ -899,7 +901,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
       continueWithAction();
     } catch (error) {
       console.error('❌ Error saving customizations:', error);
-      alert(t('resume.customizer.saveConfirmation.error'));
+      alert(t('resume.customizer.saveCustomizations.error'));
     } finally {
       setIsExporting(false);
     }
@@ -948,7 +950,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-3 border-t-purple-500 border-r-transparent border-b-pink-500 border-l-transparent mb-3"></div>
           <p className="text-sm">
-            {isLoadingCVs ? 'Searching for your CVs...' : t('resume.customizer.loading')}
+            {isLoadingCVs ? t('cloud.searching_cvs') : t('resume.customizer.loading')}
           </p>
         </div>
       </div>
@@ -971,7 +973,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
               onClick={handleBackToNewResumeBuilder}
               className="px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-md hover:shadow-lg transition-shadow duration-300"
             >
-              Back to CV Builder
+              {t('cloud.back_to_cv_builder')}
             </button>
             <button 
               onClick={() => navigate('/my-resumes')}
@@ -999,13 +1001,13 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h2 className="text-lg font-bold mb-2">No CVs Found</h2>
-          <p className="mb-4 text-sm">We couldn't find any CVs to customize. Create one first!</p>
+          <h2 className="text-lg font-bold mb-2">{t('cloud.no_cvs_found')}</h2>
+          <p className="mb-4 text-sm">{t('cloud.create_cv_to_customize')}</p>
           <button 
             onClick={() => navigate('/new-resume')}
             className="px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-md hover:shadow-lg transition-shadow duration-300"
           >
-            Create New CV
+            {t('cloud.create_new_cv')}
           </button>
         </div>
       </div>
@@ -1028,25 +1030,27 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
           </div>
         )}
         
-        {/* Enhanced Header with Clear CV Selection */}
-        <header className={`relative z-10 px-3 py-2 shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'}`}>
-          {/* Top Row - Actions */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center">
-              <button 
-                onClick={toggleSidebar}
-                className={`md:hidden p-1.5 rounded-md ${isRTL ? 'ml-2' : 'mr-2'} ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-              >
-                {sidebarVisible ? 
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg> :
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                  </svg>
-                }
-              </button>
-              
+       {/* Modern Header Design */}
+<header className={`relative z-10 px-4 py-3 ${isDarkMode ? 'bg-gray-900' : 'bg-white'} border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    {/* Left Section - Menu & Export Controls */}
+    <div className="flex items-center gap-3">
+      {/* Mobile menu button */}
+      <button 
+        onClick={toggleSidebar}
+        className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
+        aria-label="Toggle sidebar"
+      >
+        {sidebarVisible ? (
+          <i className="fas fa-times text-lg"></i>
+        ) : (
+          <i className="fas fa-bars text-lg"></i>
+        )}
+      </button>
+      
+      {/* Export buttons */}
+      <div className="flex items-center gap-2">
+                     
               <button
                 className={`py-1.5 px-3 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-xs font-medium shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center ${isRTL ? 'ml-2' : 'mr-2'}`}
                 onClick={() => handleExport('DOCX')}
@@ -1068,72 +1072,80 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                 </svg>
                PDF
               </button>
-            </div>
-            
-            <div className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-2`}> 
-              {/* Preview controls */}
-              <div className="flex items-center rounded-md">
-                <button 
-                  onClick={zoomOut}
-                  className={`p-1 ${isRTL ? 'rounded-r-md' : 'rounded-l-md'} ${isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                  disabled={previewScale <= 0.5}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                <span className={`px-2 text-xs flex items-center justify-center ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
-                  {Math.round(previewScale * 100)}%
-                </span>
-                <button 
-                  onClick={zoomIn}
-                  className={`p-1 ${isRTL ? 'rounded-l-md' : 'rounded-r-md'} ${isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                  disabled={previewScale >= 1.5}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
+           
 
-          {/* Bottom Row - CV Selector */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Customizing:
-              </span>
-              <CompactCVSelector
-                selectedCV={selectedCV}
-                availableCVs={availableCVs}
-                onOpenModal={() => setShowCVModal(true)}
-                isDarkMode={isDarkMode}
-              />
-            </div>
-            
-            {/* Additional info and refresh */}
-            <div className="flex items-center gap-2">
-              {availableCVs.length > 1 && (
-                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {availableCVs.length} CVs available
-                </span>
-              )}
-              <button
-                onClick={loadAvailableCVs}
-                disabled={isLoadingCVs}
-                className={`p-1.5 rounded-md text-xs transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title="Refresh CV list"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCVs ? 'animate-spin' : ''}`} />
-              </button>
-            </div>
+      </div>
+    </div>
+
+    {/* Center Section - CV Selector (Main Focus) */}
+    <div className="flex-1 max-w-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg bg-opacity-50 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+         
+          <div className={`px-3 py-1.5 rounded-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+            <CompactCVSelector
+              selectedCV={selectedCV}
+              availableCVs={availableCVs}
+              onOpenModal={() => setShowCVModal(true)}
+              isDarkMode={isDarkMode}
+            />
           </div>
-        </header>
+        </div>
+        
+        {/* CV counter and refresh */}
+        <div className="flex items-center gap-2">
+          {availableCVs.length > 1 && (
+            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+              <i className="fas fa-database mr-1"></i>
+              {availableCVs.length} {t('cloud.cvs_available')}
+            </span>
+          )}
+          <button
+            onClick={loadAvailableCVs}
+            disabled={isLoadingCVs}
+            className={`p-2 rounded-lg transition-colors ${
+              isDarkMode 
+                ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' 
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+            title={t('cloud.refresh_cv_list')}
+          >
+            <i className={`fas fa-sync-alt ${isLoadingCVs ? 'animate-spin' : ''}`}></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* Right Section - Preview Controls */}
+    <div className="flex items-center justify-end">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          <i className="fas fa-search mr-1"></i>
+          Preview:
+        </span>
+        <div className="flex items-center rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+          <button 
+            onClick={zoomOut}
+            className={`p-2 px-3 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'} transition-colors`}
+            disabled={previewScale <= 0.5}
+          >
+            <i className="fas fa-minus"></i>
+          </button>
+          <span className={`px-3 py-1.5 text-sm flex items-center justify-center min-w-[70px] ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'}`}>
+            {Math.round(previewScale * 100)}%
+          </span>
+          <button 
+            onClick={zoomIn}
+            className={`p-2 px-3 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'} transition-colors`}
+            disabled={previewScale >= 1.5}
+          >
+            <i className="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
         
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden">
@@ -1166,7 +1178,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                 `}
                 onClick={() => setActiveTab('templates')}
               >
-                {t('resume.customizer.templates.templates') || 'Templates'}
+                {t('resume.customizer.templates.templates')}
               </button>
               <button 
                 className={`flex-1 py-2 text-xs font-medium transition-colors 
@@ -1176,7 +1188,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                 `}
                 onClick={() => setActiveTab('styling')}
               >
-                {t('resume.customizer.templates.styling') || 'Styling'}
+                {t('resume.customizer.templates.styling')}
               </button>
               <button 
                 className={`flex-1 py-2 text-xs font-medium transition-colors 
@@ -1186,7 +1198,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                 `}
                 onClick={() => setActiveTab('sharing')}
               >
-                {t('resume.customizer.templates.sharing') || 'Sharing'}
+                {t('resume.customizer.templates.sharing')}
               </button>
             </div>
             
@@ -1203,7 +1215,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
                 </div>
               )}
               
-              {/* Styling Tab */}
+               {/* Styling Tab */}
               {activeTab === 'styling' && (
                 <div>
                   <h3 className={`text-sm font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>

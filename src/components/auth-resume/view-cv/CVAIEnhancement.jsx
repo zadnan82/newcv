@@ -13,7 +13,8 @@ import {
   Zap, 
   BarChart2,
   Save,
-  HardDrive
+  HardDrive,
+  AlertCircle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useSessionStore from '../../../stores/sessionStore';
@@ -24,7 +25,6 @@ const CVAIEnhancement = ({ darkMode }) => {
   const { t } = useTranslation();
   const { sessionToken, canSaveToCloud, saveLocally, saveToConnectedCloud } = useSessionStore();
   
-  // Local CV data state
   const [formData, setFormData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingSections, setLoadingSections] = useState({});
@@ -35,9 +35,9 @@ const CVAIEnhancement = ({ darkMode }) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const sections = [
-    { id: 'summary', name: t('resume.personal_info.summary', 'Professional Summary'), key: 'personal_info.summary' },
-    { id: 'experiences', name: t('resume.experience.title', 'Work Experience'), key: 'experiences', items: true },
-    { id: 'skills', name: t('resume.skills.title', 'Skills'), key: 'skills', items: true },
+    { id: 'summary', name: t('resume.personal_info.summary'), key: 'personal_info.summary' },
+    { id: 'experiences', name: t('resume.experience.title'), key: 'experiences', items: true },
+    { id: 'skills', name: t('resume.skills.title'), key: 'skills', items: true },
   ];
   
   const [suggestions, setSuggestions] = useState({
@@ -46,23 +46,19 @@ const CVAIEnhancement = ({ darkMode }) => {
     skills: {}
   });
 
-  // Load CV data from localStorage or draft
   useEffect(() => {
     const loadCVData = () => {
       try {
         setIsLoading(true);
         
-        // Try to load from multiple sources
         let cvData = null;
         
-        // 1. Check for AI enhancement specific draft
         const aiDraft = localStorage.getItem('cv_draft_for_ai');
         if (aiDraft) {
           cvData = JSON.parse(aiDraft);
           console.log('📖 Loaded CV from AI draft');
         }
         
-        // 2. Fallback to regular draft
         if (!cvData) {
           const regularDraft = localStorage.getItem('cv_draft');
           if (regularDraft) {
@@ -71,7 +67,6 @@ const CVAIEnhancement = ({ darkMode }) => {
           }
         }
         
-        // 3. Fallback to customizer draft
         if (!cvData) {
           const customizerDraft = localStorage.getItem('cv_draft_for_customization');
           if (customizerDraft) {
@@ -81,7 +76,7 @@ const CVAIEnhancement = ({ darkMode }) => {
         }
         
         if (!cvData || !cvData.personal_info?.full_name) {
-          setError('No CV data found. Please create a CV first.');
+          setError(t('ai_enhancement.create_resume_first'));
           return;
         }
         
@@ -90,16 +85,15 @@ const CVAIEnhancement = ({ darkMode }) => {
         
       } catch (error) {
         console.error('❌ Error loading CV data:', error);
-        setError('Failed to load CV data');
+        setError(t('common.error'));
       } finally {
         setIsLoading(false);
       }
     };
     
     loadCVData();
-  }, []);
+  }, [t]);
 
-  // Check AI usage limits
   const checkUsageLimit = async () => {
     if (!sessionToken) return;
     
@@ -125,7 +119,6 @@ const CVAIEnhancement = ({ darkMode }) => {
     }
   }, [sessionToken]);
 
-  // Save enhanced CV locally
   const saveEnhancedCV = async (saveToCloud = false) => {
     if (!formData) return;
     
@@ -133,7 +126,6 @@ const CVAIEnhancement = ({ darkMode }) => {
       console.log('💾 Saving enhanced CV...');
       setIsLoading(true);
       
-      // Add metadata about AI enhancement
       const enhancedData = {
         ...formData,
         _ai_enhanced: {
@@ -145,36 +137,31 @@ const CVAIEnhancement = ({ darkMode }) => {
       let result;
       
       if (saveToCloud && canSaveToCloud()) {
-        // Save to connected cloud storage
         result = await saveToConnectedCloud(enhancedData, 'google_drive');
       } else {
-        // Save locally
         result = await saveLocally(enhancedData);
       }
       
       if (result.success) {
-        // Update all relevant drafts
         localStorage.setItem('cv_draft', JSON.stringify(enhancedData));
         localStorage.setItem('cv_draft_for_customization', JSON.stringify(enhancedData));
-        localStorage.removeItem('cv_draft_for_ai'); // Clean up AI specific draft
+        localStorage.removeItem('cv_draft_for_ai');
         
         setHasUnsavedChanges(false);
         
-        // Show success message
         const successMessage = result.message || 
-          (saveToCloud ? 'CV saved to Google Drive!' : 'CV saved locally!');
+          (saveToCloud ? t('resume.actions.update_success') : t('resume.actions.save_success'));
         
         alert(successMessage);
         
-        // Navigate back to resume builder or dashboard
         navigate('/my-resumes');
       } else {
-        throw new Error(result.error || 'Save failed');
+        throw new Error(result.error || t('common.error'));
       }
       
     } catch (err) {
       console.error('❌ Error saving enhanced CV:', err);
-      setError(`Failed to save: ${err.message}`);
+      setError(`${t('common.error')}: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -206,12 +193,12 @@ const CVAIEnhancement = ({ darkMode }) => {
             }))
           };
         } else {
-          throw new Error(t('ai_enhancement.no_experiences', 'No work experiences added yet'));
+          throw new Error(t('ai_enhancement.no_experiences'));
         }
       }
 
       if (!sessionToken) {
-        throw new Error(t('auth.login.title', 'Please connect to use AI features'));
+        throw new Error(t('settings.not_authenticated'));
       }
 
       const url = `${CV_AI_ENDPOINTS.IMPROVE_SECTION}?section=${sectionId}`;
@@ -235,7 +222,6 @@ const CVAIEnhancement = ({ darkMode }) => {
               
               setError(
                 t('ai.limit_reached', 
-                  "You've used {{used}} of {{limit}} daily AI requests. Please try again in {{hours}} hours.", 
                   { 
                     used: used_today, 
                     limit: daily_limit, 
@@ -244,30 +230,21 @@ const CVAIEnhancement = ({ darkMode }) => {
                 )
               );
             } else {
-              setError(
-                t('ai.limit_reached_simple', 
-                  "Daily AI limit reached. Please try again tomorrow."
-                )
-              );
+              setError(t('ai.limit_reached_simple'));
             }
           } catch (parseError) {
-            setError(
-              t('ai.limit_reached_simple', 
-                "Daily AI limit reached. Please try again tomorrow."
-              )
-            );
+            setError(t('ai.limit_reached_simple'));
           }
           setLoadingSections(prev => ({ ...prev, [sectionId]: false }));
           return;
         } else {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.detail || t('ai_enhancement.error_message', 'An error occurred. Please try again.'));
+          throw new Error(errorData.detail || t('ai_enhancement.error_message'));
         }
       }
 
       const taskData = await response.json();
       
-      // Poll for results
       const pollInterval = setInterval(async () => {
         try {
           const statusResponse = await fetch(taskData.check_status_url, {
@@ -278,7 +255,7 @@ const CVAIEnhancement = ({ darkMode }) => {
           
           if (!statusResponse.ok) {
             clearInterval(pollInterval);
-            throw new Error(t('ai_enhancement.error_message', 'An error occurred checking task status.'));
+            throw new Error(t('ai_enhancement.error_message'));
           }
           
           const statusData = await statusResponse.json();
@@ -313,12 +290,12 @@ const CVAIEnhancement = ({ darkMode }) => {
           } 
           else if (statusData.status === 'failed') {
             clearInterval(pollInterval);
-            throw new Error(statusData.error || t('ai_enhancement.error_message', 'Task processing failed.'));
+            throw new Error(statusData.error || t('ai_enhancement.error_message'));
           }
         } catch (error) {
           clearInterval(pollInterval);
           console.error(`Error checking section ${sectionId} status:`, error);
-          setError(t('ai_enhancement.error_message', 'An error occurred. Please try again.'));
+          setError(t('ai_enhancement.error_message'));
           setLoadingSections(prev => ({ ...prev, [sectionId]: false }));
         }
       }, 2000);
@@ -326,7 +303,7 @@ const CVAIEnhancement = ({ darkMode }) => {
     } catch (error) {
       console.error(`Error enhancing section ${sectionId}:`, error);
       if (!error.message.includes('daily AI requests')) {
-        setError(error.message || t('ai_enhancement.error_message', 'An error occurred. Please try again.'));
+        setError(error.message || t('ai_enhancement.error_message'));
       }
       setLoadingSections(prev => ({ ...prev, [sectionId]: false }));
     }
@@ -338,7 +315,7 @@ const CVAIEnhancement = ({ darkMode }) => {
 
     try {
       if (!sessionToken) {
-        throw new Error(t('auth.login.title', 'Please connect to use AI features'));
+        throw new Error(t('settings.not_authenticated'));
       }
 
       const response = await fetch(CV_AI_ENDPOINTS.IMPROVE_FULL_CV, {
@@ -359,7 +336,6 @@ const CVAIEnhancement = ({ darkMode }) => {
               
               setError(
                 t('ai.limit_reached', 
-                  "You've used {{used}} of {{limit}} daily AI requests. Please try again in {{hours}} hours.", 
                   { 
                     used: used_today, 
                     limit: daily_limit, 
@@ -368,25 +344,17 @@ const CVAIEnhancement = ({ darkMode }) => {
                 )
               );
             } else {
-              setError(
-                t('ai.limit_reached_simple', 
-                  "Daily AI limit reached. Please try again tomorrow."
-                )
-              );
+              setError(t('ai.limit_reached_simple'));
             }
           } catch (parseError) {
-            setError(
-              t('ai.limit_reached_simple', 
-                "Daily AI limit reached. Please try again tomorrow."
-              )
-            );
+            setError(t('ai.limit_reached_simple'));
           }
           setStatus('error');
           return;
         } else {
           const errorText = await response.text();
           console.error('Error response:', errorText);
-          throw new Error(t('ai_enhancement.error_message', 'An error occurred. Please try again.'));
+          throw new Error(t('ai_enhancement.error_message'));
         }
       }
 
@@ -399,14 +367,12 @@ const CVAIEnhancement = ({ darkMode }) => {
         skills: {}
       };
 
-      // Process summary suggestion
       if (result.improvements?.summary?.main) {
         newSuggestions.summary = {
           main: result.improvements.summary.main
         };
       }
 
-      // Process experience suggestions
       if (result.improvements?.raw) {
         const experienceSuggestions = parseAIResponseAndDistributeBullets(
           result.improvements.raw,
@@ -420,7 +386,6 @@ const CVAIEnhancement = ({ darkMode }) => {
         newSuggestions.experiences = result.improvements.experiences;
       }
 
-      // Process skills suggestions
       if (result.improvements?.skills?.main) {
         newSuggestions.skills = {
           main: result.improvements.skills.main,
@@ -432,7 +397,6 @@ const CVAIEnhancement = ({ darkMode }) => {
       setSuggestions(newSuggestions);
       setStatus('success');
 
-      // Expand all sections with suggestions
       const sectionsToExpand = {};
       Object.keys(newSuggestions).forEach(sectionId => {
         if (Object.keys(newSuggestions[sectionId]).length > 0) {
@@ -447,13 +411,12 @@ const CVAIEnhancement = ({ darkMode }) => {
     } catch (err) {
       console.error('Error enhancing full CV:', err);
       if (!err.message.includes('daily AI requests')) {
-        setError(err.message || t('ai_enhancement.error_message', 'An error occurred. Please try again.'));
+        setError(err.message || t('ai_enhancement.error_message'));
       }
       setStatus('error');
     }
   };
 
-  // Helper functions (keep the existing ones)
   const extractImprovedText = (result) => {
     if (result.improved_text) {
       return result.improved_text;
@@ -467,7 +430,7 @@ const CVAIEnhancement = ({ darkMode }) => {
       try {
         return JSON.stringify(result, null, 2);
       } catch (e) {
-        return t('ai_enhancement.error_message', 'An error occurred. Please try again.');
+        return t('ai_enhancement.error_message');
       }
     }
   };
@@ -493,19 +456,15 @@ const CVAIEnhancement = ({ darkMode }) => {
       }
     }
 
-    // Fallback parsing logic (keep existing implementation)
     return suggestions;
   };
 
   const parseAIResponseAndDistributeBullets = (rawText, experiences) => {
-    // Keep your existing implementation
     const suggestions = {};
     
     if (!rawText || experiences.length === 0) {
       return suggestions;
     }
-    
-    // Your existing parsing logic here...
     
     return suggestions;
   };
@@ -631,7 +590,7 @@ const CVAIEnhancement = ({ darkMode }) => {
   const handleBackToBuilder = () => {
     if (hasUnsavedChanges) {
       const confirmLeave = window.confirm(
-        'You have unsaved changes. Do you want to save before leaving?'
+        t('cloud.unsaved_changes_save_before_leaving', 'You have unsaved changes. Do you want to save before leaving?')
       );
       if (confirmLeave) {
         saveEnhancedCV(false);
@@ -642,7 +601,6 @@ const CVAIEnhancement = ({ darkMode }) => {
   };
 
   const handleContinueToCustomizer = () => {
-    // Save current state and go to customizer
     if (formData) {
       localStorage.setItem('cv_draft_for_customization', JSON.stringify(formData));
     }
@@ -655,7 +613,7 @@ const CVAIEnhancement = ({ darkMode }) => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mb-4"></div>
           <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Loading CV for AI enhancement...
+            {t('ai_enhancement.loading', 'Loading CV for AI enhancement...')}
           </p>
         </div>
       </div>
@@ -674,17 +632,17 @@ const CVAIEnhancement = ({ darkMode }) => {
           <h2 className="text-lg font-bold mb-2">{t('common.error')}</h2>
           <p className="mb-4 text-sm">{error}</p>
           <div className="flex gap-2 justify-center">
-            <button 
+            <button
               onClick={() => navigate('/new-resume')}
               className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-md hover:shadow-lg transition-shadow duration-300"
             >
-              Create New CV
+              {t('resumeDashboard.buttons.createNew', 'Create New CV')}
             </button>
-            <button 
+            <button
               onClick={() => navigate('/my-resumes')}
               className="px-4 py-2 rounded-full bg-gray-500 text-white text-sm font-medium shadow-md hover:shadow-lg transition-shadow duration-300"
             >
-              My CVs
+              {t('navigation.myResumes', 'My CVs')}
             </button>
           </div>
         </div>
@@ -694,16 +652,13 @@ const CVAIEnhancement = ({ darkMode }) => {
 
   return (
     <div className={`max-w-5xl mx-auto pt-14 px-4 pb-8 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-gray-800'}`}>
-      {/* Background Elements */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-purple-600/20 mix-blend-multiply filter blur-3xl"></div>
         <div className="absolute top-0 -right-24 w-48 h-48 rounded-full bg-pink-600/20 mix-blend-multiply filter blur-3xl"></div>
         <div className="absolute -bottom-24 left-24 w-48 h-48 rounded-full bg-blue-600/20 mix-blend-multiply filter blur-3xl"></div>
       </div>
 
-      {/* Content wrapper */}
       <div className="relative z-10">
-        {/* Header */}
         <div className="mb-4 flex justify-between items-center">
           <div className="flex items-center">
             <button
@@ -714,22 +669,21 @@ const CVAIEnhancement = ({ darkMode }) => {
             </button>
             <div>
               <h1 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {t('ai_enhancement.title', 'AI Resume Enhancement')}
+                {t('ai_enhancement.title')}
               </h1>
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Enhancing: {formData?.personal_info?.full_name || formData?.title || 'Your CV'}
+                {t('ai_enhancement.enhancing', 'Enhancing')}: {formData?.personal_info?.full_name || formData?.title || t('cloud.your_cv', 'Your CV')}
               </p>
             </div>
           </div>
           
-          {/* Save Buttons */}
           <div className="flex gap-2">
             {hasUnsavedChanges && (
               <div className={`flex items-center text-xs px-2 py-1 rounded ${
                 darkMode ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-700'
               }`}>
                 <AlertCircle className="w-3 h-3 mr-1" />
-                Unsaved changes
+                {t('cloud.unsaved_changes', 'Unsaved changes')}
               </div>
             )}
             
@@ -745,7 +699,7 @@ const CVAIEnhancement = ({ darkMode }) => {
               }`}
             >
               <HardDrive className="w-4 h-4 mr-2" />
-              Save Locally
+              {t('cloud.save_locally', 'Save Locally')}
             </button>
             
             {canSaveToCloud() && (
@@ -761,13 +715,12 @@ const CVAIEnhancement = ({ darkMode }) => {
                 }`}
               >
                 <Save className="w-4 h-4 mr-2" />
-                Save to Drive
+                {t('cloud.save_to_drive', 'Save to Drive')}
               </button>
             )}
           </div>
         </div>
 
-        {/* Usage Info */}
         {usageInfo && (
           <div className={`mb-4 text-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
@@ -777,7 +730,6 @@ const CVAIEnhancement = ({ darkMode }) => {
           </div>
         )}
 
-        {/* Error Display */}
         {error && (
           <div className={`mb-4 p-3 ${darkMode ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800'} rounded-md text-sm`}>
             {error}
@@ -785,15 +737,15 @@ const CVAIEnhancement = ({ darkMode }) => {
               onClick={() => setError(null)}
               className={`ml-2 ${darkMode ? 'text-red-200 hover:text-red-100' : 'text-red-800 hover:text-red-900'}`}
             >
-              {t('common.dismiss', 'Dismiss')}
+              {t('common.dismiss')}
             </button>
           </div>
         )}
 
-        {/* Enhance All Button */}
         <div className="mb-6 text-center">
           <button
-            onClick={requestFullCVEnhancement} disabled={status === 'loading'}
+            onClick={requestFullCVEnhancement} 
+            disabled={status === 'loading'}
             className={`px-6 py-3 rounded-lg text-white flex items-center justify-center mx-auto gap-2 text-sm font-medium ${
               status === 'loading'
                 ? 'bg-gray-400 cursor-not-allowed'
@@ -803,18 +755,17 @@ const CVAIEnhancement = ({ darkMode }) => {
             {status === 'loading' ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                {t('common.enhancing', 'Enhancing...')}
+                {t('common.enhancing')}
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                {t('ai_enhancement.enhance_all', 'Enhance All Sections')}
+                {t('ai_enhancement.enhance_all')}
               </>
             )}
           </button>
         </div>
 
-        {/* Sections */}
         <div className="space-y-4">
           {sections.map((section) => (
             <div
@@ -830,7 +781,7 @@ const CVAIEnhancement = ({ darkMode }) => {
                   </h2>
                   {suggestions[section.id] && Object.keys(suggestions[section.id]).length > 0 && (
                     <span className={`ml-3 px-2 py-1 text-xs ${darkMode ? 'bg-indigo-900 text-indigo-200' : 'bg-indigo-100 text-indigo-800'} rounded-full`}>
-                      {Object.keys(suggestions[section.id]).length} {t('common.ai_suggestions', 'AI Suggestions')}
+                      {Object.keys(suggestions[section.id]).length} {t('common.ai_suggestions')}
                     </span>
                   )}
                   <button
@@ -850,40 +801,37 @@ const CVAIEnhancement = ({ darkMode }) => {
                     className="px-3 py-1.5 text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors flex items-center gap-2"
                   >
                     <Sparkles className="w-3 h-3" />
-                    {t('common.enhance', 'Enhance')}
+                    {t('common.enhance')}
                   </button>
                 )}
                 
                 {loadingSections[section.id] && (
                   <div className={`flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     <RefreshCw className="w-3 h-3 animate-spin mr-2" />
-                    {t('common.enhancing', 'Enhancing...')}
+                    {t('common.enhancing')}
                   </div>
                 )}
               </div>
 
               {expandedSections[section.id] && (
                 <div className="p-4">
-                  {/* Current Content Preview */}
                   <div className="mb-4">
                     <h3 className={`text-sm font-medium mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {t('ai_enhancement.current_content', 'Current Content')}
+                      {t('ai_enhancement.current_content')}
                     </h3>
 
-                    {/* Summary Content */}
                     {section.id === 'summary' && (
                       <div className={`p-3 rounded-md ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                         {formData?.personal_info?.summary ? (
                           <p className="text-sm">{formData.personal_info.summary}</p>
                         ) : (
                           <p className={`text-sm italic ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {t('common.no_summary', 'No summary added yet')}
+                            {t('common.no_summary')}
                           </p>
                         )}
                       </div>
                     )}
 
-                    {/* Experiences Content */}
                     {section.id === 'experiences' && (
                       <div className={`rounded-md ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                         {formData?.experiences?.length > 0 ? (
@@ -893,19 +841,18 @@ const CVAIEnhancement = ({ darkMode }) => {
 
                               return (
                                 <div key={index} className={`p-3 border rounded ${darkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-                                  <div className="text-sm font-medium">{exp.position} at {exp.company}</div>
+                                  <div className="text-sm font-medium">{exp.position} {t('common.at')} {exp.company}</div>
                                   <div className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    {exp.start_date} - {exp.current ? 'Present' : exp.end_date}
+                                    {exp.start_date} - {exp.current ? t('common.tonow') : exp.end_date}
                                   </div>
                                   <p className={`text-sm mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                    {exp.description || 'No description added'}
+                                    {exp.description || t('common.notSpecified')}
                                   </p>
 
-                                  {/* AI Suggestions for this experience */}
                                   {hasSuggestion && (
                                     <div className={`mt-3 p-3 rounded ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-indigo-50 border-indigo-100'} border`}>
                                       <h4 className={`text-xs font-medium mb-2 ${darkMode ? 'text-indigo-300' : 'text-indigo-600'}`}>
-                                        {t('common.ai_suggestions', 'AI Suggestions')}
+                                        {t('common.ai_suggestions')}
                                       </h4>
 
                                       <div className="text-sm mb-3">
@@ -936,14 +883,14 @@ const CVAIEnhancement = ({ darkMode }) => {
                                           className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600 text-white rounded flex items-center"
                                         >
                                           <CheckCircle className="w-3 h-3 mr-1" />
-                                          {t('common.apply', 'Apply')}
+                                          {t('common.apply')}
                                         </button>
                                         <button
                                           onClick={() => rejectSuggestion('experiences', `item_${index}`)}
                                           className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white rounded flex items-center"
                                         >
                                           <XCircle className="w-3 h-3 mr-1" />
-                                          {t('common.reject', 'Reject')}
+                                          {t('common.reject')}
                                         </button>
                                       </div>
                                     </div>
@@ -954,13 +901,12 @@ const CVAIEnhancement = ({ darkMode }) => {
                           </div>
                         ) : (
                           <p className={`text-sm p-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {t('ai_enhancement.no_experiences', 'No work experiences added yet')}
+                            {t('ai_enhancement.no_experiences')}
                           </p>
                         )}
                       </div>
                     )}
 
-                    {/* Skills Content */}
                     {section.id === 'skills' && (
                       <div className={`p-3 rounded-md ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                         {formData?.skills?.length > 0 ? (
@@ -985,12 +931,11 @@ const CVAIEnhancement = ({ darkMode }) => {
                     )}
                   </div>
 
-                  {/* AI Suggestions for Summary and Skills */}
                   {(section.id === 'summary' || section.id === 'skills') && suggestions[section.id]?.main && (
                     <div className="space-y-3">
                       <h3 className={`text-sm font-medium ${darkMode ? 'text-indigo-400' : 'text-indigo-500'} flex items-center`}>
                         <Sparkles className="w-3 h-3 mr-1" />
-                        {t('common.ai_suggestions', 'AI Suggestions')}
+                        {t('common.ai_suggestions')}
                       </h3>
 
                       <div className={`border rounded-md p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-indigo-50 border-indigo-200'}`}>
@@ -1026,14 +971,14 @@ const CVAIEnhancement = ({ darkMode }) => {
                             className="px-3 py-1.5 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors flex items-center"
                           >
                             <CheckCircle className="w-3 h-3 mr-1" />
-                            {t('common.apply', 'Apply')}
+                            {t('common.apply')}
                           </button>
                           <button
                             onClick={() => rejectSuggestion(section.id, 'main')}
                             className="px-3 py-1.5 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors flex items-center"
                           >
                             <XCircle className="w-3 h-3 mr-1" />
-                            {t('common.reject', 'Reject')}
+                            {t('common.reject')}
                           </button>
                         </div>
                       </div>
@@ -1045,7 +990,6 @@ const CVAIEnhancement = ({ darkMode }) => {
           ))}
         </div>
 
-        {/* Bottom Action Bar */}
         <div className="mt-8 flex justify-between items-center">
           <button
             onClick={handleBackToBuilder}
@@ -1055,7 +999,7 @@ const CVAIEnhancement = ({ darkMode }) => {
                 : 'bg-gray-200 hover:bg-gray-300 text-gray-800 hover:shadow-md'
             }`}
           >
-            {t('common.back_to_editor', 'Back to Editor')}
+            {t('common.back_to_editor')}
           </button>
           
           <div className="flex gap-3">
@@ -1065,7 +1009,7 @@ const CVAIEnhancement = ({ darkMode }) => {
                 className="px-4 py-2 text-sm rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 flex items-center"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {t('resume.actions.save_changes', 'Save Changes')}
+                {t('resume.actions.save_changes')}
               </button>
             )}
             
@@ -1073,7 +1017,7 @@ const CVAIEnhancement = ({ darkMode }) => {
               onClick={handleContinueToCustomizer}
               className="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
             >
-              {t('common.choose_your_templates', 'Customize Templates')}
+              {t('common.choose_your_templates')}
             </button>
           </div>
         </div>

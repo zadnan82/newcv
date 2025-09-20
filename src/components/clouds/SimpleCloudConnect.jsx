@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Cloud, CheckCircle, Loader2, Shield } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
+import { useTranslation } from 'react-i18next';
 
 const SimpleCloudConnect = ({ darkMode }) => {
   const [connecting, setConnecting] = useState(false);
+  const { t } = useTranslation();
   
   const { 
     connectedProviders, 
@@ -48,13 +50,13 @@ const SimpleCloudConnect = ({ darkMode }) => {
           <h3 className={`text-lg font-semibold mb-2 ${
             darkMode ? 'text-white' : 'text-gray-800'
           }`}>
-            Google Drive Connected
+            {t('cloud.google_drive_connected')}
           </h3>
           
           <p className={`text-sm mb-4 ${
             darkMode ? 'text-gray-300' : 'text-gray-600'
           }`}>
-            You can now save your CVs directly to your Google Drive
+            {t('cloud.can_save_cvs_to_drive')}
           </p>
           
           <div className={`p-3 rounded-lg ${
@@ -67,7 +69,7 @@ const SimpleCloudConnect = ({ darkMode }) => {
               <span className={`text-xs ${
                 darkMode ? 'text-green-300' : 'text-green-700'
               }`}>
-                Your data stays in YOUR Google Drive
+                {t('cloud.data_stays_in_your_drive')}
               </span>
             </div>
           </div>
@@ -95,13 +97,13 @@ const SimpleCloudConnect = ({ darkMode }) => {
         <h3 className={`text-lg font-semibold mb-2 ${
           darkMode ? 'text-white' : 'text-gray-800'
         }`}>
-          Connect Google Drive
+          {t('cloud.connect_google_drive')}
         </h3>
         
         <p className={`text-sm mb-4 ${
           darkMode ? 'text-gray-300' : 'text-gray-600'
         }`}>
-          Save your CVs securely to your own Google Drive account
+          {t('cloud.save_cvs_securely')}
         </p>
         
         {error && (
@@ -124,11 +126,11 @@ const SimpleCloudConnect = ({ darkMode }) => {
           {connecting || loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin inline" />
-              Connecting...
+              {t('cloud.connecting')}...
             </>
           ) : (
             <>
-              🗂️ Connect Google Drive
+              🗂️ {t('cloud.connect_google_drive')}
             </>
           )}
         </button>
@@ -144,12 +146,12 @@ const SimpleCloudConnect = ({ darkMode }) => {
               <p className={`text-xs font-medium mb-1 ${
                 darkMode ? 'text-green-300' : 'text-green-700'
               }`}>
-                Privacy Protected
+                {t('cloud.privacy_protected')}
               </p>
               <p className={`text-xs ${
                 darkMode ? 'text-green-400' : 'text-green-600'
               }`}>
-                Your CVs are saved directly to your Google Drive - we never access your files
+                {t('cloud.never_access_files')}
               </p>
             </div>
           </div>

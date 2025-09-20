@@ -1,4 +1,4 @@
-// src/components/auth-resume/view-cv/NewResumeBuilder.jsx - REWRITTEN CLEAN VERSION
+ // src/components/auth-resume/view-cv/NewResumeBuilder.jsx - REWRITTEN CLEAN VERSION
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom'; 
 import { useTranslation } from 'react-i18next'; 
@@ -44,7 +44,7 @@ const NewResumeBuilder = ({ darkMode }) => {
   
   // Blank resume template - CONSTANT
   const BLANK_RESUME_TEMPLATE = useMemo(() => ({
-    title: "My Resume",
+    title: t('resumeDashboard.defaultTitle'),
     is_public: false,
     customization: {
       template: "stockholm",
@@ -82,9 +82,9 @@ const NewResumeBuilder = ({ darkMode }) => {
     courses: [],
     internships: [],
     photo: { photolink: null }
-  }), []);
+  }), [t]);
   
-// Add this quick fix at the top of NewResumeBuilder component:
+  // Add this quick fix at the top of NewResumeBuilder component:
   
   // QUICK FIX: Clear any stuck OAuth processing flags on mount
   useEffect(() => {
@@ -143,9 +143,9 @@ const NewResumeBuilder = ({ darkMode }) => {
   
   // Sections configuration
   const sections = useMemo(() => [
-    { id: 'title', name: t('resume.title.section', 'Resume Title'), component: ResumeTitle, dataKey: 'title' },
+    { id: 'title', name: t('resume.title.section'), component: ResumeTitle, dataKey: 'title' },
     { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' },
-    { id: 'photo', name: t('resume.photo.title', 'Photo'), component: Base64PhotoUpload, dataKey: 'photo' }, 
+    { id: 'photo', name: t('resume.photo.title'), component: Base64PhotoUpload, dataKey: 'photo' }, 
     { id: 'education', name: t('resume.education.title'), component: Education, dataKey: 'educations' },
     { id: 'experience', name: t('resume.experience.title'), component: Experience, dataKey: 'experiences' },
     { id: 'skills', name: t('resume.skills.title'), component: Skills, dataKey: 'skills' },
@@ -169,8 +169,10 @@ const NewResumeBuilder = ({ darkMode }) => {
   }, [formData]);
   
   const CurrentSection = sections.find(s => s.id === activeSection)?.component || PersonalInfo;
-  
-  // Auto-save function
+   
+
+
+// Auto-save function
   const autoSave = useCallback((data) => {
     if (!isInitializedRef.current) return;
     
@@ -219,7 +221,7 @@ const NewResumeBuilder = ({ darkMode }) => {
   
   // Update form data function
   const updateFormData = useCallback((section, data) => {
-    console.log(`🔄 Updating section ${section}`);
+    console.log(`📄 Updating section ${section}`);
     
     setFormData(prev => {
       let updatedData;
@@ -277,7 +279,7 @@ const NewResumeBuilder = ({ darkMode }) => {
   
   const handleSaveLocal = useCallback(async () => {
     if (!hasUserStartedFilling) {
-      showToast('Please add some information to your CV before saving.', 'error');
+      showToast(t('common.error'), 'error');
       return;
     }
 
@@ -292,25 +294,25 @@ const NewResumeBuilder = ({ darkMode }) => {
         localStorage.setItem('last_save_method', 'local');
         setShowStorageChoice(false);
         clearAutoSave();
-        showToast(result.message || 'CV saved locally!', 'success');
+        showToast(result.message || t('cloud.saved_locally'), 'success');
       } else {
-        showToast(result.error || 'Failed to save locally', 'error');
+        showToast(result.error || t('common.error'), 'error');
       }
     } catch (error) {
       const errorResult = {
         success: false,
-        error: error.message || 'Failed to save locally'
+        error: error.message || t('common.error')
       };
       setSaveResult(errorResult);
       showToast(errorResult.error, 'error');
     } finally {
       setIsSaving(false);
     }
-  }, [hasUserStartedFilling, formData, saveLocally, showToast, clearAutoSave]);
+  }, [hasUserStartedFilling, formData, saveLocally, showToast, clearAutoSave, t]);
 
   const handleSaveCloud = useCallback(async () => {
     if (!hasUserStartedFilling) {
-      showToast('Please add some information to your CV before saving.', 'error');
+      showToast(t('common.error'), 'error');
       return;
     }
 
@@ -330,26 +332,26 @@ const NewResumeBuilder = ({ darkMode }) => {
         localStorage.setItem('last_save_method', 'cloud');
         setShowStorageChoice(false);
         clearAutoSave();
-        showToast(result.message || 'CV saved to Google Drive!', 'success');
+        showToast(result.message || t('cloud.save_to_drive'), 'success');
         localStorage.removeItem('cv_draft');
       } else {
-        showToast(result.error || 'Failed to save to cloud', 'error');
+        showToast(result.error || t('common.error'), 'error');
       }
     } catch (error) {
       const errorResult = {
         success: false,
-        error: error.message || 'Failed to save to cloud'
+        error: error.message || t('common.error')
       };
       setSaveResult(errorResult);
       showToast(errorResult.error, 'error');
     } finally {
       setIsSaving(false);
     }
-  }, [hasUserStartedFilling, formData, canSaveToCloud, saveToConnectedCloud, showToast, clearAutoSave]);
+  }, [hasUserStartedFilling, formData, canSaveToCloud, saveToConnectedCloud, showToast, clearAutoSave, t]);
   
   const handleSave = useCallback(() => {
     if (!hasUserStartedFilling) {
-      showToast('Please add some information to your CV before saving.', 'error');
+      showToast(t('common.error'), 'error');
       return;
     }
 
@@ -366,19 +368,19 @@ const NewResumeBuilder = ({ darkMode }) => {
     }
     
     setShowStorageChoice(true);
-  }, [hasUserStartedFilling, canSaveToCloud, handleSaveCloud, handleSaveLocal, showToast]);
+  }, [hasUserStartedFilling, canSaveToCloud, handleSaveCloud, handleSaveLocal, showToast, t]);
   
   const handleConnectCloud = useCallback(async (provider) => {
     try {
       setShowStorageChoice(false);
-      showToast('Redirecting to Google Drive...', 'info');
+      showToast(t('cloud.processing_connection'), 'info');
       await connectToCloudProvider(provider);
     } catch (error) {
       console.error('❌ Cloud connection failed:', error);
-      showToast(`Failed to connect to ${provider}: ${error.message}`, 'error');
+      showToast(`${t('cloud.connection_failed')}: ${error.message}`, 'error');
       setShowStorageChoice(true);
     }
-  }, [connectToCloudProvider, showToast]);
+  }, [connectToCloudProvider, showToast, t]);
   
   const handleCustomizeTemplate = useCallback(() => {
     // Save current data to localStorage so it persists when user comes back
@@ -387,46 +389,46 @@ const NewResumeBuilder = ({ darkMode }) => {
   }, [formData, navigate]);
   
   const handleAIEnhancement = useCallback(() => {
-  // Check if user has meaningful content
-  const hasContent = !!(
-    formData.personal_info?.full_name ||
-    formData.personal_info?.summary ||
-    formData.experiences?.length > 0 ||
-    formData.educations?.length > 0 ||
-    formData.skills?.length > 0
-  );
+    // Check if user has meaningful content
+    const hasContent = !!(
+      formData.personal_info?.full_name ||
+      formData.personal_info?.summary ||
+      formData.experiences?.length > 0 ||
+      formData.educations?.length > 0 ||
+      formData.skills?.length > 0
+    );
 
-  if (!hasContent) {
-    showToast('Please add some personal information, work experience, or skills before using AI enhancement.', 'error');
-    return;
-  }
+    if (!hasContent) {
+      showToast(t('common.error'), 'error');
+      return;
+    }
 
-  try {
-    const aiEnhancementData = {
-      ...formData,
-      _prepared_for_ai: {
-        timestamp: Date.now(),
-        source: 'NewResumeBuilder',
-        content_summary: {
-          has_name: !!formData.personal_info?.full_name,
-          has_summary: !!formData.personal_info?.summary,
-          experiences_count: formData.experiences?.length || 0,
-          skills_count: formData.skills?.length || 0
+    try {
+      const aiEnhancementData = {
+        ...formData,
+        _prepared_for_ai: {
+          timestamp: Date.now(),
+          source: 'NewResumeBuilder',
+          content_summary: {
+            has_name: !!formData.personal_info?.full_name,
+            has_summary: !!formData.personal_info?.summary,
+            experiences_count: formData.experiences?.length || 0,
+            skills_count: formData.skills?.length || 0
+          }
         }
-      }
-    };
-    
-    localStorage.setItem('cv_draft_for_ai', JSON.stringify(aiEnhancementData));
-    localStorage.setItem('cv_draft', JSON.stringify(formData));
-    
-    console.log('🤖 Navigating to AI enhancement');
-    navigate('/cv-ai-enhancement');
-    
-  } catch (error) {
-    console.error('❌ Failed to prepare CV for AI:', error);
-    showToast('Failed to prepare CV for AI enhancement', 'error');
-  }
-}, [formData, navigate, showToast]);
+      };
+      
+      localStorage.setItem('cv_draft_for_ai', JSON.stringify(aiEnhancementData));
+      localStorage.setItem('cv_draft', JSON.stringify(formData));
+      
+      console.log('🤖 Navigating to AI enhancement');
+      navigate('/cv-ai-enhancement');
+      
+    } catch (error) {
+      console.error('❌ Failed to prepare CV for AI:', error);
+      showToast(t('common.error'), 'error');
+    }
+  }, [formData, navigate, showToast, t]);
   
   const closeToast = useCallback(() => {
     setToast(null);
@@ -436,7 +438,7 @@ const NewResumeBuilder = ({ darkMode }) => {
   useEffect(() => {
     console.log('🔧 NewResumeBuilder: Initializing...');
     
-  // Handle OAuth return message - PREVENT MULTIPLE PROCESSING
+    // Handle OAuth return message - PREVENT MULTIPLE PROCESSING
     if (location.state?.message && !isInitializedRef.current) {
       console.log('📨 OAuth return detected:', location.state.message);
       
@@ -473,8 +475,8 @@ const NewResumeBuilder = ({ darkMode }) => {
               const { _autoSave, ...cleanData } = parsed;
               setFormData(cleanData);
               
-              const timeMsg = minutesAgo < 1 ? 'less than a minute ago' : `${minutesAgo} minute${minutesAgo !== 1 ? 's' : ''} ago`;
-              showToast(`Draft restored from ${timeMsg}`, 'info');
+              const timeMsg = minutesAgo < 1 ? t('cloud.current_draft') : `${minutesAgo} ${t('common.at')}`;
+              showToast(`${t('cloud.current_draft')} ${timeMsg}`, 'info');
             }
           }
         }
@@ -508,7 +510,7 @@ const NewResumeBuilder = ({ darkMode }) => {
       <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-800 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-gray-800'}`}>
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-          <p>{t('common.loading', 'Loading...')}</p>
+          <p>{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -562,7 +564,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                 }`}
               >
                 <Save size={16} className="mr-1" />
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? t('common.saving') : t('common.save')}
               </button>
 
               {/* Mobile Template & AI Buttons */}
@@ -574,7 +576,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                       ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                       : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-gray-700 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20'
                   }`}
-                  title="Change Template"
+                  title={t('resume.customizer.title')}
                 >
                   <Palette size={16} />
                 </button>
@@ -589,7 +591,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                         ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                         : 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 text-gray-700 hover:bg-gradient-to-r hover:from-yellow-500/20 hover:to-orange-500/20'
                   }`}
-                  title="AI Enhancement"
+                  title={t('common.ai_enhancement')}
                 >
                   <Sparkles size={16} />
                 </button>
@@ -780,12 +782,12 @@ const NewResumeBuilder = ({ darkMode }) => {
                   {viewMode === 'edit' ? (
                     <>
                       <Eye size={16} />
-                      <span>{t('cards.resume.preview', 'Preview')}</span>
+                      <span>{t('cards.resume.preview')}</span>
                     </>
                   ) : (
                     <>
                       <Edit size={16} />
-                      <span>{t('actions.edit', 'Edit')}</span>
+                      <span>{t('actions.edit')}</span>
                     </>
                   )}
                 </button>
@@ -836,12 +838,12 @@ const NewResumeBuilder = ({ darkMode }) => {
                   {isSaving ? (
                     <>
                       <Loader2 size={18} className="mr-2 animate-spin" />
-                      {saveType === 'cloud' ? 'Saving to Cloud...' : saveType === 'local' ? 'Saving Locally...' : 'Saving...'}
+                      {saveType === 'cloud' ? t('cloud.saving_to_cloud') : saveType === 'local' ? t('cloud.saving_locally') : t('common.saving')}
                     </>
                   ) : (
                     <>
                       <Save size={18} className="mr-2" />
-                      Save CV
+                      {t('cloud.save_cv')}
                     </>
                   )}
                 </button>
@@ -854,28 +856,28 @@ const NewResumeBuilder = ({ darkMode }) => {
                       return (
                         <span className="flex items-center text-purple-600">
                           <Cloud size={12} className="mr-1" />
-                          Google Drive
+                          {t('cloud.google_drive')}
                         </span>
                       );
                     } else if (lastMethod === 'local') {
                       return (
                         <span className="flex items-center text-blue-600">
                           <HardDrive size={12} className="mr-1" />
-                          This Device
+                          {t('cloud.this_device')}
                         </span>
                       );
                     } else if (canSaveToCloud()) {
                       return (
                         <span className="flex items-center">
                           <Cloud size={12} className="mr-1" />
-                          Choose destination
+                          {t('cloud.choose_destination')}
                         </span>
                       );
                     } else {
                       return (
                         <span className="flex items-center">
                           <HardDrive size={12} className="mr-1" />
-                          Local Only
+                          {t('cloud.local_only')}
                         </span>
                       );
                     }
@@ -893,10 +895,10 @@ const NewResumeBuilder = ({ darkMode }) => {
                       ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-purple-300 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-pink-600/30'
                       : 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:bg-gradient-to-r hover:from-purple-200 hover:to-pink-200'
                   }`}
-                  title="Customize your CV template and styling"
+                  title={t('resume.customizer.title')}
                 >
                   <Palette size={16} className="mr-2" />
-                  Customize Template
+                  {t('resume.customizer.title')}
                 </button>
 
                 {/* AI Enhancement Button */}
@@ -910,10 +912,10 @@ const NewResumeBuilder = ({ darkMode }) => {
                       ? 'bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-yellow-300 hover:bg-gradient-to-r hover:from-yellow-600/30 hover:to-orange-600/30'
                       : 'bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 hover:bg-gradient-to-r hover:from-yellow-200 hover:to-orange-200'
                   }`}
-                  title="Use AI to enhance your CV content"
+                  title={t('common.ai_enhancement')}
                 >
                   <Sparkles size={16} className="mr-2" />
-                  AI Enhance
+                  {t('common.ai_enhancement')}
                 </button>
 
                 {/* Change Save Location Button */}
@@ -927,7 +929,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    Change Location
+                    {t('cloud.change_location')}
                   </button>
                 )}
 
@@ -937,7 +939,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                     onClick={() => setShowCloudSetup(true)}
                     className="px-3 py-1.5 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
                   >
-                    Connect Cloud
+                    {t('cloud.connect_cloud')}
                   </button>
                 )}
               </div>
@@ -971,8 +973,8 @@ const NewResumeBuilder = ({ darkMode }) => {
                     : darkMode ? 'text-red-300' : 'text-red-700'
                 }`}>
                   {saveResult.success 
-                    ? saveResult.message || 'Saved successfully!'
-                    : saveResult.error || 'Save failed'
+                    ? saveResult.message || t('common.success')
+                    : saveResult.error || t('common.error')
                   }
                 </span>
               </div>
@@ -1021,7 +1023,7 @@ const NewResumeBuilder = ({ darkMode }) => {
           } shadow-2xl p-6`}>
             <div className="flex items-center justify-between mb-6">
               <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Connect Cloud Storage
+                {t('cloud.connect_cloud_storage')}
               </h3>
               <button 
                 onClick={() => setShowCloudSetup(false)}
@@ -1034,7 +1036,7 @@ const NewResumeBuilder = ({ darkMode }) => {
             </div>
 
             <p className={`text-sm mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Connect your Google Drive to save and access your CVs from anywhere.
+              {t('cloud.connect_drive_to_save')}
             </p>
 
             <SimpleCloudConnect darkMode={darkMode} />
@@ -1046,7 +1048,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                   darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Maybe later
+                {t('common.cancel')}
               </button>
             </div>
           </div>

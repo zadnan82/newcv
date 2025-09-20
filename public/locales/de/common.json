@@ -739,7 +739,6 @@
       "word_processing": "Fehler beim Verarbeiten des Word-Dokuments. Bitte stellen Sie sicher, dass es sich um eine gültige .doc- oder .docx-Datei handelt.",
       "pdf_processing": "Fehler beim Verarbeiten der PDF-Datei. Bitte stellen Sie sicher, dass es sich um ein gültiges PDF handelt.",
       "unsupported_format": "Nicht unterstütztes Dateiformat. Bitte verwenden Sie .txt, .doc, .docx oder .pdf",
-      "no_content": "Kein lesbarer Inhalt in der Datei gefunden",
       "file_processing": "Fehler beim Verarbeiten der Datei. Bitte versuchen Sie es erneut.",
       "rate_limit": "Bitte warten Sie {{seconds}} Sekunden, bevor Sie es erneut versuchen.",
       "model_loading": "Modell wird geladen... Versuch {{attempt}}/{{maxRetries}}",
@@ -1007,151 +1006,7 @@
       "customize": "Anpassen",
       "delete": "Löschen"
     }
-  },
-  "privacy": {
-    "title": "Datenschutzrichtlinie",
-    "lastUpdated": "Zuletzt aktualisiert",
-    "updateDate": "4. April 2025",
-    "intro": "CVATI (\"wir\", \"unser\" oder \"uns\") verpflichtet sich, Ihre Privatsphäre zu schützen. Diese Datenschutzrichtlinie erläutert, wie wir Ihre Informationen sammeln, verwenden, offenlegen und schützen, wenn Sie unseren Lebenslauf-Erstellungsservice nutzen.",
-    "collection": {
-      "title": "Informationen, die wir sammeln",
-      "desc": "Wir sammeln persönliche Informationen, die Sie uns freiwillig zur Verfügung stellen, wenn Sie unseren Service nutzen, einschließlich:",
-      "personal": "Persönliche Daten (Name, E-Mail-Adresse, Telefonnummer)",
-      "professional": "Berufliche Informationen (Berufserfahrung, Fähigkeiten, Ausbildung)",
-      "optional": "Optionale Informationen (Geburtsdatum, Nationalität, Adresse, Foto)",
-      "account": "Kontoanmeldeinformationen",
-      "usage": "Nutzungsdaten und Interaktionen mit unserem Service"
-    },
-    "use": {
-      "title": "Wie wir Ihre Informationen verwenden",
-      "desc": "Wir verwenden Ihre Informationen für die folgenden Zwecke:",
-      "provide": "Um unseren Service bereitzustellen und zu pflegen",
-      "improve": "Um unseren Service und die Benutzererfahrung zu verbessern",
-      "communicate": "Um mit Ihnen über Service-Updates zu kommunizieren",
-      "ai": "Um KI-verbesserte Erstellung von Lebensläufen und Anschreiben zu ermöglichen",
-      "security": "Um Sicherheit zu gewährleisten und Betrug zu verhindern",
-      "legal": "Um rechtlichen Verpflichtungen nachzukommen"
-    },
-    "sharing": {
-      "title": "Informationsfreigabe und Offenlegung",
-      "desc": "Wir können Ihre Informationen teilen mit:",
-      "service": "Dienstanbietern (Cloud-Speicher, Bild-Hosting, Analysen)",
-      "legal": "Rechtlichen Behörden, wenn gesetzlich vorgeschrieben",
-      "business": "Geschäftspartnern mit Ihrer ausdrücklichen Zustimmung",
-      "note": "Wir verwenden Cloudinary für Bildspeicherung und -verarbeitung. Ihre hochgeladenen Fotos unterliegen auch der Datenschutzrichtlinie von Cloudinary."
-    },
-    "storage": {
-      "title": "Datenspeicherung und Sicherheit",
-      "desc": "Wir implementieren angemessene Sicherheitsmaßnahmen zum Schutz Ihrer persönlichen Daten. Jedoch ist keine Methode der Übertragung über das Internet zu 100% sicher, und wir können keine absolute Sicherheit garantieren.",
-      "retention": "Wir speichern Ihre persönlichen Daten, solange Ihr Konto aktiv ist oder soweit es zur Bereitstellung unserer Dienste erforderlich ist. Sie können jederzeit die Löschung Ihrer Daten beantragen."
-    },
-    "rights": {
-      "title": "Ihre Datenrechte",
-      "desc": "Gemäß der DSGVO und anderen anwendbaren Datenschutzgesetzen haben Sie Rechte bezüglich Ihrer personenbezogenen Daten, darunter:",
-      "access": "Recht auf Zugang zu Ihren personenbezogenen Daten",
-      "rectify": "Recht auf Berichtigung ungenauer Daten",
-      "delete": "Recht auf Löschung (\"Recht auf Vergessenwerden\")",
-      "restrict": "Recht auf Einschränkung der Verarbeitung",
-      "portability": "Recht auf Datenübertragbarkeit",
-      "object": "Recht auf Widerspruch gegen die Verarbeitung",
-      "exercise": "Um diese Rechte auszuüben, können Sie die Kontoeinstellungen in unserer Anwendung verwenden oder uns direkt kontaktieren."
-    },
-    "cookies": {
-      "title": "Cookies und ähnliche Technologien",
-      "desc": "Wir verwenden Cookies und ähnliche Tracking-Technologien, um Ihre Erfahrung auf unserer Website zu verbessern, die Nutzung zu analysieren und bei unseren Marketingbemühungen zu helfen. Sie können Cookies über Ihre Browsereinstellungen kontrollieren."
-    },
-    "ai": {
-      "title": "KI-generierte Inhalte",
-      "desc": "Unser Service nutzt KI, um bei der Erstellung von Lebenslauf-Inhalten und Anschreiben zu helfen. Die von Ihnen bereitgestellten Daten können von unseren KI-Systemen verarbeitet werden, um personalisierte Inhalte zu generieren. Wir implementieren Maßnahmen zum Schutz Ihrer Daten während der KI-Verarbeitung und verwenden Ihre personenbezogenen Daten nicht ohne ausdrückliche Zustimmung zum Training unserer KI-Modelle."
-    },
-    "children": {
-  "title": "Datenschutz für Kinder",
-  "desc": "Unser Dienst richtet sich nicht an Personen unter 16 Jahren. Wenn Sie wissen, dass ein Minderjähriger uns personenbezogene Daten ohne elterliche Zustimmung zur Verfügung gestellt hat, kontaktieren Sie uns bitte."
-},
-"changes": {
-  "title": "Änderungen dieser Datenschutzrichtlinie",
-  "desc": "Wir können unsere Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Wir werden Sie über alle Änderungen informieren, indem wir die neue Datenschutzrichtlinie auf dieser Seite veröffentlichen und das Datum der \"Letzten Aktualisierung\" aktualisieren."
-},
-"contact": {
-  "title": "Kontakt",
-  "desc": "Wenn Sie Fragen zu dieser Datenschutzrichtlinie haben, kontaktieren Sie uns bitte unter:",
-  "email": "privacy@cvati.com"
-}, 
-    "terms": {
-    "title": "Allgemeine Geschäftsbedingungen",
-    "lastUpdated": "Zuletzt aktualisiert",
-    "updateDate": "4. April 2025",
-    "intro": "Willkommen bei CVATI. Diese Allgemeinen Geschäftsbedingungen regeln Ihre Nutzung unseres Lebenslauf-Erstellungsdienstes und unserer Website. Durch den Zugriff auf oder die Nutzung von CVATI erklären Sie sich mit diesen Bedingungen einverstanden.",
-    "definitions": {
-      "title": "1. Definitionen",
-      "service": "\"Dienst\"",
-      "serviceDesc": "Bezieht sich auf die CVATI-Website und die Lebenslauf-Erstellungsanwendung.",
-      "content": "\"Inhalt\"",
-      "contentDesc": "Bezieht sich auf Lebensläufe, Anschreiben und alle anderen Materialien, die über unseren Dienst erstellt, hochgeladen oder generiert werden.",
-      "user": "\"Benutzer\"",
-      "userDesc": "Jede Person, die auf unseren Dienst zugreift oder ihn nutzt.",
-      "account": "\"Konto\"",
-      "accountDesc": "Ein registriertes Benutzerprofil innerhalb unseres Dienstes."
-    },
-    "accounts": {
-      "title": "2. Benutzerkonten",
-      "registration": "Wenn Sie ein Konto bei uns erstellen, müssen Sie genaue, vollständige und aktuelle Informationen angeben. Sie sind für den Schutz Ihres Passworts und für alle Aktivitäten, die unter Ihrem Konto stattfinden, verantwortlich.",
-      "terminate": "Wir behalten uns das Recht vor, Ihr Konto sofort zu kündigen oder zu sperren, ohne vorherige Ankündigung oder Haftung, aus jedem Grund, einschließlich Verstoß gegen diese Bedingungen."
-    },
-    "use": {
-      "title": "3. Zulässige Nutzung",
-      "desc": "Sie stimmen zu, unseren Dienst nur für rechtmäßige Zwecke und in Übereinstimmung mit diesen Bedingungen zu nutzen. Sie stimmen zu, Folgendes nicht zu tun:",
-      "false": "Falsche oder irreführende Informationen bereitstellen",
-      "impersonate": "Sich als eine andere Person oder Einrichtung ausgeben",
-      "infringe": "Patente, Marken, Geschäftsgeheimnisse, Urheberrechte oder andere Eigentumsrechte verletzen",
-      "harmful": "Viren oder anderen bösartigen Code hochladen",
-      "interfere": "In den Dienst oder die Server eingreifen oder diese stören",
-      "automated": "Automatisierte Methoden verwenden, um auf den Dienst zuzugreifen oder ihn zu nutzen"
-    },
-    "content": {
-      "title": "4. Inhaltseigentum und Lizenz",
-      "ownership": "Sie behalten alle Eigentumsrechte an allen Lebensläufen, Anschreiben oder anderen Inhalten, die Sie über unseren Dienst erstellen. Sie gewähren uns jedoch eine nicht-exklusive, weltweite, gebührenfreie Lizenz zur Nutzung, Reproduktion und Anzeige Ihrer Inhalte ausschließlich zum Zweck der Bereitstellung und Verbesserung unseres Dienstes.",
-      "responsibility": "Sie sind allein verantwortlich für alle Inhalte, die Sie erstellen, hochladen oder anderweitig über den Dienst verfügbar machen. Sie versichern und garantieren, dass Sie das Recht haben, alle in Ihren Lebensläufen enthaltenen Informationen zu verwenden, und dass der Inhalt keine Gesetze oder Rechte Dritter verletzt."
-    },
-    "ai": {
-      "title": "5. KI-generierte Inhalte",
-      "desc": "Unser Dienst verwendet künstliche Intelligenz, um bei der Erstellung von Lebensläufen und Anschreiben zu helfen. Sie erkennen an, dass:",
-      "accuracy": "KI-generierte Inhalte nicht immer genau oder für Ihre spezifischen Bedürfnisse geeignet sein könnten",
-      "review": "Sie sollten alle KI-generierten Inhalte überprüfen und bearbeiten, bevor Sie sie verwenden",
-      "responsibility": "Sie letztendlich für alle Inhalte in Ihrem Lebenslauf oder Anschreiben verantwortlich sind, einschließlich KI-generierter Teile"
-    },
-    "disclaimer": {
-      "title": "6. Haftungsausschluss",
-      "desc": "Unser Dienst wird \"wie besehen\" und \"wie verfügbar\" ohne jegliche Garantien jeglicher Art bereitgestellt, weder ausdrücklich noch implizit, einschließlich, aber nicht beschränkt auf die impliziten Garantien der Marktgängigkeit, Eignung für einen bestimmten Zweck oder Nichtverletzung.",
-      "success": "Wir garantieren nicht, dass unser Dienst Ihnen helfen wird, eine Anstellung oder Vorstellungsgespräche zu sichern. Die Wirksamkeit von Lebensläufen und Anschreiben hängt von vielen Faktoren ab, die außerhalb unserer Kontrolle liegen."
-    },
-    "limitation": {
-      "title": "7. Haftungsbeschränkung",
-      "desc": "In dem nach geltendem Recht maximal zulässigen Umfang haften CVATI, seine Direktoren, Mitarbeiter oder Vertreter in keinem Fall für indirekte, strafende, zufällige, besondere, folgende oder exemplarische Schäden, einschließlich, ohne Einschränkung, Schäden für entgangenen Gewinn, Goodwill, Nutzung, Daten oder andere immaterielle Verluste, die aus der Nutzung oder der Unmöglichkeit der Nutzung dieses Dienstes resultieren."
-    },
-    "privacy": {
-      "title": "8. Datenschutzrichtlinie",
-      "desc": "Ihre Nutzung unseres Dienstes unterliegt auch unserer Datenschutzrichtlinie, die durch Bezugnahme in diese Bedingungen einbezogen ist. Bitte lesen Sie unsere Datenschutzrichtlinie, um unsere Praktiken bezüglich Ihrer persönlichen Informationen zu verstehen."
-    },
-    "termination": {
-      "title": "9. Kündigung",
-      "userRight": "Sie können Ihr Konto jederzeit kündigen, indem Sie den Anweisungen im Dienst folgen. Alle Ihre Daten werden gemäß unserer Datenschutzrichtlinie gelöscht.",
-      "ourRight": "Wir können Ihr Konto sofort kündigen oder sperren, ohne vorherige Ankündigung oder Haftung, aus jedem Grund, einschließlich Verstoß gegen diese Bedingungen. Bei Kündigung erlischt Ihr Recht zur Nutzung des Dienstes sofort."
-    },
-    "changes": {
-      "title": "10. Änderungen der Bedingungen",
-      "desc": "Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern oder zu ersetzen. Wenn eine Überarbeitung wesentlich ist, werden wir mindestens 30 Tage vor Inkrafttreten neuer Bedingungen eine Benachrichtigung bereitstellen. Durch fortgesetzte Nutzung unseres Dienstes nach Inkrafttreten von Überarbeitungen erklären Sie sich mit den überarbeiteten Bedingungen einverstanden."
-    },
-    "governing": {
-      "title": "11. Geltendes Recht",
-      "desc": "Diese Bedingungen unterliegen den Gesetzen von [Ihr Land/Bundesland] und werden in Übereinstimmung mit diesen ausgelegt, ohne Berücksichtigung von Kollisionsnormen."
-    },
-    "contact": {
-      "title": "12. Kontakt",
-      "desc": "Wenn Sie Fragen zu diesen Bedingungen haben, kontaktieren Sie uns bitte unter:",
-      "email": "legal@cvati.com"
-    }
-  },
+  }, 
   "cookiePolicy": {
     "title": "Cookie-Richtlinie",
     "lastUpdated": "Zuletzt aktualisiert",
@@ -1236,8 +1091,7 @@
     "learnMore": "Mehr erfahren",
     "accept": "Akzeptieren",
     "decline": "Ablehnen"
-  }
-},
+  },
 "prod1": {
   "hero": {
     "title": "Finden Sie Ihren Traumjob",
@@ -1505,6 +1359,647 @@
       "ai_suggestion": "KI-Vorschlag zur Verbesserung:",
       "apply_suggestion": "Vorschlag anwenden",
       "discard": "Verwerfen"
+    }
+  }, 
+  "cloud": {
+    "no_signups_required": "Keine Anmeldung Erforderlich",
+    "instant_access": "Sofortiger Zugang",
+    "instant_access_desc": "Sofort mit dem Erstellen beginnen. Keine Anmeldung, keine Hindernisse, erstellen Sie einfach jetzt Ihren Lebenslauf.",
+    "local_first_design": "Lokal-Zuerst Design",
+    "local_first_desc": "Arbeiten Sie vollständig auf Ihrem Gerät. Speichern Sie lokal oder upgraden Sie bei Bedarf zur Cloud-Speicherung.",
+    "optional_cloud_upgrade": "Optionales Cloud-Upgrade",
+    "optional_cloud_desc": "Verbinden Sie Ihre Cloud-Speicherung, wenn Sie von mehreren Geräten auf Ihre Lebensläufe zugreifen möchten.",
+    "your_choice": "Ihre Wahl",
+    "your_choice_desc": "Lokal speichern für Privatsphäre oder in der Cloud für Komfort. Sie entscheiden.",
+    "no_lock_in": "Keine Bindung",
+    "no_lock_in_desc": "Wechseln Sie jederzeit zwischen lokaler und Cloud-Speicherung. Ihre Daten, Ihre Wahl.",
+    "instant_preview": "Sofortige Vorschau",
+    "instant_preview_desc": "Sehen Sie Ihren Lebenslauf sofort in verschiedenen Vorlagen, ohne zu warten.",
+    "privacy_first": "Privatsphäre Zuerst",
+    "privacy_first_desc": "Wir sehen niemals Ihre Daten, es sei denn, Sie wählen die Nutzung von KI-Funktionen.",
+    "start_building_choose_later": "Beginnen Sie zu Erstellen. Wählen Sie die Speicherung Später.",
+    "no_signups_desc": "Keine Anmeldung. Keine Hindernisse. Beginnen Sie einfach jetzt mit der Erstellung Ihres professionellen Lebenslaufs. Speichern Sie lokal oder verbinden Sie bei Bedarf die Cloud-Speicherung.",
+    "ready_local_cloud_connected": "Bereit: Lokale + Cloud-Speicherung (Verbunden)",
+    "ready_local_cloud_available": "Bereit: Lokale Speicherung • Cloud Verfügbar",
+    "professional_templates_desc": "Professionelle Vorlagen, die überall funktionieren. Beginnen Sie sofort mit jedem Design zu erstellen, dann speichern Sie auf Ihrem Gerät oder in der Cloud-Speicherung.",
+    "no_signup_required": "Keine Anmeldung erforderlich - sofort beginnen",
+    "save_local_upgrade_cloud": "Lokal speichern oder später zur Cloud upgraden",
+    "beautifully_designed": "und wunderschön gestaltet",
+    "start_building_now": "Jetzt mit dem Erstellen Beginnen",
+    "local_first_cloud_when_needed": "Lokal Zuerst. Cloud Wenn Sie Sie Brauchen.",
+    "start_immediately_choose_storage": "Beginnen Sie sofort mit der Erstellung auf Ihrem Gerät, dann wählen Sie Ihre Speicheroption.",
+    "start_immediately_no_signup": "Sofort beginnen. Keine Anmeldung erforderlich. Wählen Sie Ihre Speicheroption beim Speichern.",
+    "your_data_your_choice": "Ihre Daten, Ihre Wahl",
+    "work_way_you_want": "Arbeiten Sie, wie Sie möchten. Lokale Privatsphäre oder Cloud-Komfort - Sie entscheiden.",
+    "simple_flexible_control": "Einfach, flexibel und gibt Ihnen Kontrolle über Ihre Daten.",
+    "choose_template_start_creating": "Wählen Sie eine Vorlage und beginnen Sie sofort mit der Erstellung Ihres Lebenslaufs. Keine Anmeldung, keine Hindernisse.",
+    "choose_storage": "Speicherung Wählen",
+    "when_ready_save_choose": "Wenn Sie bereit zum Speichern sind, wählen Sie lokale Speicherung oder verbinden Sie Ihre Cloud für Gerätesynchronisation.",
+    "access_anywhere": "Überall Zugriff",
+    "local_files_device_cloud_sync": "Lokale Dateien bleiben auf Ihrem Gerät. Cloud-Dateien synchronisieren sich automatisch über alle Ihre Geräte.",
+    "people_love_flexibility": "Menschen lieben die Flexibilität und den sofortigen Zugang.",
+    "start_immediately_no_signup_connect": "Sofort beginnen - keine Anmeldung erforderlich. Lokal speichern für Privatsphäre oder Cloud-Speicherung für Komfort verbinden.",
+    "ready_local_cloud_storage_available": "Bereit: Lokale + Cloud-Speicherung Verfügbar",
+    "ready_local_storage_cloud_optional": "Bereit: Lokale Speicherung • Cloud Optional",
+    "tip_connect_cloud_storage": "💡 Tipp: Verbinden Sie Cloud-Speicherung, um von jedem Gerät auf Ihre Lebensläufe zuzugreifen",
+    "google_drive": "Google Drive",
+    "connected_count": "{count} Verbunden",
+    "no_cloud": "Keine Cloud",
+    "cloud_storage_connected": "Cloud-Speicherung verbunden",
+    "no_cloud_storage_connected": "Cloud-Speicherung nicht verbunden",
+    "cloud_storage_status": "Cloud-Speicherung Status",
+    "google_drive_connected": "Google Drive Verbunden",
+    "cvs_sync_devices": "✓ Ihre Lebensläufe synchronisieren sich über alle Geräte",
+    "automatic_backup_enabled": "✓ Automatische Sicherung aktiviert",
+    "manage_cloud_storage": "Cloud-Speicherung Verwalten",
+    "no_cloud_storage": "Keine Cloud-Speicherung",
+    "cvs_saved_locally_only": "Ihre Lebensläufe sind nur lokal gespeichert",
+    "connect_cloud_device_sync": "Verbinden Sie Cloud-Speicherung für Gerätesynchronisation",
+    "connect_cloud_storage": "Cloud-Speicherung Verbinden",
+    "clear_session_cloud_connections": "Aktuelle Sitzung und Cloud-Verbindungen löschen",
+    "clear_session": "Sitzung Löschen",
+    "cloud_storage": "Cloud-Speicherung",
+    "source": "Quelle",
+    "local": "Lokal",
+    "draft": "Entwurf",
+    "this_device": "Dieses Gerät",
+    "choose_destination": "Ziel wählen",
+    "local_only": "Nur Lokal",
+    "change_location": "Ort Ändern",
+    "connect_cloud": "Cloud Verbinden",
+    "save_cv": "Lebenslauf Speichern",
+    "base64_info": "Das Bild wird direkt in Ihrer Lebenslauf-Datei für maximale Privatsphäre gespeichert.",
+    "processing": "Verarbeitung...",
+    "compressed_too_large": "Das Bild ist nach der Komprimierung immer noch zu groß. Bitte verwenden Sie ein kleineres Bild.",
+    "remove_error": "Fehler beim Entfernen des Fotos. Bitte versuchen Sie es erneut.",
+    "unsaved_changes_save_before_leaving": "Sie haben ungespeicherte Änderungen. Möchten Sie vor dem Verlassen speichern?",
+    "unsaved_changes": "Ungespeicherte Änderungen",
+    "save_locally": "Lokal Speichern",
+    "save_to_drive": "Auf Drive Speichern",
+    "your_cv": "Ihr Lebenslauf",
+    "where_save_cv": "Wo möchten Sie Ihren Lebenslauf speichern?",
+    "save_to_google_drive": "Auf Google Drive Speichern",
+    "access_any_device_backup": "Zugriff von jedem Gerät • Automatische Sicherung",
+    "connect": "Verbinden",
+    "onedrive": "OneDrive",
+    "microsoft_integration": "Microsoft-Integration • Office-Synchronisation",
+    "coming_soon": "Bald Verfügbar",
+    "dropbox": "Dropbox",
+    "file_sharing_collaboration": "Dateifreigabe-fokussiert • Team-Zusammenarbeit",
+    "save_to_device": "Auf Diesem Gerät Speichern",
+    "private_offline_device_only": "Privat • Funktioniert offline • Nur dieses Gerät",
+    "connect_cloud_device_sync_tip": "💡 Verbinden Sie Cloud-Speicherung für Gerätesynchronisation",
+    "cv_accessible_any_device": "Ihr Lebenslauf wird von jedem Gerät mit Ihrem Konto zugänglich sein",
+    "auto_saved_tip": "💡 Ihre Arbeit wird automatisch während des Tippens gespeichert - Sie verlieren nichts!",
+    "current_work_session": "Aktuelle Arbeitssitzung",
+    "saved_locally": "Lokal Gespeichert",
+    "from": "von",
+    "no_cv_selected": "Kein Lebenslauf ausgewählt",
+    "customizing": "Anpassung",
+    "cvs_available": "Lebensläufe verfügbar",
+    "preview_apply": "Vorschau & Anwenden",
+    "changes_previewed_live": "Ihre Änderungen werden live vorgeschaut. Wenden Sie sie an, um Ihren Lebenslauf zu aktualisieren.",
+    "apply_customizations": "Anpassungen Anwenden",
+    "how_it_works": "So funktioniert es",
+    "changes_previewed_instantly": "Änderungen werden sofort vorgeschaut",
+    "click_apply_save": "Klicken Sie \"Anwenden\", um in Ihrem Lebenslauf zu speichern",
+    "use_publish_shareable": "Verwenden Sie \"Veröffentlichen\", um einen teilbaren Link zu erstellen",
+    "published_links_styling": "Veröffentlichte Links enthalten Ihr Styling",
+    "lock_in": "Keine Bindung",
+    "no_session_title": "Keine Sitzung Eingerichtet",
+    "sign_in_to_access": "Bitte melden Sie sich an, um auf Ihre Anschreiben zuzugreifen und mit dem Aufbau Ihres professionellen Werkzeugkastens zu beginnen!",
+    "sign_in_to_get_started": "Anmelden zum Beginnen",
+    "tip_connect_google_drive": "Tipp: Verbinden Sie Google Drive, um Ihre Anschreiben über Geräte zu synchronisieren!",
+    "connect_google_drive": "Google Drive Verbinden",
+    "connect_drive_to_save": "Verbinden Sie Ihr Google Drive, um Ihre KI-generierten Anschreiben zu speichern und darauf zuzugreifen",
+    "tip_google_drive_integration": "Tipp: Google Drive-Integration ermöglicht es Ihnen, von überall auf Ihre Anschreiben zuzugreifen!",
+    "from_google_drive": "Von Google Drive",
+    "access_saved_cvs": "um auf Ihre gespeicherten Lebensläufe zuzugreifen",
+    "stored_in_google_drive": "In Google Drive Gespeichert",
+    "stored_in_local_storage": "Im Lokalen Speicher Gespeichert",
+    "drive": "Drive",
+    "connect_drive_to_edit": "Verbinden Sie Google Drive, um Anschreiben zu bearbeiten",
+    "current_draft": "Aktueller Entwurf",
+    "local_storage": "Lokaler Speicher",
+    "local_storage_only": "Nur lokaler Speicher",
+    "connect_google_drive_sync": "Verbinden Sie Google Drive zur Synchronisation über Geräte",
+    "processing_connection": "Google Drive-Verbindung wird verarbeitet...",
+    "connection_failed": "Google Drive-Verbindung fehlgeschlagen",
+    "verifying_connection": "Google Drive-Verbindung wird verifiziert...",
+    "connection_successful": "Erfolgreich mit Google Drive verbunden!",
+    "connected_save_to_cloud": "Google Drive verbunden! Sie können jetzt Ihren Lebenslauf in der Cloud speichern.",
+    "verification_failed": "Backend-Verifizierung fehlgeschlagen. Sie können die Option \"Trotzdem Fortfahren\" versuchen.",
+    "verification_error": "Verifizierungsfehler",
+    "no_success_confirmation": "Keine Erfolgsbestätigung erhalten",
+    "processing_error": "Verarbeitungsfehler",
+    "assuming_connected": "Annahme, dass Google Drive verbunden ist. Versuchen Sie zu speichern, um zu testen.",
+    "connecting_title": "Verbindung zu Google Drive...",
+    "connection_successful_title": "Verbindung Erfolgreich!",
+    "connection_issue_title": "Verbindungsproblem",
+    "data_stays_in_your_drive": "Ihre Daten bleiben in IHREM Google Drive-Konto",
+    "redirecting_to_builder": "Weiterleitung zum Lebenslauf-Builder...",
+    "continue_anyway": "Trotzdem Fortfahren",
+    "try_again": "Erneut Versuchen",
+    "provider_connected": "Ihr {{provider}}-Konto wurde erfolgreich verbunden.",
+    "continue_to_create": "Weiter zum Lebenslauf Erstellen",
+    "can_now_save_access": "Sie können jetzt Ihre Lebensläufe aus der Cloud speichern und darauf zugreifen.",
+    "cloud_storage_setup": "Cloud-Speicherung Einrichtung",
+    "cvs_automatically_saved": "Ihre Lebensläufe werden automatisch in Ihrem Google Drive gespeichert",
+    "access_cvs_any_device": "Greifen Sie von jedem Gerät mit Ihrem Google-Konto auf Ihre Lebensläufe zu",
+    "why_google_drive": "Warum Google Drive?",
+    "google_drive_benefits": "Google Drive bietet sicheren, zuverlässigen Cloud-Speicher, dem Sie bereits vertrauen. Ihre Lebensläufe werden direkt in Ihrem Konto mit Ende-zu-Ende-Sicherheit gespeichert.",
+    "local_storage_always_available": "Lokaler Speicher Immer Verfügbar",
+    "can_save_locally": "Sie können Ihre Lebensläufe immer lokal in Ihrem Browser speichern. Google Drive-Verbindung ist optional für Cloud-Backup und Synchronisation.",
+    "local_works_offline": "💡 Lokaler Speicher funktioniert auch ohne Internetverbindung",
+    "can_save_cvs_to_drive": "Sie können jetzt Ihre Lebensläufe direkt in Ihrem Google Drive speichern",
+    "save_cvs_securely": "Speichern Sie Ihre Lebensläufe sicher in Ihrem eigenen Google Drive-Konto",
+    "connecting": "Verbindung",
+    "privacy_protected": "Privatsphäre Geschützt",
+    "never_access_files": "Ihre Lebensläufe werden direkt in Ihrem Google Drive gespeichert - wir greifen niemals auf Ihre Dateien zu",
+    "publish_failed": "Veröffentlichung des Lebenslaufs fehlgeschlagen",
+    "share_resume_text": "Schauen Sie sich {{name}} Lebenslauf an",
+    "this_person": "diese Person",
+    "qr_complexity_unknown": "Komplexität kann nicht geschätzt werden",
+    "public_cv_qr_title": "Öffentlicher Lebenslauf & QR-Code",
+    "public_link_description": "Erstellen Sie einen öffentlichen Link, auf den jeder zugreifen kann, um Ihren Lebenslauf zu sehen. Kein Konto für Betrachter erforderlich.",
+    "publishing": "Veröffentlichung",
+    "publish_cv_publicly": "Lebenslauf Öffentlich Veröffentlichen",
+    "published_successfully": "Erfolgreich Veröffentlicht",
+    "public_url_label": "Öffentliche URL ({{count}} Zeichen)",
+    "copy_url": "URL Kopieren",
+    "open_new_tab": "In neuem Tab öffnen",
+    "share": "Teilen",
+    "hide_qr": "QR Verstecken",
+    "show_qr": "QR Anzeigen",
+    "download_qr": "QR Herunterladen",
+    "unpublish_cv": "Lebenslauf Veröffentlichung Aufheben",
+    "no_login_required": "Keine Anmeldung Erforderlich!",
+    "platform_works_without_accounts": "Unsere Plattform funktioniert ohne Benutzerkonten.",
+    "start_building_connect_optional": "Beginnen Sie sofort mit der Erstellung Ihres Lebenslaufs, dann verbinden Sie optional Cloud-Speicherung zur Synchronisation über Geräte.",
+    "start_building_cv": "Beginnen Sie mit der Erstellung Ihres Lebenslaufs",
+    "no_registration_needed": "Keine Registrierung Benötigt!",
+    "jump_straight_building": "Springen Sie direkt zur Erstellung Ihres Lebenslaufs.",
+    "data_stays_cloud_storage": "Ihre Daten bleiben in Ihrer eigenen Cloud-Speicherung, wenn Sie sich entscheiden zu speichern.",
+    "start_building": "Mit Erstellen Beginnen",
+    "manage_storage_options": "Verwalten Sie Ihre lokalen und Cloud-Speicheroptionen",
+    "resume_template": "Lebenslauf-Vorlage",
+    "choose_file": "Datei wählen",
+    "optional": "Optional",
+    "saving_locally": "Lokal speichern ..",
+    "saving_to_cloud": "In Cloud speichern ..",
+    "select_local_cv": "-- Wählen Sie einen Lebenslauf aus dem Lokalen Speicher --",
+    "from_local_storage": "Aus dem Speicher Ihres Geräts",
+    "found_cvs": "{{count}} Lebenslauf gefunden",
+    "search_cv_placeholder": "Nach Lebenslauf-Titel oder Name suchen...",
+    "no_cvs_match_search": "Keine Lebensläufe entsprechen Ihrer Suche",
+    "no_cvs_found": "Keine Lebensläufe gefunden",
+    "try_different_search": "Versuchen Sie einen anderen Suchbegriff",
+    "create_cv_first": "Erstellen Sie zuerst einen Lebenslauf, um damit zu arbeiten",
+    "cvs_count": "Lebenslauf{{count, plural, one {} other {läufe}}}",
+    "my_saved_cvs": "Meine Gespeicherten Lebensläufe",
+    "unknown_source": "Unbekannte Quelle",
+    "no_name": "Kein Name",
+    "cv_number": "Lebenslauf {{number}}",
+    "current_editing_session": "Aktuelle Bearbeitungssitzung",
+    "saved_on_device": "Auf diesem Gerät gespeichert",
+    "selected": "Ausgewählt",
+    "select_this_cv": "Diesen Lebenslauf Auswählen",
+    "saved": "Gespeichert",
+    "select_cv": "Lebenslauf Auswählen",
+    "available": "verfügbar",
+    "refresh_cv_list": "Lebenslauf-Liste aktualisieren",
+    "draft_from_builder": "Entwurf vom Lebenslauf-Builder",
+    "local_draft": "Lokaler Entwurf",
+    "google_drive_cv": "Google Drive Lebenslauf",
+    "resume_id": "Lebenslauf {{id}}",
+    "from_database": "Aus der Datenbank",
+    "failed_load_cvs": "Fehler beim Laden verfügbarer Lebensläufe",
+    "searching_cvs": "Suche nach Ihren Lebensläufen...",
+    "customizations_saved_locally": "Anpassungen lokal gespeichert!",
+    "failed_save_customizations": "Fehler beim Speichern der Anpassungen",
+    "back_to_cv_builder": "Zurück zum Lebenslauf-Builder",
+    "create_cv_to_customize": "Wir konnten keine Lebensläufe zum Anpassen finden. Erstellen Sie zuerst einen!",
+    "create_new_cv": "Neuen Lebenslauf Erstellen",
+    "select_cv_to_customize": "Lebenslauf zum Anpassen Auswählen",
+    "choose_cv_to_customize": "Wählen Sie, welchen Lebenslauf Sie anpassen möchten"
+  },
+  "terms": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "subtitle": "Klare Bedingungen für die Nutzung von CVati. Ihre Rechte, unsere Verantwortlichkeiten und was Sie erwarten können.",
+    "effective_date": "Inkrafttreten",
+    "date": "Dezember 2024",
+    "agreement": {
+      "title": "Zustimmung zu den Bedingungen",
+      "content": "Durch den Zugriff auf und die Nutzung von CVati akzeptieren und stimmen Sie zu, an die Bedingungen und Bestimmungen dieser Vereinbarung gebunden zu sein. Wenn Sie nicht einverstanden sind, das oben Genannte zu befolgen, nutzen Sie diesen Service bitte nicht."
+    },
+    "service": {
+      "title": "Service-Beschreibung",
+      "what_we_provide": {
+        "title": "Was Wir Bereitstellen"
+      },
+      "cv_builder": "Professionelle Lebenslauf/CV-Erstellungstools",
+      "templates": "Mehrere anpassbare Vorlagen",
+      "local_storage": "Lokale Speicherfähigkeiten",
+      "cloud_integration": "Optionale Cloud-Speicher-Integration",
+      "export_features": "Export- und Download-Funktionen",
+      "no_signup": {
+        "title": "Keine Registrierung Erforderlich",
+        "description": "CVati arbeitet mit einem Modell ohne Registrierung. Sie können alle Kernfunktionen sofort ohne Erstellung eines Kontos nutzen. Cloud-Speicher-Verbindung ist optional und benutzergesteuert."
+      }
+    },
+    "responsibilities": {
+      "title": "Benutzerverantwortlichkeiten",
+      "acceptable_use": {
+        "title": "Akzeptable Nutzung"
+      },
+      "lawful_use": "Den Service nur für legale Zwecke nutzen",
+      "accurate_info": "Genaue Informationen in Ihren Lebensläufen bereitstellen",
+      "no_harmful_content": "Keine schädlichen oder beleidigenden Inhalte hochladen",
+      "respect_others": "Geistige Eigentumsrechte respektieren",
+      "prohibited": {
+        "title": "Verbotene Aktivitäten"
+      },
+      "no_reverse_engineering": "Reverse Engineering oder Kopieren des Services",
+      "no_automated_access": "Automatisierte Datensammlung oder Scraping",
+      "no_interference": "Störung der Service-Abläufe",
+      "no_malicious_use": "Nutzung des Services für böswillige Zwecke"
+    },
+    "data_privacy": {
+      "title": "Daten und Datenschutz",
+      "ownership": {
+        "title": "Ihr Datenbesitz",
+        "description": "Sie behalten vollständiges Eigentum und Kontrolle über alle Inhalte, die Sie mit CVati erstellen. Wir erheben keine Ansprüche auf Ihren Lebenslauf-Inhalt, persönliche Informationen oder hochgeladene Materialien."
+      },
+      "local_storage": {
+        "title": "Lokale Speicherung",
+        "description": "Lokal gespeicherte Daten verbleiben auf Ihrem Gerät und werden nicht an unsere Server übertragen."
+      },
+      "cloud_storage": {
+        "title": "Cloud-Speicherung",
+        "description": "Cloud-Speicherung ist optional und nutzt Ihr eigenes Google Drive-Konto mit widerrufbaren Berechtigungen."
+      }
+    },
+    "availability": {
+      "title": "Service-Verfügbarkeit",
+      "uptime": {
+        "title": "Service-Betriebszeit",
+        "description": "Wir bemühen uns, hohe Service-Verfügbarkeit aufrechtzuerhalten, können aber keine 100%ige Betriebszeit garantieren. Geplante Wartung wird im Voraus angekündigt, wenn möglich."
+      },
+      "local_functionality": {
+        "title": "Lokale Funktionalität",
+        "description": "Kern-Lebenslauf-Erstellungsfunktionen arbeiten lokal auf Ihrem Gerät und benötigen keine Internetverbindung. Cloud-Funktionen erfordern Internetzugang."
+      }
+    },
+    "limitations": {
+      "title": "Einschränkungen und Haftungsausschlüsse",
+      "warranty": {
+        "title": "Keine Gewährleistung",
+        "description": "CVati wird \"wie besehen\" ohne jegliche Gewährleistungen, ausdrücklich oder stillschweigend, bereitgestellt. Wir garantieren nicht, dass der Service fehlerfrei, sicher oder kontinuierlich verfügbar sein wird."
+      },
+      "liability": {
+        "title": "Haftungsbeschränkung",
+        "description": "Wir sind nicht haftbar für Schäden, die aus der Nutzung oder der Unfähigkeit zur Nutzung unseres Services entstehen."
+      },
+      "third_party": {
+        "title": "Drittanbieter-Services",
+        "description": "Integration mit Drittanbieter-Services (wie Google Drive) unterliegt deren Bedingungen und Verfügbarkeit."
+      }
+    },
+    "modifications": {
+      "title": "Änderungen an Service und Bedingungen",
+      "service_changes": {
+        "title": "Service-Änderungen",
+        "description": "Wir behalten uns das Recht vor, jeden Teil des Services jederzeit zu ändern, zu pausieren oder einzustellen. Wir werden angemessene Vorankündigung bei bedeutenden Änderungen geben, wenn möglich."
+      },
+      "terms_changes": {
+        "title": "Änderungen der Bedingungen",
+        "description": "Diese Bedingungen können von Zeit zu Zeit aktualisiert werden. Fortgesetzte Nutzung des Services nach Änderungen stellt Akzeptanz der neuen Bedingungen dar."
+      }
+    },
+    "termination": {
+      "title": "Kündigung",
+      "by_user": {
+        "title": "Kündigung durch Sie",
+        "description": "Sie können die Nutzung des Services jederzeit beenden. Ihre lokal gespeicherten Daten verbleiben auf Ihrem Gerät. Sie können Cloud-Speicher-Berechtigungen unabhängig widerrufen."
+      },
+      "by_us": {
+        "title": "Kündigung durch Uns",
+        "description": "Wir können den Zugang einschränken, wenn Bedingungen verletzt werden. Wir werden eine Benachrichtigung geben, wenn möglich, und angemessene Zeit zur Datenwiederherstellung."
+      }
+    },
+    "legal": {
+      "title": "Rechtliche Informationen",
+      "contact": {
+        "title": "Kontaktinformationen",
+        "email": {
+          "label": "E-Mail",
+          "address": "legal@cvati.com"
+        },
+        "response": {
+          "label": "Antwortzeit",
+          "time": "Innerhalb von 48 Stunden"
+        }
+      },
+      "governing_law": {
+        "title": "Anwendbares Recht",
+        "description": "Diese Bedingungen werden gemäß den anwendbaren Gesetzen geregelt und ausgelegt. Streitigkeiten werden durch angemessene Rechtskanäle gelöst."
+      }
+    },
+    "acceptance": {
+      "title": "Akzeptanz der Bedingungen",
+      "description": "Durch die Nutzung von CVati erkennen Sie an, dass Sie diese Allgemeinen Geschäftsbedingungen gelesen, verstanden und zugestimmt haben, an sie gebunden zu sein.",
+      "effective": "Diese Bedingungen treten sofort bei Ihrer Nutzung des Services in Kraft",
+      "questions": "Fragen zu Diesen Bedingungen?"
+    }
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "subtitle": "Ihre Privatsphäre ist wichtig. Erfahren Sie, wie wir Ihre Daten mit Transparenz und Sorgfalt behandeln.",
+    "last_updated": "Zuletzt Aktualisiert",
+    "date": "Dezember 2024",
+    "introduction": {
+      "title": "Einführung",
+      "content": "Willkommen bei CVati. Diese Datenschutzerklärung erklärt, wie wir Ihre Informationen sammeln, verwenden, offenlegen und schützen, wenn Sie unsere Lebenslauf/CV-Erstellungsanwendung und -services nutzen. Bitte lesen Sie diese Datenschutzerklärung sorgfältig. Wenn Sie mit den Bedingungen dieser Datenschutzerklärung nicht einverstanden sind, greifen Sie bitte nicht auf die Anwendung zu."
+    },
+    "collection": {
+      "title": "Informationen, die Wir Sammeln",
+      "personal": {
+        "title": "Persönliche Informationen, die Sie Bereitstellen",
+        "description": "Wenn Sie unseren Service nutzen, können wir die folgenden persönlichen Informationen sammeln, die Sie freiwillig bereitstellen:"
+      },
+      "cv_content": "Lebenslauf/CV-Inhalt",
+      "personal_info": "Persönliche Informationen (Name, E-Mail, Telefon, Adresse)",
+      "professional_info": "Berufliche Informationen (Berufserfahrung, Bildung, Fähigkeiten)",
+      "personal_details": "Persönliche Details (Geburtsdatum, Nationalität)",
+      "photos": "Profilfotos und Bilder",
+      "references": "Referenzen und Kontaktinformationen",
+      "account_info": "Kontoinformationen",
+      "session_tokens": "Sitzungstoken für Authentifizierung",
+      "preferences": "Benutzereinstellungen und Konfigurationen",
+      "usage_data": "Anwendungsnutzungsdaten",
+      "automatic": {
+        "title": "Automatisch Gesammelte Informationen"
+      },
+      "device_info": "Geräteinformationen (Browser-Typ, Betriebssystem)",
+      "analytics": "Nutzungsanalysen und Anwendungsleistungsdaten",
+      "session_data": "Sitzungsdaten und Authentifizierungstoken",
+      "local_storage": "Lokale Speicherdaten für Offline-Funktionalität"
+    },
+    "usage": {
+      "title": "Wie Wir Ihre Informationen Verwenden",
+      "primary": {
+        "title": "Primäre Services"
+      },
+      "cv_creation": "Lebenslauf-Erstellung und -Bearbeitung",
+      "template_application": "Vorlagenanwendung und -anpassung",
+      "data_storage": "Datenspeicherung (lokal und Cloud)",
+      "document_generation": "Dokumentenerstellung und -export",
+      "service": {
+        "title": "Service-Verbesserung"
+      },
+      "app_improvement": "Anwendungsverbesserung und -optimierung",
+      "technical_support": "Technischer Support und Fehlerbehebung",
+      "security": "Sicherheit und Betrugsprävention",
+      "analytics": "Nutzungsanalysen (anonymisiert)"
+    },
+    "storage": {
+      "title": "Datenspeicherungsoptionen",
+      "local": {
+        "title": "Lokale Speicherung (Standard)",
+        "device_only": "Daten bleiben nur auf Ihrem Gerät",
+        "no_transmission": "Keine Datenübertragung an unsere Server",
+        "full_privacy": "Vollständige Privatsphäre und Kontrolle",
+        "browser_storage": "Nutzt Browser-lokale Speicherung"
+      },
+      "cloud": {
+        "title": "Cloud-Speicherung (Optional)",
+        "google_drive": "Google Drive-Integration",
+        "encrypted": "Daten verschlüsselt bei Übertragung und Speicherung",
+        "user_control": "Benutzergesteuerte Verbindung",
+        "revocable": "Berechtigungen jederzeit widerrufbar"
+      }
+    },
+    "sharing": {
+      "title": "Datenweitergabe und -offenlegung",
+      "no_selling": {
+        "title": "Wir Verkaufen Ihre Daten Nicht",
+        "description": "Wir verkaufen, vermieten oder handeln niemals mit Ihren persönlichen Informationen an Dritte. Ihre Lebenslauf-Daten bleiben privat und unter Ihrer Kontrolle."
+      },
+      "limited": {
+        "title": "Begrenzte Weitergabe-Szenarien"
+      },
+      "legal_compliance": "Rechtliche Compliance, wenn gesetzlich erforderlich",
+      "security_protection": "Schutz unserer Rechte und Sicherheit",
+      "service_providers": "Vertrauensvolle Service-Anbieter (mit strengen Vereinbarungen)",
+      "user_consent": "Nur mit Ihrer ausdrücklichen Zustimmung"
+    },
+    "rights": {
+      "title": "Ihre Rechte und Wahlmöglichkeiten",
+      "access": {
+        "title": "Zugang und Kontrolle",
+        "view": "Alle Ihre gespeicherten Daten einsehen",
+        "edit": "Ihre Informationen bearbeiten oder aktualisieren",
+        "delete": "Ihre Daten jederzeit löschen",
+        "export": "Ihre Daten exportieren (Portabilität)"
+      },
+      "storage": {
+        "title": "Speicherwahlmöglichkeiten",
+        "local_only": "Daten nur lokal behalten",
+        "cloud_connect": "Cloud-Speicherung verbinden/trennen",
+        "revoke": "Cloud-Berechtigungen widerrufen",
+        "migrate": "Zwischen Speicheroptionen migrieren"
+      }
+    },
+    "security": {
+      "title": "Sicherheitsmaßnahmen",
+      "encryption": {
+        "title": "Verschlüsselung",
+        "description": "Alle Datenübertragungen verwenden HTTPS-Verschlüsselung"
+      },
+      "access": {
+        "title": "Zugriffskontrolle",
+        "description": "Sichere Authentifizierung und Sitzungsverwaltung"
+      },
+      "monitoring": {
+        "title": "Überwachung",
+        "description": "Kontinuierliche Sicherheitsüberwachung und Updates"
+      }
+    },
+    "contact": {
+      "title": "Kontaktieren Sie Uns",
+      "description": "Wenn Sie Fragen zu dieser Datenschutzerklärung oder unseren Datenpraktiken haben, kontaktieren Sie uns bitte:",
+      "email": {
+        "title": "E-Mail",
+        "address": "privacy@cvati.com"
+      },
+      "response": {
+        "title": "Antwortzeit",
+        "time": "Wir antworten innerhalb von 48 Stunden"
+      }
+    },
+    "updates": {
+      "title": "Richtlinien-Updates",
+      "description": "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Wir werden Sie über Änderungen informieren, indem wir die neue Datenschutzerklärung auf dieser Seite veröffentlichen und das Datum \"Zuletzt Aktualisiert\" aktualisieren.",
+      "notification": "Benachrichtigungen über Updates Erhalten"
+    }
+  },
+  "cookies2": {
+    "title": "Cookie-Richtlinie",
+    "subtitle": "Erfahren Sie, wie CVati Cookies und ähnliche Technologien verwendet, um Ihre Erfahrung zu verbessern.",
+    "last_updated": "Zuletzt aktualisiert",
+    "date": "September 2025",
+    "message": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Durch die weitere Nutzung dieser Website stimmen Sie unserer Verwendung von Cookies zu.",
+    "learnMore": "Mehr erfahren",
+    "decline": "Ablehnen",
+    "accept": "Akzeptieren",
+    
+    "what_are": {
+      "title": "Was sind Cookies?",
+      "description": "Cookies sind kleine Textdateien, die auf Ihrem Gerät gespeichert werden, wenn Sie eine Website besuchen. Sie helfen Websites dabei, sich an Ihre Präferenzen zu erinnern und Ihr Browsing-Erlebnis zu verbessern.",
+      "how_work": {
+        "title": "Wie sie funktionieren",
+        "description": "Cookies speichern Informationen über Ihren Besuch und können Sie erkennen, wenn Sie zur Website zurückkehren."
+      },
+      "your_control": {
+        "title": "Ihre Kontrolle",
+        "description": "Sie können Cookies jederzeit über Ihre Browser-Einstellungen kontrollieren und löschen."
+      }
+    },
+    
+    "how_we_use": {
+      "title": "Wie CVati Cookies verwendet",
+      "minimal_approach": {
+        "title": "Minimaler Cookie-Ansatz",
+        "description": "CVati verfolgt einen datenschutzorientierten Ansatz und verwendet minimale Cookies. Die meisten Funktionen funktionieren ohne Cookies, und wir verwenden sie nur bei Bedarf für Kernfunktionen."
+      },
+      "purposes": {
+        "title": "Wir verwenden Cookies für:"
+      },
+      "essential": {
+        "title": "Wesentliche Funktionen",
+        "session": "Sitzungsverwaltung und Authentifizierung",
+        "preferences": "Speicherung Ihrer Präferenzen (Dunkler Modus, Sprache)",
+        "local_storage": "Lokale Speicherfunktionalität"
+      },
+      "analytics": {
+        "title": "Analytics (Optional)",
+        "usage": "Verstehen, wie die App verwendet wird",
+        "performance": "Leistungsüberwachung",
+        "improvements": "Identifizierung von Verbesserungsmöglichkeiten"
+      }
+    },
+    
+    "types": {
+      "title": "Arten von Cookies, die wir verwenden",
+      "essential": {
+        "title": "Wesentliche Cookies (Erforderlich)",
+        "status": "Immer aktiv",
+        "description": "Diese Cookies sind für das ordnungsgemäße Funktionieren der Website erforderlich und können nicht deaktiviert werden.",
+        "session": {
+          "title": "Sitzungs-Cookies",
+          "description": "Aufrechterhalten Ihrer Sitzung während der App-Nutzung"
+        },
+        "preferences": {
+          "title": "Präferenz-Cookies",
+          "description": "Speichern Ihre Einstellungen wie den dunklen Modus"
+        },
+        "consent": {
+          "title": "Einverständnis-Cookies",
+          "description": "Speichern Ihre Cookie-Präferenzen"
+        }
+      },
+      "analytics": {
+        "title": "Analytics-Cookies (Optional)",
+        "status": "Benutzerauswahl",
+        "description": "Diese Cookies helfen uns zu verstehen, wie Sie unsere Website nutzen, damit wir sie verbessern können.",
+        "usage": {
+          "title": "Nutzungsanalyse",
+          "description": "Verfolgen, welche Funktionen am häufigsten verwendet werden"
+        },
+        "performance": {
+          "title": "Leistungsüberwachung",
+          "description": "Überwachen der App-Geschwindigkeit und -Zuverlässigkeit"
+        }
+      },
+      "marketing": {
+        "title": "Marketing-/Werbe-Cookies",
+        "status": "Nicht verwendet",
+        "description": "CVati verwendet keine Marketing- oder Werbe-Cookies. Wir verfolgen Sie nicht für Werbezwecke oder teilen Daten mit Werbetreibenden."
+      }
+    },
+    
+    "third_party": {
+      "title": "Drittanbieter-Dienste",
+      "description": "Wenn Sie sich für die Verbindung optionaler Dienste entscheiden, können diese ihre eigenen Cookies setzen:",
+      "google_drive": {
+        "title": "Google Drive-Integration",
+        "description": "Wenn Sie Google Drive verbinden, kann Google Cookies gemäß ihrer Datenschutzrichtlinie setzen."
+      },
+      "analytics_service": {
+        "title": "Analytics-Service",
+        "description": "Wenn aktiviert, kann unser Analytics-Anbieter Cookies setzen, um Nutzungsmuster zu verfolgen."
+      }
+    },
+    
+    "managing": {
+      "title": "Verwaltung Ihrer Cookie-Präferenzen",
+      "your_choices": {
+        "title": "Ihre Auswahlmöglichkeiten"
+      },
+      "banner_choice": {
+        "title": "Cookie-Banner",
+        "description": "Akzeptieren oder lehnen Sie optionale Cookies ab, wenn Sie CVati zum ersten Mal besuchen."
+      },
+      "browser_settings": {
+        "title": "Browser-Einstellungen",
+        "description": "Kontrollieren Sie Cookies über Ihre Browser-Einstellungen - blockieren, löschen oder verwalten Sie alle Cookies."
+      },
+      "browser_instructions": {
+        "title": "Browser-spezifische Anweisungen"
+      },
+      "browsers": {
+        "chrome": "Cookies in Chrome-Einstellungen verwalten",
+        "firefox": "Cookies in Firefox-Einstellungen verwalten",
+        "safari": "Cookies in Safari-Einstellungen verwalten",
+        "edge": "Cookies in Edge-Einstellungen verwalten",
+        "opera": "Cookies in Opera-Einstellungen verwalten",
+        "mobile": "Cookies in mobilen Browser-Einstellungen verwalten"
+      }
+    },
+    
+    "impact": {
+      "title": "Auswirkungen der Deaktivierung von Cookies",
+      "essential_disabled": {
+        "title": "Wenn wesentliche Cookies deaktiviert sind",
+        "sessions": "Sitzungsverwaltung funktioniert möglicherweise nicht ordnungsgemäß",
+        "preferences": "Ihre Präferenzen (Dunkler Modus, Sprache) werden nicht gespeichert",
+        "cloud_sync": "Cloud-Speicher-Synchronisation kann beeinträchtigt werden"
+      },
+      "analytics_disabled": {
+        "title": "Wenn Analytics-Cookies deaktiviert sind",
+        "functionality": "Alle Funktionen bleiben vollständig verfügbar",
+        "improvements": "Wir können keine Erkenntnisse zur Verbesserung der App sammeln",
+        "issues": "Schwieriger, technische Probleme zu identifizieren und zu beheben"
+      }
+    },
+    
+    "contact": {
+      "title": "Fragen zu Cookies?",
+      "description": "Wenn Sie Fragen zu unserer Verwendung von Cookies oder zu dieser Cookie-Richtlinie haben, kontaktieren Sie uns bitte:",
+      "email": {
+        "title": "E-Mail",
+        "address": "cookies@cvati.com"
+      },
+      "response": {
+        "title": "Antwortzeit",
+        "time": "Wir antworten innerhalb von 48 Stunden"
+      }
+    },
+    
+    "updates": {
+      "title": "Cookie-Richtlinien-Updates",
+      "description": "Wir können diese Cookie-Richtlinie von Zeit zu Zeit aktualisieren. Wir werden Sie über Änderungen informieren, indem wir die neue Richtlinie auf dieser Seite veröffentlichen.",
+      "stay_informed": "Bleiben Sie über Updates informiert"
     }
   }
 }

@@ -26,7 +26,7 @@ import { CV_AI_ENDPOINTS } from '../../../config';
 const EditResumeBuilder = ({ darkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token } = useAuthStore();
+  const { t } = useTranslation();
   
   // Use sessionStore instead of resumeStore
   const { 
@@ -34,9 +34,8 @@ const EditResumeBuilder = ({ darkMode }) => {
     saveLocally, 
     saveToConnectedCloud,
     loadGoogleDriveCV,
-    updateConnectedCloudCV,  // Add this line
+    updateConnectedCloudCV,
     googleDriveConnected 
-    
   } = useSessionStore();
   
   const [activeSection, setActiveSection] = useState('personal'); 
@@ -47,10 +46,7 @@ const EditResumeBuilder = ({ darkMode }) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localError, setLocalError] = useState(null);
-  const { t } = useTranslation();
   const [formData, setFormData] = useState({});
-  const { isAuthenticated } = useAuthStore();
-  const userIsAuthenticated = isAuthenticated();
   const htmlResumeRef = useRef(null);
   const [usageInfo, setUsageInfo] = useState(null);
   const [cvSource, setCvSource] = useState('local'); // 'local', 'draft', 'cloud'
@@ -63,104 +59,79 @@ const EditResumeBuilder = ({ darkMode }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-  const loadCVData = async () => {
-    try {
-      setIsLoading(true);
-      console.log('📖 Loading CV for editing...');
-      
-      let cvData = null;
-      let source = 'local';
-      let cvId = null;
-      
-      const stateData = location.state;
-      
-      // Get explicit source information from navigation state
-      if (stateData?.editSource === 'cloud' && stateData?.originalFileId) {
-        // Editing a cloud CV
-        console.log('☁️ Loading specific cloud CV for editing:', stateData.originalFileId);
-        cvData = await loadGoogleDriveCV(stateData.originalFileId);
+    const loadCVData = async () => {
+      try {
+        setIsLoading(true);
+        console.log('📖 Loading CV for editing...');
         
-        if (cvData) {
-          source = 'cloud';
-          cvId = stateData.originalFileId;
-          console.log('✅ Loaded specific cloud CV for editing');
-        }
-      } else if (stateData?.editSource === 'local') {
-        // Editing a local CV
-        const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
-        cvData = localCVs.find(cv => cv.id === stateData.cvId);
+        let cvData = null;
+        let source = 'local';
+        let cvId = null;
         
-        if (cvData) {
-          source = 'local';
-          cvId = stateData.cvId;
-        }
-      } else {
-        // Fallback to draft loading (existing logic)
-        const draft = localStorage.getItem('cv_draft');
-        if (draft) {
-          const parsed = JSON.parse(draft);
+        const stateData = location.state;
+        
+        // Get explicit source information from navigation state
+        if (stateData?.editSource === 'cloud' && stateData?.originalFileId) {
+          // Editing a cloud CV
+          console.log('☁️ Loading specific cloud CV for editing:', stateData.originalFileId);
+          cvData = await loadGoogleDriveCV(stateData.originalFileId);
           
-          // Check the draft's source tracking
-          if (parsed._edit_source === 'cloud' && parsed._original_cloud_id) {
-            cvData = parsed;
+          if (cvData) {
             source = 'cloud';
-            cvId = parsed._original_cloud_id;
-          } else if (parsed._edit_source === 'local' && parsed._original_local_id) {
-            cvData = parsed;
-            source = 'local'; 
-            cvId = parsed._original_local_id;
-          } else {
-            cvData = parsed;
-            source = 'draft';
+            cvId = stateData.originalFileId;
+            console.log('✅ Loaded specific cloud CV for editing');
+          }
+        } else if (stateData?.editSource === 'local') {
+          // Editing a local CV
+          const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
+          cvData = localCVs.find(cv => cv.id === stateData.cvId);
+          
+          if (cvData) {
+            source = 'local';
+            cvId = stateData.cvId;
+          }
+        } else {
+          // Fallback to draft loading (existing logic)
+          const draft = localStorage.getItem('cv_draft');
+          if (draft) {
+            const parsed = JSON.parse(draft);
+            
+            // Check the draft's source tracking
+            if (parsed._edit_source === 'cloud' && parsed._original_cloud_id) {
+              cvData = parsed;
+              source = 'cloud';
+              cvId = parsed._original_cloud_id;
+            } else if (parsed._edit_source === 'local' && parsed._original_local_id) {
+              cvData = parsed;
+              source = 'local'; 
+              cvId = parsed._original_local_id;
+            } else {
+              cvData = parsed;
+              source = 'draft';
+            }
           }
         }
-      }
-      
-      if (!cvData) {
-        throw new Error('No CV data found');
-      }
-      
-      setFormData(cvData);
-      setCvSource(source);
-      setOriginalCvId(cvId);
-      
-      console.log(`✅ Loaded CV for editing: ${cvData.title} (source: ${source}, id: ${cvId})`);
-      
-    } catch (error) {
-      console.error('❌ Error loading CV:', error);
-      setLocalError('Failed to load CV. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  loadCVData();
-}, [location.state]);
-
-  const checkUsageLimit = async () => {
-    if (!token) return;
-    
-    try {
-      const response = await fetch(CV_AI_ENDPOINTS.USAGE_LIMIT, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+        
+        if (!cvData) {
+          throw new Error(t('common.error'));
         }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setUsageInfo(data);
+        
+        setFormData(cvData);
+        setCvSource(source);
+        setOriginalCvId(cvId);
+        
+        console.log(`✅ Loaded CV for editing: ${cvData.title} (source: ${source}, id: ${cvId})`);
+        
+      } catch (error) {
+        console.error('❌ Error loading CV:', error);
+        setLocalError(t('common.error'));
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error('Error checking usage limit:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (token) {
-      checkUsageLimit();
-    }
-  }, [token]);
+    };
+    
+    loadCVData();
+  }, [location.state, t]);
 
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(false);
@@ -220,114 +191,115 @@ const EditResumeBuilder = ({ darkMode }) => {
   };
 
   // Save CV function - supports local and cloud saving
-const handleSaveCV = async (saveToCloud = false) => {
-  if (!formData) return;
-  
-  try {
-    setIsSaving(true);
-    console.log('💾 Saving CV...', { saveToCloud, source: cvSource, originalCvId });
+  const handleSaveCV = async (saveToCloud = false) => {
+    if (!formData) return;
     
-    // Add metadata
-    const cvToSave = {
-      ...formData,
-      updated_at: new Date().toISOString(),
-      _metadata: {
-        source: cvSource,
-        originalId: originalCvId,
-        lastEdited: Date.now()
-      }
-    };
-    
-    let result;
-    
-    if (saveToCloud && canSaveToCloud()) {
-      // Save to Google Drive
-      if (cvSource === 'cloud' && originalCvId) {
-        // UPDATE existing cloud file
-        console.log('📝 Updating existing cloud file:', originalCvId);
-        result = await updateConnectedCloudCV(cvToSave, originalCvId, 'google_drive');
-        
-        if (result.success) {
-          showToast('CV updated in Google Drive successfully!', 'success');
-          // Keep the same originalCvId since we're updating the same file
+    try {
+      setIsSaving(true);
+      console.log('💾 Saving CV...', { saveToCloud, source: cvSource, originalCvId });
+      
+      // Add metadata
+      const cvToSave = {
+        ...formData,
+        updated_at: new Date().toISOString(),
+        _metadata: {
+          source: cvSource,
+          originalId: originalCvId,
+          lastEdited: Date.now()
+        }
+      };
+      
+      let result;
+      
+      if (saveToCloud && canSaveToCloud()) {
+        // Save to Google Drive
+        if (cvSource === 'cloud' && originalCvId) {
+          // UPDATE existing cloud file
+          console.log('📝 Updating existing cloud file:', originalCvId);
+          result = await updateConnectedCloudCV(cvToSave, originalCvId, 'google_drive');
+          
+          if (result.success) {
+            showToast(t('common.success'), 'success');
+            // Keep the same originalCvId since we're updating the same file
+          }
+        } else {
+          // CREATE new cloud file
+          console.log('📝 Creating new cloud file');
+          result = await saveToConnectedCloud(cvToSave, 'google_drive');
+          
+          if (result.success) {
+            showToast(t('common.success'), 'success');
+            setCvSource('cloud');
+            setOriginalCvId(result.file_id);
+          }
         }
       } else {
-        // CREATE new cloud file
-        console.log('📝 Creating new cloud file');
-        result = await saveToConnectedCloud(cvToSave, 'google_drive');
-        
-        if (result.success) {
-          showToast('CV saved to Google Drive successfully!', 'success');
-          setCvSource('cloud');
-          setOriginalCvId(result.file_id);
-        }
-      }
-    } else {
-      // Save locally (existing logic remains the same)
-      if (cvSource === 'local' && originalCvId) {
-        // UPDATE existing local CV
-        console.log('📝 Updating existing local CV:', originalCvId);
-        
-        try {
-          const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
-          const cvIndex = localCVs.findIndex(cv => cv.id === originalCvId);
+        // Save locally (existing logic remains the same)
+        if (cvSource === 'local' && originalCvId) {
+          // UPDATE existing local CV
+          console.log('📝 Updating existing local CV:', originalCvId);
           
-          if (cvIndex !== -1) {
-            // Update existing CV
-            localCVs[cvIndex] = { ...cvToSave, id: originalCvId };
-            localStorage.setItem('local_cvs', JSON.stringify(localCVs));
+          try {
+            const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
+            const cvIndex = localCVs.findIndex(cv => cv.id === originalCvId);
             
-            result = { success: true, message: 'CV updated locally' };
-            showToast('CV updated locally successfully!', 'success');
-          } else {
-            // CV not found in local storage, create new one
+            if (cvIndex !== -1) {
+              // Update existing CV
+              localCVs[cvIndex] = { ...cvToSave, id: originalCvId };
+              localStorage.setItem('local_cvs', JSON.stringify(localCVs));
+              
+              result = { success: true, message: t('common.success') };
+              showToast(t('common.success'), 'success');
+            } else {
+              // CV not found in local storage, create new one
+              result = await saveLocally(cvToSave);
+              
+              if (result.success) {
+                showToast(t('common.success'), 'success');
+                setCvSource('local');
+                setOriginalCvId(cvToSave.id);
+              }
+            }
+          } catch (error) {
+            console.error('Error updating local CV:', error);
+            // Fallback to creating new one
             result = await saveLocally(cvToSave);
             
             if (result.success) {
-              showToast('CV saved locally successfully!', 'success');
+              showToast(t('common.success'), 'success');
               setCvSource('local');
               setOriginalCvId(cvToSave.id);
             }
           }
-        } catch (error) {
-          console.error('Error updating local CV:', error);
-          // Fallback to creating new one
+        } else {
+          // CREATE new local CV
+          console.log('📝 Creating new local CV');
           result = await saveLocally(cvToSave);
           
           if (result.success) {
-            showToast('CV saved locally successfully!', 'success');
+            showToast(t('common.success'), 'success');
             setCvSource('local');
             setOriginalCvId(cvToSave.id);
           }
         }
-      } else {
-        // CREATE new local CV
-        console.log('📝 Creating new local CV');
-        result = await saveLocally(cvToSave);
-        
-        if (result.success) {
-          showToast('CV saved locally successfully!', 'success');
-          setCvSource('local');
-          setOriginalCvId(cvToSave.id);
-        }
       }
+      
+      if (!result.success) {
+        throw new Error(result.error || t('common.error'));
+      }
+      
+      // Update all relevant drafts
+      localStorage.setItem('cv_draft', JSON.stringify(cvToSave));
+      localStorage.setItem('cv_draft_for_customization', JSON.stringify(cvToSave));
+      
+    } catch (error) {
+      console.error('❌ Save failed:', error);
+      showToast(`${t('common.error')}: ${error.message}`, 'error');
+    } finally {
+      setIsSaving(false);
     }
-    
-    if (!result.success) {
-      throw new Error(result.error || 'Save failed');
-    }
-    
-    // Update all relevant drafts
-    localStorage.setItem('cv_draft', JSON.stringify(cvToSave));
-    localStorage.setItem('cv_draft_for_customization', JSON.stringify(cvToSave));
-    
-  } catch (error) {
-    console.error('❌ Save failed:', error);
-    showToast(`Failed to save: ${error.message}`, 'error');
-  } finally {
-    setIsSaving(false);
-  }
-};
+  };
+
   const showToast = (message, type) => {
     setToast({ message, type });
     setTimeout(() => {
@@ -337,7 +309,7 @@ const handleSaveCV = async (saveToCloud = false) => {
  
   const sections = [
     { id: 'photo', name: t('resume.photo.title'), component: EditPhotoUpload, dataKey: 'photos' },
-    { id: 'title', name: t('resume.title.section', 'Resume Title'), component: ResumeTitle, dataKey: 'title' },
+    { id: 'title', name: t('resume.title.section'), component: ResumeTitle, dataKey: 'title' },
     { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' }, 
     { id: 'education', name: t('resume.education.title'), component: Education, dataKey: 'educations' },
     { id: 'experience', name: t('resume.experience.title'), component: Experience, dataKey: 'experiences' },
@@ -377,11 +349,6 @@ const handleSaveCV = async (saveToCloud = false) => {
     htmlResumeRef.current = ref;
   };
 
-  const handleLoginRedirect = () => {
-    localStorage.setItem('tempResumeData', JSON.stringify(formData));
-    navigate('/login', { state: { returnTo: location.pathname } });
-  };
-
   const handleCustomize = () => {
     // Save current CV to customization draft
     localStorage.setItem('cv_draft_for_customization', JSON.stringify(formData));
@@ -393,12 +360,6 @@ const handleSaveCV = async (saveToCloud = false) => {
   };
 
   const handleExportPDF = async () => {
-    if (!userIsAuthenticated) {
-      showToast(t('settings.not_authenticated', 'You must be logged in'), 'error');
-      setShowAuthModal(true);
-      return;
-    }
-    
     try {
       setIsPdfExporting(true);
       setLocalError('');
@@ -413,7 +374,7 @@ const handleSaveCV = async (saveToCloud = false) => {
       }
     } catch (err) {
       console.error('Error exporting PDF:', err);
-      showToast(`${t('preview.pdf_error')}: ${err.message || 'Unknown error'}`, 'error');
+      showToast(`${t('preview.pdf_error')}: ${err.message || t('common.error')}`, 'error');
     } finally {
       setIsPdfExporting(false);
       setMobileMenuOpen(false);
@@ -421,12 +382,6 @@ const handleSaveCV = async (saveToCloud = false) => {
   };
 
   const handlePrint = async () => {
-    if (!userIsAuthenticated) {
-      showToast(t('settings.not_authenticated', 'You must be logged in'), 'error');
-      setShowAuthModal(true);
-      return;
-    }
-    
     try {
       setIsPrinting(true);
       setLocalError('');
@@ -447,12 +402,6 @@ const handleSaveCV = async (saveToCloud = false) => {
   };
 
   const handleWordExport = async () => {
-    if (!userIsAuthenticated) {
-      showToast(t('settings.not_authenticated', 'You must be logged in'), 'error');
-      setShowAuthModal(true);
-      return;
-    }
-    
     try {
       setIsDocxExporting(true);
       setLocalError('');
@@ -477,7 +426,7 @@ const handleSaveCV = async (saveToCloud = false) => {
 
   const handleAIEnhancement = () => {
     if (!hasUserStartedFilling) {
-      showToast('Please add some information to your CV before using AI enhancement.', 'error');
+      showToast(t('common.error'), 'error');
       return;
     }
 
@@ -497,7 +446,7 @@ const handleSaveCV = async (saveToCloud = false) => {
       navigate('/cv-ai-enhancement');
     } catch (error) {
       console.error('❌ Failed to prepare CV for AI enhancement:', error);
-      showToast('Failed to prepare CV for AI enhancement', 'error');
+      showToast(t('common.error'), 'error');
     }
     
     setMobileMenuOpen(false);
@@ -557,8 +506,8 @@ const handleSaveCV = async (saveToCloud = false) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 backdrop-blur-sm pt-20">
         <div className={`p-6 rounded-xl shadow-lg max-w-md w-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white/90 backdrop-blur-sm text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-purple-200'}`}>
-          <h2 className="text-xl font-bold mb-4">{t('auth.login.title', 'Login Required')}</h2>
-          <p className="mb-6 text-sm">{t('auth.login.sign_in_to_continue', 'Sign in to continue with this action.')}</p>
+          <h2 className="text-xl font-bold mb-4">{t('auth.login.title')}</h2>
+          <p className="mb-6 text-sm">{t('auth.login.sign_in_to_continue')}</p>
           <div className="flex justify-end space-x-3">
             <button 
               onClick={onClose} 
@@ -568,14 +517,14 @@ const handleSaveCV = async (saveToCloud = false) => {
                   : 'bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 hover:shadow-lg hover:scale-105'
               }`}
             >
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </button>
             <button 
-              onClick={handleLoginRedirect} 
+              onClick={() => navigate('/login')} 
               className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 flex items-center text-sm"
             >
               <LogIn size={16} className="mr-2" />
-              {t('navigation.login', 'Login')}
+              {t('navigation.login')}
             </button>
           </div>
         </div>
@@ -594,10 +543,10 @@ const handleSaveCV = async (saveToCloud = false) => {
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105'
         }`}
-        title="Save locally"
+        title={t('cloud.save_locally')}
       >
         <HardDrive size={14} />
-        <span>{isSaving ? 'Saving...' : 'Save'}</span>
+        <span>{isSaving ? t('common.saving') : t('common.save')}</span>
       </button>
 
       {canSaveToCloud() && (
@@ -609,10 +558,10 @@ const handleSaveCV = async (saveToCloud = false) => {
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
           }`}
-          title="Save to Google Drive"
+          title={t('cloud.save_to_drive')}
         >
           <Cloud size={14} />
-          <span>{isSaving ? 'Saving...' : 'Drive'}</span>
+          <span>{isSaving ? t('common.saving') : t('cloud.drive')}</span>
         </button>
       )}
     </div>
@@ -623,7 +572,7 @@ const handleSaveCV = async (saveToCloud = false) => {
       <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 text-gray-800'}`}>
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-          <p>{t('common.loading', 'Loading CV...')}</p>
+          <p>{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -633,20 +582,20 @@ const handleSaveCV = async (saveToCloud = false) => {
     return (
       <div className={`flex justify-center items-center h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
         <div className={`text-center max-w-md p-8 rounded-xl shadow-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-white/90 text-gray-800'}`}>
-          <h2 className="text-xl font-bold mb-4">Error Loading CV</h2>
+          <h2 className="text-xl font-bold mb-4">{t('common.error')}</h2>
           <p className="mb-6">{localError}</p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={handleBackToDashboard}
               className="px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600"
             >
-              Back to Dashboard
+              {t('common.back')}
             </button>
             <button
               onClick={() => navigate('/new-resume')}
               className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700"
             >
-              Create New CV
+              {t('resumeDashboard.buttons.createNew')}
             </button>
           </div>
         </div>
@@ -691,11 +640,11 @@ const handleSaveCV = async (saveToCloud = false) => {
 
             <div className="text-center">
               <div className="text-lg font-semibold">
-                {viewMode === 'edit' ? 'Edit CV' : 'Preview CV'}
+                {viewMode === 'edit' ? t('editor.edit_resume') : t('editor.preview_resume')}
               </div>
               {cvSource && (
                 <div className="text-xs text-gray-500">
-                  Source: {cvSource === 'cloud' ? 'Google Drive' : cvSource === 'draft' ? 'Draft' : 'Local'}
+                  {t('cloud.source')}: {cvSource === 'cloud' ? t('cloud.google_drive') : cvSource === 'draft' ? t('cloud.draft') : t('cloud.local')}
                 </div>
               )}
             </div>
@@ -747,7 +696,7 @@ const handleSaveCV = async (saveToCloud = false) => {
                       disabled={!hasUserStartedFilling}
                     >
                       <Sparkles size={16} />
-                      AI Enhancement
+                      {t('common.ai_enhancement')}
                     </button>
                     
                     <button
@@ -756,11 +705,11 @@ const handleSaveCV = async (saveToCloud = false) => {
                         darkMode 
                           ? 'hover:bg-gray-600' 
                           : 'hover:bg-gray-100'
-                      } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
+                      }`}
                       disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                     >
                       <Download size={16} />
-                      {isPdfExporting ? 'Exporting...' : 'Export PDF'}
+                      {isPdfExporting ? t('preview.exporting') : t('preview.export_as_pdf')}
                     </button>
                     
                     <button
@@ -769,11 +718,11 @@ const handleSaveCV = async (saveToCloud = false) => {
                         darkMode 
                           ? 'hover:bg-gray-600' 
                           : 'hover:bg-gray-100'
-                      } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
+                      }`}
                       disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                     >
                       <FileSpreadsheet size={16} />
-                      {isDocxExporting ? 'Exporting...' : 'Export Word'}
+                      {isDocxExporting ? t('preview.exporting') : t('preview.export_as_docx')}
                     </button>
                     
                     <button
@@ -782,11 +731,11 @@ const handleSaveCV = async (saveToCloud = false) => {
                         darkMode 
                           ? 'hover:bg-gray-600' 
                           : 'hover:bg-gray-100'
-                      } ${!userIsAuthenticated ? 'opacity-90' : ''}`}
+                      }`}
                       disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                     >
                       <Printer size={16} />
-                      {isPrinting ? 'Preparing...' : 'Print'}
+                      {isPrinting ? t('common.preparing') : t('common.print')}
                     </button>
                     
                     <button 
@@ -797,7 +746,7 @@ const handleSaveCV = async (saveToCloud = false) => {
                           : 'hover:bg-gray-100'
                       }`}
                     > 
-                      Customize Template
+                      {t('resume.customizer.title')}
                     </button>
                    
                   </div>
@@ -811,10 +760,7 @@ const handleSaveCV = async (saveToCloud = false) => {
       {/* Usage Info */}
       {usageInfo && isMobileView && (
         <div className={`mb-3 text-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
-            remaining: usageInfo.remaining,
-            limit: usageInfo.limit
-          })}
+          {t('ai.limit_info', { remaining: usageInfo.remaining, limit: usageInfo.limit })}
         </div>
       )}
 
@@ -832,7 +778,7 @@ const handleSaveCV = async (saveToCloud = false) => {
             <div className={`flex justify-between items-center mb-4 border-b pb-2 ${
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
-              <h3 className="font-bold text-lg">CV Sections</h3>
+              <h3 className="font-bold text-lg">{t('editor.resume_sections')}</h3>
               <button onClick={toggleMobileNav}>
                 <X size={20} />
               </button>
@@ -878,10 +824,7 @@ const handleSaveCV = async (saveToCloud = false) => {
         {/* Usage Info */}
         {usageInfo && !isMobileView && (
           <div className={`mb-3 text-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            {t('ai.limit_info', 'AI requests remaining: {{remaining}} of {{limit}}', {
-              remaining: usageInfo.remaining,
-              limit: usageInfo.limit
-            })}
+            {t('ai.limit_info', { remaining: usageInfo.remaining, limit: usageInfo.limit })}
           </div>
         )}
 
@@ -891,10 +834,10 @@ const handleSaveCV = async (saveToCloud = false) => {
           cvSource === 'draft' ? 'bg-yellow-100 text-yellow-700' :
           'bg-green-100 text-green-700'
         }`}>
-          {cvSource === 'cloud' && <><Cloud size={12} className="inline mr-1" /> Google Drive</>}
-          {cvSource === 'draft' && <><FileSpreadsheet size={12} className="inline mr-1" /> Draft</>}
-          {cvSource === 'local' && <><HardDrive size={12} className="inline mr-1" /> Local Storage</>}
-          {cvSource === 'new' && <><FileSpreadsheet size={12} className="inline mr-1" /> New CV</>}
+          {cvSource === 'cloud' && <><Cloud size={12} className="inline mr-1" /> {t('cloud.google_drive')}</>}
+          {cvSource === 'draft' && <><FileSpreadsheet size={12} className="inline mr-1" /> {t('cloud.draft')}</>}
+          {cvSource === 'local' && <><HardDrive size={12} className="inline mr-1" /> {t('cloud.local_storage')}</>}
+          {cvSource === 'new' && <><FileSpreadsheet size={12} className="inline mr-1" /> {t('resumeDashboard.buttons.createNew')}</>}
         </div>
         
         {/* Section Navigation - Responsive Grid */}
@@ -980,7 +923,6 @@ const handleSaveCV = async (saveToCloud = false) => {
                 sections.find(s => s.id === activeSection)?.dataKey || 'personal_info',
                 data
               )}
-              token={token}
             />
           )}
         </div>
@@ -996,7 +938,7 @@ const handleSaveCV = async (saveToCloud = false) => {
             className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
           >
             <ChevronLeft size={16} />
-            <span className="hidden sm:inline">Previous</span>
+            <span className="hidden sm:inline">{t('prod1.sections.previous')}</span>
           </button>
           
           <div className="text-sm font-medium">
@@ -1008,12 +950,12 @@ const handleSaveCV = async (saveToCloud = false) => {
                 {viewMode === 'edit' ? (
                   <>
                     <Eye size={16} />
-                    <span>Preview</span>
+                    <span>{t('cards.resume.preview')}</span>
                   </>
                 ) : (
                   <>
                     <Edit size={16} />
-                    <span>Edit</span>
+                    <span>{t('actions.edit')}</span>
                   </>
                 )}
               </button>
@@ -1026,7 +968,7 @@ const handleSaveCV = async (saveToCloud = false) => {
             onClick={() => navigateSection('next')}
             className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
           >
-            <span className="hidden sm:inline">Next</span>
+            <span className="hidden sm:inline">{t('prod1.sections.next')}</span>
             <ChevronRight size={16} />
           </button>
         </div>
@@ -1056,61 +998,61 @@ const handleSaveCV = async (saveToCloud = false) => {
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:shadow-lg hover:shadow-yellow-500/20 hover:scale-105'
               }`}
-              title={hasUserStartedFilling ? 'AI Enhancement' : 'Add content first'}
+              title={hasUserStartedFilling ? t('common.ai_enhancement') : t('common.error')}
               disabled={!hasUserStartedFilling}
             >
               <Sparkles size={14} />
-              <span>AI</span>
+              <span>{t('common.ai')}</span>
             </button>
             
             <button
               onClick={handleExportPDF}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                !userIsAuthenticated || isPdfExporting || isPrinting || isDocxExporting || isSaving
+                isPdfExporting || isPrinting || isDocxExporting || isSaving
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
               }`}
-              title={userIsAuthenticated ? 'Export PDF' : 'Login required'}
-              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
+              title={t('preview.export_as_pdf')}
+              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
             >
               <Download size={14} />
-              <span>{isPdfExporting ? 'Exporting...' : 'PDF'}</span>
+              <span>{isPdfExporting ? t('preview.exporting') : 'PDF'}</span>
             </button>
             
             <button
               onClick={handleWordExport}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                !userIsAuthenticated || isPdfExporting || isPrinting || isDocxExporting || isSaving
+                isPdfExporting || isPrinting || isDocxExporting || isSaving
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-pink-600 to-blue-600 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105'
               }`}
-              title={userIsAuthenticated ? 'Export Word' : 'Login required'}
-              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
+              title={t('preview.export_as_docx')}
+              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
             >
               <FileSpreadsheet size={14} />
-              <span>{isDocxExporting ? 'Exporting...' : 'Word'}</span>
+              <span>{isDocxExporting ? t('preview.exporting') : 'Word'}</span>
             </button>
             
             <button
               onClick={handlePrint}
               className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                !userIsAuthenticated || isPdfExporting || isPrinting || isDocxExporting || isSaving
+                isPdfExporting || isPrinting || isDocxExporting || isSaving
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
               }`}
-              title={userIsAuthenticated ? 'Print' : 'Login required'}
-              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
+              title={t('common.print')}
+              disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
             >
               <Printer size={14} />
-              <span>{isPrinting ? 'Preparing...' : 'Print'}</span>
+              <span>{isPrinting ? t('common.preparing') : t('common.print')}</span>
             </button>
 
             <button
               onClick={handleCustomize}
               className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-green-600 to-teal-600 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105"
-              title="Customize template and styling"
+              title={t('resume.customizer.title')}
             >
-              <span>Style</span>
+              <span>{t('resume.customizer.templates.styling')}</span>
             </button>
           </div>
         )}
@@ -1143,20 +1085,20 @@ const handleSaveCV = async (saveToCloud = false) => {
                 className="px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
               >
                 <Edit size={16} />
-                <span>Edit</span>
+                <span>{t('actions.edit')}</span>
               </button>
               
               <button 
                 onClick={handleExportPDF}
-                disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated}
+                disabled={isPdfExporting || isPrinting || isDocxExporting || isSaving}
                 className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-                  isPdfExporting || isPrinting || isDocxExporting || isSaving || !userIsAuthenticated
+                  isPdfExporting || isPrinting || isDocxExporting || isSaving
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
                 }`}
               >
                 <Download size={16} />
-                <span>{isPdfExporting ? 'Exporting...' : 'Export PDF'}</span>
+                <span>{isPdfExporting ? t('preview.exporting') : t('preview.export_as_pdf')}</span>
               </button>
             </div>
           )}

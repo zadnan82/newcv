@@ -14,7 +14,6 @@ const CustomizationManager = ({
   const handleApplyChanges = () => {
     setIsUpdating(true);
     
-    // Update the preview immediately
     if (onUpdatePreview) {
       onUpdatePreview({
         template: selectedTemplate,
@@ -22,7 +21,6 @@ const CustomizationManager = ({
       });
     }
     
-    // Update local draft with new customizations
     try {
       const currentDraft = JSON.parse(localStorage.getItem('cv_draft') || '{}');
       const updatedDraft = {
@@ -55,16 +53,15 @@ const CustomizationManager = ({
         isDarkMode ? 'text-white' : 'text-gray-800'
       }`}>
         <Eye className="w-3 h-3 mr-1" />
-        Preview & Apply
+        {t('cloud.preview_apply', 'Preview & Apply')}
       </h4>
 
       <p className={`text-xs mb-3 ${
         isDarkMode ? 'text-gray-400' : 'text-gray-600'
       }`}>
-        Your changes are previewed live. Apply them to update your CV.
+        {t('cloud.changes_previewed_live', 'Your changes are previewed live. Apply them to update your CV.')}
       </p>
 
-      {/* Apply Button */}
       <button
         onClick={handleApplyChanges}
         disabled={isUpdating}
@@ -79,17 +76,16 @@ const CustomizationManager = ({
         {isUpdating ? (
           <>
             <RefreshCw className="w-3 h-3 mr-2 animate-spin" />
-            Applying...
+            {t('common.applying', 'Applying...')}
           </>
         ) : (
           <>
             <RefreshCw className="w-3 h-3 mr-2" />
-            Apply Customizations
+            {t('cloud.apply_customizations', 'Apply Customizations')}
           </>
         )}
       </button>
 
-      {/* Info Box */}
       <div className={`p-2 rounded border text-xs ${
         isDarkMode
           ? 'bg-blue-900/20 border-blue-700 text-blue-300'
@@ -98,12 +94,12 @@ const CustomizationManager = ({
         <div className="flex items-start">
           <Info className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="font-medium mb-1">How it works:</p>
+            <p className="font-medium mb-1">{t('cloud.how_it_works', 'How it works')}:</p>
             <ul className="space-y-1 text-[0.65rem] opacity-90">
-              <li>• Changes are previewed instantly</li>
-              <li>• Click "Apply" to save to your CV</li>
-              <li>• Use "Publish" to create shareable link</li>
-              <li>• Published links include your styling</li>
+              <li>• {t('cloud.changes_previewed_instantly', 'Changes are previewed instantly')}</li>
+              <li>• {t('cloud.click_apply_save', 'Click "Apply" to save to your CV')}</li>
+              <li>• {t('cloud.use_publish_shareable', 'Use "Publish" to create shareable link')}</li>
+              <li>• {t('cloud.published_links_styling', 'Published links include your styling')}</li>
             </ul>
           </div>
         </div>

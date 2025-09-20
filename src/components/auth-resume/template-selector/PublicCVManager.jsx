@@ -63,10 +63,10 @@ const PublicCVManager = ({
       const publicCVs = JSON.parse(localStorage.getItem('published_cvs') || '[]');
       const newPublicCV = {
         id: Date.now().toString(),
-        title: formData.title || 'My Resume',
+        title: formData.title || t('resumeDashboard.defaultTitle'),
         url: url,
         created_at: new Date().toISOString(),
-        personal_name: formData.personal_info?.full_name || 'Unknown'
+        personal_name: formData.personal_info?.full_name || t('common.notSpecified')
       };
       
       publicCVs.push(newPublicCV);
@@ -78,7 +78,7 @@ const PublicCVManager = ({
 
     } catch (err) {
       console.error('❌ Publishing failed:', err);
-      setError(err.message || 'Failed to publish CV');
+      setError(err.message || t('cloud.publish_failed'));
     } finally {
       setIsPublishing(false);
     }
@@ -98,8 +98,10 @@ const PublicCVManager = ({
     if (navigator.share && publicURL) {
       try {
         await navigator.share({
-          title: formData.title || 'My Resume',
-          text: `Check out ${formData.personal_info?.full_name || 'this'} resume`,
+          title: formData.title || t('resumeDashboard.defaultTitle'),
+          text: t('cloud.share_resume_text', { 
+            name: formData.personal_info?.full_name || t('cloud.this_person') 
+          }),
           url: publicURL
         });
       } catch (err) {
@@ -135,7 +137,10 @@ const PublicCVManager = ({
     qrComplexity = publicURL ? estimateQRComplexity(publicURL) : null;
   } catch (err) {
     console.error('Error estimating QR complexity:', err);
-    qrComplexity = { level: 'unknown', description: 'Unable to estimate complexity' };
+    qrComplexity = { 
+      level: 'unknown', 
+      description: t('cloud.qr_complexity_unknown') 
+    };
   }
 
   return (
@@ -146,7 +151,7 @@ const PublicCVManager = ({
         isDarkMode ? 'text-white' : 'text-gray-800'
       }`}>
         <QrCode className="w-4 h-4 mr-2" />
-        Public CV & QR Code
+        {t('cloud.public_cv_qr_title')}
       </h4>
 
       {/* Error Display */}
@@ -164,7 +169,7 @@ const PublicCVManager = ({
       {!publicURL && (
         <div className="space-y-3">
           <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Create a public link that anyone can access to view your CV. No account required for viewers.
+            {t('cloud.public_link_description')}
           </p>
           
           <button
@@ -179,12 +184,12 @@ const PublicCVManager = ({
             {isPublishing ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                Publishing...
+                {t('cloud.publishing')}...
               </>
             ) : (
               <>
                 <Share className="w-4 h-4 mr-2" />
-                Publish CV Publicly
+                {t('cloud.publish_cv_publicly')}
               </>
             )}
           </button>
@@ -201,7 +206,7 @@ const PublicCVManager = ({
                 isDarkMode ? 'text-green-400' : 'text-green-700'
               }`}>
                 <CheckCircle className="w-4 h-4 mr-1" />
-                Published Successfully
+                {t('cloud.published_successfully')}
               </span>
             </div>
 
@@ -210,7 +215,7 @@ const PublicCVManager = ({
               <label className={`text-xs font-medium ${
                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
               }`}>
-                Public URL ({publicURL.length} characters):
+                {t('cloud.public_url_label', { count: publicURL.length })}:
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -232,7 +237,7 @@ const PublicCVManager = ({
                       ? 'border-gray-600 hover:bg-gray-600 text-gray-400'
                       : 'border-gray-300 hover:bg-gray-100 text-gray-600'
                   }`}
-                  title="Copy URL"
+                  title={t('cloud.copy_url')}
                 >
                   <Copy className="w-4 h-4" />
                 </button>
@@ -243,7 +248,7 @@ const PublicCVManager = ({
                       ? 'border-gray-600 hover:bg-gray-600 text-gray-400'
                       : 'border-gray-300 hover:bg-gray-100 text-gray-600'
                   }`}
-                  title="Open in new tab"
+                  title={t('cloud.open_new_tab')}
                 >
                   <ExternalLink className="w-4 h-4" />
                 </button>
@@ -257,14 +262,14 @@ const PublicCVManager = ({
                 className="flex-1 py-2 px-3 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors flex items-center justify-center"
               >
                 <Share className="w-3 h-3 mr-1" />
-                Share
+                {t('cloud.share')}
               </button>
               <button
                 onClick={() => setShowQR(!showQR)}
                 className="flex-1 py-2 px-3 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors flex items-center justify-center"
               >
                 <QrCode className="w-3 h-3 mr-1" />
-                {showQR ? 'Hide QR' : 'Show QR'}
+                {showQR ? t('cloud.hide_qr') : t('cloud.show_qr')}
               </button>
             </div>
           </div>
@@ -303,7 +308,7 @@ const PublicCVManager = ({
                   className="py-1 px-3 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors flex items-center"
                 >
                   <Download className="w-3 h-3 mr-1" />
-                  Download QR
+                  {t('cloud.download_qr')}
                 </button>
                 <button
                   onClick={() => setShowQR(false)}
@@ -314,7 +319,7 @@ const PublicCVManager = ({
                   }`}
                 >
                   <X className="w-3 h-3 mr-1" />
-                  Close
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -336,7 +341,7 @@ const PublicCVManager = ({
                 : 'bg-red-50 text-red-700 hover:bg-red-100'
             }`}
           >
-            Unpublish CV
+            {t('cloud.unpublish_cv')}
           </button>
         </div>
       )}

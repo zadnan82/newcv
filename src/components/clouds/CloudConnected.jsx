@@ -2,17 +2,19 @@
 import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const CloudConnected = ({ darkMode }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const provider = searchParams.get('provider');
 
   const getProviderName = (provider) => {
     const names = {
-      google_drive: 'Google Drive',
-      onedrive: 'OneDrive',
-      dropbox: 'Dropbox',
+      google_drive: t('cloud.google_drive'),
+      onedrive: t('cloud.onedrive'),
+      dropbox: t('cloud.dropbox'),
       box: 'Box'
     };
     return names[provider] || provider;
@@ -35,12 +37,12 @@ const CloudConnected = ({ darkMode }) => {
 
         {/* Title */}
         <h1 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-          Successfully Connected!
+          {t('cloud.connection_successful_title')}
         </h1>
 
         {/* Message */}
         <p className={`text-base mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          Your {getProviderName(provider)} account has been successfully connected.
+          {t('cloud.provider_connected', { provider: getProviderName(provider) })}
         </p>
 
         {/* Continue Button */}
@@ -48,11 +50,11 @@ const CloudConnected = ({ darkMode }) => {
           onClick={handleContinue}
           className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Continue to Create Resume
+          {t('cloud.continue_to_create')}
         </button>
 
         <p className={`text-sm mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          You can now save and access your resumes from the cloud.
+          {t('cloud.can_now_save_access')}
         </p>
       </div>
     </div>

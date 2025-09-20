@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import { ArrowLeft, Shield, HardDrive, Cloud, CheckCircle } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
 import SimpleCloudConnect from './SimpleCloudConnect';
+import { useTranslation } from 'react-i18next';
 
 const CloudSetup = ({ darkMode }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedProvider, setSelectedProvider] = useState('google_drive');
 
   const handleBack = () => {
@@ -28,7 +30,7 @@ const CloudSetup = ({ darkMode }) => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Cloud Storage Setup
+            {t('cloud.cloud_storage_setup')}
           </h1>
         </div>
 
@@ -41,7 +43,7 @@ const CloudSetup = ({ darkMode }) => {
             <h2 className={`text-xl font-semibold mb-4 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              Save to Google Drive
+              {t('cloud.save_to_google_drive')}
             </h2>
             
             <div className="space-y-4">
@@ -57,12 +59,12 @@ const CloudSetup = ({ darkMode }) => {
                   <h3 className={`font-medium mb-1 ${
                     darkMode ? 'text-white' : 'text-gray-800'
                   }`}>
-                    Automatic Backups
+                    {t('cloud.automatic_backup_enabled')}
                   </h3>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    Your CVs are automatically saved to your Google Drive
+                    {t('cloud.cvs_automatically_saved')}
                   </p>
                 </div>
               </div>
@@ -79,12 +81,12 @@ const CloudSetup = ({ darkMode }) => {
                   <h3 className={`font-medium mb-1 ${
                     darkMode ? 'text-white' : 'text-gray-800'
                   }`}>
-                    Access Anywhere
+                    {t('cloud.access_anywhere')}
                   </h3>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    Access your CVs from any device with your Google account
+                    {t('cloud.access_cvs_any_device')}
                   </p>
                 </div>
               </div>
@@ -101,12 +103,12 @@ const CloudSetup = ({ darkMode }) => {
                   <h3 className={`font-medium mb-1 ${
                     darkMode ? 'text-white' : 'text-gray-800'
                   }`}>
-                    Complete Privacy
+                    {t('cloud.privacy_first')}
                   </h3>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    Your files stay in YOUR Google Drive - we never access your data
+                    {t('cloud.data_stays_in_your_drive')}
                   </p>
                 </div>
               </div>
@@ -123,13 +125,12 @@ const CloudSetup = ({ darkMode }) => {
                   <p className={`text-sm font-medium ${
                     darkMode ? 'text-blue-300' : 'text-blue-700'
                   }`}>
-                    Why Google Drive?
+                    {t('cloud.why_google_drive')}
                   </p>
                   <p className={`text-sm mt-1 ${
                     darkMode ? 'text-blue-400' : 'text-blue-600'
                   }`}>
-                    Google Drive offers secure, reliable cloud storage that you already trust. 
-                    Your CVs are stored directly in your account with end-to-end security.
+                    {t('cloud.google_drive_benefits')}
                   </p>
                 </div>
               </div>
@@ -147,13 +148,12 @@ const CloudSetup = ({ darkMode }) => {
               <h3 className={`text-lg font-semibold mb-3 ${
                 darkMode ? 'text-white' : 'text-gray-800'
               }`}>
-                Local Storage Always Available
+                {t('cloud.local_storage_always_available')}
               </h3>
               <p className={`text-sm mb-4 ${
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>
-                You can always save your CVs locally in your browser. 
-                Google Drive connection is optional for cloud backup and sync.
+                {t('cloud.can_save_locally')}
               </p>
               <div className={`p-3 rounded-lg ${
                 darkMode ? 'bg-gray-700' : 'bg-gray-100'
@@ -161,7 +161,7 @@ const CloudSetup = ({ darkMode }) => {
                 <p className={`text-xs ${
                   darkMode ? 'text-gray-400' : 'text-gray-600'
                 }`}>
-                  💡 Local storage works even without internet connection
+                  {t('cloud.local_works_offline')}
                 </p>
               </div>
             </div>

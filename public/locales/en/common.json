@@ -1007,151 +1007,6 @@
       "delete": "Delete"
     }
   },
-  "privacy": {
-    "title": "Privacy policy",
-    "lastUpdated": "Last Updated",
-    "updateDate": "April 4, 2025",
-    "intro": "CVATI (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our resume building service.",
-    "collection": {
-      "title": "Information we collect",
-      "desc": "We collect personal information that you voluntarily provide to us when you use our service, including:",
-      "personal": "Personal details (name, email address, phone number)",
-      "professional": "Professional information (work experience, skills, education)",
-      "optional": "Optional information (date of birth, nationality, address, photo)",
-      "account": "Account credentials",
-      "usage": "Usage data and interactions with our service"
-    },
-    "use": {
-      "title": "How we use your information",
-      "desc": "We use your information for the following purposes:",
-      "provide": "To provide and maintain our service",
-      "improve": "To improve our service and user experience",
-      "communicate": "To communicate with you about service updates",
-      "ai": "To provide AI-enhanced resume and cover letter generation",
-      "security": "To ensure security and prevent fraud",
-      "legal": "To comply with legal obligations"
-    },
-    "sharing": {
-      "title": "Information sharing and disclosure",
-      "desc": "We may share your information with:",
-      "service": "Service providers (cloud storage, image hosting, analytics)",
-      "legal": "Legal authorities when required by law",
-      "business": "Business partners with your explicit consent",
-      "note": "We use Cloudinary for image storage and processing. Your uploaded photos are subject to Cloudinary's privacy policy as well."
-    },
-    "storage": {
-      "title": "Data storage and security",
-      "desc": "We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.",
-      "retention": "We retain your personal information as long as your account is active or as needed to provide you services. You can request deletion of your data at any time."
-    },
-    "rights": {
-      "title": "Your data rights",
-      "desc": "Under the GDPR and other applicable data protection laws, you have rights regarding your personal data, including:",
-      "access": "Right to access your personal data",
-      "rectify": "Right to correct inaccurate data",
-      "delete": "Right to erasure (\"right to be forgotten\")",
-      "restrict": "Right to restrict processing",
-      "portability": "Right to data portability",
-      "object": "Right to object to processing",
-      "exercise": "To exercise these rights, you can use the account settings in our application or contact us directly."
-    },
-    "cookies": {
-      "title": "Cookies and similar technologies",
-      "desc": "We use cookies and similar tracking technologies to enhance your experience on our website, analyze usage, and assist in our marketing efforts. You can control cookies through your browser settings."
-    },
-    "ai": {
-      "title": "AI-Generated content",
-      "desc": "Our service uses AI to help generate resume content and cover letters. The data you provide may be processed by our AI systems to generate personalized content. We implement measures to protect your data during AI processing and do not use your personal data to train our AI models without explicit consent."
-    },
-    "children": {
-      "title": "Children's privacy",
-      "desc": "Our service is not directed to individuals under the age of 16. If you are aware that a minor has provided us with personal information without parental consent, please contact us."
-    },
-    "changes": {
-      "title": "Changes to this privacy policy",
-      "desc": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the \"Last Updated\" date."
-    },
-    "contact": {
-      "title": "Contact us",
-      "desc": "If you have any questions about this privacy policy, please contact us at:",
-      "email": "privacy@cvati.com"
-    }
-  },
-  "terms": {
-    "title": "Terms and conditions",
-    "lastUpdated": "Last updated",
-    "updateDate": "April 4, 2025",
-    "intro": "Welcome to CVATI. These terms and conditions govern your use of our resume building service and website. By accessing or using CVATI, you agree to be bound by these Terms.",
-    "definitions": {
-      "title": "1. Definitions",
-      "service": "\"Service\"",
-      "serviceDesc": "Refers to the CVATI website and resume building application.",
-      "content": "\"Content\"",
-      "contentDesc": "Refers to resumes, cover letters, and any other materials created, uploaded, or generated through our Service.",
-      "user": "\"User\"",
-      "userDesc": "Any individual who accesses or uses our Service.",
-      "account": "\"Account\"",
-      "accountDesc": "A registered user profile within our Service."
-    },
-    "accounts": {
-      "title": "2. User accounts",
-      "registration": "When you create an account with us, you must provide accurate, complete, and current information. You are responsible for safeguarding your password and for all activities that occur under your account.",
-      "terminate": "We reserve the right to terminate or suspend your account immediately, without prior notice or liability, for any reason, including breach of these Terms."
-    },
-    "use": {
-      "title": "3. Acceptable use",
-      "desc": "You agree to use our Service only for lawful purposes and in accordance with these Terms. You agree not to:",
-      "false": "Provide any false or misleading information",
-      "impersonate": "Impersonate any person or entity",
-      "infringe": "Infringe upon any patents, trademarks, trade secrets, copyrights, or other proprietary rights",
-      "harmful": "Upload viruses or other malicious code",
-      "interfere": "Interfere with or disrupt the Service or servers",
-      "automated": "Use automated methods to access or use the Service"
-    },
-    "content": {
-      "title": "4. Content ownership and license",
-      "ownership": "You retain all ownership rights to any resumes, cover letters, or other content you create through our Service. However, you grant us a non-exclusive, worldwide, royalty-free license to use, reproduce, and display your content solely for the purpose of providing and improving our Service.",
-      "responsibility": "You are solely responsible for all content you create, upload, or otherwise make available through the Service. You represent and warrant that you have the right to use all information included in your resumes and that the content does not violate any laws or third-party rights."
-    },
-    "ai": {
-      "title": "5. AI-Generated content",
-      "desc": "Our service uses artificial intelligence to assist in creating resumes and cover letters. You acknowledge that:",
-      "accuracy": "AI-generated content may not always be accurate or appropriate for your specific needs",
-      "review": "You should review and edit all AI-generated content before using it",
-      "responsibility": "You are ultimately responsible for all content in your resume or cover letter, including AI-generated portions"
-    },
-    "disclaimer": {
-      "title": "6. Disclaimer of warranties",
-      "desc": "Our service is provided \"as is\" and \"as available\" without any warranties of any kind, either express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement.",
-      "success": "We do not guarantee that our Service will help you secure employment or interviews. The effectiveness of resumes and cover letters depends on many factors beyond our control."
-    },
-    "limitation": {
-      "title": "7. Limitation of liability",
-      "desc": "To the maximum extent permitted by law, in no event shall CVATI, its directors, employees, or agents be liable for any indirect, punitive, incidental, special, consequential, or exemplary damages, including without limitation damages for loss of profits, goodwill, use, data, or other intangible losses, that result from the use of, or inability to use, this Service."
-    },
-    "privacy": {
-      "title": "8. Privacy policy",
-      "desc": "Your use of our service is also governed by our Privacy Policy, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand our practices regarding your personal information."
-    },
-    "termination": {
-      "title": "9. Termination",
-      "userRight": "You may terminate your account at any time by following the instructions in the Service. All your data will be deleted in accordance with our Privacy Policy.",
-      "ourRight": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason, including breach of these Terms. Upon termination, your right to use the Service will immediately cease."
-    },
-    "changes": {
-      "title": "10. Changes to terms",
-      "desc": "We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect. By continuing to access or use our Service after any revisions become effective, you agree to be bound by the revised terms."
-    },
-    "governing": {
-      "title": "11. Governing law",
-      "desc": "These terms shall be governed by and construed in accordance with the laws of [Your Country/State], without regard to its conflict of law provisions."
-    },
-    "contact": {
-      "title": "12. Contact us",
-      "desc": "If you have any questions about these Terms, please contact us at:",
-      "email": "info@cvati.com"
-    }
-  },
   "cookiePolicy": {
     "title": "Cookie policy",
     "lastUpdated": "Last updated",
@@ -1504,6 +1359,647 @@
       "ai_suggestion": "AI Suggested Improvement:",
       "apply_suggestion": "Apply Suggestion",
       "discard": "Discard"
+    }
+  },
+  "cloud": {
+    "no_signups_required": "No Signups Required",
+    "instant_access": "Instant Access",
+    "instant_access_desc": "Start building immediately. No signup, no barriers, just create your CV right now.",
+    "local_first_design": "Local-First Design",
+    "local_first_desc": "Work entirely on your device. Save locally or upgrade to cloud storage when you need it.",
+    "optional_cloud_upgrade": "Optional Cloud Upgrade", 
+    "optional_cloud_desc": "Connect your cloud storage when you want to access your CVs from multiple devices.",
+    "your_choice": "Your Choice",
+    "your_choice_desc": "Save locally for privacy or to cloud for convenience. You decide.",
+    "no_lock_in": "No Lock-in",
+    "no_lock_in_desc": "Switch between local and cloud storage anytime. Your data, your choice.",
+    "instant_preview": "Instant Preview",
+    "instant_preview_desc": "See your CV in different templates immediately, no waiting.",
+    "privacy_first": "Privacy First",
+    "privacy_first_desc": "We never see your data unless you choose to use AI features.",
+    "start_building_choose_later": "Start Building. Choose Storage Later.",
+    "no_signups_desc": "No signups. No barriers. Just start creating your professional CV right now. Save locally or connect cloud storage when you need it.",
+    "ready_local_cloud_connected": "Ready: Local + Cloud Storage (Connected)",
+    "ready_local_cloud_available": "Ready: Local Storage • Cloud Available",
+    "professional_templates_desc": "Professional templates that work everywhere. Start building immediately with any design, then save to your device or cloud storage.",
+    "no_signup_required": "No signup required - start immediately",
+    "save_local_upgrade_cloud": "Save locally or upgrade to cloud later",
+    "beautifully_designed": "and beautifully designed",
+    "start_building_now": "Start Building Now",
+    "local_first_cloud_when_needed": "Local-First. Cloud When You Need It.",
+    "start_immediately_choose_storage": "Start building immediately on your device, then choose your storage option.",
+    "start_immediately_no_signup": "Start immediately. No signup required. Choose your storage option when you save.",
+    "your_data_your_choice": "Your Data, Your Choice",
+    "work_way_you_want": "Work the way you want. Local privacy or cloud convenience - you decide.",
+    "simple_flexible_control": "Simple, flexible, and puts you in control of your data.",
+    "choose_template_start_creating": "Choose a template and start creating your CV immediately. No signup, no barriers.",
+    "choose_storage": "Choose Storage",
+    "when_ready_save_choose": "When ready to save, choose local storage or connect your cloud for device sync.",
+    "access_anywhere": "Access Anywhere",
+    "local_files_device_cloud_sync": "Local files stay on your device. Cloud files sync across all your devices automatically.",
+    "people_love_flexibility": "People love the flexibility and instant access.",
+    "start_immediately_no_signup_connect": "Start immediately - no signup required. Save locally for privacy or connect cloud storage for convenience.",
+    "ready_local_cloud_storage_available": "Ready: Local + Cloud Storage Available",
+    "ready_local_storage_cloud_optional": "Ready: Local Storage • Cloud Optional",
+    "tip_connect_cloud_storage": "💡 Tip: Connect cloud storage to access your CVs from any device",
+    "google_drive": "Google Drive",
+    "connected_count": "{count} Connected",
+    "no_cloud": "No Cloud",
+    "cloud_storage_connected": "Cloud storage connected",
+    "no_cloud_storage_connected": "No cloud storage connected",
+    "cloud_storage_status": "Cloud Storage Status",
+    "google_drive_connected": "Google Drive Connected",
+    "cvs_sync_devices": "✓ Your CVs sync across all devices",
+    "automatic_backup_enabled": "✓ Automatic backup enabled",
+    "manage_cloud_storage": "Manage Cloud Storage",
+    "no_cloud_storage": "No Cloud Storage",
+    "cvs_saved_locally_only": "Your CVs are saved locally only",
+    "connect_cloud_device_sync": "Connect cloud storage for device sync",
+    "connect_cloud_storage": "Connect Cloud Storage",
+    "clear_session_cloud_connections": "Clear current session and cloud connections",
+    "clear_session": "Clear Session",
+    "cloud_storage": "Cloud Storage",
+    "source": "Source",
+    "local": "Local",
+    "draft": "Draft",
+    "this_device": "This Device",
+    "choose_destination": "Choose destination",
+    "local_only": "Local Only",
+    "change_location": "Change Location",
+    "connect_cloud": "Connect Cloud",
+    "save_cv": "Save CV",
+    "base64_info": "Image will be stored directly in your CV file for maximum privacy.",
+    "processing": "Processing...",
+    "compressed_too_large": "Image is still too large after compression. Please use a smaller image.",
+    "remove_error": "Error removing photo. Please try again.",
+    "unsaved_changes_save_before_leaving": "You have unsaved changes. Do you want to save before leaving?",
+    "unsaved_changes": "Unsaved changes",
+    "save_locally": "Save Locally",
+    "save_to_drive": "Save to Drive",
+    "your_cv": "Your CV",
+    "where_save_cv": "Where would you like to save your CV?",
+    "save_to_google_drive": "Save to Google Drive",
+    "access_any_device_backup": "Access from any device • Automatic backup",
+    "connect": "Connect",
+    "onedrive": "OneDrive",
+    "microsoft_integration": "Microsoft integration • Office sync",
+    "coming_soon": "Coming Soon",
+    "dropbox": "Dropbox",
+    "file_sharing_collaboration": "File sharing focused • Team collaboration",
+    "save_to_device": "Save to This Device",
+    "private_offline_device_only": "Private • Works offline • This device only",
+    "connect_cloud_device_sync_tip": "💡 Connect cloud storage for device sync",
+    "cv_accessible_any_device": "Your CV will be accessible from any device with your account",
+    "auto_saved_tip": "💡 Your work is auto-saved as you type - you won't lose anything!",
+    "current_work_session": "Current Work Session",
+    "saved_locally": "Saved Locally",
+    "from": "from",
+    "no_cv_selected": "No CV selected",
+    "customizing": "Customizing",
+    "cvs_available": "CVs available",
+    "preview_apply": "Preview & Apply",
+    "changes_previewed_live": "Your changes are previewed live. Apply them to update your CV.",
+    "apply_customizations": "Apply Customizations",
+    "how_it_works": "How it works",
+    "changes_previewed_instantly": "Changes are previewed instantly",
+    "click_apply_save": "Click \"Apply\" to save to your CV",
+    "use_publish_shareable": "Use \"Publish\" to create shareable link",
+    "published_links_styling": "Published links include your styling",
+    "lock_in": "No Lock-in",
+    "no_session_title": "No Session Established",
+    "sign_in_to_access": "Please sign in to access your cover letters and start building your career toolkit!",
+    "sign_in_to_get_started": "Sign In to Get Started",
+    "tip_connect_google_drive": "Tip: Connect Google Drive to sync your cover letters across devices!",
+    "connect_google_drive": "Connect Google Drive",
+    "connect_drive_to_save": "Connect your Google Drive to save and access your AI-generated cover letters",
+    "tip_google_drive_integration": "Tip: Google Drive integration allows you to access your cover letters from anywhere!",
+    "from_google_drive": "From Google Drive",
+    "access_saved_cvs": "to access your saved CVs", 
+    "stored_in_google_drive": "Stored in Google Drive",
+    "stored_in_local_storage": "Stored in Local Storage",
+    "drive": "Drive", 
+    "connect_drive_to_edit": "Connect Google Drive to edit cover letters",
+    "current_draft": "Current Draft",
+    "local_storage": "Local Storage",
+    "local_storage_only": "Local storage only",
+    "connect_google_drive_sync": "Connect Google Drive to sync across devices",
+    "processing_connection": "Processing Google Drive connection...",
+    "connection_failed": "Google Drive connection failed",
+    "verifying_connection": "Verifying Google Drive connection...",
+    "connection_successful": "Successfully connected to Google Drive!",
+    "connected_save_to_cloud": "Google Drive connected! You can now save your CV to the cloud.",
+    "verification_failed": "Backend verification failed. You can try the \"Continue Anyway\" option.",
+    "verification_error": "Verification error",
+    "no_success_confirmation": "No success confirmation received",
+    "processing_error": "Processing error",
+    "assuming_connected": "Assuming Google Drive is connected. Try saving to test.",
+    "connecting_title": "Connecting to Google Drive...",
+    "connection_successful_title": "Connection Successful!",
+    "connection_issue_title": "Connection Issue",
+    "data_stays_in_your_drive": "Your data stays in YOUR Google Drive account",
+    "redirecting_to_builder": "Redirecting to resume builder...",
+    "continue_anyway": "Continue Anyway",
+    "try_again": "Try Again",
+    "provider_connected": "Your {{provider}} account has been successfully connected.",
+    "continue_to_create": "Continue to Create Resume",
+    "can_now_save_access": "You can now save and access your resumes from the cloud.",
+    "cloud_storage_setup": "Cloud Storage Setup", 
+    "cvs_automatically_saved": "Your CVs are automatically saved to your Google Drive",
+    "access_cvs_any_device": "Access your CVs from any device with your Google account",
+    "why_google_drive": "Why Google Drive?",
+    "google_drive_benefits": "Google Drive offers secure, reliable cloud storage that you already trust. Your CVs are stored directly in your account with end-to-end security.",
+    "local_storage_always_available": "Local Storage Always Available",
+    "can_save_locally": "You can always save your CVs locally in your browser. Google Drive connection is optional for cloud backup and sync.",
+    "local_works_offline": "💡 Local storage works even without internet connection",
+    "can_save_cvs_to_drive": "You can now save your CVs directly to your Google Drive",
+    "save_cvs_securely": "Save your CVs securely to your own Google Drive account",
+    "connecting": "Connecting",
+    "privacy_protected": "Privacy Protected",
+    "never_access_files": "Your CVs are saved directly to your Google Drive - we never access your files",
+    "publish_failed": "Failed to publish CV",
+    "share_resume_text": "Check out {{name}} resume",
+    "this_person": "this person",
+    "qr_complexity_unknown": "Unable to estimate complexity",
+    "public_cv_qr_title": "Public CV & QR Code",
+    "public_link_description": "Create a public link that anyone can access to view your CV. No account required for viewers.",
+    "publishing": "Publishing",
+    "publish_cv_publicly": "Publish CV Publicly",
+    "published_successfully": "Published Successfully",
+    "public_url_label": "Public URL ({{count}} characters)",
+    "copy_url": "Copy URL",
+    "open_new_tab": "Open in new tab",
+    "share": "Share",
+    "hide_qr": "Hide QR",
+    "show_qr": "Show QR",
+    "download_qr": "Download QR",
+    "unpublish_cv": "Unpublish CV",
+    "no_login_required": "No Login Required!",
+    "platform_works_without_accounts": "Our platform works without user accounts.",
+    "start_building_connect_optional": "Start building your CV immediately, then optionally connect cloud storage for sync across devices.",
+    "start_building_cv": "Start Building Your CV",
+    "no_registration_needed": "No Registration Needed!",
+    "jump_straight_building": "Jump straight into building your CV.",
+    "data_stays_cloud_storage": "Your data stays in your own cloud storage when you choose to save.",
+    "start_building": "Start Building",
+    "manage_storage_options": "Manage your local and cloud storage options",
+    "resume_template": "Resume Template",
+    "choose_file": "Choose file",
+    "optional": "Optional",
+    "saving_locally": "Saving locally ..",
+    "saving_to_cloud": "Saving to cloud ..",
+    "select_local_cv": "-- Select a CV from Local Storage --",
+    "from_local_storage": "From your device's storage",
+    "found_cvs": "Found {{count}} CV ",
+    "search_cv_placeholder": "Search by CV title or name...",
+    "no_cvs_match_search": "No CVs match your search",
+    "no_cvs_found": "No CVs found",
+    "try_different_search": "Try a different search term",
+    "create_cv_first": "Create a CV first to work with it",
+    "cvs_count": "CV{{count, plural, one {} other {s}}}", 
+    "my_saved_cvs": "My Saved CVs",
+    "unknown_source": "Unknown Source",
+    "no_name": "No name",
+    "cv_number": "CV {{number}}",
+    "current_editing_session": "Current editing session",
+    "saved_on_device": "Saved on this device",
+    "selected": "Selected", 
+    "select_this_cv": "Select This CV", 
+    "saved": "Saved",
+    "select_cv": "Select CV",
+    "available": "available", 
+    "refresh_cv_list": "Refresh CV list",
+    "draft_from_builder": "Draft from CV Builder",
+    "local_draft": "Local Draft",
+    "google_drive_cv": "Google Drive CV",
+    "resume_id": "Resume {{id}}",
+    "from_database": "From database",
+    "failed_load_cvs": "Failed to load available CVs",
+    "searching_cvs": "Searching for your CVs...",
+    "customizations_saved_locally": "Customizations saved locally!",
+    "failed_save_customizations": "Failed to save customizations",
+    "back_to_cv_builder": "Back to CV Builder",
+    "create_cv_to_customize": "We couldn't find any CVs to customize. Create one first!",
+    "create_new_cv": "Create New CV",
+    "select_cv_to_customize": "Select CV to Customize",
+    "choose_cv_to_customize": "Choose which CV you'd like to customize"
+  }, 
+  "terms": {
+    "title": "Terms and Conditions",
+    "subtitle": "Clear terms for using CVati. Your rights, our responsibilities, and what to expect.",
+    "effective_date": "Effective Date",
+    "date": "December 2024",
+    "agreement": {
+      "title": "Agreement to Terms",
+      "content": "By accessing and using CVati, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service."
+    },
+    "service": {
+      "title": "Service Description",
+      "what_we_provide": {
+        "title": "What We Provide"
+      },
+      "cv_builder": "Professional CV/resume building tools",
+      "templates": "Multiple customizable templates",
+      "local_storage": "Local storage capabilities",
+      "cloud_integration": "Optional cloud storage integration",
+      "export_features": "Export and download features",
+      "no_signup": {
+        "title": "No Registration Required",
+        "description": "CVati operates on a no-signup model. You can use all core features immediately without creating an account. Cloud storage connection is optional and user-controlled."
+      }
+    },
+    "responsibilities": {
+      "title": "User Responsibilities",
+      "acceptable_use": {
+        "title": "Acceptable Use"
+      },
+      "lawful_use": "Use the service for lawful purposes only",
+      "accurate_info": "Provide accurate information in your CVs",
+      "no_harmful_content": "Do not upload harmful or offensive content",
+      "respect_others": "Respect intellectual property rights",
+      "prohibited": {
+        "title": "Prohibited Activities"
+      },
+      "no_reverse_engineering": "Reverse engineering or copying the service",
+      "no_automated_access": "Automated data collection or scraping",
+      "no_interference": "Interfering with service operations",
+      "no_malicious_use": "Using the service for malicious purposes"
+    },
+    "data_privacy": {
+      "title": "Data and Privacy",
+      "ownership": {
+        "title": "Your Data Ownership",
+        "description": "You retain full ownership and control of all content you create using CVati. We do not claim any rights to your CV content, personal information, or uploaded materials."
+      },
+      "local_storage": {
+        "title": "Local Storage",
+        "description": "Data stored locally remains on your device and is not transmitted to our servers."
+      },
+      "cloud_storage": {
+        "title": "Cloud Storage",
+        "description": "Cloud storage is optional and uses your own Google Drive account with revocable permissions."
+      }
+    },
+    "availability": {
+      "title": "Service Availability",
+      "uptime": {
+        "title": "Service Uptime",
+        "description": "We strive to maintain high service availability but cannot guarantee 100% uptime. Scheduled maintenance will be announced in advance when possible."
+      },
+      "local_functionality": {
+        "title": "Local Functionality",
+        "description": "Core CV building features work locally on your device and do not require internet connectivity. Cloud features require internet access."
+      }
+    },
+    "limitations": {
+      "title": "Limitations and Disclaimers",
+      "warranty": {
+        "title": "No Warranty",
+        "description": "CVati is provided \"as is\" without any warranties, express or implied. We do not guarantee that the service will be error-free, secure, or continuously available."
+      },
+      "liability": {
+        "title": "Limitation of Liability",
+        "description": "We are not liable for any damages arising from the use or inability to use our service."
+      },
+      "third_party": {
+        "title": "Third-Party Services",
+        "description": "Integration with third-party services (like Google Drive) is subject to their terms and availability."
+      }
+    },
+    "modifications": {
+      "title": "Modifications to Service and Terms",
+      "service_changes": {
+        "title": "Service Changes",
+        "description": "We reserve the right to modify, suspend, or discontinue any part of the service at any time. We will provide reasonable notice of significant changes when possible."
+      },
+      "terms_changes": {
+        "title": "Terms Changes",
+        "description": "These terms may be updated from time to time. Continued use of the service after changes constitutes acceptance of the new terms."
+      }
+    },
+    "termination": {
+      "title": "Termination",
+      "by_user": {
+        "title": "Termination by You",
+        "description": "You may stop using the service at any time. Your locally stored data remains on your device. You can revoke cloud storage permissions independently."
+      },
+      "by_us": {
+        "title": "Termination by Us",
+        "description": "We may restrict access if terms are violated. We will provide notice when possible and reasonable time to retrieve your data."
+      }
+    },
+    "legal": {
+      "title": "Legal Information",
+      "contact": {
+        "title": "Contact Information",
+        "email": {
+          "label": "Email",
+          "address": "legal@cvati.com"
+        },
+        "response": {
+          "label": "Response Time",
+          "time": "Within 48 hours"
+        }
+      },
+      "governing_law": {
+        "title": "Governing Law",
+        "description": "These terms are governed by and construed in accordance with applicable laws. Any disputes will be resolved through appropriate legal channels."
+      }
+    },
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "description": "By using CVati, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.",
+      "effective": "These terms are effective immediately upon your use of the service",
+      "questions": "Questions About These Terms?"
+    } 
+  },
+ "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "Your privacy matters. Learn how we handle your data with transparency and care.",
+    "last_updated": "Last Updated",
+    "date": "December 2024",
+    "introduction": {
+      "title": "Introduction",
+      "content": "Welcome to CVati. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our CV/resume building application and services. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application."
+    },
+    "collection": {
+      "title": "Information We Collect",
+      "personal": {
+        "title": "Personal Information You Provide",
+        "description": "When you use our Service, we may collect the following personal information that you voluntarily provide:"
+      },
+      "cv_content": "CV/Resume Content",
+      "personal_info": "Personal information (name, email, phone, address)",
+      "professional_info": "Professional information (work experience, education, skills)",
+      "personal_details": "Personal details (date of birth, nationality)",
+      "photos": "Profile photos and images",
+      "references": "References and contact information",
+      "account_info": "Account Information",
+      "session_tokens": "Session tokens for authentication",
+      "preferences": "User preferences and settings",
+      "usage_data": "Application usage data",
+      "automatic": {
+        "title": "Automatically Collected Information"
+      },
+      "device_info": "Device information (browser type, operating system)",
+      "analytics": "Usage analytics and application performance data",
+      "session_data": "Session data and authentication tokens",
+      "local_storage": "Local storage data for offline functionality"
+    },
+    "usage": {
+      "title": "How We Use Your Information",
+      "primary": {
+        "title": "Primary Services"
+      },
+      "cv_creation": "CV creation and editing",
+      "template_application": "Template application and customization",
+      "data_storage": "Data storage (local and cloud)",
+      "document_generation": "Document generation and export",
+      "service": {
+        "title": "Service Improvement"
+      },
+      "app_improvement": "Application improvement and optimization",
+      "technical_support": "Technical support and troubleshooting",
+      "security": "Security and fraud prevention",
+      "analytics": "Usage analytics (anonymized)"
+    },
+    "storage": {
+      "title": "Data Storage Options",
+      "local": {
+        "title": "Local Storage (Default)",
+        "device_only": "Data stays on your device only",
+        "no_transmission": "No data transmission to our servers",
+        "full_privacy": "Complete privacy and control",
+        "browser_storage": "Uses browser local storage"
+      },
+      "cloud": {
+        "title": "Cloud Storage (Optional)",
+        "google_drive": "Google Drive integration",
+        "encrypted": "Data encrypted in transit and at rest",
+        "user_control": "User-controlled connection",
+        "revocable": "Permissions revocable anytime"
+      }
+    },
+    "sharing": {
+      "title": "Data Sharing and Disclosure",
+      "no_selling": {
+        "title": "We Do Not Sell Your Data",
+        "description": "We never sell, rent, or trade your personal information to third parties. Your CV data remains private and under your control."
+      },
+      "limited": {
+        "title": "Limited Sharing Scenarios"
+      },
+      "legal_compliance": "Legal compliance when required by law",
+      "security_protection": "Protection of our rights and security",
+      "service_providers": "Trusted service providers (with strict agreements)",
+      "user_consent": "With your explicit consent only"
+    },
+    "rights": {
+      "title": "Your Rights and Choices",
+      "access": {
+        "title": "Access and Control",
+        "view": "View all your stored data",
+        "edit": "Edit or update your information",
+        "delete": "Delete your data anytime",
+        "export": "Export your data (portability)"
+      },
+      "storage": {
+        "title": "Storage Choices",
+        "local_only": "Keep data local only",
+        "cloud_connect": "Connect/disconnect cloud storage",
+        "revoke": "Revoke cloud permissions",
+        "migrate": "Migrate between storage options"
+      }
+    },
+    "security": {
+      "title": "Security Measures",
+      "encryption": {
+        "title": "Encryption",
+        "description": "All data transmission uses HTTPS encryption"
+      },
+      "access": {
+        "title": "Access Control",
+        "description": "Secure authentication and session management"
+      },
+      "monitoring": {
+        "title": "Monitoring",
+        "description": "Continuous security monitoring and updates"
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "If you have any questions about this Privacy Policy or our data practices, please contact us:",
+      "email": {
+        "title": "Email",
+        "address": "privacy@cvati.com"
+      },
+      "response": {
+        "title": "Response Time",
+        "time": "We respond within 48 hours"
+      }
+    },
+    "updates": {
+      "title": "Policy Updates",
+      "description": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the \"Last Updated\" date.",
+      "notification": "Get Notified of Updates"
+    }
+  },
+  "cookies2": {
+    "title": "Cookie Policy",
+    "subtitle": "Learn about how CVati uses cookies and similar technologies to enhance your experience.",
+    "last_updated": "Last Updated",
+    "date": "September 2025",
+    "message": "We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.",
+    "learnMore": "Learn more",
+    "decline": "Decline",
+    "accept": "Accept",
+    
+    "what_are": {
+      "title": "What Are Cookies?",
+      "description": "Cookies are small text files that are stored on your device when you visit a website. They help websites remember your preferences and improve your browsing experience.",
+      "how_work": {
+        "title": "How They Work",
+        "description": "Cookies store information about your visit and can recognize you when you return to the website."
+      },
+      "your_control": {
+        "title": "Your Control",
+        "description": "You can control and delete cookies through your browser settings at any time."
+      }
+    },
+    
+    "how_we_use": {
+      "title": "How CVati Uses Cookies",
+      "minimal_approach": {
+        "title": "Minimal Cookie Approach",
+        "description": "CVati follows a privacy-first approach and uses minimal cookies. Most functionality works without cookies, and we only use them when necessary for core features."
+      },
+      "purposes": {
+        "title": "We Use Cookies For:"
+      },
+      "essential": {
+        "title": "Essential Functions",
+        "session": "Session management and authentication",
+        "preferences": "Remembering your preferences (dark mode, language)",
+        "local_storage": "Local storage functionality"
+      },
+      "analytics": {
+        "title": "Analytics (Optional)",
+        "usage": "Understanding how the app is used",
+        "performance": "Performance monitoring",
+        "improvements": "Identifying areas for improvement"
+      }
+    },
+    
+    "types": {
+      "title": "Types of Cookies We Use",
+      "essential": {
+        "title": "Essential Cookies (Required)",
+        "status": "Always Active",
+        "description": "These cookies are necessary for the website to function properly and cannot be disabled.",
+        "session": {
+          "title": "Session Cookies",
+          "description": "Maintain your session while using the app"
+        },
+        "preferences": {
+          "title": "Preference Cookies",
+          "description": "Remember your settings like dark mode"
+        },
+        "consent": {
+          "title": "Consent Cookies",
+          "description": "Remember your cookie preferences"
+        }
+      },
+      "analytics": {
+        "title": "Analytics Cookies (Optional)",
+        "status": "User Choice",
+        "description": "These cookies help us understand how you use our website so we can improve it.",
+        "usage": {
+          "title": "Usage Analytics",
+          "description": "Track which features are used most"
+        },
+        "performance": {
+          "title": "Performance Monitoring",
+          "description": "Monitor app speed and reliability"
+        }
+      },
+      "marketing": {
+        "title": "Marketing/Advertising Cookies",
+        "status": "Not Used",
+        "description": "CVati does not use marketing or advertising cookies. We do not track you for advertising purposes or share data with advertisers."
+      }
+    },
+    
+    "third_party": {
+      "title": "Third-Party Services",
+      "description": "When you choose to connect optional services, they may set their own cookies:",
+      "google_drive": {
+        "title": "Google Drive Integration",
+        "description": "When you connect Google Drive, Google may set cookies according to their privacy policy."
+      },
+      "analytics_service": {
+        "title": "Analytics Service",
+        "description": "If enabled, our analytics provider may set cookies to track usage patterns."
+      }
+    },
+    
+    "managing": {
+      "title": "Managing Your Cookie Preferences",
+      "your_choices": {
+        "title": "Your Choices"
+      },
+      "banner_choice": {
+        "title": "Cookie Banner",
+        "description": "Accept or decline optional cookies when you first visit CVati."
+      },
+      "browser_settings": {
+        "title": "Browser Settings",
+        "description": "Control cookies through your browser settings - block, delete, or manage all cookies."
+      },
+      "browser_instructions": {
+        "title": "Browser-Specific Instructions"
+      },
+      "browsers": {
+        "chrome": "Manage cookies in Chrome settings",
+        "firefox": "Manage cookies in Firefox settings",
+        "safari": "Manage cookies in Safari settings",
+        "edge": "Manage cookies in Edge settings",
+        "opera": "Manage cookies in Opera settings",
+        "mobile": "Manage cookies in mobile browser settings"
+      }
+    },
+    
+    "impact": {
+      "title": "Impact of Disabling Cookies",
+      "essential_disabled": {
+        "title": "If Essential Cookies Are Disabled",
+        "sessions": "Session management may not work properly",
+        "preferences": "Your preferences (dark mode, language) won't be saved",
+        "cloud_sync": "Cloud storage sync may be affected"
+      },
+      "analytics_disabled": {
+        "title": "If Analytics Cookies Are Disabled",
+        "functionality": "All functionality remains fully available",
+        "improvements": "We can't gather insights to improve the app",
+        "issues": "Harder to identify and fix technical issues"
+      }
+    },
+    
+    "contact": {
+      "title": "Questions About Cookies?",
+      "description": "If you have any questions about our use of cookies or this Cookie Policy, please contact us:",
+      "email": {
+        "title": "Email",
+        "address": "cookies@cvati.com"
+      },
+      "response": {
+        "title": "Response Time",
+        "time": "We respond within 48 hours"
+      }
+    },
+    
+    "updates": {
+      "title": "Cookie Policy Updates",
+      "description": "We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new policy on this page.",
+      "stay_informed": "Stay Informed About Updates"
     }
   }
 }
