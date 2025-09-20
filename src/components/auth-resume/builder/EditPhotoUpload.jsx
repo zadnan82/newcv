@@ -6,16 +6,16 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const [uploadError, setUploadError] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [currentPhotoUrl, setCurrentPhotoUrl] = useState(''); 
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState('');
+  
+  // Resume store methods (keep for compatibility but won't use Cloudinary anymore)
   const updatePhoto = useResumeStore(state => state.updatePhoto);
   const deletePhoto = useResumeStore(state => state.deletePhoto);
-  const currentResume = useResumeStore(state => state.currentResume); 
-  const CLOUDINARY_CLOUD_NAME = 'dgxhrgcqz'; 
+  const currentResume = useResumeStore(state => state.currentResume);
 
-  useEffect(() => { 
-    console.log('EditPhotoUpload received data:', data);
+  useEffect(() => {
+    console.log('EditPhotoUpload - Data received:', data);
     console.log('Current resume photos:', currentResume?.photos);
     
     let photoUrl = '';
@@ -25,100 +25,124 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
     // First, check if data has photolink property (modern format)
     if (data && typeof data === 'object' && data.photolink) {
       photoUrl = data.photolink;
-      console.log('Using photolink from data object:', photoUrl);
+      console.log('Using photolink from data object:', photoUrl.substring(0, 50) + '...');
     }
     // Second, check if data is an array with photo property (legacy format)
     else if (Array.isArray(data) && data.length > 0 && data[0]?.photo) {
       photoUrl = data[0].photo;
-      console.log('Using photo from data array:', photoUrl);
+      console.log('Using photo from data array:', photoUrl.substring(0, 50) + '...');
     }
     // Third, check if currentResume has photos.photolink
     else if (currentResume?.photos?.photolink) {
       photoUrl = currentResume.photos.photolink;
-      console.log('Using photolink from currentResume:', photoUrl);
+      console.log('Using photolink from currentResume:', photoUrl.substring(0, 50) + '...');
     }
     
     // Update local state if we found a photo URL
     if (photoUrl && photoUrl !== currentPhotoUrl) {
-      console.log('Setting currentPhotoUrl to:', photoUrl);
+      console.log('Setting currentPhotoUrl');
       setCurrentPhotoUrl(photoUrl);
     }
-  }, [currentResume?.id]); 
+  }, [data, currentResume?.photos, currentPhotoUrl]);
+
+  const resizeImage = (file, maxWidth = 600, maxHeight = 600, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        let { width, height } = img;
+        
+        const ratio = Math.min(maxWidth / width, maxHeight / height);
+        
+        if (ratio < 1) {
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const targetSizeKB = 200;
+        let currentQuality = quality;
+        let base64 = canvas.toDataURL('image/jpeg', currentQuality);
+        
+        while (base64.length / 1024 > targetSizeKB && currentQuality > 0.3) {
+          currentQuality -= 0.1;
+          base64 = canvas.toDataURL('image/jpeg', currentQuality);
+        }
+        
+        console.log(`📷 Image optimized: ${width}x${height}, quality: ${currentQuality.toFixed(1)}, size: ${Math.round(base64.length / 1024)}KB`);
+        
+        resolve(base64);
+      };
+
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     setUploadError('');
-    setUploadProgress(0);
     
     if (!file) return;
 
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setUploadError(t('resume.photo.invalid_type', 'Please upload a valid image file (JPG, PNG, or GIF)'));
+      setUploadError(t('resume.photo.invalid_type'));
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setUploadError(t('resume.photo.size_limit', 'Photo size should be less than 2MB'));
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError(t('resume.photo.size_limit'));
       return;
     }
 
-    setIsUploading(true);
+    setIsProcessing(true);
 
     try {
-      // Upload to Cloudinary
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'user_cv_images');
-
-      // Set a unique public_id for the image
-      const timestamp = Date.now();
-      const uniqueId = Math.floor(Math.random() * 1000);
-      formData.append('public_id', `cvati/user_${uniqueId}_${timestamp}`);
+      console.log('Processing image file:', file.name, 'Original size:', Math.round(file.size / 1024), 'KB');
       
-      // Upload to Cloudinary using fetch
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData
-        }
-      );
+      const base64Image = await resizeImage(file, 600, 600, 0.7);
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Cloudinary Error:', errorText);
-        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      const finalSizeKB = Math.round(base64Image.length / 1024);
+      console.log('Image converted to base64, final size:', finalSizeKB, 'KB');
+      
+      if (base64Image.length > 500 * 1024) {
+        setUploadError(t('cloud.compressed_too_large'));
+        return;
       }
-      
-      const responseData = await response.json();
-      const imageUrl = responseData.secure_url;
       
       // For editing existing resume, update the database immediately
-      if (currentResume?.id) {
-        console.log(`Updating photo for resume ${currentResume.id} in database with URL:`, imageUrl);
-        await updatePhoto(imageUrl);
-      }
+     console.log(`Base64 photo ready for CV save (${finalSizeKB}KB)`);
       
       // Update component state
-      setCurrentPhotoUrl(imageUrl);
+      setCurrentPhotoUrl(base64Image);
       
-      // Update the parent with the consistent data format - IMPORTANT
-      console.log('Calling onChange with photolink:', imageUrl);
-      onChange({ photolink: imageUrl });
+      // Update the parent with the consistent data format
+      console.log('Calling onChange with Base64 photolink');
+      onChange({ photolink: base64Image });
+      
+      console.log('✅ Photo successfully converted to base64 and saved, size:', finalSizeKB, 'KB');
       
     } catch (error) {
-      console.error('Error uploading photo to Cloudinary:', error);
-      setUploadError(t('resume.photo.upload_error', 'Error uploading photo. Please try again.'));
+      console.error('❌ Error processing photo:', error);
+      setUploadError(t('resume.photo.process_error'));
     } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
+      setIsProcessing(false);
     }
   };
 
   const removePhoto = async () => {
     try {
-      setIsUploading(true); // Show loading state
+      setIsProcessing(true);
       setUploadError('');
       
       // Get the current resume ID
@@ -129,27 +153,30 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
         console.log(`Deleting photo for resume ${resumeId} from database`);
         await deletePhoto(resumeId);
       } else {
-        // For local resumes, just update with empty string
-        console.log('Updating photo to empty string (local resume)');
-        await updatePhoto('');
+        // For local resumes, just update with null
+        console.log('Updating photo to null (local resume)');
+        await updatePhoto(null);
       }
       
       // Update component state
       setCurrentPhotoUrl('');
       
-      // Update parent with consistent empty photolink format - IMPORTANT
-      console.log('Calling onChange with empty photolink');
-      onChange({ photolink: '' });
+      // Update parent with consistent empty photolink format
+      console.log('Calling onChange with null photolink');
+      onChange({ photolink: null });
       
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      console.log('✅ Photo removed');
+      
     } catch (error) {
-      console.error('Error removing photo:', error);
-      setUploadError(t('resume.photo.remove_error', 'Error removing photo. Please try again.'));
+      console.error('❌ Error removing photo:', error);
+      setUploadError(t('cloud.remove_error'));
     } finally {
-      setIsUploading(false);
+      setIsProcessing(false);
     }
   };
 
@@ -168,7 +195,7 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
       <h3 className={`text-sm font-semibold mb-4 ${
         darkMode ? 'text-white' : 'text-gray-800'
       }`}>
-        {t('resume.photo.title', 'Profile Photo')}
+        {t('resume.photo.title')}
       </h3>
 
       <div className="space-y-3">
@@ -177,14 +204,19 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
             <div className="relative">
               <img 
                 src={currentPhotoUrl} 
-                alt={t('resume.photo.alt', 'Profile')}
+                alt={t('resume.photo.alt')}
                 className="w-20 h-20 rounded-md object-cover border shadow-md"
+                onError={(e) => {
+                  console.error('Image display error:', e);
+                  setUploadError(t('common.error'));
+                }}
               />
               <button
                 type="button"
                 onClick={removePhoto}
-                className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors shadow-md"
-                aria-label={t('resume.photo.remove_photo', 'Remove photo')}
+                disabled={isProcessing}
+                className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors shadow-md disabled:opacity-50"
+                aria-label={t('resume.photo.remove_photo')}
               >
                 ×
               </button>
@@ -197,18 +229,19 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
                 onChange={handlePhotoChange}
                 className="hidden"
                 id="photo-upload"
+                disabled={isProcessing}
               />
               <label
                 htmlFor="photo-upload"
                 className={`inline-block w-full px-2 py-1.5 text-sm text-center ${
-                  isUploading 
+                  isProcessing 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
                 } text-white rounded-full transition-all duration-300 shadow-md`}
               >
-                {isUploading 
-                  ? t('resume.photo.uploading', 'Uploading...') 
-                  : t('resume.photo.change', 'Change Photo')}
+                {isProcessing 
+                  ? t('cloud.processing') 
+                  : t('resume.photo.change')}
               </label>
             </div>
           </div>
@@ -221,39 +254,50 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
               onChange={handlePhotoChange}
               className="hidden"
               id="photo-upload"
+              disabled={isProcessing}
             />
             <label
               htmlFor="photo-upload"
               className={`inline-block w-full px-2 py-1.5 text-sm text-center ${
-                isUploading 
+                isProcessing 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105'
               } text-white rounded-full transition-all duration-300 shadow-md`}
             >
-              {isUploading 
-                ? t('resume.photo.uploading', 'Uploading...') 
-                : t('resume.photo.upload', 'Upload Photo')}
+              {isProcessing 
+                ? t('cloud.processing') 
+                : t('resume.photo.upload')}
             </label>
           </div>
         )}
         
-        {isUploading && (
+        {isProcessing && (
           <div className="w-full bg-gray-200 rounded-full h-1.5 my-2 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-purple-600 to-blue-600 h-1.5 rounded-full transition-all duration-300" 
-              style={{ width: `${uploadProgress}%` }}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 h-1.5 rounded-full transition-all duration-300 animate-pulse" 
+              style={{ width: '70%' }}
             ></div>
           </div>
         )}
         
         {uploadError && (
-          <p className="text-xs text-red-500 mt-1">{uploadError}</p>
+          <div className={`p-2 rounded-lg border ${
+            darkMode 
+              ? 'bg-red-900/20 border-red-700 text-red-300' 
+              : 'bg-red-50 border-red-200 text-red-700'
+          }`}>
+            <p className="text-xs">{uploadError}</p>
+          </div>
         )}
-        <p className={`text-xs mt-1 ${
+        
+        <div className={`text-xs ${
           darkMode ? 'text-gray-400' : 'text-gray-500'
         }`}>
-          {t('resume.photo.max_size', 'Maximum size: 2MB')}
-        </p>
+          <p>{t('resume.photo.max_size')}</p>
+          <p className="mt-1">
+            {t('cloud.base64_info')}
+          </p>
+        </div>
       </div>
     </div>
   );

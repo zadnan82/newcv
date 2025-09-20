@@ -12,7 +12,16 @@ const HTMLResumeViewer = ({
   const resumeRef = useRef(null); 
   const containerRef = useRef(null);
   const [scale, setScale] = useState(0.6);
-   
+   // At the top of HTMLResumeViewer component
+console.log('HTMLResumeViewer received data:', {
+  has_formData: !!formData,
+  photo_field: formData?.photo,
+  photos_field: formData?.photos,
+  personal_info_photo: formData?.personal_info?.photo,
+  all_photo_related: Object.keys(formData || {}).filter(key => 
+    key.toLowerCase().includes('photo')
+  )
+});
   useEffect(() => {
     if (onRef && resumeRef.current) {
       onRef(resumeRef.current);
@@ -139,9 +148,9 @@ const HTMLResumeViewer = ({
             flexWrap: 'wrap'
           }}>
            <div style={{ 
-  width: formData.photos && formData.photos.photolink 
-    ? 'calc(100% - 120px)' 
-    : '100%' 
+ width: formData.photo && formData.photo.photolink 
+  ? 'calc(100% - 120px)' 
+  : '100%'
 }}>
               <h1 style={{
                 fontSize: '1.8rem',
@@ -322,9 +331,9 @@ const HTMLResumeViewer = ({
               </div>
             </div>
             
-            {formData.photos && formData.photos.photolink && (
+            {formData.photo && formData.photo.photolink && (
               <img 
-                src={formData.photos.photolink}  
+                src={formData.photo.photolink}
                 alt={t('resume.photo.alt')}
                 style={{
                   width: '100px',

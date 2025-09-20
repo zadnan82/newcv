@@ -1555,7 +1555,7 @@
     "no_cvs_found": "No CVs found",
     "try_different_search": "Try a different search term",
     "create_cv_first": "Create a CV first to work with it",
-    "cvs_count": "CV{{count, plural, one {} other {s}}}", 
+    "cvs_count": "CV{{count, plural, one {} other {s}}", 
     "my_saved_cvs": "My Saved CVs",
     "unknown_source": "Unknown Source",
     "no_name": "No name",

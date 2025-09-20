@@ -11,8 +11,7 @@ import FontSelector from './FontSelector';
 import HeadersStyleSelector from './HeadersStyleSelector';
 import SkillLevelToggle from './SkillLevelToggle';  
 import useResumeStore from '../../../stores/resumeStore';
-import useSessionStore from '../../../stores/sessionStore'; 
-import SaveCustomizationsButton from './CustomizationManager'; 
+import useSessionStore from '../../../stores/sessionStore';  
 import { exportToDocx } from '../view-cv/js/Exportdocx';
 import SaveConfirmationModal from './SaveConfirmationModal';
 import API_BASE_URL from '../../../config';
@@ -81,14 +80,14 @@ const CVSelectionModal = ({
   onSelectCV, 
   isLoading, 
   onRefresh,
-  isDarkMode,
-  title = "Select CV",
-  subtitle = "Choose which CV you'd like to work with"
+  isDarkMode
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
-
+ 
+       const  title= t('cloud.select_cv_to_customize');  
+       const subtitle= t('cloud.choose_cv_to_customize'); 
   if (!isOpen) return null;
 
   const groupedCVs = availableCVs.reduce((groups, cv) => {
@@ -263,11 +262,11 @@ const CVSelectionModal = ({
                     <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       {getSourceLabel(source)}
                     </h3>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
+                    {/* <span className={`text-xs px-2 py-1 rounded-full ${
                       isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {cvs.length} {t('cloud.cvs_count', { count: cvs.length })}
-                    </span>
+                      {cvs.length} {t('cloud.cvs_count', { count: cvs.length } )}
+                    </span> */}
                   </div>
 
                   <div className={viewMode === 'grid' 
@@ -532,19 +531,28 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
   };
 
   // Main function to load all available CVs
-  const loadAvailableCVs = async () => {
-    setIsLoadingCVs(true);
-    const cvs = [];
+ // Main function to load all available CVs - COMPLETE FIXED VERSION
+const loadAvailableCVs = async () => {
+  setIsLoadingCVs(true);
+  const cvs = [];
 
-    try {
-      console.log('🔍 Loading available CVs from all sources...');
+  try {
+    console.log('🔍 Loading available CVs from all sources...');
 
-      // 1. Check for draft from NewResumeBuilder
-      const draftData = localStorage.getItem('cv_draft_for_customization');
-      if (draftData) {
-        try {
-          const parsed = JSON.parse(draftData);
-          console.log('📝 Found draft from CV builder:', parsed.title || 'Untitled');
+    // 1. Check for draft from NewResumeBuilder
+    const draftData = localStorage.getItem('cv_draft_for_customization');
+    if (draftData) {
+      try {
+        const parsed = JSON.parse(draftData);
+        console.log('📝 Found draft from CV builder:', parsed.title || 'Untitled');
+        
+        // Validate that the CV has meaningful content
+        const hasContent = parsed.personal_info?.full_name || 
+                          (parsed.experiences && parsed.experiences.length > 0) ||
+                          (parsed.educations && parsed.educations.length > 0) ||
+                          (parsed.skills && parsed.skills.length > 0);
+        
+        if (hasContent) {
           cvs.push({
             id: 'draft-customization',
             source: 'draft',
@@ -554,137 +562,247 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
             personal_info: parsed.personal_info,
             priority: 1
           });
-        } catch (error) {
-          console.error('Error parsing draft data:', error);
+          console.log('✅ Added draft CV with content');
+        } else {
+          console.log('⚠️ Draft CV found but appears to be empty');
         }
+      } catch (error) {
+        console.error('Error parsing draft data:', error);
       }
+    }
 
-      // 2. Check for recent local CV
-      const localCV = localStorage.getItem('cv_draft');
+    // 2. Check for recent local CV - FIXED VERSION with multiple key support
+    const localStorageKeys = [
+      'cv_draft',           // Primary fallback key
+      'resumeFormData',     // Alternative key used by resumeStore
+      'local_cvs'           // For multiple local CVs
+    ];
+
+    // Check individual CV keys first
+    for (const key of localStorageKeys.slice(0, 2)) { // Skip 'local_cvs' for now
+      const localCV = localStorage.getItem(key);
       if (localCV) {
         try {
           const parsed = JSON.parse(localCV);
-          console.log('💾 Found local CV:', parsed.title || 'Untitled');
-          cvs.push({
-            id: 'local-draft-' + Date.now(),
-            source: 'local',
-            title: parsed.title || t('cloud.local_draft'),
-            name: t('cloud.saved_on_device'),
-            content: parsed,
-            personal_info: parsed.personal_info,
-            priority: 3
-          });
+          console.log('💾 Found local CV from key:', key, 'Title:', parsed.title || 'Untitled');
+          
+          // Validate that the CV has meaningful content
+          const hasContent = parsed.personal_info?.full_name || 
+                            (parsed.experiences && parsed.experiences.length > 0) ||
+                            (parsed.educations && parsed.educations.length > 0) ||
+                            (parsed.skills && parsed.skills.length > 0);
+          
+          if (hasContent) {
+            // Check if we already have a draft with same content to avoid duplicates
+            const isDuplicate = cvs.some(existingCV => 
+              existingCV.source === 'draft' && 
+              existingCV.content?.personal_info?.full_name === parsed.personal_info?.full_name
+            );
+            
+            if (!isDuplicate) {
+              cvs.push({
+                id: `local-draft-${Date.now()}`,
+                source: 'local',
+                title: parsed.title || t('cloud.local_draft'),
+                name: t('cloud.saved_on_device'),
+                content: parsed,
+                personal_info: parsed.personal_info,
+                priority: 3,
+                storageKey: key
+              });
+              
+              console.log('✅ Added local CV with content:', {
+                title: parsed.title,
+                hasPersonalInfo: !!parsed.personal_info,
+                sectionsCount: {
+                  experiences: parsed.experiences?.length || 0,
+                  educations: parsed.educations?.length || 0,
+                  skills: parsed.skills?.length || 0
+                },
+                storageKey: key
+              });
+            } else {
+              console.log('⚠️ Skipping duplicate local CV from key:', key);
+            }
+            break; // Only add one local CV to avoid duplicates
+          } else {
+            console.log('⚠️ Local CV found but appears to be empty:', key);
+          }
         } catch (error) {
-          console.error('Error parsing local CV:', error);
+          console.error('Error parsing local CV from key:', key, error);
         }
       }
+    }
 
-      // 3. Load from Google Drive if connected - ENHANCED VERSION WITH BETTER LOGGING
-      if (canSaveToCloud()) {
-        try {
-          console.log('☁️ Loading CVs from Google Drive...');
-          console.log('☁️ Google Drive connection status:', canSaveToCloud());
+    // Check for multiple local CVs stored in 'local_cvs' array
+    const localCVsArray = localStorage.getItem('local_cvs');
+    if (localCVsArray) {
+      try {
+        const parsedArray = JSON.parse(localCVsArray);
+        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+          console.log('💾 Found local CVs array with', parsedArray.length, 'CVs');
           
-          const cloudData = await listGoogleDriveCVs();
-          console.log('☁️ Raw Google Drive response:', cloudData);
-          console.log('☁️ Is cloudData an array?', Array.isArray(cloudData));
-          console.log('☁️ cloudData length:', cloudData?.length);
-          
-          if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
-            console.log(`📁 Processing ${cloudData.length} Google Drive files...`);
+          // Add the most recent local CV if we don't already have one
+          const hasLocalCV = cvs.some(cv => cv.source === 'local');
+          if (!hasLocalCV) {
+            const mostRecent = parsedArray.sort((a, b) => 
+              new Date(b.lastModified || b.updated_at || b.created_at || 0) - 
+              new Date(a.lastModified || a.updated_at || a.created_at || 0)
+            )[0];
             
-            // Process files in parallel with Promise.all
-            const driveCVPromises = cloudData.map(async (file, index) => {
+            if (mostRecent) {
+              const hasContent = mostRecent.personal_info?.full_name || 
+                               (mostRecent.experiences && mostRecent.experiences.length > 0) ||
+                               (mostRecent.educations && mostRecent.educations.length > 0) ||
+                               (mostRecent.skills && mostRecent.skills.length > 0);
+              
+              if (hasContent) {
+                cvs.push({
+                  id: mostRecent.id || `local-array-${Date.now()}`,
+                  source: 'local',
+                  title: mostRecent.title || t('cloud.local_draft'),
+                  name: t('cloud.saved_on_device'),
+                  content: mostRecent,
+                  personal_info: mostRecent.personal_info,
+                  priority: 3,
+                  storageKey: 'local_cvs'
+                });
+                console.log('✅ Added most recent local CV from array');
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing local CVs array:', error);
+      }
+    }
+
+    // 3. Load from Google Drive if connected - ENHANCED VERSION WITH BETTER LOGGING
+    if (canSaveToCloud()) {
+      try {
+        console.log('☁️ Loading CVs from Google Drive...');
+        console.log('☁️ Google Drive connection status:', canSaveToCloud());
+        
+        const cloudData = await listGoogleDriveCVs();
+        console.log('☁️ Raw Google Drive response:', cloudData);
+        console.log('☁️ Is cloudData an array?', Array.isArray(cloudData));
+        console.log('☁️ cloudData length:', cloudData?.length);
+        
+        if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+          console.log(`📁 Processing ${cloudData.length} Google Drive files...`);
+          
+          // Process files in parallel with Promise.all
+          const driveCVPromises = cloudData.map(async (file, index) => {
+            try {
+              console.log(`📥 Processing Google Drive file ${index + 1}/${cloudData.length}:`, {
+                name: file.name,
+                id: file.file_id,
+                size: file.size_bytes
+              });
+              
+              // Use the correct sessionStore method that calls the right endpoint
               try {
-                console.log(`📥 Processing Google Drive file ${index + 1}/${cloudData.length}:`, {
-                  name: file.name,
-                  id: file.file_id,
-                  size: file.size_bytes
+                const fileContent = await loadGoogleDriveCV(file.file_id);
+                console.log(`📥 File content loaded for ${file.name}:`, {
+                  hasContent: !!fileContent,
+                  contentType: typeof fileContent,
+                  isSuccess: fileContent?.success !== false
                 });
                 
-                // Use the correct sessionStore method that calls the right endpoint
-                try {
-                  const fileContent = await loadGoogleDriveCV(file.file_id);
-                  console.log(`📥 File content loaded for ${file.name}:`, {
-                    hasContent: !!fileContent,
-                    contentType: typeof fileContent,
-                    isSuccess: fileContent?.success !== false
-                  });
-                  
-                  if (!fileContent || fileContent.error) {
-                    console.log(`⚠️ Skipping Google Drive file: ${file.name} - invalid content or error`);
-                    return null;
-                  }
-                  
-                  // The sessionStore method should return the parsed CV data directly
-                  let actualContent = fileContent;
-                  
-                  // If the response has a cv_data wrapper, extract it
-                  if (fileContent.cv_data) {
-                    actualContent = fileContent.cv_data;
-                  }
-                  
-                  console.log(`✅ Successfully processed Google Drive file: ${file.name}`, {
-                    hasPersonalInfo: !!actualContent?.personal_info,
-                    title: actualContent?.title,
-                    fullName: actualContent?.personal_info?.full_name
-                  });
-                  
-                  return {
-                    id: file.file_id,
-                    source: 'cloud',
-                    title: file.name?.replace('.json', '') || t('cloud.google_drive_cv'),
-                    name: file.name || t('common.untitled'),
-                    content: actualContent,
-                    modifiedTime: file.last_modified,
-                    personal_info: actualContent.personal_info,
-                    priority: 2
-                  };
-                } catch (loadError) {
-                  console.error(`❌ Error loading content for ${file.name}:`, loadError);
+                if (!fileContent || fileContent.error) {
+                  console.log(`⚠️ Skipping Google Drive file: ${file.name} - invalid content or error`);
                   return null;
                 }
                 
-              } catch (fileError) {
-                console.error(`❌ Error processing Google Drive file ${file.file_id}:`, fileError);
+                // The sessionStore method should return the parsed CV data directly
+                let actualContent = fileContent;
+                
+                // If the response has a cv_data wrapper, extract it
+                if (fileContent.cv_data) {
+                  actualContent = fileContent.cv_data;
+                }
+                
+                // Validate content
+                const hasContent = actualContent?.personal_info?.full_name || 
+                                 (actualContent?.experiences && actualContent.experiences.length > 0) ||
+                                 (actualContent?.educations && actualContent.educations.length > 0) ||
+                                 (actualContent?.skills && actualContent.skills.length > 0);
+                
+                if (!hasContent) {
+                  console.log(`⚠️ Google Drive CV appears to be empty: ${file.name}`);
+                  return null;
+                }
+                
+                console.log(`✅ Successfully processed Google Drive file: ${file.name}`, {
+                  hasPersonalInfo: !!actualContent?.personal_info,
+                  title: actualContent?.title,
+                  fullName: actualContent?.personal_info?.full_name
+                });
+                
+                return {
+                  id: file.file_id,
+                  source: 'cloud',
+                  title: file.name?.replace('.json', '') || t('cloud.google_drive_cv'),
+                  name: file.name || t('common.untitled'),
+                  content: actualContent,
+                  modifiedTime: file.last_modified,
+                  personal_info: actualContent.personal_info,
+                  priority: 2
+                };
+              } catch (loadError) {
+                console.error(`❌ Error loading content for ${file.name}:`, loadError);
                 return null;
               }
-            });
-            
-            console.log(`🔄 Waiting for all ${driveCVPromises.length} Google Drive files to process...`);
-            const driveCVs = await Promise.all(driveCVPromises);
-            
-            // Filter out null results and add to CVs array
-            const validDriveCVs = driveCVs.filter(cv => cv !== null);
-            console.log(`✅ Successfully processed ${validDriveCVs.length}/${cloudData.length} Google Drive CVs`);
-            
-            if (validDriveCVs.length > 0) {
-              console.log('✅ Adding Google Drive CVs to list:', validDriveCVs.map(cv => ({
-                title: cv.title,
-                source: cv.source,
-                hasContent: !!cv.content
-              })));
-              cvs.push(...validDriveCVs);
-            } else {
-              console.warn('⚠️ No valid Google Drive CVs found after processing');
+              
+            } catch (fileError) {
+              console.error(`❌ Error processing Google Drive file ${file.file_id}:`, fileError);
+              return null;
             }
-          } else {
-            console.log('ℹ️ No Google Drive files found or invalid response structure');
-          }
-        } catch (error) {
-          console.error('❌ Error loading from Google Drive:', error);
-          console.error('❌ Error details:', {
-            message: error.message,
-            stack: error.stack
           });
+          
+          console.log(`🔄 Waiting for all ${driveCVPromises.length} Google Drive files to process...`);
+          const driveCVs = await Promise.all(driveCVPromises);
+          
+          // Filter out null results and add to CVs array
+          const validDriveCVs = driveCVs.filter(cv => cv !== null);
+          console.log(`✅ Successfully processed ${validDriveCVs.length}/${cloudData.length} Google Drive CVs`);
+          
+          if (validDriveCVs.length > 0) {
+            console.log('✅ Adding Google Drive CVs to list:', validDriveCVs.map(cv => ({
+              title: cv.title,
+              source: cv.source,
+              hasContent: !!cv.content
+            })));
+            cvs.push(...validDriveCVs);
+          } else {
+            console.warn('⚠️ No valid Google Drive CVs found after processing');
+          }
+        } else {
+          console.log('ℹ️ No Google Drive files found or invalid response structure');
         }
-      } else {
-        console.log('ℹ️ Google Drive not connected, skipping cloud CVs');
+      } catch (error) {
+        console.error('❌ Error loading from Google Drive:', error);
+        console.error('❌ Error details:', {
+          message: error.message,
+          stack: error.stack
+        });
       }
+    } else {
+      console.log('ℹ️ Google Drive not connected, skipping cloud CVs');
+    }
 
-      // 4. Add current resume from API if exists
-      if (currentResume && currentResume.id) {
-        console.log('🌐 Found API resume:', currentResume.title || currentResume.id);
+    // 4. Add current resume from API if exists
+    if (currentResume && currentResume.id) {
+      console.log('🌐 Found API resume:', currentResume.title || currentResume.id);
+      
+      // Check if this API resume is not already included
+      const isDuplicate = cvs.some(cv => 
+        cv.id === currentResume.id || 
+        (cv.content?.personal_info?.full_name === currentResume.personal_info?.full_name &&
+         cv.source !== 'api')
+      );
+      
+      if (!isDuplicate) {
         cvs.push({
           id: currentResume.id,
           source: 'api',
@@ -694,54 +812,161 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
           personal_info: currentResume.personal_info,
           priority: 2
         });
+        console.log('✅ Added API resume to list');
+      } else {
+        console.log('⚠️ API resume already exists in list, skipping duplicate');
       }
-
-      // Sort by priority
-      cvs.sort((a, b) => a.priority - b.priority);
-
-      console.log(`✅ Loaded ${cvs.length} CVs total from all sources`);
-      
-      // Debug log
-      console.group('📋 Loaded CVs Summary');
-      cvs.forEach((cv, index) => {
-        console.log(`CV ${index + 1}:`, {
-          source: cv.source,
-          title: cv.title,
-          id: cv.id,
-          hasContent: !!cv.content,
-          contentType: typeof cv.content
-        });
-      });
-      console.groupEnd();
-
-      setAvailableCVs(cvs);
-
-      // Auto-select the highest priority CV if none selected
-      if (cvs.length > 0 && !selectedCV) {
-        const priorityCV = cvs.find(cv => cv.content); // Find first CV with actual content
-        if (priorityCV) {
-          console.log('🎯 Auto-selecting CV:', priorityCV.title);
-          handleSelectCV(priorityCV);
-        }
-      }
-
-    } catch (error) {
-      console.error('❌ Error loading available CVs:', error);
-      setLocalError(t('cloud.failed_load_cvs'));
-    } finally {
-      setIsLoadingCVs(false);
     }
-  };
+
+    // Sort by priority and filter out any remaining invalid entries
+    const validCVs = cvs.filter(cv => cv.content && typeof cv.content === 'object');
+    validCVs.sort((a, b) => a.priority - b.priority);
+
+    console.log(`✅ Loaded ${validCVs.length} valid CVs total from all sources`);
+    
+    // Debug log
+    console.group('📋 Loaded CVs Summary');
+    validCVs.forEach((cv, index) => {
+      console.log(`CV ${index + 1}:`, {
+        source: cv.source,
+        title: cv.title,
+        id: cv.id,
+        hasContent: !!cv.content,
+        contentType: typeof cv.content,
+        personalInfoName: cv.content?.personal_info?.full_name || 'No name',
+        storageKey: cv.storageKey || 'N/A'
+      });
+    });
+    console.groupEnd();
+
+    setAvailableCVs(validCVs);
+
+    // Auto-select the highest priority CV if none selected
+    if (validCVs.length > 0 && !selectedCV) {
+      const priorityCV = validCVs.find(cv => cv.content); // Find first CV with actual content
+      if (priorityCV) {
+        console.log('🎯 Auto-selecting CV:', priorityCV.title);
+        handleSelectCV(priorityCV);
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Error loading available CVs:', error);
+    setLocalError(t('cloud.failed_load_cvs'));
+  } finally {
+    setIsLoadingCVs(false);
+  }
+};
 
   // Handle CV selection
-  const handleSelectCV = (cv) => {
-    console.log('✅ Selected CV:', cv.title, 'from', cv.source);
-    setSelectedCV(cv);
-    setResumeData(cv.content);
+  // Handle CV selection - COMPLETE ENHANCED VERSION
+const handleSelectCV = (cv) => {
+  console.log('✅ Selected CV:', cv.title, 'from', cv.source);
+  
+  // Enhanced debugging
+  console.group('📋 CV Selection Debug Information');
+  console.log('CV Object:', cv);
+  console.log('Has content?', !!cv.content);
+  console.log('Content type:', typeof cv.content);
+  
+  if (cv.content) {
+    console.log('Content keys:', Object.keys(cv.content));
+    console.log('Personal info:', cv.content.personal_info);
+    console.log('Sections count:', {
+      experiences: cv.content.experiences?.length || 0,
+      educations: cv.content.educations?.length || 0,
+      skills: cv.content.skills?.length || 0,
+      languages: cv.content.languages?.length || 0,
+      hobbies: cv.content.hobbies?.length || 0,
+      courses: cv.content.courses?.length || 0
+    });
+    
+    // Check for empty sections
+    const emptySections = [];
+    const sections = ['experiences', 'educations', 'skills', 'languages', 'hobbies', 'courses', 'internships', 'referrals', 'custom_sections', 'extracurriculars'];
+    sections.forEach(section => {
+      if (!cv.content[section] || cv.content[section].length === 0) {
+        emptySections.push(section);
+      }
+    });
+    
+    if (emptySections.length > 0) {
+      console.log('Empty sections:', emptySections);
+    }
+    
+    // Check personal info completeness
+    const personalInfo = cv.content.personal_info || {};
+    const personalInfoFields = ['full_name', 'email', 'mobile', 'address', 'title', 'summary'];
+    const filledPersonalFields = personalInfoFields.filter(field => personalInfo[field] && personalInfo[field].trim() !== '');
+    const emptyPersonalFields = personalInfoFields.filter(field => !personalInfo[field] || personalInfo[field].trim() === '');
+    
+    console.log('Personal info completeness:', {
+      filled: filledPersonalFields,
+      empty: emptyPersonalFields,
+      completeness: `${filledPersonalFields.length}/${personalInfoFields.length} fields filled`
+    });
+    
+    // Check customization data
+    if (cv.content.customization) {
+      console.log('Has customization settings:', cv.content.customization);
+    } else {
+      console.log('No customization settings found');
+    }
+    
+    // Storage info for local CVs
+    if (cv.source === 'local' && cv.storageKey) {
+      console.log('Local storage info:', {
+        storageKey: cv.storageKey,
+        rawData: localStorage.getItem(cv.storageKey) ? 'Found' : 'Not found'
+      });
+    }
+  } else {
+    console.error('❌ CV has no content!');
+  }
+  console.groupEnd();
+  
+  // Validate CV content before proceeding
+  if (!cv.content || typeof cv.content !== 'object') {
+    console.error('❌ Invalid CV content structure');
+    setLocalError('Selected CV has invalid or missing content. Please try another CV.');
+    return;
+  }
+  
+  // Check if CV is completely empty
+  const hasAnyContent = cv.content.personal_info?.full_name ||
+                       (cv.content.experiences && cv.content.experiences.length > 0) ||
+                       (cv.content.educations && cv.content.educations.length > 0) ||
+                       (cv.content.skills && cv.content.skills.length > 0) ||
+                       (cv.content.languages && cv.content.languages.length > 0) ||
+                       (cv.content.hobbies && cv.content.hobbies.length > 0) ||
+                       (cv.content.courses && cv.content.courses.length > 0);
+  
+  if (!hasAnyContent) {
+    console.warn('⚠️ CV appears to be completely empty');
+    setLocalError('Selected CV appears to be empty. Please check the CV content or try another CV.');
+    setShowCVModal(true); // Keep modal open
+    return;
+  }
+  
+  // Set the selected CV and resume data
+  setSelectedCV(cv);
+  setResumeData(cv.content);
+  
+  // Apply customization settings if they exist
+  try {
     applyCustomizationSettings(cv.content);
-    setLocalError(null);
-    setShowCVModal(false);
-  };
+    console.log('✅ Applied customization settings successfully');
+  } catch (error) {
+    console.error('❌ Error applying customization settings:', error);
+    // Don't fail the whole selection for customization errors
+  }
+  
+  // Clear any previous errors and close modal
+  setLocalError(null);
+  setShowCVModal(false);
+  
+  console.log('✅ CV selection completed successfully');
+};
  
   // Enhanced initialization
   useEffect(() => {
@@ -1029,60 +1254,60 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
             <div className="absolute -bottom-48 right-48 w-96 h-96 rounded-full bg-purple-600/20 mix-blend-multiply filter blur-3xl"></div>
           </div>
         )}
-        
-       {/* Modern Header Design */}
-<header className={`relative z-10 px-4 py-3 ${isDarkMode ? 'bg-gray-900' : 'bg-white'} border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-    {/* Left Section - Menu & Export Controls */}
-    <div className="flex items-center gap-3">
-      {/* Mobile menu button */}
-      <button 
-        onClick={toggleSidebar}
-        className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-        aria-label="Toggle sidebar"
-      >
-        {sidebarVisible ? (
-          <i className="fas fa-times text-lg"></i>
-        ) : (
-          <i className="fas fa-bars text-lg"></i>
-        )}
-      </button>
-      
-      {/* Export buttons */}
-      <div className="flex items-center gap-2">
-                     
-              <button
-                className={`py-1.5 px-3 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-xs font-medium shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center ${isRTL ? 'ml-2' : 'mr-2'}`}
-                onClick={() => handleExport('DOCX')}
-                disabled={isExporting}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 ${isRTL ? 'ml-1' : 'mr-1'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                DOCX
-              </button>
-              
-              <button
-                className="py-1.5 px-3 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-xs font-medium shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center"
-                onClick={() => handleExport('PDF')}
-                disabled={isExporting}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 ${isRTL ? 'ml-1' : 'mr-1'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-               PDF
-              </button>
            
+<header className={`relative z-10 ${isDarkMode ? 'bg-gray-900' : 'bg-white'} border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} shadow-sm`}>
+  {/* Mobile Header */}
+  <div className="block md:hidden">
+    <div className="flex items-center justify-between p-4">
+      {/* Left: Menu + Title */}
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={toggleSidebar}
+          className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
+          aria-label="Toggle sidebar"
+        >
+          {sidebarVisible ? (
+            <i className="fas fa-times text-lg"></i>
+          ) : (
+            <i className="fas fa-bars text-lg"></i>
+          )}
+        </button>
+        <h1 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          {t('resume.customizer.title') || 'Resume Studio'}
+        </h1>
+      </div>
 
+      {/* Right: Export Actions */}
+      <div className="flex items-center gap-2">
+        <button
+          className="py-2 px-3 rounded-lg bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center"
+          onClick={() => handleExport('DOCX')}
+          disabled={isExporting}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          DOCX
+        </button>
+        
+        <button
+          className="py-2 px-3 rounded-lg bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center"
+          onClick={() => handleExport('PDF')}
+          disabled={isExporting}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          PDF
+        </button>
       </div>
     </div>
 
-    {/* Center Section - CV Selector (Main Focus) */}
-    <div className="flex-1 max-w-2xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg bg-opacity-50 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3">
-         
-          <div className={`px-3 py-1.5 rounded-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+    {/* Mobile CV Selector Row with Preview Controls */}
+    <div className="px-4 pb-4">
+      <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex-1 min-w-0">
             <CompactCVSelector
               selectedCV={selectedCV}
               availableCVs={availableCVs}
@@ -1090,57 +1315,186 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
               isDarkMode={isDarkMode}
             />
           </div>
-        </div>
-        
-        {/* CV counter and refresh */}
-        <div className="flex items-center gap-2">
-          {availableCVs.length > 1 && (
-            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-              <i className="fas fa-database mr-1"></i>
-              {availableCVs.length} {t('cloud.cvs_available')}
-            </span>
-          )}
-          <button
-            onClick={loadAvailableCVs}
-            disabled={isLoadingCVs}
-            className={`p-2 rounded-lg transition-colors ${
-              isDarkMode 
-                ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-            title={t('cloud.refresh_cv_list')}
-          >
-            <i className={`fas fa-sync-alt ${isLoadingCVs ? 'animate-spin' : ''}`}></i>
-          </button>
+          
+          <div className="flex items-center gap-2 ml-3">
+            {/* Preview Controls */}
+            <div className={`inline-flex items-center rounded-lg border ${isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'} overflow-hidden`}>
+              <button 
+                onClick={zoomOut}
+                className={`p-2 ${isDarkMode ? 'hover:bg-gray-600 text-gray-300 bg-gray-700' : 'hover:bg-gray-100 text-gray-700 bg-white'} transition-colors border-r ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                disabled={previewScale <= 0.5}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13H5v-2h14v2z"/>
+                </svg>
+              </button>
+              <div className={`px-3 py-2 text-xs font-medium flex items-center justify-center min-w-[50px] ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-white text-gray-700'}`}>
+                {Math.round(previewScale * 100)}%
+              </div>
+              <button 
+                onClick={zoomIn}
+                className={`p-2 ${isDarkMode ? 'hover:bg-gray-600 text-gray-300 bg-gray-700' : 'hover:bg-gray-100 text-gray-700 bg-white'} transition-colors border-l ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                disabled={previewScale >= 1.5}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+              </button>
+            </div>
+
+            {availableCVs.length > 1 && (
+              <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-white text-gray-600'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
+                {availableCVs.length} CVs
+              </span>
+            )}
+            <button
+              onClick={loadAvailableCVs}
+              disabled={isLoadingCVs}
+              className={`p-2 rounded-lg transition-colors ${
+                isDarkMode 
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-600' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300'
+              } border`}
+              title={t('cloud.refresh_cv_list')}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className={isLoadingCVs ? 'animate-spin' : ''}>
+                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    {/* Right Section - Preview Controls */}
-    <div className="flex items-center justify-end">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          <i className="fas fa-search mr-1"></i>
-          Preview:
-        </span>
-        <div className="flex items-center rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+  {/* Desktop Header */}
+  <div className="hidden md:block">
+    <div className="px-6 py-4">
+      <div className="flex items-center justify-between">
+        {/* Left Section - Actions */}
+        <div className="flex items-center gap-4">
           <button 
-            onClick={zoomOut}
-            className={`p-2 px-3 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'} transition-colors`}
-            disabled={previewScale <= 0.5}
+            onClick={toggleSidebar}
+            className={`p-2.5 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
+            aria-label="Toggle sidebar"
           >
-            <i className="fas fa-minus"></i>
+            {sidebarVisible ? (
+              <i className="fas fa-times text-lg"></i>
+            ) : (
+              <i className="fas fa-bars text-lg"></i>
+            )}
           </button>
-          <span className={`px-3 py-1.5 text-sm flex items-center justify-center min-w-[70px] ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'}`}>
-            {Math.round(previewScale * 100)}%
-          </span>
-          <button 
-            onClick={zoomIn}
-            className={`p-2 px-3 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'} transition-colors`}
-            disabled={previewScale >= 1.5}
-          >
-            <i className="fas fa-plus"></i>
-          </button>
+          
+          <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
+          
+          {/* Export Actions */}
+          <div className="flex items-center gap-3">
+           
+            <button
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-lg hover:shadow-xl hover:shadow-purple-500/25 transition-all duration-300 flex items-center transform hover:scale-105"
+              onClick={() => handleExport('DOCX')}
+              disabled={isExporting}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+                DOCX
+            </button>
+            
+            <button
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-lg hover:shadow-xl hover:shadow-purple-500/25 transition-all duration-300 flex items-center transform hover:scale-105"
+              onClick={() => handleExport('PDF')}
+              disabled={isExporting}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+             PDF
+            </button>
+          </div>
+        </div>
+
+        {/* Center Section - CV Selector */}
+        <div className="flex-1 max-w-2xl mx-8">
+          <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-gray-50 border border-gray-200'} shadow-inner`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'} shadow-sm`}>
+                  <i className={`fas fa-file-alt ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}></i>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <CompactCVSelector
+                    selectedCV={selectedCV}
+                    availableCVs={availableCVs}
+                    onOpenModal={() => setShowCVModal(true)}
+                    isDarkMode={isDarkMode}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 ml-4">
+                {availableCVs.length > 1 && (
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'} shadow-sm`}>
+                    <i className={`fas fa-database text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}></i>
+                    <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {availableCVs.length} {t('cloud.available') || 'Available'}
+                    </span>
+                  </div>
+                )}
+                <button
+                  onClick={loadAvailableCVs}
+                  disabled={isLoadingCVs}
+                  className={`p-2.5 rounded-lg transition-all duration-200 ${
+                    isDarkMode 
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white text-gray-600 hover:bg-gray-100'
+                  } shadow-sm hover:shadow-md`}
+                  title={t('cloud.refresh_cv_list')}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className={isLoadingCVs ? 'animate-spin' : ''}>
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section - Preview Controls */}
+        <div className="flex items-center gap-4">
+          <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
+          
+          <div className="flex items-center gap-3">
+            <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              {t('CoverLetter.preview.title') || 'Preview'}:
+            </span>
+            <div className={`inline-flex items-center rounded-xl border ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} overflow-hidden shadow-sm`}>
+              <button 
+                onClick={zoomOut}
+                className={`px-4 py-2.5 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'} transition-colors border-r ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                disabled={previewScale <= 0.5}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13H5v-2h14v2z"/>
+                </svg>
+              </button>
+              <div className={`px-4 py-2.5 text-sm font-medium flex items-center justify-center min-w-[100px] ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'}`}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="mr-2">
+                  <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                {Math.round(previewScale * 100)}%
+              </div>
+              <button 
+                onClick={zoomIn}
+                className={`px-4 py-2.5 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'} transition-colors border-l ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                disabled={previewScale >= 1.5}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1385,9 +1739,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
         onSelectCV={handleSelectCV}
         isLoading={isLoadingCVs}
         onRefresh={loadAvailableCVs}
-        isDarkMode={isDarkMode}
-        title="Select CV to Customize"
-        subtitle="Choose which CV you'd like to customize"
+        isDarkMode={isDarkMode} 
       />
     </>
   );

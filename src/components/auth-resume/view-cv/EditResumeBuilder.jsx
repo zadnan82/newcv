@@ -181,9 +181,9 @@ const EditResumeBuilder = ({ darkMode }) => {
     setFormData(prev => {
       if (section === 'title') {
         return { ...prev, title: data };
-      } else if (section === 'photos') {
-        console.log('Updating photos in formData:', data);
-        return { ...prev, photos: data };
+     } else if (section === 'photo') {
+  console.log('Updating photo in formData:', data);
+  return { ...prev, photo: data };
       } else {
         return { ...prev, [section]: data };
       }
@@ -233,6 +233,7 @@ const EditResumeBuilder = ({ darkMode }) => {
             setOriginalCvId(result.file_id);
           }
         }
+        
       } else {
         // Save locally (existing logic remains the same)
         if (cvSource === 'local' && originalCvId) {
@@ -307,8 +308,8 @@ const EditResumeBuilder = ({ darkMode }) => {
     }, 5000);
   }; 
  
-  const sections = [
-    { id: 'photo', name: t('resume.photo.title'), component: EditPhotoUpload, dataKey: 'photos' },
+  const sections = [ 
+    { id: 'photo', name: t('resume.photo.title'), component: EditPhotoUpload, dataKey: 'photo' },
     { id: 'title', name: t('resume.title.section'), component: ResumeTitle, dataKey: 'title' },
     { id: 'personal', name: t('resume.personal_info.title'), component: PersonalInfo, dataKey: 'personal_info' }, 
     { id: 'education', name: t('resume.education.title'), component: Education, dataKey: 'educations' },
@@ -546,7 +547,7 @@ const EditResumeBuilder = ({ darkMode }) => {
         title={t('cloud.save_locally')}
       >
         <HardDrive size={14} />
-        <span>{isSaving ? t('common.saving') : t('common.save')}</span>
+        <span>{isSaving ? t('resume.actions.saving') : t('common.save')}</span>
       </button>
 
       {canSaveToCloud() && (
@@ -561,7 +562,7 @@ const EditResumeBuilder = ({ darkMode }) => {
           title={t('cloud.save_to_drive')}
         >
           <Cloud size={14} />
-          <span>{isSaving ? t('common.saving') : t('cloud.drive')}</span>
+          <span>{isSaving ? t('resume.actions.saving') : t('cloud.drive')}</span>
         </button>
       )}
     </div>

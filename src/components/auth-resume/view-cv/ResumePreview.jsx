@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import HTMLResumeViewer from './HTMLResumeViewer';
-import { useTranslation } from 'react-i18next'; 
-import useResumeStore from '../../../stores/resumeStore';
+import { useTranslation } from 'react-i18next';  
 
 const ResumePreview = ({
   formData,
@@ -90,7 +89,7 @@ const ResumePreview = ({
       { name: "Hiking" }
     ],
     courses: [],
-    photos: { photolink: null },
+    photo: { photolink: null },
     internships: []
   };
   

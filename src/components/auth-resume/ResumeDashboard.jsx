@@ -239,7 +239,7 @@ const ResumeDashboard = ({ darkMode }) => {
       if (cv.source === 'cloud') {
         // Load full CV data from Google Drive first
         setIsLoading(true);
-        const fullCV = await loadGoogleDriveCV(cv.id);
+        const fullCV = await loadGoogleDriveCV(cv.originalCloudId);
         
         if (fullCV) {
           localStorage.setItem('cv_draft_for_customization', JSON.stringify(fullCV));
@@ -305,7 +305,7 @@ const ResumeDashboard = ({ darkMode }) => {
       
       if (cv.source === 'cloud') {
         setIsLoading(true);
-        cvData = await loadGoogleDriveCV(cv.id);
+        cvData = await loadGoogleDriveCV(cv.originalCloudId);
       }
       
       // Create and download JSON file

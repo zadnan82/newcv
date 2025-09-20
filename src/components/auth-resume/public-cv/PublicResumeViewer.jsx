@@ -74,6 +74,9 @@ const PublicResumeViewer = () => {
         
         console.log("Received resume data from store:", storeResume);
         
+        // FIXED: Handle both 'photo' and 'photos' fields for Base64 compatibility
+        const photoData = storeResume.photo || storeResume.photos || { photolink: null };
+        
         // Transform to match format expected by TemplateRenderer
         const processedData = {
           id: storeResume.id,
@@ -104,7 +107,9 @@ const PublicResumeViewer = () => {
           hobbies: storeResume.hobbies || [],
           courses: storeResume.courses || [],
           internships: storeResume.internships || [],
-          photos: storeResume.photos || { photolink: null },
+          // FIXED: Use both 'photo' and 'photos' for backward compatibility
+          photo: photoData,
+          photos: photoData,
           template: storeResume.customization?.template || defaultSettings.template,
           customization: {
             accent_color: storeResume.customization?.accent_color || defaultSettings.accentColor,
@@ -118,6 +123,16 @@ const PublicResumeViewer = () => {
               : defaultSettings.hideSkillLevel
           }
         };
+        
+        // Debug logging for photo data
+        console.log('📷 Photo data processing:', {
+          original_photo: storeResume.photo,
+          original_photos: storeResume.photos,
+          processed_photo: photoData,
+          has_photolink: !!photoData?.photolink,
+          photolink_type: typeof photoData?.photolink,
+          photolink_length: photoData?.photolink?.length || 0
+        });
         
         setResumeData(processedData);
         setIsPublicView(false);
