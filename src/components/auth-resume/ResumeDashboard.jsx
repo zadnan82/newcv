@@ -14,9 +14,14 @@ const ResumeDashboard = ({ darkMode }) => {
     loadLocalCVs,
     canSaveToCloud,
     listGoogleDriveCVs,
+    listCVsFromProvider, // Add this for multi-provider support
     deleteGoogleDriveCV,
+    deleteCVFromProvider, // Add this for multi-provider support
     loadGoogleDriveCV,
-    googleDriveConnected
+    loadCVFromProvider, // Add this for multi-provider support
+    googleDriveConnected,
+    connectedProviders, // Get all connected providers
+    getProviderStatus // Get provider status
   } = useSessionStore();
   
   const [allCVs, setAllCVs] = useState([]);
@@ -24,7 +29,7 @@ const ResumeDashboard = ({ darkMode }) => {
   const [error, setError] = useState(null);
   const [lastRefreshTime, setLastRefreshTime] = useState(new Date());
 
-  const loadAllCVs = async () => {
+ const loadAllCVs = async () => {
   try {
     setIsLoading(true);
     setError(null);
@@ -33,44 +38,48 @@ const ResumeDashboard = ({ darkMode }) => {
 
     console.log('📋 Loading CVs from all sources...');
 
-    // 1. Load Google Drive CVs FIRST (highest priority)
-    if (canSaveToCloud()) {
-      try {
-        console.log('☁️ Loading Google Drive CVs...');
-        const cloudCVs = await listGoogleDriveCVs();
-        
-        if (Array.isArray(cloudCVs)) {
-          for (const file of cloudCVs) {
-            const displayName = file.name
-              .replace('.json', '')
-              .replace(/^cv_/, '')
-              .replace(/_\d{8}_\d{6}$/, '')
-              .replace(/_/g, ' ');
+    // 1. Load CVs from ALL connected cloud providers
+    if (canSaveToCloud() && connectedProviders.length > 0) {
+      for (const provider of connectedProviders) {
+        try {
+          console.log(`☁️ Loading CVs from ${provider}...`);
+          const cloudCVs = await listCVsFromProvider(provider);
+          
+          if (Array.isArray(cloudCVs)) {
+            for (const file of cloudCVs) {
+              const displayName = file.name
+                .replace('.json', '')
+                .replace(/^cv_/, '')
+                .replace(/_\d{8}_\d{6}$/, '')
+                .replace(/_/g, ' ');
+                
+              const cv = {
+                id: `${provider}_${file.file_id}`, // Prefix with provider name
+                source: 'cloud',
+                provider: provider, // Store the provider type
+                title: displayName || t(`cloud.${provider}`),
+                updated_at: file.last_modified,
+                personal_info: { 
+                  full_name: displayName || t('common.untitled')
+                },
+                sourceIcon: Cloud,
+                sourceLabel: t(`cloud.${provider}`),
+                sourceColor: provider === 'google_drive' ? 'text-blue-500' : 'text-purple-500',
+                sourceBgColor: provider === 'google_drive' ? 'bg-blue-500' : 'bg-purple-500',
+                cloudFile: file,
+                originalCloudId: file.file_id, // Store the actual file ID
+                originalProvider: provider // Store the provider
+              };
               
-            const cv = {
-              id: `cloud_${file.file_id}`, // Prefix with cloud_
-              source: 'cloud',
-              title: displayName || t('cloud.google_drive'),
-              updated_at: file.last_modified,
-              personal_info: { 
-                full_name: displayName || t('common.untitled')
-              },
-              sourceIcon: Cloud,
-              sourceLabel: t('cloud.google_drive'),
-              sourceColor: 'text-blue-500',
-              sourceBgColor: 'bg-blue-500',
-              cloudFile: file,
-              originalCloudId: file.file_id // Store the actual file ID
-            };
-            
-            cvs.push(cv);
-            seenIds.add(file.file_id); // Track this file ID
+              cvs.push(cv);
+              seenIds.add(`${provider}_${file.file_id}`); // Track this file ID with provider
+            }
+            console.log(`☁️ Loaded ${cloudCVs.length} CVs from ${provider}`);
           }
-          console.log(`☁️ Loaded ${cloudCVs.length} Google Drive CVs`);
+        } catch (error) {
+          console.error(`❌ Error loading ${provider} CVs:`, error);
+          setError(`Failed to load some CVs from ${t(`cloud.${provider}`)}`);
         }
-      } catch (error) {
-        console.error('❌ Error loading Google Drive CVs:', error);
-        setError('Failed to load some CVs from Google Drive');
       }
     }
 
@@ -79,7 +88,7 @@ const ResumeDashboard = ({ darkMode }) => {
       const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
       for (const cv of localCVs) {
         // Skip if this is actually a cloud CV that we already loaded
-        if (cv._original_cloud_id && seenIds.has(cv._original_cloud_id)) {
+        if (cv._original_cloud_id && cv._original_provider && seenIds.has(`${cv._original_provider}_${cv._original_cloud_id}`)) {
           console.log('⏭️ Skipping duplicate cloud CV from local storage');
           continue;
         }
@@ -134,7 +143,7 @@ const ResumeDashboard = ({ darkMode }) => {
 
     setAllCVs(cvs);
     setLastRefreshTime(new Date());
-    console.log(`✅ Loaded ${cvs.length} unique CVs`);
+    console.log(`✅ Loaded ${cvs.length} unique CVs from ${connectedProviders.length} cloud providers and local storage`);
 
   } catch (err) {
     console.error('❌ Error loading CVs:', err);
@@ -159,16 +168,17 @@ const ResumeDashboard = ({ darkMode }) => {
  const handleEdit = async (cv) => {
   try {
     if (cv.source === 'cloud') {
-      console.log('📥 Loading cloud CV for editing:', cv.originalCloudId);
+      console.log('📥 Loading cloud CV for editing:', cv.originalCloudId, 'from', cv.originalProvider);
       setIsLoading(true);
       
-      const fullCV = await loadGoogleDriveCV(cv.originalCloudId);
+      const fullCV = await loadCVFromProvider(cv.originalProvider, cv.originalCloudId);
       
       if (fullCV) {
         const draftData = {
           ...fullCV,
           _edit_source: 'cloud',
           _original_cloud_id: cv.originalCloudId,
+          _original_provider: cv.originalProvider,
           _edit_timestamp: Date.now()
         };
         
@@ -177,7 +187,8 @@ const ResumeDashboard = ({ darkMode }) => {
         navigate('/edit-resume', { 
           state: { 
             editSource: 'cloud',
-            originalFileId: cv.originalCloudId
+            originalFileId: cv.originalCloudId,
+            provider: cv.originalProvider
           } 
         });
       }
@@ -206,13 +217,12 @@ const ResumeDashboard = ({ darkMode }) => {
   }
 };
 
-  const handleView = async (cv) => {
+const handleView = async (cv) => {
   try {
     if (cv.source === 'cloud') {
       // Generate encoded URL for cloud CVs
       setIsLoading(true);
-      // FIX: Use originalCloudId instead of the prefixed id
-      const fullCV = await loadGoogleDriveCV(cv.originalCloudId);
+      const fullCV = await loadCVFromProvider(cv.originalProvider, cv.originalCloudId);
       
       if (fullCV) {
         // Create encoded public URL
@@ -234,38 +244,17 @@ const ResumeDashboard = ({ darkMode }) => {
   }
 };
 
-  const handleCustomize = async (cv) => {
-    try {
-      if (cv.source === 'cloud') {
-        // Load full CV data from Google Drive first
-        setIsLoading(true);
-        const fullCV = await loadGoogleDriveCV(cv.originalCloudId);
-        
-        if (fullCV) {
-          localStorage.setItem('cv_draft_for_customization', JSON.stringify(fullCV));
-          navigate('/resume-customizer');
-        }
-      } else {
-        localStorage.setItem('cv_draft_for_customization', JSON.stringify(cv));
-        navigate('/resume-customizer');
-      }
-    } catch (error) {
-      console.error('❌ Error loading CV for customization:', error);
-      alert('Failed to load CV for customization');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (cv) => {
-      console.log('🗑️ Deleting CV:', {
+const handleDelete = async (cv) => {
+  console.log('🗑️ Deleting CV:', {
     source: cv.source,
     id: cv.id,
     originalCloudId: cv.originalCloudId,
+    originalProvider: cv.originalProvider,
     title: cv.title
   });
+  
   const confirmMessage = cv.source === 'cloud' 
-    ? 'This will permanently delete the CV from your Google Drive. Are you sure?'
+    ? `This will permanently delete the CV from your ${t(`cloud.${cv.originalProvider}`)}. Are you sure?`
     : 'This will permanently delete the CV from this device. Are you sure?';
     
   if (!window.confirm(confirmMessage)) {
@@ -276,8 +265,8 @@ const ResumeDashboard = ({ darkMode }) => {
     setIsLoading(true);
     
     if (cv.source === 'cloud') {
-      // Delete from Google Drive - FIXED: use originalCloudId instead of id
-      await deleteGoogleDriveCV(cv.originalCloudId);
+      // Delete from cloud provider
+      await deleteCVFromProvider(cv.originalProvider, cv.originalCloudId);
     } else if (cv.source === 'local') {
       // Delete from local storage
       const localCVs = loadLocalCVs();
@@ -299,34 +288,33 @@ const ResumeDashboard = ({ darkMode }) => {
   }
 };
 
-  const handleDownload = async (cv) => {
-    try {
-      let cvData = cv;
-      
-      if (cv.source === 'cloud') {
-        setIsLoading(true);
-        cvData = await loadGoogleDriveCV(cv.originalCloudId);
-      }
-      
-      // Create and download JSON file
-      const dataStr = JSON.stringify(cvData, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `${cvData.title || 'resume'}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      
-    } catch (error) {
-      console.error('❌ Error downloading CV:', error);
-      alert('Failed to download CV');
-    } finally {
-      setIsLoading(false);
+const handleDownload = async (cv) => {
+  try {
+    let cvData = cv;
+    
+    if (cv.source === 'cloud') {
+      setIsLoading(true);
+      cvData = await loadCVFromProvider(cv.originalProvider, cv.originalCloudId);
     }
-  };
-
+    
+    // Create and download JSON file
+    const dataStr = JSON.stringify(cvData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `${cvData.title || 'resume'}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+  } catch (error) {
+    console.error('❌ Error downloading CV:', error);
+    alert('Failed to download CV');
+  } finally {
+    setIsLoading(false);
+  }
+};
   const formatDate = (dateString) => {
     if (!dateString) return t('common.notSpecified');
     
@@ -568,33 +556,37 @@ const ResumeDashboard = ({ darkMode }) => {
         </div>
         
         {/* Connection Status */}
-        <div className="mt-8 text-center">
-          {canSaveToCloud() ? (
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
-              darkMode ? 'bg-green-900/20 text-green-400' : 'bg-green-100 text-green-700'
-            }`}>
-              <Cloud size={16} />
-              <span className="text-sm">{t('cloud.google_drive_connected')}</span>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
-                darkMode ? 'bg-yellow-900/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700'
-              }`}>
-                <HardDrive size={16} />
-                <span className="text-sm">{t('cloud.local_storage_only')}</span>
-              </div>
-              <div>
-                <button
-                  onClick={() => navigate('/cloud-setup')}
-                  className="text-blue-600 hover:text-blue-800 text-sm underline"
-                >
-                  {t('cloud.connect_google_drive_sync')}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+<div className="mt-8 text-center">
+  {connectedProviders.length > 0 ? (
+    <div className="space-y-2">
+      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
+        darkMode ? 'bg-green-900/20 text-green-400' : 'bg-green-100 text-green-700'
+      }`}>
+        <Cloud size={16} />
+        <span className="text-sm">
+          {t('cloud.connected_providers')}: {connectedProviders.map(provider => t(`cloud.${provider}`)).join(', ')}
+        </span>
+      </div>
+    </div>
+  ) : (
+    <div className="space-y-2">
+      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
+        darkMode ? 'bg-yellow-900/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700'
+      }`}>
+        <HardDrive size={16} />
+        <span className="text-sm">{t('cloud.local_storage_only')}</span>
+      </div>
+      <div>
+        <button
+          onClick={() => navigate('/cloud-setup')}
+          className="text-blue-600 hover:text-blue-800 text-sm underline"
+        >
+          {t('cloud.connect_cloud_storage')}
+        </button>
+      </div>
+    </div>
+  )}
+</div>
       </div>
     </div>
   );

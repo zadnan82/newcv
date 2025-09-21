@@ -173,28 +173,28 @@ async updateCVInProvider(provider, fileId, cvData) {
   }
 }
 
-// Generic list method that routes to the correct provider
 async listCVsFromProvider(provider) {
   console.log(`📋 Listing CVs from ${provider}...`);
   
-  if (!this.isProviderSupported(provider)) {
-    throw new Error(`Provider ${provider} is not supported`);
-  }
-
-  const config = this.getProviderConfig(provider);
-  const token = this.getSessionToken();
-  
   try {
+    const config = this.getProviderConfig(provider);
     const response = await this.makeApiCall(config.endpoints.LIST);
     
-    if (response.files || response.cvs) {
-      const files = response.files || response.cvs || [];
+    if (response.files || Array.isArray(response)) {
+      const files = response.files || response || [];
       console.log(`✅ Listed ${files.length} CVs from ${provider}`);
       return files;
+    } else if (response.error && response.error.includes('404')) {
+      console.warn(`⚠️ No CVs folder found in ${provider}, returning empty list`);
+      return []; // Return empty array instead of throwing error
     } else {
       return [];
     }
   } catch (error) {
+    if (error.message.includes('404') || error.message.includes('itemNotFound')) {
+      console.warn(`⚠️ No CVs found in ${provider}, returning empty list`);
+      return []; // Return empty array for 404 errors
+    }
     console.error(`❌ List from ${provider} failed:`, error);
     throw new Error(`Failed to list CVs from ${provider}: ${error.message}`);
   }
