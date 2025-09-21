@@ -175,17 +175,18 @@ const useNewCoverLetterStore = create(
               try {
                 console.log(`☁️ Loading cover letters from ${provider}...`);
                 
+                // Use the new multi-provider service method
                 const cloudLetters = await cloudProviderService.listCoverLettersFromProvider(provider);
                 
                 // Process cloud letters and mark them with provider info
                 const processedCloudLetters = cloudLetters.map(letter => ({
-                  id: letter.id,
-                  title: letter.title || 'Untitled Cover Letter',
+                  id: letter.id || letter.file_id,
+                  title: letter.title || letter.name || 'Untitled Cover Letter',
                   company_name: letter.company_name || 'Not specified',
                   job_title: letter.job_title || 'Not specified',
                   created_at: letter.created_at || new Date().toISOString(),
                   updated_at: letter.updated_at || new Date().toISOString(),
-                  is_favorite: favoritesList.includes(letter.id),
+                  is_favorite: favoritesList.includes(letter.id || letter.file_id),
                   recipient_name: letter.recipient_name || '',
                   recipient_title: letter.recipient_title || '',
                   cover_letter_content: letter.cover_letter_content || '',
@@ -195,14 +196,15 @@ const useNewCoverLetterStore = create(
                   author_phone: letter.author_phone || '',
                   storageType: provider, // Mark with provider name
                   provider: provider, // Add provider field for easy access
-                  syncedToCloud: true
+                  syncedToCloud: true,
+                  file_id: letter.file_id || letter.id // Ensure we have file_id for operations
                 }));
                 
                 console.log(`☁️ ${provider} cover letters:`, processedCloudLetters.length);
                 allCoverLetters.push(...processedCloudLetters);
                 
               } catch (providerError) {
-                console.warn(`⚠️ Failed to load from ${provider}:`, providerError);
+                console.warn(`⚠️ Failed to load cover letters from ${provider}:`, providerError);
                 // Continue with other providers
               }
             }
@@ -263,7 +265,7 @@ const useNewCoverLetterStore = create(
           // Try each connected provider
           for (const provider of connectedProviders) {
             try {
-              console.log(`🔍 Trying to load from ${provider}...`);
+              console.log(`🔍 Trying to load cover letter from ${provider}...`);
               const result = await cloudProviderService.loadCoverLetterFromProvider(provider, id);
               
               if (result) {
@@ -278,7 +280,7 @@ const useNewCoverLetterStore = create(
                 return coverLetter;
               }
             } catch (providerError) {
-              console.log(`❌ Not found in ${provider}:`, providerError.message);
+              console.log(`❌ Cover letter not found in ${provider}:`, providerError.message);
               // Continue trying other providers
             }
           }
@@ -335,7 +337,7 @@ const useNewCoverLetterStore = create(
           // Try each connected provider
           for (const provider of connectedProviders) {
             try {
-              console.log(`🔍 Trying to delete from ${provider}...`);
+              console.log(`🔍 Trying to delete cover letter from ${provider}...`);
               const result = await cloudProviderService.deleteCoverLetterFromProvider(provider, id);
               
               if (result && result.success) {
@@ -414,7 +416,7 @@ const useNewCoverLetterStore = create(
           // Try each connected provider
           for (const provider of connectedProviders) {
             try {
-              console.log(`🔍 Trying to update in ${provider}...`);
+              console.log(`🔍 Trying to update cover letter in ${provider}...`);
               const result = await cloudProviderService.updateCoverLetterInProvider(provider, id, updateData);
               
               if (result && result.success) {
@@ -535,17 +537,17 @@ const useNewCoverLetterStore = create(
               try {
                 cloudProviderService.setSessionToken(sessionToken);
                 
-                // Save to cloud
+                // Save to cloud using the unified service
                 const cloudSave = await cloudProviderService.saveCoverLetterToProvider(targetProvider, {
                   ...coverLetterData,
                   storageType: targetProvider
                 });
-                results.cloudResult = { success: true, ...cloudSave };
+                results.cloudResult = { success: true, provider: targetProvider, ...cloudSave };
                 
                 console.log(`✅ Cover letter saved to ${targetProvider}:`, cloudSave);
               } catch (cloudError) {
                 console.warn('Cloud save failed, but local save succeeded:', cloudError);
-                results.cloudResult = { success: false, error: cloudError.message };
+                results.cloudResult = { success: false, error: cloudError.message, provider: targetProvider };
               }
             } else {
               results.cloudResult = { success: false, error: 'No cloud providers connected' };

@@ -4,13 +4,19 @@ import { useTranslation } from 'react-i18next';
 import useNewCoverLetterStore from '../../stores/coverLetterStore';
 import useSessionStore from '../../stores/sessionStore';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Eye, Trash, FileText, Settings, RefreshCw, Star } from 'lucide-react';
+import { Plus, Edit, Eye, Trash, FileText, Settings, RefreshCw, Star, Cloud, HardDrive } from 'lucide-react';
 
 const CoverLetterDashboard = ({ darkMode }) => {
   const { t } = useTranslation();
   const navigate = useNavigate(); 
   
-  const { sessionToken, googleDriveConnected } = useSessionStore();
+  // Updated to use multi-provider session store
+  const { 
+    sessionToken, 
+    connectedProviders, 
+    hasCloudConnection,
+    getConnectedProviderDetails 
+  } = useSessionStore();
   
   const {
     coverLetters,
@@ -29,6 +35,7 @@ const CoverLetterDashboard = ({ darkMode }) => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFavorites, setFilterFavorites] = useState(false);
+  const [filterByProvider, setFilterByProvider] = useState('all');
   const [previewLetter, setPreviewLetter] = useState(null);
   const [isCardView, setIsCardView] = useState(window.innerWidth < 768);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -43,12 +50,12 @@ const CoverLetterDashboard = ({ darkMode }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Only load cover letters if both session and Google Drive are connected
+  // Load cover letters when session is available (don't require specific provider)
   useEffect(() => {
-    if (sessionToken && googleDriveConnected) {
+    if (sessionToken) {
       loadCoverLetters();
     }
-  }, [sessionToken, googleDriveConnected]);
+  }, [sessionToken, connectedProviders]);
   
   useEffect(() => {
     if (error) {
@@ -57,16 +64,13 @@ const CoverLetterDashboard = ({ darkMode }) => {
     }
   }, [error, clearError]);
   
-  // Load cover letters from both local and Google Drive
+  // Load cover letters from all sources (local + all connected cloud providers)
   const loadCoverLetters = async () => {
     try {
       console.log('📋 Loading cover letters from all sources...');
+      console.log('🔗 Connected providers:', connectedProviders);
       
-      // Load from Google Drive first
       await fetchCoverLetters();
-      
-      // TODO: Also load from local storage and merge
-      // This will need to be implemented in the store to truly fix the issue
       
       console.log('✅ Cover letters loaded successfully');
     } catch (error) {
@@ -170,6 +174,13 @@ const CoverLetterDashboard = ({ darkMode }) => {
       filtered = filtered.filter(letter => letter.is_favorite);
     }
     
+    if (filterByProvider !== 'all') {
+      filtered = filtered.filter(letter => {
+        const source = getStorageSource(letter);
+        return source === filterByProvider;
+      });
+    }
+    
     return filtered.sort((a, b) => {
       let valueA = a[sortBy] || '';
       let valueB = b[sortBy] || '';
@@ -203,11 +214,16 @@ const CoverLetterDashboard = ({ darkMode }) => {
     }
   };
   
-  // Helper function to determine storage source
+  // Enhanced storage source detection for multi-provider support
   const getStorageSource = (letter) => {
     // Check for explicit storage type first
     if (letter.storageType) {
-      return letter.storageType === 'local' ? 'local-storage' : 'google-drive';
+      return letter.storageType;
+    }
+    
+    // Check for provider field
+    if (letter.provider && connectedProviders.includes(letter.provider)) {
+      return letter.provider;
     }
     
     // Check for local storage indicators
@@ -215,55 +231,62 @@ const CoverLetterDashboard = ({ darkMode }) => {
         letter.id?.startsWith('local_cl_') ||
         letter.localStorage_only ||
         letter.local_only) {
-      return 'local-storage';
+      return 'local';
     }
     
-    // Check for Google Drive indicators
-    if (letter.syncedToCloud === true ||
-        letter.file_id ||
-        letter.drive_file_id ||
-        letter.google_drive_id) {
-      return 'google-drive';
+    // Check for specific provider indicators
+    if (letter.file_id || letter.drive_file_id || letter.google_drive_id) {
+      return 'google_drive';
     }
     
-    // Default based on context - if we're showing this in the dashboard
-    // and Google Drive is connected, assume it's from Google Drive
-    // unless explicitly marked as local
-    if (googleDriveConnected && !letter.id?.includes('local')) {
-      return 'google-drive';
+    // Check for OneDrive indicators (file IDs with exclamation marks)
+    if (letter.id && letter.id.includes('!')) {
+      return 'onedrive';
     }
     
-    return 'local-storage';
+    // Default to local if we can't determine the source
+    return 'local';
   };
 
-  // Storage source indicator component
+  // Get provider display info
+  const getProviderDisplayInfo = (provider) => {
+    switch (provider) {
+      case 'google_drive':
+        return { name: 'Google Drive', icon: '📄', color: 'blue' };
+      case 'onedrive':
+        return { name: 'OneDrive', icon: '☁️', color: 'purple' };
+      case 'local':
+        return { name: 'Local Storage', icon: '💾', color: 'gray' };
+      default:
+        return { name: provider, icon: '🗃️', color: 'gray' };
+    }
+  };
+
+  // Storage source indicator component with multi-provider support
   const StorageSourceBadge = ({ source, size = 'sm' }) => {
-    const isGoogleDrive = source === 'google-drive';
+    const providerInfo = getProviderDisplayInfo(source);
     const sizeClasses = size === 'xs' ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-1';
+    
+    const colorClasses = {
+      blue: darkMode 
+        ? 'bg-blue-900/30 text-blue-300 border border-blue-700/30'
+        : 'bg-blue-100 text-blue-700 border border-blue-200',
+      purple: darkMode
+        ? 'bg-purple-900/30 text-purple-300 border border-purple-700/30'
+        : 'bg-purple-100 text-purple-700 border border-purple-200',
+      gray: darkMode
+        ? 'bg-gray-700/50 text-gray-300 border border-gray-600/30'
+        : 'bg-gray-100 text-gray-600 border border-gray-300'
+    };
     
     return (
       <span 
-        className={`inline-flex items-center gap-1 rounded-full font-medium ${sizeClasses} ${
-          isGoogleDrive
-            ? darkMode 
-              ? 'bg-blue-900/30 text-blue-300 border border-blue-700/30'
-              : 'bg-blue-100 text-blue-700 border border-blue-200'
-            : darkMode
-              ? 'bg-gray-700/50 text-gray-300 border border-gray-600/30'
-              : 'bg-gray-100 text-gray-600 border border-gray-300'
-        }`}
-        title={isGoogleDrive ? t('cloud.stored_in_google_drive', 'Stored in Google Drive') : t('cloud.stored_in_local_storage', 'Stored in Local Storage')}
+        className={`inline-flex items-center gap-1 rounded-full font-medium ${sizeClasses} ${colorClasses[providerInfo.color]}`}
+        title={`Stored in ${providerInfo.name}`}
       >
-        {isGoogleDrive ? (
-          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6.5 15.5L10.5 8.5L14.5 15.5H6.5ZM19.2 15.5H15.5L12.5 10.5L15.5 5.5L19.2 15.5ZM4.8 15.5L8.5 10.5L12.5 15.5H4.8Z"/>
-          </svg>
-        ) : (
-          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7V17L12 22L22 17V7L12 2ZM12 4.18L19.14 8L12 11.82L4.86 8L12 4.18ZM4 9.68L11 13.32V19.64L4 16V9.68ZM13 19.64V13.32L20 9.68V16L13 19.64Z"/>
-          </svg>
-        )}
-        {isGoogleDrive ? t('cloud.drive', 'Drive') : t('cloud.local', 'Local')}
+        <span>{providerInfo.icon}</span>
+        {size !== 'xs' && <span>{providerInfo.name}</span>}
+        {size === 'xs' && <span>{source === 'local' ? 'Local' : providerInfo.name.split(' ')[0]}</span>}
       </span>
     );
   };
@@ -425,7 +448,7 @@ const CoverLetterDashboard = ({ darkMode }) => {
           <div className="text-blue-500 text-xl">💡</div>
           <div>
             <p className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
-              {t('cloud.tip_connect_google_drive', 'Tip: Connect Google Drive to sync your cover letters across devices!')}
+              {t('cloud.tip_connect_providers', 'Tip: Connect cloud providers to sync your cover letters across devices!')}
             </p>
           </div>
         </div>
@@ -433,72 +456,93 @@ const CoverLetterDashboard = ({ darkMode }) => {
     </div>
   );
 
-  // No Google Drive State
-  const NoGoogleDriveState = () => (
-    <div className="text-center py-12">
-      <div className="mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z"/>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 21l4-4 4 4"/>
-        </svg>
-        <h2 className="text-2xl font-bold mb-2">{t('cloud.connect_google_drive', 'Connect Google Drive')}</h2>
-        <p className={`mb-6 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          {t('cloud.connect_drive_to_save', 'Connect your Google Drive to save and access your AI-generated cover letters')}
-        </p>
-        <Link
-          to="/cloud-setup"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 text-lg font-medium"
-        >
-          {t('cloud.connect_google_drive', 'Connect Google Drive')}
-        </Link>
-      </div>
-      
-      <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
-        <div className="flex items-start gap-2">
-          <div className="text-blue-500 text-xl">💡</div>
-          <div>
-            <p className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
-              {t('cloud.tip_google_drive_integration', 'Tip: Google Drive integration allows you to access your cover letters from anywhere!')}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const EmptyState = () => (
-    <div className="text-center py-12">
-      <FileText className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-      <h2 className="text-2xl font-bold mb-2">{t('coverLetters.empty.title', 'No Cover Letters Found')}</h2>
-      <p className={`mb-6 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-        {t('coverLetters.empty.message', 'Start building your professional cover letters and take the next step in your career!')}
-      </p>
-      <Link 
-        to="/cover-letter" 
-        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 text-lg font-medium"
-      >
-        <Plus size={20} />
-        {t('coverLetters.empty.action', 'Create Your First Cover Letter')}
-      </Link>
-      
-      <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
-        <div className="flex items-start gap-2">
-          <div className="text-blue-500 text-xl">💡</div>
-          <div>
-            <p className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
-              {t('cloud.tip_connect_google_drive', 'Tip: Connect Google Drive to sync your cover letters across devices!')}
-            </p>
+  // Enhanced Cloud Setup State for multi-provider
+  const NoCloudConnectionState = () => {
+    const connectedProviderDetails = getConnectedProviderDetails();
+    
+    return (
+      <div className="text-center py-12">
+        <div className="mb-6">
+          <Cloud className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+          <h2 className="text-2xl font-bold mb-2">
+            {connectedProviderDetails.length === 0 
+              ? t('cloud.connect_cloud_storage', 'Connect Cloud Storage')
+              : t('coverLetters.empty.title', 'No Cover Letters Found')
+            }
+          </h2>
+          <p className={`mb-6 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            {connectedProviderDetails.length === 0 
+              ? t('cloud.connect_storage_to_save', 'Connect cloud storage to save and access your AI-generated cover letters')
+              : t('coverLetters.empty.message', 'Start building your professional cover letters and take the next step in your career!')
+            }
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
-              to="/cloud-setup"
-              className={`inline-block mt-2 text-sm underline ${darkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-800'}`}
+              to="/cover-letter"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 text-lg font-medium"
             >
-              {t('cloud.connect_google_drive', 'Connect Google Drive')}
+              <Plus size={20} />
+              {t('coverLetters.empty.action', 'Create Your First Cover Letter')}
             </Link>
+            
+            {connectedProviderDetails.length === 0 && (
+              <Link
+                to="/cloud-setup"
+                className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-300 text-lg font-medium ${
+                  darkMode 
+                    ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                    : 'bg-white hover:bg-gray-50 text-gray-800 border border-gray-300'
+                }`}
+              >
+                <Cloud size={20} />
+                {t('cloud.connect_storage', 'Connect Cloud Storage')}
+              </Link>
+            )}
+          </div>
+        </div>
+        
+        {/* Show connected providers status */}
+        {connectedProviderDetails.length > 0 && (
+          <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-green-900/20 border border-green-800' : 'bg-green-50 border border-green-200'}`}>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="text-green-500 text-xl">✅</div>
+              <p className={`text-sm font-medium ${darkMode ? 'text-green-300' : 'text-green-800'}`}>
+                {t('cloud.connected_providers', 'Connected Storage Providers')}:
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {connectedProviderDetails.map(({ provider, name }) => (
+                <StorageSourceBadge key={provider} source={provider} />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+          <div className="flex items-start gap-2">
+            <div className="text-blue-500 text-xl">💡</div>
+            <div>
+              <p className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
+                {connectedProviderDetails.length === 0 
+                  ? t('cloud.tip_connect_providers', 'Tip: Connect cloud providers to sync your cover letters across devices!')
+                  : t('cloud.tip_create_first', 'Tip: Generate your first cover letter using AI to get started!')
+                }
+              </p>
+              {connectedProviderDetails.length === 0 && (
+                <Link
+                  to="/cloud-setup"
+                  className={`inline-block mt-2 text-sm underline ${darkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-800'}`}
+                >
+                  {t('cloud.connect_storage', 'Connect Cloud Storage')}
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const CoverLetterCard = ({ letter }) => (
     <div className={`rounded-xl shadow-md p-3 backdrop-blur-sm border border-white/10 ${
@@ -572,6 +616,15 @@ const CoverLetterDashboard = ({ darkMode }) => {
     </div>
   );
 
+  // Get available filter options based on actual data
+  const getAvailableProviders = () => {
+    const providers = new Set();
+    coverLetters.forEach(letter => {
+      providers.add(getStorageSource(letter));
+    });
+    return Array.from(providers);
+  };
+
   // Main render logic with proper state handling
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
@@ -584,18 +637,12 @@ const CoverLetterDashboard = ({ darkMode }) => {
       </div>
       
       <div className="container mx-auto px-4 py-4 relative z-10">
-        {/* Conditional rendering based on session and Google Drive state */}
+        {/* Conditional rendering based on session state */}
         {!sessionToken ? (
           <div className={`rounded-xl shadow-md backdrop-blur-sm border border-white/10 ${
             darkMode ? 'bg-gray-800/80' : 'bg-white/80'
           }`}>
             <NoSessionState />
-          </div>
-        ) : !googleDriveConnected ? (
-          <div className={`rounded-xl shadow-md backdrop-blur-sm border border-white/10 ${
-            darkMode ? 'bg-gray-800/80' : 'bg-white/80'
-          }`}>
-            <NoGoogleDriveState />
           </div>
         ) : (
           <>
@@ -604,9 +651,18 @@ const CoverLetterDashboard = ({ darkMode }) => {
               <h1 className={`text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                 {t('coverLetters.title', 'Your AI Cover Letters')}
               </h1>
-              <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {t('coverLetters.description', 'Manage all your AI-generated cover letters stored in Google Drive')}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {t('coverLetters.description_multi', 'Manage your AI-generated cover letters from all sources')}
+                </p>
+                {connectedProviders.length > 0 && (
+                  <div className="flex gap-1">
+                    {connectedProviders.map(provider => (
+                      <StorageSourceBadge key={provider} source={provider} size="xs" />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Action bar */}
@@ -685,17 +741,42 @@ const CoverLetterDashboard = ({ darkMode }) => {
                   </svg>
                 </div>
                 
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="favorites-filter"
-                    checked={filterFavorites}
-                    onChange={() => setFilterFavorites(!filterFavorites)}
-                    className="h-3.5 w-3.5 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
-                  />
-                  <label htmlFor="favorites-filter" className="ml-1.5 text-xs">
-                    {t('coverLetters.filter.favorites', 'Show Favorites Only')}
-                  </label>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="favorites-filter"
+                      checked={filterFavorites}
+                      onChange={() => setFilterFavorites(!filterFavorites)}
+                      className="h-3.5 w-3.5 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                    />
+                    <label htmlFor="favorites-filter" className="ml-1.5 text-xs">
+                      {t('coverLetters.filter.favorites', 'Favorites')}
+                    </label>
+                  </div>
+                  
+                  {/* Provider filter */}
+                  {getAvailableProviders().length > 1 && (
+                    <select
+                      value={filterByProvider}
+                      onChange={(e) => setFilterByProvider(e.target.value)}
+                      className={`text-xs rounded border px-2 py-1 ${
+                        darkMode 
+                          ? 'bg-gray-800 border-gray-700 text-white' 
+                          : 'bg-white border-gray-300 text-gray-800'
+                      }`}
+                    >
+                      <option value="all">{t('common.all_sources', 'All Sources')}</option>
+                      {getAvailableProviders().map(provider => {
+                        const info = getProviderDisplayInfo(provider);
+                        return (
+                          <option key={provider} value={provider}>
+                            {info.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  )}
                 </div>
               </div>
             </div>
@@ -713,7 +794,7 @@ const CoverLetterDashboard = ({ darkMode }) => {
               <div className={`rounded-xl shadow-md backdrop-blur-sm border border-white/10 ${
                 darkMode ? 'bg-gray-800/80' : 'bg-white/80'
               }`}>
-                <EmptyState />
+                <NoCloudConnectionState />
               </div>
             )}
             
@@ -924,6 +1005,16 @@ const CoverLetterDashboard = ({ darkMode }) => {
                 <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   {t('coverLetters.no_results', 'No cover letters match your search criteria')}
                 </p>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilterFavorites(false);
+                    setFilterByProvider('all');
+                  }}
+                  className="mt-2 text-xs text-purple-600 hover:text-purple-800 underline"
+                >
+                  {t('common.clear_filters', 'Clear filters')}
+                </button>
               </div>
             )}
             

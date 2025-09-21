@@ -119,7 +119,8 @@ export const COVER_LETTER_ENDPOINTS = {
   BY_ID: (id) => `${API_BASE_URL}/api/cover-letter/${id}`,
   TASK_STATUS: (taskId) => `${API_BASE_URL}/api/cover-letter/task-status/${taskId}`,
   LEGACY_DELETE: (id) => `${API_BASE_URL}/api/cover-letter/delete/${id}`,
-  SAVE: `${API_BASE_URL}/api/cover-letter/save`,    
+  SAVE: `${API_BASE_URL}/api/cover-letter/save`,   
+   
 };
 
 // ================== GOOGLE DRIVE ENDPOINTS (CVs) ==================
@@ -146,7 +147,7 @@ export const GOOGLE_DRIVE_ENDPOINTS = {
     LOAD: (fileId) => `${API_BASE_URL}/api/google-drive/cover-letters/${fileId}`,
     DELETE: (fileId) => `${API_BASE_URL}/api/google-drive/cover-letters/${fileId}`,
     UPDATE: (fileId) => `${API_BASE_URL}/api/google-drive/cover-letters/${fileId}`,
-    SAVE: `${API_BASE_URL}/api/google-drive/save-cover-letter`,
+    SAVE: `${API_BASE_URL}/api/google-drive/save`,
   }
 };
 

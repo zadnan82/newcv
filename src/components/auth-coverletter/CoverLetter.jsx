@@ -13,12 +13,13 @@ const CoverLetter = ({ darkMode }) => {
   
   // Session store for both local and cloud CVs
   const {
-    listGoogleDriveCVs,
-    loadGoogleDriveCV,
+    listAllCloudCVs,
+    loadCVFromProvider,
     loadLocalCVs,
-    googleDriveConnected,
+    connectedProviders,
     sessionToken,
-    localCVs
+    localCVs,
+    getConnectedProviderDetails
   } = useSessionStore();
   
   const {
@@ -34,10 +35,10 @@ const CoverLetter = ({ darkMode }) => {
   } = useCoverLetterStore();
   
   const [cvFile, setCvFile] = useState(null);
-  const [googleDriveCVs, setGoogleDriveCVs] = useState([]);
+  const [cloudCVs, setCloudCVs] = useState([]); // All cloud CVs from all providers
   const [localStorageCVs, setLocalStorageCVs] = useState([]);
   const [selectedCV, setSelectedCV] = useState(null);
-  const [selectedCVSource, setSelectedCVSource] = useState(''); // 'local', 'google-drive', or 'upload'
+  const [selectedCVSource, setSelectedCVSource] = useState(''); // 'local', provider name, or 'upload'
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [generatedCoverLetterData, setGeneratedCoverLetterData] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -54,9 +55,48 @@ const CoverLetter = ({ darkMode }) => {
     jobDescription: '',
   });
 
+  // Debug function to validate CV data
+  const validateCVForGeneration = (cvData) => {
+    console.log('🔍 Validating CV data for generation:', {
+      hasCVData: !!cvData,
+      hasPersonalInfo: !!(cvData?.personal_info),
+      hasFullName: !!(cvData?.personal_info?.full_name),
+      hasExperiences: !!(cvData?.experiences?.length),
+      hasEducations: !!(cvData?.educations?.length),
+      hasSkills: !!(cvData?.skills?.length),
+      source: cvData?.source_provider || cvData?.provider || 'unknown'
+    });
+    
+    if (!cvData) {
+      return { valid: false, error: 'No CV data provided' };
+    }
+    
+    if (!cvData.personal_info) {
+      return { valid: false, error: 'CV missing personal information' };
+    }
+    
+    if (!cvData.personal_info.full_name) {
+      return { valid: false, error: 'CV missing full name' };
+    }
+    
+    // Check if CV has some meaningful content
+    const hasContent = (
+      (cvData.experiences && cvData.experiences.length > 0) ||
+      (cvData.educations && cvData.educations.length > 0) ||
+      (cvData.skills && cvData.skills.length > 0) ||
+      (cvData.personal_info.summary && cvData.personal_info.summary.trim().length > 0)
+    );
+    
+    if (!hasContent) {
+      console.warn('⚠️ CV appears to have minimal content');
+    }
+    
+    return { valid: true };
+  };
+
   const isLoading = coverLetterLoading;
 
-  // Load both local and Google Drive CVs on component mount
+  // Load both local and cloud CVs on component mount
   useEffect(() => {
     const loadAllCVs = async () => {
       // Load local CVs
@@ -68,58 +108,140 @@ const CoverLetter = ({ darkMode }) => {
         console.error('❌ Failed to load local CVs:', error);
       }
 
-      // Load Google Drive CVs if connected
-      if (googleDriveConnected && sessionToken) {
+      // Load cloud CVs from all connected providers
+      if (connectedProviders.length > 0 && sessionToken) {
         try {
-          console.log('📋 Loading Google Drive CVs...');
-          const cvs = await listGoogleDriveCVs();
-          console.log('✅ Loaded Google Drive CVs:', cvs);
-          setGoogleDriveCVs(cvs || []);
+          console.log('📋 Loading CVs from all connected providers...', connectedProviders);
+          const allCloudCVs = await listAllCloudCVs();
+          console.log('✅ Loaded cloud CVs:', allCloudCVs);
+          setCloudCVs(allCloudCVs || []);
         } catch (error) {
-          console.error('❌ Failed to load Google Drive CVs:', error);
+          console.error('❌ Failed to load cloud CVs:', error);
         }
       }
     };
 
     loadAllCVs();
-  }, [googleDriveConnected, sessionToken, listGoogleDriveCVs, loadLocalCVs]);
+  }, [connectedProviders, sessionToken, listAllCloudCVs, loadLocalCVs]);
+
+  // Group cloud CVs by provider for display
+  const groupedCloudCVs = cloudCVs.reduce((acc, cv) => {
+    const provider = cv.provider || 'unknown';
+    if (!acc[provider]) {
+      acc[provider] = [];
+    }
+    acc[provider].push(cv);
+    return acc;
+  }, {});
 
   // Handle CV selection from any source
-  const handleCVSelection = async (source, cvId) => {
+  const handleCVSelection = async (source, cvId, provider = null) => {
     try {
-      console.log(`📥 Loading selected CV from ${source}:`, cvId);
+      console.log(`📥 Loading selected CV from ${source}:`, cvId, provider);
       setSelectedResumeId(cvId);
       setSelectedCVSource(source);
       
       let cvData = null;
       
-      if (source === 'google-drive') {
-        cvData = await loadGoogleDriveCV(cvId);
-      } else if (source === 'local') {
+      if (source === 'local') {
         // Find the CV in local storage
         const localCV = localStorageCVs.find(cv => cv.id === cvId);
         if (localCV) {
           cvData = localCV;
+          console.log('✅ Local CV found:', cvData.title || cvData.id);
         } else {
           throw new Error('Local CV not found');
         }
+      } else if (connectedProviders.includes(source)) {
+        // Load from cloud provider - fetch fresh data
+        console.log(`☁️ Loading CV from ${source}...`);
+        
+        try {
+          cvData = await loadCVFromProvider(source, cvId);
+          if (cvData) {
+            console.log('✅ Cloud CV loaded successfully:', cvData.title || 'Untitled');
+            // Ensure provider metadata is included
+            cvData.source_provider = source;
+            cvData.cloud_provider = source;
+            cvData.cloud_file_id = cvId;
+          } else {
+            throw new Error(`No data returned from ${source}`);
+          }
+        } catch (cloudError) {
+          console.error(`❌ Failed to load CV from ${source}:`, cloudError);
+          
+          // Try to find the CV in our cached cloud CVs as fallback
+          const cachedCV = cloudCVs.find(cv => 
+            (cv.file_id === cvId || cv.id === cvId) && cv.provider === source
+          );
+          
+          if (cachedCV) {
+            console.log(`📋 Using cached CV data as fallback...`);
+            cvData = {
+              ...cachedCV,
+              source_provider: source,
+              cloud_provider: source,
+              cloud_file_id: cvId
+            };
+          } else {
+            // If we can't load the CV, show error and clear selection
+            toast.error(`Failed to load CV from ${source}. Please try selecting it again.`);
+            setSelectedResumeId('');
+            setSelectedCVSource('');
+            setSelectedCV(null);
+            return;
+          }
+        }
+      } else {
+        throw new Error(`Unsupported CV source: ${source}`);
       }
       
-      console.log('✅ CV loaded:', cvData);
+      if (!cvData) {
+        throw new Error('No CV data available');
+      }
+      
+      // Validate CV data
+      if (!cvData.personal_info) {
+        console.warn('⚠️ CV missing personal_info, adding empty object');
+        cvData.personal_info = {};
+      }
+      
+      console.log('✅ CV loaded successfully:', {
+        source,
+        title: cvData.title || 'Untitled',
+        hasPersonalInfo: !!cvData.personal_info?.full_name,
+        experienceCount: (cvData.experiences || []).length,
+        educationCount: (cvData.educations || []).length
+      });
+      
       setSelectedCV(cvData);
       
       // Auto-fill form with CV data
-      if (cvData && cvData.personal_info) {
+      if (cvData.personal_info) {
         setFormData(prev => ({
           ...prev,
           fullName: cvData.personal_info.full_name || '',
           email: cvData.personal_info.email || '',
           phone: cvData.personal_info.mobile || cvData.personal_info.phone || ''
         }));
+        console.log('📝 Form auto-filled with CV personal info');
       }
+      
+      // Show success feedback
+      const providerName = source === 'local' ? 'Local Storage' : getProviderDisplayInfo(source).name;
+      toast.success(`CV loaded from ${providerName}: ${cvData.title || 'Untitled'}`);
+      
     } catch (error) {
       console.error('❌ Failed to load CV:', error);
-      toast.error('Failed to load selected CV. Please try again.');
+      setSelectedResumeId('');
+      setSelectedCVSource('');
+      setSelectedCV(null);
+      
+      let errorMessage = 'Failed to load selected CV. Please try again.';
+      if (error.message.includes('not found')) {
+        errorMessage = 'CV not found. It may have been moved or deleted.';
+      }
+      toast.error(errorMessage);
     }
   };
 
@@ -172,8 +294,31 @@ const CoverLetter = ({ darkMode }) => {
       return;
     }
 
+    // Validate that we have the selected CV data
+    if (selectedResumeId && !selectedCV && selectedCVSource !== 'upload') {
+      toast.error('CV data not loaded. Please select the CV again.');
+      return;
+    }
+
+    // Validate CV data if we have it
+    if (selectedCV) {
+      const validation = validateCVForGeneration(selectedCV);
+      if (!validation.valid) {
+        toast.error(`CV validation failed: ${validation.error}`);
+        return;
+      }
+    }
+
     try {
       console.log('🚀 Starting cover letter generation...');
+      console.log('📊 Generation context:', {
+        selectedCVSource,
+        selectedResumeId,
+        hasSelectedCV: !!selectedCV,
+        hasUploadedFile: !!cvFile,
+        cvTitle: selectedCV?.title || 'N/A'
+      });
+      
       setProgressStatus(t('CoverLetter.form.generating', 'Generating your cover letter...'));
       
       // Create FormData for the API request
@@ -186,24 +331,92 @@ const CoverLetter = ({ darkMode }) => {
       formDataToSend.append('recipient_name', formData.hiringManager.trim());
       formDataToSend.append('recipient_title', '');
       
-      // Add CV source based on selection
-      if (selectedCVSource === 'google-drive' && selectedResumeId) {
-        formDataToSend.append('resume_id', selectedResumeId);
-        console.log('📄 Using Google Drive CV:', selectedResumeId);
-      } else if (selectedCVSource === 'local' && selectedCV) {
-        // For local CVs, we need to send the CV data as JSON
-        formDataToSend.append('resume_data', JSON.stringify(selectedCV));
-        console.log('💾 Using local CV:', selectedCV.title || selectedCV.id);
-      } else if (selectedCVSource === 'upload' && cvFile) {
-        formDataToSend.append('resume_file', cvFile);
+      // Enhanced CV source handling - FORCE backend to use provided data ONLY
+      if (selectedCVSource === 'upload' && cvFile) {
+        // Handle file upload
         console.log('📎 Using uploaded file:', cvFile.name);
+        formDataToSend.append('resume_file', cvFile);
+        // DO NOT send any other CV-related parameters
+        
+      } else if (selectedCV) {
+        // Handle selected CV (both local and cloud) - FORCE backend to use provided data
+        console.log(`📄 Using ${selectedCVSource} CV:`, selectedCV.title || 'Untitled');
+        console.log('🚨 CRITICAL: Forcing backend to use provided CV data only');
+        
+        // Clean and prepare CV data
+        const cvDataForAPI = {
+          // Core CV structure
+          title: selectedCV.title || 'My Resume',
+          personal_info: selectedCV.personal_info || {},
+          experiences: selectedCV.experiences || [],
+          educations: selectedCV.educations || [],
+          skills: selectedCV.skills || [],
+          languages: selectedCV.languages || [],
+          
+          // Optional sections
+          referrals: selectedCV.referrals || [],
+          custom_sections: selectedCV.custom_sections || [],
+          extracurriculars: selectedCV.extracurriculars || [],
+          hobbies: selectedCV.hobbies || [],
+          courses: selectedCV.courses || [],
+          internships: selectedCV.internships || [],
+          
+          // Photo handling
+          photo: selectedCV.photo || selectedCV.photos || { photolink: null },
+          
+          // Metadata for reference only (not for backend processing)
+          source_provider: selectedCVSource,
+          cv_source_type: selectedCVSource === 'local' ? 'local' : 'cloud'
+        };
+        
+        // CRITICAL: Only send resume_data to force backend to use provided data
+        // Do NOT send resume_id or provider parameters that would trigger cloud loading
+        formDataToSend.append('resume_data', JSON.stringify(cvDataForAPI));
+        
+        // Add a special flag to indicate this is pre-loaded data
+        formDataToSend.append('data_source', 'frontend_provided');
+        formDataToSend.append('skip_cloud_loading', 'true');
+        
+        console.log('✅ CV data prepared for API (FORCED DATA-ONLY MODE):', {
+          hasPersonalInfo: !!cvDataForAPI.personal_info.full_name,
+          experienceCount: cvDataForAPI.experiences.length,
+          educationCount: cvDataForAPI.educations.length,
+          skillCount: cvDataForAPI.skills.length,
+          sourceProvider: cvDataForAPI.source_provider,
+          dataSize: JSON.stringify(cvDataForAPI).length,
+          mode: 'FORCED_DATA_ONLY'
+        });
+        
+        console.log('🚨 NOT SENDING: resume_id, provider, or any cloud-loading parameters');
+        
+      } else {
+        // This should not happen with proper validation, but handle it
+        throw new Error('No valid CV data available. Please select a CV or upload a file.');
       }
 
       // Optional fields
       formDataToSend.append('save_to_database', 'false');
       formDataToSend.append('title', `Cover Letter - ${formData.jobTitle} at ${formData.companyName}`);
       
-      console.log('📤 Sending cover letter request...');
+      // Debug information for backend
+      formDataToSend.append('debug_cv_source', selectedCVSource);
+      formDataToSend.append('debug_has_cv_data', selectedCV ? 'true' : 'false');
+      formDataToSend.append('debug_frontend_version', '2.0');
+      
+      console.log('📤 Sending cover letter generation request...');
+      
+      // Log what we're sending (without sensitive data)
+      const debugInfo = {
+        hasResumeData: formDataToSend.has('resume_data'),
+        hasResumeFile: formDataToSend.has('resume_file'),
+        hasResumeId: formDataToSend.has('resume_id'),
+        cvSource: formDataToSend.get('cv_source'),
+        provider: formDataToSend.get('provider'),
+        jobTitle: formDataToSend.get('job_title'),
+        companyName: formDataToSend.get('company_name')
+      };
+      console.log('📋 Request payload summary:', debugInfo);
+      
       const response = await generateCoverLetter(formDataToSend);
       
       if (response.success && response.cover_letter) {
@@ -220,7 +433,19 @@ const CoverLetter = ({ darkMode }) => {
       setAlertType('error');
       setGeneratedLetter('');
       setProgressStatus('');
-      toast.error(t('CoverLetter.errors.generation', 'Failed to generate cover letter') + `: ${error.message}`);
+      
+      // Enhanced error handling
+      let errorMessage = error.message || 'Failed to generate cover letter';
+      
+      if (errorMessage.includes('No CV data available')) {
+        errorMessage = 'CV data not found. Please ensure the selected CV is properly loaded.';
+      } else if (errorMessage.includes('HTTP 400')) {
+        errorMessage = 'Invalid request. Please check your CV selection and try again.';
+      } else if (errorMessage.includes('File not found')) {
+        errorMessage = 'CV file not found. Please select a different CV.';
+      }
+      
+      toast.error(t('CoverLetter.errors.generation', errorMessage));
     }
   };
 
@@ -243,8 +468,9 @@ const CoverLetter = ({ darkMode }) => {
         is_favorite: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        resume_id: selectedCVSource === 'google-drive' ? selectedResumeId : null,
-        cv_source: selectedCVSource
+        resume_id: connectedProviders.includes(selectedCVSource) ? selectedResumeId : null,
+        cv_source: selectedCVSource,
+        cv_provider: connectedProviders.includes(selectedCVSource) ? selectedCVSource : null
       });
       
       let letterContent = '';
@@ -308,7 +534,7 @@ const CoverLetter = ({ darkMode }) => {
   };
 
   // Handle saving cover letter (local-first with optional cloud sync)
-  const handleSaveCoverLetter = async (saveToCloud = false) => {
+  const handleSaveCoverLetter = async (saveToCloud = false, preferredProvider = null) => {
     if (!generatedCoverLetterData) {
       toast.error(t('CoverLetter.errors.generation', 'No cover letter to save. Please generate one first.'));
       return;
@@ -317,14 +543,14 @@ const CoverLetter = ({ darkMode }) => {
     try {
       setIsSaving(true);
       
-      const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud);
+      const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud, preferredProvider);
       
       if (result.success) {
         if (saveToCloud) {
           if (result.cloudResult?.success) {
-            toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally and to Google Drive!'));
+            toast.success(t('CoverLetter.success.letter_generated', `Cover letter saved locally and to ${result.cloudResult.provider}!`));
           } else {
-            toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally! (Google Drive sync failed)'));
+            toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally! (Cloud sync failed)'));
           }
         } else {
           toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally!'));
@@ -375,6 +601,18 @@ const CoverLetter = ({ darkMode }) => {
       if (interval) clearInterval(interval);
     };
   }, [currentTask, checkTaskStatus]);
+
+  // Get provider display info
+  const getProviderDisplayInfo = (provider) => {
+    const providerDetails = getConnectedProviderDetails().find(p => p.provider === provider);
+    if (providerDetails) {
+      return {
+        name: providerDetails.name,
+        icon: provider === 'google_drive' ? '📄' : provider === 'onedrive' ? '☁️' : '🗃️'
+      };
+    }
+    return { name: provider, icon: '🗃️' };
+  };
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
@@ -429,35 +667,40 @@ const CoverLetter = ({ darkMode }) => {
                   </div>
                 )}
 
-                {/* Google Drive CVs */}
-                {googleDriveConnected && googleDriveCVs.length > 0 && (
-                  <div className="mb-3">
-                    <label className="block text-xs font-medium mb-1">
-                      ☁️ {t('cloud.from_google_drive', 'From Google Drive')}
-                    </label>
-                    <select
-                      value={selectedCVSource === 'google-drive' ? selectedResumeId : ''}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleCVSelection('google-drive', e.target.value);
-                        }
-                      }}
-                      className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
-                    >
-                      <option value="">{t('CoverLetter.form.select_resume', '-- Select a CV from Google Drive --')}</option>
-                      {googleDriveCVs.map(cv => (
-                        <option key={cv.file_id} value={cv.file_id}>
-                          {cv.name}
-                        </option>
-                      ))}
-                    </select>
-                    {selectedCVSource === 'google-drive' && selectedCV && (
-                      <p className="text-xs text-green-600 mt-1">
-                        ✓ {t('common.selected', 'Selected')}: {selectedCV.title}
-                      </p>
-                    )}
-                  </div>
-                )}
+                {/* Cloud CVs by Provider */}
+                {Object.keys(groupedCloudCVs).map(provider => {
+                  const providerInfo = getProviderDisplayInfo(provider);
+                  const cvs = groupedCloudCVs[provider];
+                  
+                  return (
+                    <div key={provider} className="mb-3">
+                      <label className="block text-xs font-medium mb-1">
+                        {providerInfo.icon} {t('cloud.from_provider', `From ${providerInfo.name}`)}
+                      </label>
+                      <select
+                        value={selectedCVSource === provider ? selectedResumeId : ''}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleCVSelection(provider, e.target.value, provider);
+                          }
+                        }}
+                        className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                      >
+                        <option value="">{t('CoverLetter.form.select_resume', `-- Select a CV from ${providerInfo.name} --`)}</option>
+                        {cvs.map(cv => (
+                          <option key={cv.file_id || cv.id} value={cv.file_id || cv.id}>
+                            {cv.name || cv.title || 'Untitled CV'}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedCVSource === provider && selectedCV && (
+                        <p className="text-xs text-green-600 mt-1">
+                          ✓ {t('common.selected', 'Selected')}: {selectedCV.title || selectedCV.name || 'Cloud CV'}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
                 
                 {/* Upload Option */}
                 <div className="mb-3">
@@ -491,9 +734,14 @@ const CoverLetter = ({ darkMode }) => {
                       💡 {localStorageCVs.length} CV{localStorageCVs.length !== 1 ? 's' : ''} available locally
                     </p>
                   )}
-                  {!googleDriveConnected && (
+                  {Object.keys(groupedCloudCVs).length > 0 && (
+                    <p className="text-green-600">
+                      💡 {Object.values(groupedCloudCVs).flat().length} CV{Object.values(groupedCloudCVs).flat().length !== 1 ? 's' : ''} available in cloud
+                    </p>
+                  )}
+                  {connectedProviders.length === 0 && (
                     <p className="text-amber-600">
-                      💡 <a href="/cloud-setup" className="underline">{t('cloud.connect_google_drive', 'Connect Google Drive')}</a> {t('cloud.access_saved_cvs', 'to access your cloud CVs')}
+                      💡 <a href="/cloud-setup" className="underline">{t('cloud.connect_providers', 'Connect cloud storage')}</a> {t('cloud.access_saved_cvs', 'to access your cloud CVs')}
                     </p>
                   )}
                 </div>
@@ -649,25 +897,30 @@ const CoverLetter = ({ darkMode }) => {
                         )}
                       </button>
                       
-                      {googleDriveConnected && (
-                        <button 
-                          onClick={() => handleSaveCoverLetter(true)}
-                          disabled={isSaving}
-                          className="px-2 py-1 text-xs bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded hover:shadow-lg hover:shadow-green-500/20 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isSaving ? (
-                            <span className="flex items-center">
-                              <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                              </svg>
-                              {t('common.saving', 'Saving...')}
-                            </span>
-                          ) : (
-                            t('cloud.save_to_drive', '☁️ Save to Drive')
-                          )}
-                        </button>
-                      )}
+                      {/* Cloud save buttons for each connected provider */}
+                      {connectedProviders.map(provider => {
+                        const providerInfo = getProviderDisplayInfo(provider);
+                        return (
+                          <button 
+                            key={provider}
+                            onClick={() => handleSaveCoverLetter(true, provider)}
+                            disabled={isSaving}
+                            className="px-2 py-1 text-xs bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded hover:shadow-lg hover:shadow-green-500/20 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isSaving ? (
+                              <span className="flex items-center">
+                                <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                </svg>
+                                {t('common.saving', 'Saving...')}
+                              </span>
+                            ) : (
+                              t('cloud.save_to_provider', `${providerInfo.icon} Save to ${providerInfo.name}`)
+                            )}
+                          </button>
+                        );
+                      })}
                     </>
                   )}
                   
