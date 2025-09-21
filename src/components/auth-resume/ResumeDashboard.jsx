@@ -165,7 +165,74 @@ const ResumeDashboard = ({ darkMode }) => {
     navigate('/new-resume');
   };
 
- const handleEdit = async (cv) => {
+ // Fix for ResumeDashboard.jsx - Replace the handleEdit function
+
+
+ const handleCustomize = async (cv) => {
+  try {
+    console.log('🎨 Opening customizer for CV:', cv.title, 'from', cv.source);
+    
+    let cvData = cv;
+    
+    // If it's a cloud CV, load the full content first
+    if (cv.source === 'cloud') {
+      setIsLoading(true);
+      
+      try {
+        if (cv.originalProvider === 'onedrive') {
+          cvData = await loadCVFromProvider('onedrive', cv.originalCloudId);
+        } else if (cv.originalProvider === 'google_drive') {
+          cvData = await loadGoogleDriveCV(cv.originalCloudId);
+        } else {
+          // Fallback to generic method
+          cvData = await loadCVFromProvider(cv.originalProvider, cv.originalCloudId);
+        }
+        
+        if (!cvData) {
+          throw new Error('Failed to load CV content');
+        }
+        
+        console.log('✅ CV content loaded for customization');
+      } catch (error) {
+        console.error('❌ Failed to load CV for customization:', error);
+        alert('Failed to load CV for customization. Please try again.');
+        return;
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    // Prepare CV data for customization
+    const customizationData = {
+      ...cvData,
+      _prepared_for_customization: {
+        timestamp: Date.now(),
+        source: cv.source,
+        originalId: cv.originalCloudId || cv.id,
+        provider: cv.originalProvider,
+        from: 'ResumeDashboard'
+      }
+    };
+    
+    // Save to customization draft
+    localStorage.setItem('cv_draft_for_customization', JSON.stringify(customizationData));
+    
+    // Navigate to customizer
+    navigate('/resume-customizer', {
+      state: {
+        cvId: cv.originalCloudId || cv.id,
+        source: cv.source,
+        provider: cv.originalProvider,
+        title: cv.title
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Error opening customizer:', error);
+    alert('Failed to open customizer. Please try again.');
+  }
+};
+const handleEdit = async (cv) => {
   try {
     if (cv.source === 'cloud') {
       console.log('📥 Loading cloud CV for editing:', cv.originalCloudId, 'from', cv.originalProvider);
@@ -178,7 +245,7 @@ const ResumeDashboard = ({ darkMode }) => {
           ...fullCV,
           _edit_source: 'cloud',
           _original_cloud_id: cv.originalCloudId,
-          _original_provider: cv.originalProvider,
+          _original_provider: cv.originalProvider, // Store the provider
           _edit_timestamp: Date.now()
         };
         
@@ -188,7 +255,8 @@ const ResumeDashboard = ({ darkMode }) => {
           state: { 
             editSource: 'cloud',
             originalFileId: cv.originalCloudId,
-            provider: cv.originalProvider
+            provider: cv.originalProvider, // PASS THE PROVIDER
+            originalProvider: cv.originalProvider // Also as backup
           } 
         });
       }

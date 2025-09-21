@@ -22,6 +22,7 @@ import { exportToPDF, printResumeFn } from './js/pdfExporterUtilsNew';
 import { exportToDocx } from './js/Exportdocx';
 import { exportResumeToDocxAlt } from './js/AltWordExport'; 
 import { CV_AI_ENDPOINTS } from '../../../config';
+import cloudProviderService from '../../../services/cloudProviderService';
 
 const EditResumeBuilder = ({ darkMode }) => {
   const navigate = useNavigate();
@@ -29,14 +30,15 @@ const EditResumeBuilder = ({ darkMode }) => {
   const { t } = useTranslation();
   
   // Use sessionStore instead of resumeStore
-  const { 
-    canSaveToCloud, 
-    saveLocally, 
-    saveToConnectedCloud,
-    loadGoogleDriveCV,
-    updateConnectedCloudCV,
-    googleDriveConnected 
-  } = useSessionStore();
+ const { 
+  canSaveToCloud, 
+  saveLocally, 
+  saveToConnectedCloud,
+  loadGoogleDriveCV,
+  updateConnectedCloudCV,
+  googleDriveConnected,
+  sessionToken  // ADD THIS
+} = useSessionStore();
   
   const [activeSection, setActiveSection] = useState('personal'); 
   const [isSaving, setIsSaving] = useState(false);
@@ -51,87 +53,240 @@ const EditResumeBuilder = ({ darkMode }) => {
   const [usageInfo, setUsageInfo] = useState(null);
   const [cvSource, setCvSource] = useState('local'); // 'local', 'draft', 'cloud'
   const [originalCvId, setOriginalCvId] = useState(null);
-  
+  // Add this state at the top with other useState declarations
+const [originalProvider, setOriginalProvider] = useState(null);
   // Resume Preview Action States
   const [isPdfExporting, setIsPdfExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isDocxExporting, setIsDocxExporting] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  useEffect(() => {
-    const loadCVData = async () => {
-      try {
-        setIsLoading(true);
-        console.log('📖 Loading CV for editing...');
-        
-        let cvData = null;
-        let source = 'local';
-        let cvId = null;
-        
-        const stateData = location.state;
-        
-        // Get explicit source information from navigation state
-        if (stateData?.editSource === 'cloud' && stateData?.originalFileId) {
-          // Editing a cloud CV
-          console.log('☁️ Loading specific cloud CV for editing:', stateData.originalFileId);
-          cvData = await loadGoogleDriveCV(stateData.originalFileId);
-          
-          if (cvData) {
-            source = 'cloud';
-            cvId = stateData.originalFileId;
-            console.log('✅ Loaded specific cloud CV for editing');
-          }
-        } else if (stateData?.editSource === 'local') {
-          // Editing a local CV
-          const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
-          cvData = localCVs.find(cv => cv.id === stateData.cvId);
-          
-          if (cvData) {
-            source = 'local';
-            cvId = stateData.cvId;
-          }
-        } else {
-          // Fallback to draft loading (existing logic)
-          const draft = localStorage.getItem('cv_draft');
-          if (draft) {
-            const parsed = JSON.parse(draft);
-            
-            // Check the draft's source tracking
-            if (parsed._edit_source === 'cloud' && parsed._original_cloud_id) {
-              cvData = parsed;
-              source = 'cloud';
-              cvId = parsed._original_cloud_id;
-            } else if (parsed._edit_source === 'local' && parsed._original_local_id) {
-              cvData = parsed;
-              source = 'local'; 
-              cvId = parsed._original_local_id;
-            } else {
-              cvData = parsed;
-              source = 'draft';
-            }
-          }
-        }
-        
-        if (!cvData) {
-          throw new Error(t('common.error'));
-        }
-        
-        setFormData(cvData);
-        setCvSource(source);
-        setOriginalCvId(cvId);
-        
-        console.log(`✅ Loaded CV for editing: ${cvData.title} (source: ${source}, id: ${cvId})`);
-        
-      } catch (error) {
-        console.error('❌ Error loading CV:', error);
-        setLocalError(t('common.error'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
+ const loadOneDriveCV = async (fileId) => {
+  try {
+    console.log('🔄 Loading OneDrive CV directly via API:', fileId);
     
+    // Get session token from useSessionStore hook or directly from store
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    
+    console.log('🔑 Session token available:', !!token);
+    
+    if (!token) {
+      throw new Error('No session token found in sessionStore');
+    }
+    
+    const response = await fetch(`http://localhost:8000/api/onedrive/load/${fileId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('📡 OneDrive API response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('❌ OneDrive API error:', errorData);
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.success && result.cv_data) {
+      console.log('✅ OneDrive CV loaded successfully');
+      return result.cv_data;
+    } else {
+      throw new Error(result.error || 'Failed to load CV from OneDrive');
+    }
+  } catch (error) {
+    console.error('❌ OneDrive direct load failed:', error);
+    throw error;
+  }
+};
+
+// ALTERNATIVE: If sessionToken is still not available, let's try getting it from the sessionStore persistence:
+const loadOneDriveCVAlt = async (fileId) => {
+  try {
+    console.log('🔄 Loading OneDrive CV (alternative method):', fileId);
+    
+    // Try multiple ways to get the session token
+    let token = null;
+    
+    // Method 1: From useSessionStore hook
+    const storeState = useSessionStore.getState();
+    token = storeState.sessionToken;
+    
+    // Method 2: From localStorage (sessionStore persists here)
+    if (!token) {
+      try {
+        const persistedState = localStorage.getItem('session-storage');
+        if (persistedState) {
+          const parsed = JSON.parse(persistedState);
+          token = parsed.state?.sessionToken;
+        }
+      } catch (e) {
+        console.warn('Failed to get token from localStorage:', e);
+      }
+    }
+    
+    console.log('🔑 Session token found:', !!token);
+    console.log('🔑 Token length:', token ? token.length : 0);
+    
+    if (!token) {
+      throw new Error('No session token available. Please refresh the page and try again.');
+    }
+    
+    const response = await fetch(`http://localhost:8000/api/onedrive/load/${fileId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('📡 OneDrive API response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('❌ OneDrive API error:', errorData);
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.success && result.cv_data) {
+      console.log('✅ OneDrive CV loaded successfully');
+      return result.cv_data;
+    } else {
+      throw new Error(result.error || 'Failed to load CV from OneDrive');
+    }
+  } catch (error) {
+    console.error('❌ OneDrive alternative load failed:', error);
+    throw error;
+  }
+};
+
+
+
+  useEffect(() => {
+  const loadCVData = async () => {
+  try {
+    setIsLoading(true);
+    console.log('📖 Loading CV for editing...');
+    
+    let cvData = null;
+    let source = 'local';
+    let cvId = null;
+    let provider = null;
+    
+    const stateData = location.state;
+    
+    // Get explicit source information from navigation state
+    if (stateData?.editSource === 'cloud' && stateData?.originalFileId) {
+      // Editing a cloud CV - CHECK WHICH PROVIDER
+      const fileId = stateData.originalFileId;
+      provider = stateData.provider || 'google_drive';
+      
+      console.log(`☁️ Loading specific cloud CV for editing: ${fileId} from ${provider}`);
+      
+      if (provider === 'onedrive') {
+        cvData = await loadOneDriveCVAlt(fileId);
+      } else if (provider === 'google_drive') {
+        cvData = await loadGoogleDriveCV(fileId);
+      } else {
+        throw new Error(`Unsupported provider: ${provider}`);
+      }
+      
+      if (cvData) {
+        source = 'cloud';
+        cvId = fileId;
+        console.log(`✅ Loaded specific cloud CV for editing from ${provider}`);
+      }
+    } else if (stateData?.editSource === 'local') {
+      // Editing a local CV
+      const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
+      cvData = localCVs.find(cv => cv.id === stateData.cvId);
+      
+      if (cvData) {
+        source = 'local';
+        cvId = stateData.cvId;
+      }
+    } else {
+      // Fallback to draft loading (existing logic)
+      const draft = localStorage.getItem('cv_draft');
+      if (draft) {
+        const parsed = JSON.parse(draft);
+        
+        // Check the draft's source tracking
+        if (parsed._edit_source === 'cloud' && parsed._original_cloud_id) {
+          cvData = parsed;
+          source = 'cloud';
+          cvId = parsed._original_cloud_id;
+          provider = parsed._original_provider || 'google_drive';
+        } else if (parsed._edit_source === 'local' && parsed._original_local_id) {
+          cvData = parsed;
+          source = 'local'; 
+          cvId = parsed._original_local_id;
+        } else {
+          cvData = parsed;
+          source = 'draft';
+        }
+      }
+    }
+    
+    if (!cvData) {
+      throw new Error('No CV data found');
+    }
+    
+    setFormData(cvData);
+    setCvSource(source);
+    setOriginalCvId(cvId);
+    setOriginalProvider(provider); // SET THE PROVIDER STATE
+    
+    console.log(`✅ Loaded CV for editing: ${cvData.title} (source: ${source}, provider: ${provider}, id: ${cvId})`);
+    
+  } catch (error) {
+    console.error('❌ Error loading CV:', error);
+    setLocalError(error.message || t('common.error'));
+  } finally {
+    setIsLoading(false);
+  }
+};
     loadCVData();
   }, [location.state, t]);
+
+
+  const getProviderDisplayName = (provider) => {
+  switch (provider) {
+    case 'google_drive':
+      return t('cloud.google_drive');
+    case 'onedrive':
+      return t('cloud.onedrive') || 'OneDrive';
+    case 'dropbox':
+      return t('cloud.dropbox') || 'Dropbox';
+    case 'box':
+      return t('cloud.box') || 'Box';
+    default:
+      return t('cloud.google_drive'); // Fallback
+  }
+};
+
+// Helper function to get provider icon:
+const getProviderIcon = (provider) => {
+  switch (provider) {
+    case 'google_drive':
+      return Cloud;
+    case 'onedrive':
+      return Cloud; // You could import a specific OneDrive icon
+    case 'dropbox':
+      return Cloud;
+    case 'box':
+      return Cloud;
+    default:
+      return Cloud;
+  }
+};
+
 
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(false);
@@ -191,115 +346,199 @@ const EditResumeBuilder = ({ darkMode }) => {
   };
 
   // Save CV function - supports local and cloud saving
-  const handleSaveCV = async (saveToCloud = false) => {
-    if (!formData) return;
+const handleSaveCV = async (saveToCloud = false) => {
+  if (!formData) return;
+  
+  try {
+    setIsSaving(true);
+    console.log('💾 Saving CV...', { saveToCloud, source: cvSource, originalCvId, provider: originalProvider });
     
-    try {
-      setIsSaving(true);
-      console.log('💾 Saving CV...', { saveToCloud, source: cvSource, originalCvId });
+    // Add metadata
+    const cvToSave = {
+      ...formData,
+      updated_at: new Date().toISOString(),
+      _metadata: {
+        source: cvSource,
+        originalId: originalCvId,
+        provider: originalProvider,
+        lastEdited: Date.now()
+      }
+    };
+    
+    let result;
+    
+    if (saveToCloud && canSaveToCloud()) {
+      // Save to cloud - use the correct provider
+      const targetProvider = originalProvider || 'google_drive'; // Default to Google Drive if no provider specified
       
-      // Add metadata
-      const cvToSave = {
-        ...formData,
-        updated_at: new Date().toISOString(),
-        _metadata: {
-          source: cvSource,
-          originalId: originalCvId,
-          lastEdited: Date.now()
-        }
-      };
-      
-      let result;
-      
-      if (saveToCloud && canSaveToCloud()) {
-        // Save to Google Drive
-        if (cvSource === 'cloud' && originalCvId) {
-          // UPDATE existing cloud file
-          console.log('📝 Updating existing cloud file:', originalCvId);
-          result = await updateConnectedCloudCV(cvToSave, originalCvId, 'google_drive');
-          
-          if (result.success) {
-            showToast(t('common.success'), 'success');
-            // Keep the same originalCvId since we're updating the same file
-          }
+      if (cvSource === 'cloud' && originalCvId) {
+        // UPDATE existing cloud file
+        console.log(`📝 Updating existing cloud file: ${originalCvId} in ${targetProvider}`);
+        
+        if (targetProvider === 'onedrive') {
+          // Use OneDrive update method
+          result = await updateOneDriveCV(originalCvId, cvToSave);
         } else {
-          // CREATE new cloud file
-          console.log('📝 Creating new cloud file');
-          result = await saveToConnectedCloud(cvToSave, 'google_drive');
-          
-          if (result.success) {
-            showToast(t('common.success'), 'success');
-            setCvSource('cloud');
-            setOriginalCvId(result.file_id);
-          }
+          // Use the existing Google Drive method
+          result = await updateConnectedCloudCV(cvToSave, originalCvId, targetProvider);
         }
         
+        if (result.success) {
+          showToast(`${t('common.success')} (${getProviderDisplayName(targetProvider)})`, 'success');
+        }
       } else {
-        // Save locally (existing logic remains the same)
-        if (cvSource === 'local' && originalCvId) {
-          // UPDATE existing local CV
-          console.log('📝 Updating existing local CV:', originalCvId);
+        // CREATE new cloud file
+        console.log(`📝 Creating new cloud file in ${targetProvider}`);
+        
+        if (targetProvider === 'onedrive') {
+          // Use OneDrive save method
+          result = await saveToOneDrive(cvToSave);
+        } else {
+          // Use the existing Google Drive method
+          result = await saveToConnectedCloud(cvToSave, targetProvider);
+        }
+        
+        if (result.success) {
+          showToast(`${t('common.success')} (${getProviderDisplayName(targetProvider)})`, 'success');
+          setCvSource('cloud');
+          setOriginalCvId(result.file_id || result.fileId);
+          setOriginalProvider(targetProvider);
+        }
+      }
+      
+    } else {
+      // Save locally (existing logic remains the same)
+      if (cvSource === 'local' && originalCvId) {
+        // UPDATE existing local CV
+        console.log('📝 Updating existing local CV:', originalCvId);
+        
+        try {
+          const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
+          const cvIndex = localCVs.findIndex(cv => cv.id === originalCvId);
           
-          try {
-            const localCVs = JSON.parse(localStorage.getItem('local_cvs') || '[]');
-            const cvIndex = localCVs.findIndex(cv => cv.id === originalCvId);
+          if (cvIndex !== -1) {
+            // Update existing CV
+            localCVs[cvIndex] = { ...cvToSave, id: originalCvId };
+            localStorage.setItem('local_cvs', JSON.stringify(localCVs));
             
-            if (cvIndex !== -1) {
-              // Update existing CV
-              localCVs[cvIndex] = { ...cvToSave, id: originalCvId };
-              localStorage.setItem('local_cvs', JSON.stringify(localCVs));
-              
-              result = { success: true, message: t('common.success') };
-              showToast(t('common.success'), 'success');
-            } else {
-              // CV not found in local storage, create new one
-              result = await saveLocally(cvToSave);
-              
-              if (result.success) {
-                showToast(t('common.success'), 'success');
-                setCvSource('local');
-                setOriginalCvId(cvToSave.id);
-              }
-            }
-          } catch (error) {
-            console.error('Error updating local CV:', error);
-            // Fallback to creating new one
+            result = { success: true, message: t('common.success') };
+            showToast(`${t('common.success')} (${t('cloud.local_storage')})`, 'success');
+          } else {
+            // CV not found in local storage, create new one
             result = await saveLocally(cvToSave);
             
             if (result.success) {
-              showToast(t('common.success'), 'success');
+              showToast(`${t('common.success')} (${t('cloud.local_storage')})`, 'success');
               setCvSource('local');
               setOriginalCvId(cvToSave.id);
             }
           }
-        } else {
-          // CREATE new local CV
-          console.log('📝 Creating new local CV');
+        } catch (error) {
+          console.error('Error updating local CV:', error);
+          // Fallback to creating new one
           result = await saveLocally(cvToSave);
           
           if (result.success) {
-            showToast(t('common.success'), 'success');
+            showToast(`${t('common.success')} (${t('cloud.local_storage')})`, 'success');
             setCvSource('local');
             setOriginalCvId(cvToSave.id);
           }
         }
+      } else {
+        // CREATE new local CV
+        console.log('📝 Creating new local CV');
+        result = await saveLocally(cvToSave);
+        
+        if (result.success) {
+          showToast(`${t('common.success')} (${t('cloud.local_storage')})`, 'success');
+          setCvSource('local');
+          setOriginalCvId(cvToSave.id);
+        }
       }
-      
-      if (!result.success) {
-        throw new Error(result.error || t('common.error'));
-      }
-      
-      // Update all relevant drafts
-      localStorage.setItem('cv_draft', JSON.stringify(cvToSave));
-      localStorage.setItem('cv_draft_for_customization', JSON.stringify(cvToSave));
-      
-    } catch (error) {
-      console.error('❌ Save failed:', error);
-      showToast(`${t('common.error')}: ${error.message}`, 'error');
-    } finally {
-      setIsSaving(false);
     }
-  };
+    
+    if (!result.success) {
+      throw new Error(result.error || t('common.error'));
+    }
+    
+    // Update all relevant drafts
+    localStorage.setItem('cv_draft', JSON.stringify(cvToSave));
+    localStorage.setItem('cv_draft_for_customization', JSON.stringify(cvToSave));
+    
+  } catch (error) {
+    console.error('❌ Save failed:', error);
+    showToast(`${t('common.error')}: ${error.message}`, 'error');
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+
+const saveToOneDrive = async (cvData) => {
+  try {
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    if (!token) {
+      throw new Error('No session token available');
+    }
+
+    const response = await fetch('http://localhost:8000/api/onedrive/save', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cvData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    return {
+      success: result.success,
+      file_id: result.file_id,
+      provider: 'onedrive'
+    };
+  } catch (error) {
+    console.error('❌ OneDrive save failed:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+const updateOneDriveCV = async (fileId, cvData) => {
+  try {
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    if (!token) {
+      throw new Error('No session token available');
+    }
+
+    const response = await fetch(`http://localhost:8000/api/onedrive/update-file/${fileId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cvData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    return {
+      success: result.success,
+      file_id: fileId,
+      provider: 'onedrive'
+    };
+  } catch (error) {
+    console.error('❌ OneDrive update failed:', error);
+    return { success: false, error: error.message };
+  }
+};
 
   const showToast = (message, type) => {
     setToast({ message, type });
@@ -535,38 +774,45 @@ const EditResumeBuilder = ({ darkMode }) => {
 
   // Save Button Component
   const SaveButton = () => (
-    <div className="flex gap-2">
+  <div className="flex gap-2">
+    <button
+      onClick={() => handleSaveCV(false)}
+      disabled={isSaving}
+      className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
+        isSaving
+          ? 'bg-gray-400 cursor-not-allowed'
+          : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105'
+      }`}
+      title={t('cloud.save_locally')}
+    >
+      <HardDrive size={14} />
+      <span>{isSaving ? t('resume.actions.saving') : t('common.save')}</span>
+    </button>
+
+    {canSaveToCloud() && (
       <button
-        onClick={() => handleSaveCV(false)}
+        onClick={() => handleSaveCV(true)}
         disabled={isSaving}
         className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
           isSaving
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105'
+            : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
         }`}
-        title={t('cloud.save_locally')}
+        title={originalProvider ? getProviderDisplayName(originalProvider) : t('cloud.save_to_cloud')}
       >
-        <HardDrive size={14} />
-        <span>{isSaving ? t('resume.actions.saving') : t('common.save')}</span>
+        <Cloud size={14} />
+        <span>
+          {isSaving 
+            ? t('resume.actions.saving') 
+            : originalProvider 
+              ? getProviderDisplayName(originalProvider).split(' ')[0] // Show just "OneDrive" or "Google"
+              : t('cloud.cloud')
+          }
+        </span>
       </button>
-
-      {canSaveToCloud() && (
-        <button
-          onClick={() => handleSaveCV(true)}
-          disabled={isSaving}
-          className={`px-3 py-1 text-xs rounded-full text-white flex items-center gap-1 shadow-md transition-all duration-300 ${
-            isSaving
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
-          }`}
-          title={t('cloud.save_to_drive')}
-        >
-          <Cloud size={14} />
-          <span>{isSaving ? t('resume.actions.saving') : t('cloud.drive')}</span>
-        </button>
-      )}
-    </div>
-  );
+    )}
+  </div>
+);
 
   if (isLoading) {
     return (
@@ -640,15 +886,25 @@ const EditResumeBuilder = ({ darkMode }) => {
             </button>
 
             <div className="text-center">
-              <div className="text-lg font-semibold">
-                {viewMode === 'edit' ? t('editor.edit_resume') : t('editor.preview_resume')}
-              </div>
-              {cvSource && (
-                <div className="text-xs text-gray-500">
-                  {t('cloud.source')}: {cvSource === 'cloud' ? t('cloud.google_drive') : cvSource === 'draft' ? t('cloud.draft') : t('cloud.local')}
-                </div>
-              )}
-            </div>
+  <div className="text-lg font-semibold">
+    {viewMode === 'edit' ? t('editor.edit_resume') : t('editor.preview_resume')}
+  </div>
+  {cvSource && (
+    <div className="text-xs text-gray-500">
+      {t('cloud.source')}: {
+        cvSource === 'cloud' && originalProvider
+          ? getProviderDisplayName(originalProvider)
+          : cvSource === 'cloud'
+          ? t('cloud.cloud_storage')
+          : cvSource === 'draft'
+          ? t('cloud.draft')
+          : cvSource === 'local'
+          ? t('cloud.local_storage')
+          : cvSource
+      }
+    </div>
+  )}
+</div>
 
             <div className="relative mobile-menu-container">
               <button 
@@ -830,16 +1086,43 @@ const EditResumeBuilder = ({ darkMode }) => {
         )}
 
         {/* CV Source Info */}
-        <div className={`mb-2 text-center text-xs px-3 py-1 rounded-full ${
-          cvSource === 'cloud' ? 'bg-blue-100 text-blue-700' :
-          cvSource === 'draft' ? 'bg-yellow-100 text-yellow-700' :
-          'bg-green-100 text-green-700'
-        }`}>
-          {cvSource === 'cloud' && <><Cloud size={12} className="inline mr-1" /> {t('cloud.google_drive')}</>}
-          {cvSource === 'draft' && <><FileSpreadsheet size={12} className="inline mr-1" /> {t('cloud.draft')}</>}
-          {cvSource === 'local' && <><HardDrive size={12} className="inline mr-1" /> {t('cloud.local_storage')}</>}
-          {cvSource === 'new' && <><FileSpreadsheet size={12} className="inline mr-1" /> {t('resumeDashboard.buttons.createNew')}</>}
-        </div>
+<div className={`mb-2 text-center text-xs px-3 py-1 rounded-full ${
+  cvSource === 'cloud' ? 'bg-blue-100 text-blue-700' :
+  cvSource === 'draft' ? 'bg-yellow-100 text-yellow-700' :
+  'bg-green-100 text-green-700'
+}`}>
+  {cvSource === 'cloud' && originalProvider && (
+    <>
+      {React.createElement(getProviderIcon(originalProvider), { size: 12, className: "inline mr-1" })}
+      {getProviderDisplayName(originalProvider)}
+    </>
+  )}
+  {cvSource === 'cloud' && !originalProvider && (
+    <>
+      <Cloud size={12} className="inline mr-1" />
+      {t('cloud.cloud_storage')}
+    </>
+  )}
+  {cvSource === 'draft' && (
+    <>
+      <FileSpreadsheet size={12} className="inline mr-1" />
+      {t('cloud.draft')}
+    </>
+  )}
+  {cvSource === 'local' && (
+    <>
+      <HardDrive size={12} className="inline mr-1" />
+      {t('cloud.local_storage')}
+    </>
+  )}
+  {cvSource === 'new' && (
+    <>
+      <FileSpreadsheet size={12} className="inline mr-1" />
+      {t('resumeDashboard.buttons.createNew')}
+    </>
+  )}
+</div>
+
         
         {/* Section Navigation - Responsive Grid */}
         <div className={`mb-4 sticky top-0 z-10 pb-2 border-b ${
