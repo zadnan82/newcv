@@ -1,18 +1,14 @@
-// src/stores/newCoverLetterStore.js - COMPLETELY NEW CLEAN VERSION
+// src/stores/coverLetterStore.js - Updated for multi-provider support
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import useSessionStore from './sessionStore';
+import cloudProviderService from '../services/cloudProviderService';
 
 // Base API URL
 const API_BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://api.cvati.com';
 
-// Clean Cover Letter API Endpoints - HARDCODED to avoid config issues
-const COVER_LETTER_API = {
-  LIST: `${API_BASE_URL}/api/google-drive/cover-letters`,
-  SAVE:`${API_BASE_URL}/api/google-drive/cover-letter/save-cover-letter`,
-  LOAD: (id) => `${API_BASE_URL}/api/google-drive/cover-letters/${id}`,
-  DELETE: (id) => `${API_BASE_URL}/api/google-drive/cover-letters/${id}`,
-  UPDATE: (id) => `${API_BASE_URL}/api/google-drive/cover-letters/${id}`,
+// Cover letter generation endpoint (still uses the original API)
+const COVER_LETTER_GENERATION_API = {
   GENERATE: `${API_BASE_URL}/api/cover-letter/generate`,
   TASK_STATUS: (taskId) => `${API_BASE_URL}/api/cover-letter/task-status/${taskId}`,
 };
@@ -40,7 +36,7 @@ const useNewCoverLetterStore = create(
       // Clear current task
       clearCurrentTask: () => set({ currentTask: null }),
 
-      // LOCAL STORAGE METHODS
+      // ================== LOCAL STORAGE METHODS ==================
       saveLocalCoverLetter: (coverLetterData) => {
         try {
           console.log("💾 Saving cover letter locally...");
@@ -128,7 +124,7 @@ const useNewCoverLetterStore = create(
         );
       },
 
-      // FAVORITES MANAGEMENT
+      // ================== FAVORITES MANAGEMENT ==================
       loadFavoritesFromStorage: () => {
         try {
           const favoritesList = JSON.parse(localStorage.getItem('cover_letter_favorites') || '[]');
@@ -149,168 +145,146 @@ const useNewCoverLetterStore = create(
         }
       },
 
-      // API HELPER
-      makeApiCall: async (url, method = 'GET', body = null) => {
-        const sessionToken = useSessionStore.getState().sessionToken;
+      // ================== MULTI-PROVIDER CLOUD OPERATIONS ==================
+
+      // Fetch cover letters from all connected providers
+      fetchCoverLetters: async () => {
+        set({ isLoading: true, error: null });
         
-        if (!sessionToken) {
-          throw new Error('No session token found. Please refresh the page.');
-        }
-
-        console.log(`🔄 API Call: ${method} ${url}`);
-
-        const config = {
-          method,
-          headers: {
-            'Authorization': `Bearer ${sessionToken}`,
-            'Content-Type': 'application/json',
+        try {
+          console.log("🔄 Fetching cover letters from all sources...");
+          
+          const allCoverLetters = [];
+          
+          // 1. Load from local storage
+          const localLetters = get().loadLocalCoverLetters();
+          console.log("📱 Local cover letters:", localLetters.length);
+          allCoverLetters.push(...localLetters);
+          
+          // 2. Load from all connected cloud providers
+          const sessionStore = useSessionStore.getState();
+          const { connectedProviders, sessionToken } = sessionStore;
+          
+          if (sessionToken && connectedProviders.length > 0) {
+            cloudProviderService.setSessionToken(sessionToken);
+            
+            // Load favorites from localStorage
+            const favoritesList = get().loadFavoritesFromStorage();
+            
+            for (const provider of connectedProviders) {
+              try {
+                console.log(`☁️ Loading cover letters from ${provider}...`);
+                
+                const cloudLetters = await cloudProviderService.listCoverLettersFromProvider(provider);
+                
+                // Process cloud letters and mark them with provider info
+                const processedCloudLetters = cloudLetters.map(letter => ({
+                  id: letter.id,
+                  title: letter.title || 'Untitled Cover Letter',
+                  company_name: letter.company_name || 'Not specified',
+                  job_title: letter.job_title || 'Not specified',
+                  created_at: letter.created_at || new Date().toISOString(),
+                  updated_at: letter.updated_at || new Date().toISOString(),
+                  is_favorite: favoritesList.includes(letter.id),
+                  recipient_name: letter.recipient_name || '',
+                  recipient_title: letter.recipient_title || '',
+                  cover_letter_content: letter.cover_letter_content || '',
+                  job_description: letter.job_description || '',
+                  author_name: letter.author_name || '',
+                  author_email: letter.author_email || '',
+                  author_phone: letter.author_phone || '',
+                  storageType: provider, // Mark with provider name
+                  provider: provider, // Add provider field for easy access
+                  syncedToCloud: true
+                }));
+                
+                console.log(`☁️ ${provider} cover letters:`, processedCloudLetters.length);
+                allCoverLetters.push(...processedCloudLetters);
+                
+              } catch (providerError) {
+                console.warn(`⚠️ Failed to load from ${provider}:`, providerError);
+                // Continue with other providers
+              }
+            }
           }
-        };
-
-        if (body && method !== 'GET') {
-          config.body = JSON.stringify(body);
+          
+          // 3. Remove duplicates (prefer cloud version if both exist)
+          const uniqueLetters = get().removeDuplicatesByContent(allCoverLetters);
+          
+          console.log("✅ Total unique cover letters:", uniqueLetters.length);
+          
+          set({ 
+            coverLetters: uniqueLetters,
+            localCoverLetters: localLetters,
+            isLoading: false 
+          });
+          
+          return uniqueLetters;
+        } catch (error) {
+          console.error('❌ Error fetching cover letters:', error);
+          set({ 
+            isLoading: false, 
+            error: error.message || 'Failed to fetch cover letters' 
+          });
+          return [];
         }
-
-        const response = await fetch(url, config);
-
-        console.log(`📡 Response: ${response.status} from ${url}`);
-
-        if (!response.ok) {
-          const errorData = await response.text();
-          console.error(`❌ API Error: ${response.status}`, errorData);
-          throw new Error(`HTTP ${response.status}: ${errorData}`);
-        }
-
-        return response.json();
       },
 
-      // CLOUD OPERATIONS
-
-      // Fetch all cover letters
-      // Fetch all cover letters from both local and cloud storage
-fetchCoverLetters: async () => {
-  set({ isLoading: true, error: null });
-  
-  try {
-    console.log("🔄 Fetching cover letters from all sources...");
-    
-    const allCoverLetters = [];
-    
-    // 1. Load from local storage
-    const localLetters = get().loadLocalCoverLetters();
-    console.log("📱 Local cover letters:", localLetters.length);
-    allCoverLetters.push(...localLetters);
-    
-    // 2. Load from Google Drive (if connected)
-    const { googleDriveConnected } = useSessionStore.getState();
-    if (googleDriveConnected) {
-      try {
-        // Load favorites from localStorage
-        const favoritesList = get().loadFavoritesFromStorage();
-        
-        // Make API call to Google Drive
-        const result = await get().makeApiCall(COVER_LETTER_API.LIST);
-        console.log("☁️ Google Drive response:", result);
-        
-        const driveLetters = result.success && result.cover_letters ? result.cover_letters : [];
-        
-        // Process Google Drive letters and mark them as cloud storage
-        const processedDriveLetters = driveLetters.map(letter => ({
-          id: letter.id,
-          title: letter.title || 'Untitled Cover Letter',
-          company_name: letter.company_name || 'Not specified',
-          job_title: letter.job_title || 'Not specified',
-          created_at: letter.created_at || new Date().toISOString(),
-          updated_at: letter.updated_at || new Date().toISOString(),
-          is_favorite: favoritesList.includes(letter.id),
-          recipient_name: letter.recipient_name || '',
-          recipient_title: letter.recipient_title || '',
-          cover_letter_content: letter.cover_letter_content || '',
-          job_description: letter.job_description || '',
-          author_name: letter.author_name || '',
-          author_email: letter.author_email || '',
-          author_phone: letter.author_phone || '',
-          storageType: 'google-drive', // Mark as Google Drive
-          syncedToCloud: true
-        }));
-        
-        console.log("☁️ Google Drive cover letters:", processedDriveLetters.length);
-        allCoverLetters.push(...processedDriveLetters);
-      } catch (driveError) {
-        console.warn("⚠️ Failed to load from Google Drive:", driveError);
-        // Continue with local letters only
-      }
-    }
-    
-    // 3. Remove duplicates (prefer Google Drive version if both exist)
-    const uniqueLetters = get().removeDuplicatesByContent(allCoverLetters);
-    
-    console.log("✅ Total unique cover letters:", uniqueLetters.length);
-    
-    set({ 
-      coverLetters: uniqueLetters,
-      localCoverLetters: localLetters,
-      isLoading: false 
-    });
-    
-    return uniqueLetters;
-  } catch (error) {
-    console.error('❌ Error fetching cover letters:', error);
-    set({ 
-      isLoading: false, 
-      error: error.message || 'Failed to fetch cover letters' 
-    });
-    return [];
-  }
-},
-
-
-// Add this helper function inside your store object
-removeDuplicatesByContent: (letters) => {
-  const seen = new Map();
-  
-  for (const letter of letters) {
-    // Create a key based on title, company, and job title
-    const key = `${(letter.title || '').toLowerCase()}-${(letter.company_name || '').toLowerCase()}-${(letter.job_title || '').toLowerCase()}`;
-    
-    if (!seen.has(key)) {
-      seen.set(key, letter);
-    } else {
-      // If duplicate exists, prefer Google Drive version
-      const existing = seen.get(key);
-      if (letter.storageType === 'google-drive' && existing.storageType === 'local') {
-        seen.set(key, letter);
-      }
-    }
-  }
-  
-  return Array.from(seen.values());
-},
-
-      // Load single cover letter
+      // Load single cover letter from any provider
       getCoverLetter: async (id) => {
         set({ isLoading: true, error: null });
         
         try {
           console.log("🔄 Loading cover letter:", id);
-          console.log("🔗 Using URL:", COVER_LETTER_API.LOAD(id));
           
-          const result = await get().makeApiCall(COVER_LETTER_API.LOAD(id));
-          console.log("📄 Cover letter loaded:", result);
+          // First check if it's a local cover letter
+          const localLetters = get().loadLocalCoverLetters();
+          const localLetter = localLetters.find(letter => letter.id === id);
           
-          let coverLetter = null;
-          
-          if (result.success && result.cover_letter_data) {
-            coverLetter = result.cover_letter_data;
-            console.log("✅ Cover letter data extracted:", coverLetter);
+          if (localLetter) {
+            console.log("📄 Cover letter found locally:", localLetter);
+            set({ 
+              currentLetter: localLetter,
+              isLoading: false 
+            });
+            return localLetter;
           }
           
-          set({ 
-            currentLetter: coverLetter,
-            isLoading: false 
-          });
+          // Try to find which provider has this cover letter
+          const sessionStore = useSessionStore.getState();
+          const { connectedProviders, sessionToken } = sessionStore;
           
-          return coverLetter;
+          if (!sessionToken || connectedProviders.length === 0) {
+            throw new Error('No cloud providers connected');
+          }
+          
+          cloudProviderService.setSessionToken(sessionToken);
+          
+          // Try each connected provider
+          for (const provider of connectedProviders) {
+            try {
+              console.log(`🔍 Trying to load from ${provider}...`);
+              const result = await cloudProviderService.loadCoverLetterFromProvider(provider, id);
+              
+              if (result) {
+                console.log(`✅ Cover letter found in ${provider}:`, result);
+                const coverLetter = { ...result, provider };
+                
+                set({ 
+                  currentLetter: coverLetter,
+                  isLoading: false 
+                });
+                
+                return coverLetter;
+              }
+            } catch (providerError) {
+              console.log(`❌ Not found in ${provider}:`, providerError.message);
+              // Continue trying other providers
+            }
+          }
+          
+          throw new Error('Cover letter not found in any connected provider');
+          
         } catch (error) {
           console.error('❌ Error fetching cover letter:', error);
           set({ 
@@ -321,47 +295,73 @@ removeDuplicatesByContent: (letters) => {
         }
       },
 
-      // Delete cover letter
+      // Delete cover letter from any provider
       deleteCoverLetter: async (id) => {
         set({ isLoading: true, error: null });
         
         try {
           console.log("🗑️ Deleting cover letter:", id);
-          console.log("🔗 Using URL:", COVER_LETTER_API.DELETE(id));
           
-          const sessionToken = useSessionStore.getState().sessionToken;
+          // First check if it's a local cover letter
+          const localLetters = get().loadLocalCoverLetters();
+          const localLetter = localLetters.find(letter => letter.id === id);
           
-          if (!sessionToken) {
-            throw new Error('No session token found');
-          }
-
-          const response = await fetch(COVER_LETTER_API.DELETE(id), {
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${sessionToken}`,
+          if (localLetter) {
+            const success = get().deleteLocalCoverLetter(id);
+            set({ isLoading: false });
+            
+            if (success) {
+              // Remove from favorites
+              const favoritesList = get().loadFavoritesFromStorage();
+              const updatedFavorites = favoritesList.filter(fav => fav !== id);
+              get().saveFavoritesToStorage(updatedFavorites);
+              
+              return { success: true, message: 'Cover letter deleted locally' };
+            } else {
+              throw new Error('Failed to delete local cover letter');
             }
-          });
-
-          if (!response.ok) {
-            const errorData = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorData}`);
           }
-
-          const result = await response.json();
-          console.log("✅ Cover letter deleted successfully:", result);
           
-          // Remove from favorites in localStorage
-          const favoritesList = get().loadFavoritesFromStorage();
-          const updatedFavorites = favoritesList.filter(fav => fav !== id);
-          get().saveFavoritesToStorage(updatedFavorites);
+          // Try to find and delete from cloud providers
+          const sessionStore = useSessionStore.getState();
+          const { connectedProviders, sessionToken } = sessionStore;
           
-          // Update state
-          set(state => ({
-            coverLetters: state.coverLetters.filter(letter => letter.id !== id),
-            isLoading: false
-          }));
+          if (!sessionToken || connectedProviders.length === 0) {
+            throw new Error('No cloud providers connected');
+          }
           
-          return result;
+          cloudProviderService.setSessionToken(sessionToken);
+          
+          // Try each connected provider
+          for (const provider of connectedProviders) {
+            try {
+              console.log(`🔍 Trying to delete from ${provider}...`);
+              const result = await cloudProviderService.deleteCoverLetterFromProvider(provider, id);
+              
+              if (result && result.success) {
+                console.log(`✅ Cover letter deleted from ${provider}`);
+                
+                // Remove from favorites
+                const favoritesList = get().loadFavoritesFromStorage();
+                const updatedFavorites = favoritesList.filter(fav => fav !== id);
+                get().saveFavoritesToStorage(updatedFavorites);
+                
+                // Update state
+                set(state => ({
+                  coverLetters: state.coverLetters.filter(letter => letter.id !== id),
+                  isLoading: false
+                }));
+                
+                return result;
+              }
+            } catch (providerError) {
+              console.log(`❌ Delete failed in ${provider}:`, providerError.message);
+              // Continue trying other providers
+            }
+          }
+          
+          throw new Error('Cover letter not found in any connected provider');
+          
         } catch (error) {
           console.error('❌ Error deleting cover letter:', error);
           set({ 
@@ -372,23 +372,71 @@ removeDuplicatesByContent: (letters) => {
         }
       },
 
-      // Update cover letter
+      // Update cover letter in any provider
       updateCoverLetter: async (id, updateData) => {
         set({ isLoading: true, error: null });
         
         try {
           console.log("🔄 Updating cover letter:", id);
           
-          const result = await get().makeApiCall(COVER_LETTER_API.UPDATE(id), 'PUT', updateData);
+          // First check if it's a local cover letter
+          const localLetters = get().loadLocalCoverLetters();
+          const localLetter = localLetters.find(letter => letter.id === id);
           
-          set(state => ({
-            coverLetters: state.coverLetters.map(letter => 
-              letter.id === id ? { ...letter, ...updateData } : letter
-            ),
-            isLoading: false
-          }));
+          if (localLetter) {
+            console.log("📝 Updating local cover letter:", id);
+            const updatedLetter = { ...localLetter, ...updateData, lastModified: new Date().toISOString() };
+            const success = get().saveLocalCoverLetter(updatedLetter);
+            set({ isLoading: false });
+            
+            if (success.success) {
+              set(state => ({
+                coverLetters: state.coverLetters.map(letter => 
+                  letter.id === id ? updatedLetter : letter
+                )
+              }));
+              return { success: true, message: 'Cover letter updated locally' };
+            } else {
+              throw new Error('Failed to update local cover letter');
+            }
+          }
           
-          return result;
+          // Try to find and update in cloud providers
+          const sessionStore = useSessionStore.getState();
+          const { connectedProviders, sessionToken } = sessionStore;
+          
+          if (!sessionToken || connectedProviders.length === 0) {
+            throw new Error('No cloud providers connected');
+          }
+          
+          cloudProviderService.setSessionToken(sessionToken);
+          
+          // Try each connected provider
+          for (const provider of connectedProviders) {
+            try {
+              console.log(`🔍 Trying to update in ${provider}...`);
+              const result = await cloudProviderService.updateCoverLetterInProvider(provider, id, updateData);
+              
+              if (result && result.success) {
+                console.log(`✅ Cover letter updated in ${provider}`);
+                
+                set(state => ({
+                  coverLetters: state.coverLetters.map(letter => 
+                    letter.id === id ? { ...letter, ...updateData } : letter
+                  ),
+                  isLoading: false
+                }));
+                
+                return result;
+              }
+            } catch (providerError) {
+              console.log(`❌ Update failed in ${provider}:`, providerError.message);
+              // Continue trying other providers
+            }
+          }
+          
+          throw new Error('Cover letter not found in any connected provider');
+          
         } catch (error) {
           console.error('❌ Error updating cover letter:', error);
           set({ 
@@ -457,22 +505,79 @@ removeDuplicatesByContent: (letters) => {
         }
       },
 
-      // GENERATION AND TASKS
+      // Save cover letter to any provider or locally
+      saveCoverLetter: async (coverLetterData, saveToCloud = false, preferredProvider = null) => {
+        const results = {
+          success: false,
+          localResult: null,
+          cloudResult: null,
+          error: null
+        };
+
+        try {
+          // ALWAYS save to local storage first (as backup)
+          const localSave = get().saveLocalCoverLetter(coverLetterData);
+          results.localResult = localSave;
+          
+          // ONLY save to cloud if specifically requested
+          if (saveToCloud) {
+            const sessionStore = useSessionStore.getState();
+            const { connectedProviders, sessionToken } = sessionStore;
+            
+            if (sessionToken && connectedProviders.length > 0) {
+              // Determine which provider to use
+              let targetProvider = preferredProvider;
+              if (!targetProvider || !connectedProviders.includes(targetProvider)) {
+                // Use first connected provider as fallback
+                targetProvider = connectedProviders[0];
+              }
+              
+              try {
+                cloudProviderService.setSessionToken(sessionToken);
+                
+                // Save to cloud
+                const cloudSave = await cloudProviderService.saveCoverLetterToProvider(targetProvider, {
+                  ...coverLetterData,
+                  storageType: targetProvider
+                });
+                results.cloudResult = { success: true, ...cloudSave };
+                
+                console.log(`✅ Cover letter saved to ${targetProvider}:`, cloudSave);
+              } catch (cloudError) {
+                console.warn('Cloud save failed, but local save succeeded:', cloudError);
+                results.cloudResult = { success: false, error: cloudError.message };
+              }
+            } else {
+              results.cloudResult = { success: false, error: 'No cloud providers connected' };
+            }
+          }
+          
+          results.success = true;
+          return results;
+          
+        } catch (error) {
+          results.error = error.message;
+          return results;
+        }
+      },
+
+      // ================== GENERATION AND TASKS ==================
       
-      // Generate cover letter
+      // Generate cover letter (still uses original API)
       generateCoverLetter: async (formData) => {
         set({ isLoading: true, error: null });
         
         try {
           console.log("🤖 Generating cover letter...");
           
-          const sessionToken = useSessionStore.getState().sessionToken;
+          const sessionStore = useSessionStore.getState();
+          const { sessionToken } = sessionStore;
           
           if (!sessionToken) {
             throw new Error('No session token found');
           }
           
-          const response = await fetch(COVER_LETTER_API.GENERATE, {
+          const response = await fetch(COVER_LETTER_GENERATION_API.GENERATE, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${sessionToken}`,
@@ -510,7 +615,7 @@ removeDuplicatesByContent: (letters) => {
         }
       },
 
-      // Check task status
+      // Check task status (still uses original API)
       checkTaskStatus: async (taskId) => {
         const { currentTask } = get();
         
@@ -521,84 +626,85 @@ removeDuplicatesByContent: (letters) => {
         const id = taskId || currentTask.id;
         
         try {
-          const response = await get().makeApiCall(COVER_LETTER_API.TASK_STATUS(id));
+          const sessionStore = useSessionStore.getState();
+          const { sessionToken } = sessionStore;
+          
+          if (!sessionToken) {
+            throw new Error('No session token found');
+          }
+          
+          const response = await fetch(COVER_LETTER_GENERATION_API.TASK_STATUS(id), {
+            headers: {
+              'Authorization': `Bearer ${sessionToken}`,
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorData}`);
+          }
+          
+          const result = await response.json();
           
           const updatedTask = {
-            id: response.task_id,
-            status: response.status,
-            result: response.result,
-            error: response.error,
-            message: response.message,
-            completedAt: response.completed_at
+            id: result.task_id,
+            status: result.status,
+            result: result.result,
+            error: result.error,
+            message: result.message,
+            completedAt: result.completed_at
           };
           
           set({ currentTask: updatedTask });
           
-          if (response.status === 'completed') {
+          if (result.status === 'completed') {
             set({ 
               isLoading: false,
               currentTask: null
             });
           }
           
-          if (response.status === 'failed') {
+          if (result.status === 'failed') {
             set({ 
               isLoading: false,
-              error: response.error || 'Cover letter generation failed',
+              error: result.error || 'Cover letter generation failed',
               currentTask: null
             });
           }
           
-          return response;
+          return result;
         } catch (error) {
           console.error('❌ Error checking task status:', error);
           return null;
         }
       },
 
-     saveCoverLetter: async (coverLetterData, saveToCloud = false) => {
-  const results = {
-    success: false,
-    localResult: null,
-    cloudResult: null,
-    error: null
-  };
+      // ================== UTILITY METHODS ==================
 
-  try {
-    // ALWAYS save to local storage first (as backup)
-    const localSave = get().saveLocalCoverLetter(coverLetterData);
-    results.localResult = localSave;
-    
-    // ONLY save to cloud if specifically requested
-    if (saveToCloud) {
-      const { googleDriveConnected } = useSessionStore.getState();
-      if (googleDriveConnected) {
-        try {
-          // Save to Google Drive via API
-          const cloudSave = await get().makeApiCall(COVER_LETTER_API.SAVE, 'POST', {
-            ...coverLetterData,
-            storageType: 'google-drive'
-          });
-          results.cloudResult = cloudSave;
-        } catch (cloudError) {
-          console.warn('Cloud save failed, but local save succeeded:', cloudError);
-          results.cloudResult = { success: false, error: cloudError.message };
+      // Remove duplicates helper
+      removeDuplicatesByContent: (letters) => {
+        const seen = new Map();
+        
+        for (const letter of letters) {
+          // Create a key based on title, company, and job title
+          const key = `${(letter.title || '').toLowerCase()}-${(letter.company_name || '').toLowerCase()}-${(letter.job_title || '').toLowerCase()}`;
+          
+          if (!seen.has(key)) {
+            seen.set(key, letter);
+          } else {
+            // If duplicate exists, prefer cloud version
+            const existing = seen.get(key);
+            if (letter.storageType !== 'local' && existing.storageType === 'local') {
+              seen.set(key, letter);
+            }
+          }
         }
-      } else {
-        results.cloudResult = { success: false, error: 'Google Drive not connected' };
-      }
-    }
-    
-    results.success = true;
-    return results;
-    
-  } catch (error) {
-    results.error = error.message;
-    return results;
-  }
-},
+        
+        return Array.from(seen.values());
+      },
 
-      // FORMAT COVER LETTER FOR DISPLAY
+      // Format cover letter for display
       formatCoverLetter: (letter) => {
         try {
           console.log("📝 Formatting cover letter:", letter);
@@ -691,6 +797,18 @@ removeDuplicatesByContent: (letters) => {
           console.error("❌ Error formatting cover letter:", error);
           return "Error formatting cover letter content.";
         }
+      },
+
+      // Get connected providers for cover letters
+      getConnectedProviders: () => {
+        const sessionStore = useSessionStore.getState();
+        return sessionStore.connectedProviders || [];
+      },
+
+      // Get preferred provider for cover letters
+      getPreferredProvider: () => {
+        const sessionStore = useSessionStore.getState();
+        return sessionStore.getPreferredProvider();
       },
     }),
     {

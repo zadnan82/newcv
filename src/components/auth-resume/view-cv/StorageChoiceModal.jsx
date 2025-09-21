@@ -1,291 +1,278 @@
-import React from 'react';
-import { X, HardDrive, Cloud, ChevronRight } from 'lucide-react';
+// src/components/auth-resume/view-cv/StorageChoiceModal.jsx - Enhanced Multi-Provider Version
+import React, { useState } from 'react';
+import { X, HardDrive, Cloud, CheckCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import useSessionStore from '../../../stores/sessionStore';
 
 const StorageChoiceModal = ({ 
   isOpen, 
   onClose, 
   onSaveLocal, 
   onSaveCloud, 
-  canSaveToCloud,
-  darkMode,
-  isSaving,
-  saveType,
-  onConnectCloud
+  onConnectCloud, 
+  canSaveToCloud, 
+  darkMode, 
+  isSaving, 
+  saveType 
 }) => {
   const { t } = useTranslation();
+  const { connectedProviders, getConnectedProviderDetails } = useSessionStore();
+  const [selectedProvider, setSelectedProvider] = useState(null);
 
   if (!isOpen) return null;
 
+  const connectedDetails = getConnectedProviderDetails();
+  
+  // Get provider display info
+  const getProviderInfo = (provider) => {
+    switch (provider) {
+      case 'google_drive':
+        return {
+          name: 'Google Drive',
+          icon: '📄',
+          color: 'from-blue-500 to-blue-600',
+          bgColor: 'bg-blue-50',
+          textColor: 'text-blue-700',
+          description: 'Save to Google Drive (15GB free)'
+        };
+      case 'onedrive':
+        return {
+          name: 'OneDrive',
+          icon: '☁️',
+          color: 'from-purple-500 to-purple-600',
+          bgColor: 'bg-purple-50',
+          textColor: 'text-purple-700',
+          description: 'Save to Microsoft OneDrive (5GB free)'
+        };
+      default:
+        return {
+          name: provider,
+          icon: '☁️',
+          color: 'from-gray-500 to-gray-600',
+          bgColor: 'bg-gray-50',
+          textColor: 'text-gray-700',
+          description: `Save to ${provider}`
+        };
+    }
+  };
+
+  const handleCloudSave = (provider) => {
+    setSelectedProvider(provider);
+    onSaveCloud(provider);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className={`max-w-md w-full rounded-2xl ${
+      <div className={`max-w-lg w-full rounded-2xl ${
         darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'
-      } shadow-2xl p-6 transform transition-all`}>
+      } shadow-2xl p-6 max-h-[90vh] overflow-y-auto`}>
         
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            {t('cloud.where_save_cv', 'Where would you like to save your CV?')}
+            {t('cloud.choose_save_location')}
           </h3>
           <button 
             onClick={onClose}
             className={`p-2 rounded-full hover:bg-gray-100 ${
               darkMode ? 'hover:bg-gray-700 text-gray-400' : 'text-gray-500'
             }`}
-            disabled={isSaving}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="space-y-3">
+        {/* Save Options */}
+        <div className="space-y-4">
           
-          {canSaveToCloud ? (
-            <button
-              onClick={onSaveCloud}
-              disabled={isSaving}
-              className={`w-full p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group ${
-                isSaving && saveType === 'cloud'
-                  ? 'border-purple-500 bg-purple-50 cursor-not-allowed'
-                  : darkMode
-                  ? 'border-gray-600 bg-gray-700 hover:border-purple-500 hover:bg-purple-900/20'
-                  : 'border-gray-200 bg-gray-50 hover:border-purple-500 hover:bg-purple-50'
-              }`}
-            >
-              <div className="flex items-center">
-                <div className={`p-3 rounded-lg mr-4 ${
-                  darkMode ? 'bg-purple-900/30' : 'bg-purple-100'
+          {/* Local Storage Option */}
+          <div className={`border-2 rounded-xl p-4 transition-all ${
+            darkMode 
+              ? 'border-gray-600 bg-gray-700/50' 
+              : 'border-gray-200 bg-gray-50'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className={`p-3 rounded-lg ${
+                  darkMode ? 'bg-blue-900/30' : 'bg-blue-100'
                 }`}>
-                  <Cloud className={`w-6 h-6 ${
-                    darkMode ? 'text-purple-400' : 'text-purple-600'
+                  <HardDrive className={`w-6 h-6 ${
+                    darkMode ? 'text-blue-400' : 'text-blue-600'
                   }`} />
                 </div>
-                <div className="text-left">
+                <div>
                   <h4 className={`font-semibold ${
-                    darkMode ? 'text-white' : 'text-gray-800'
+                    darkMode ? 'text-white' : 'text-gray-900'
                   }`}>
-                    {t('cloud.save_to_google_drive', 'Save to Google Drive')}
+                    {t('cloud.this_device')}
                   </h4>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    {t('cloud.access_any_device_backup', 'Access from any device • Automatic backup')}
+                    {t('cloud.save_locally_description')}
                   </p>
                 </div>
               </div>
-              <div className={`transition-transform group-hover:translate-x-1 ${
-                isSaving && saveType === 'cloud' ? 'animate-spin' : ''
-              }`}>
-                {isSaving && saveType === 'cloud' ? (
-                  <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              
+              <button
+                onClick={onSaveLocal}
+                disabled={isSaving}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
+                  isSaving && saveType === 'local'
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
+                }`}
+              >
+                {isSaving && saveType === 'local' ? (
+                  <>
+                    <Loader2 size={16} className="mr-2 animate-spin" />
+                    {t('common.saving')}
+                  </>
                 ) : (
-                  <ChevronRight className={`w-5 h-5 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <>
+                    <HardDrive size={16} className="mr-2" />
+                    {t('cloud.save_locally')}
+                  </>
                 )}
-              </div>
-            </button>
+              </button>
+            </div>
+          </div>
+
+          {/* Cloud Storage Options */}
+          {connectedDetails.length > 0 ? (
+            <div className="space-y-3">
+              <h4 className={`font-medium ${
+                darkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                {t('cloud.connected_providers')}
+              </h4>
+              
+              {connectedDetails.map(({ provider, name, status }) => {
+                const providerInfo = getProviderInfo(provider);
+                const isCurrentlySaving = isSaving && saveType === 'cloud' && selectedProvider === provider;
+                
+                return (
+                  <div key={provider} className={`border-2 rounded-xl p-4 transition-all ${
+                    darkMode 
+                      ? 'border-gray-600 bg-gray-700/50' 
+                      : 'border-gray-200 bg-gray-50'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className={`p-3 rounded-lg ${
+                          darkMode 
+                            ? provider === 'onedrive' ? 'bg-purple-900/30' : 'bg-blue-900/30'
+                            : provider === 'onedrive' ? 'bg-purple-100' : 'bg-blue-100'
+                        }`}>
+                          <span className="text-2xl">{providerInfo.icon}</span>
+                        </div>
+                        <div>
+                          <h4 className={`font-semibold flex items-center ${
+                            darkMode ? 'text-white' : 'text-gray-900'
+                          }`}>
+                            {providerInfo.name}
+                            {status?.connected && (
+                              <CheckCircle className={`w-4 h-4 ml-2 ${
+                                darkMode ? 'text-green-400' : 'text-green-600'
+                              }`} />
+                            )}
+                          </h4>
+                          <p className={`text-sm ${
+                            darkMode ? 'text-gray-300' : 'text-gray-600'
+                          }`}>
+                            {providerInfo.description}
+                            {status?.email && (
+                              <span className="block text-xs mt-1">
+                                {status.email}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={() => handleCloudSave(provider)}
+                        disabled={isSaving}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
+                          isCurrentlySaving
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                            : `bg-gradient-to-r ${providerInfo.color} text-white hover:shadow-lg hover:scale-105`
+                        }`}
+                      >
+                        {isCurrentlySaving ? (
+                          <>
+                            <Loader2 size={16} className="mr-2 animate-spin" />
+                            {t('common.saving')}
+                          </>
+                        ) : (
+                          <>
+                            <Cloud size={16} className="mr-2" />
+                            {t('cloud.save_to_provider', { provider: providerInfo.name })}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
-            <div className={`w-full p-4 rounded-xl border-2 border-dashed ${
+            /* No Cloud Providers Connected */
+            <div className={`border-2 border-dashed rounded-xl p-6 text-center ${
               darkMode 
-                ? 'border-gray-600 bg-gray-700/50' 
+                ? 'border-gray-600 bg-gray-700/30' 
                 : 'border-gray-300 bg-gray-50'
             }`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className={`p-3 rounded-lg mr-4 ${
-                    darkMode ? 'bg-gray-600' : 'bg-gray-200'
-                  }`}>
-                    <Cloud className={`w-6 h-6 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-500'
-                    }`} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className={`font-semibold ${
-                      darkMode ? 'text-white' : 'text-gray-800'
-                    }`}>
-                      {t('cloud.google_drive')}
-                    </h4>
-                    <p className={`text-sm ${
-                      darkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                      {t('cloud.access_any_device_backup')}
-                    </p>
-                  </div>
-                </div>
-                <button 
+              <Cloud className={`w-12 h-12 mx-auto mb-3 ${
+                darkMode ? 'text-gray-400' : 'text-gray-400'
+              }`} />
+              <h4 className={`font-medium mb-2 ${
+                darkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                {t('cloud.no_cloud_providers')}
+              </h4>
+              <p className={`text-sm mb-4 ${
+                darkMode ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                {t('cloud.connect_provider_to_save')}
+              </p>
+              
+              <div className="space-y-2">
+                <button
                   onClick={() => onConnectCloud('google_drive')}
-                  className="px-3 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                  disabled={isSaving}
+                  className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
                 >
-                  {t('cloud.connect', 'Connect')}
+                  📄 Connect Google Drive
+                </button>
+                
+                <button
+                  onClick={() => onConnectCloud('onedrive')}
+                  className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
+                >
+                  ☁️ Connect OneDrive
                 </button>
               </div>
             </div>
           )}
-
-          <div className={`w-full p-4 rounded-xl border-2 border-dashed opacity-60 ${
-            darkMode 
-              ? 'border-gray-700 bg-gray-800/50' 
-              : 'border-gray-200 bg-gray-50/50'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className={`p-3 rounded-lg mr-4 ${
-                  darkMode ? 'bg-blue-900/20' : 'bg-blue-100/50'
-                }`}>
-                  <svg className={`w-6 h-6 ${
-                    darkMode ? 'text-blue-400/60' : 'text-blue-600/60'
-                  }`} viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M5.5 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5c0.2 0 0.4 0 0.6 0.1C6.6 6.9 8.2 6 10 6c2.2 0 4.1 1.4 4.8 3.4 0.1 0 0.2 0 0.2 0 1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5h-1v1.1c0 0.8 0.7 1.5 1.5 1.5s1.5-0.7 1.5-1.5V14h2c1.1 0 2-0.9 2-2s-0.9-2-2-2c0-2.8-2.2-5-5-5-1.9 0-3.6 1.1-4.4 2.7C8.6 7.3 7.1 7 5.5 7C2.5 7 0 9.5 0 12.5S2.5 18 5.5 18h9c1.4 0 2.5-1.1 2.5-2.5S15.9 13 14.5 13h-1v2.5H5.5z"/>
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h4 className={`font-semibold ${
-                    darkMode ? 'text-white/60' : 'text-gray-800/60'
-                  }`}>
-                    {t('cloud.onedrive', 'OneDrive')}
-                  </h4>
-                  <p className={`text-sm ${
-                    darkMode ? 'text-gray-300/60' : 'text-gray-600/60'
-                  }`}>
-                    {t('cloud.microsoft_integration', 'Microsoft integration • Office sync')}
-                  </p>
-                </div>
-              </div>
-              <span className={`px-3 py-2 text-xs rounded-lg font-medium ${
-                darkMode 
-                  ? 'bg-gray-700 text-gray-400' 
-                  : 'bg-gray-200 text-gray-500'
-              }`}>
-                {t('cloud.coming_soon', 'Coming Soon')}
-              </span>
-            </div>
-          </div>
-
-          <div className={`w-full p-4 rounded-xl border-2 border-dashed opacity-60 ${
-            darkMode 
-              ? 'border-gray-700 bg-gray-800/50' 
-              : 'border-gray-200 bg-gray-50/50'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className={`p-3 rounded-lg mr-4 ${
-                  darkMode ? 'bg-blue-900/20' : 'bg-blue-100/50'
-                }`}>
-                  <svg className={`w-6 h-6 ${
-                    darkMode ? 'text-blue-400/60' : 'text-blue-600/60'
-                  }`} viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0L7.2 3.6l4.8 3.6L7.2 10.8 12 7.2l4.8 3.6L12 14.4l-4.8-3.6L2.4 14.4 7.2 18 12 14.4l4.8 3.6 4.8-3.6-4.8-3.6L12 14.4l-4.8-3.6L12 7.2l4.8-3.6L12 0z"/>
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h4 className={`font-semibold ${
-                    darkMode ? 'text-white/60' : 'text-gray-800/60'
-                  }`}>
-                    {t('cloud.dropbox', 'Dropbox')}
-                  </h4>
-                  <p className={`text-sm ${
-                    darkMode ? 'text-gray-300/60' : 'text-gray-600/60'
-                  }`}>
-                    {t('cloud.file_sharing_collaboration', 'File sharing focused • Team collaboration')}
-                  </p>
-                </div>
-              </div>
-              <span className={`px-3 py-2 text-xs rounded-lg font-medium ${
-                darkMode 
-                  ? 'bg-gray-700 text-gray-400' 
-                  : 'bg-gray-200 text-gray-500'
-              }`}>
-                {t('cloud.coming_soon')}
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={onSaveLocal}
-            disabled={isSaving}
-            className={`w-full p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group ${
-              isSaving && saveType === 'local'
-                ? 'border-blue-500 bg-blue-50 cursor-not-allowed'
-                : darkMode
-                ? 'border-gray-600 bg-gray-700 hover:border-blue-500 hover:bg-blue-900/20'
-                : 'border-gray-200 bg-gray-50 hover:border-blue-500 hover:bg-blue-50'
-            }`}
-          >
-            <div className="flex items-center">
-              <div className={`p-3 rounded-lg mr-4 ${
-                darkMode ? 'bg-blue-900/30' : 'bg-blue-100'
-              }`}>
-                <HardDrive className={`w-6 h-6 ${
-                  darkMode ? 'text-blue-400' : 'text-blue-600'
-                }`} />
-              </div>
-              <div className="text-left">
-                <h4 className={`font-semibold ${
-                  darkMode ? 'text-white' : 'text-gray-800'
-                }`}>
-                  {t('cloud.save_to_device', 'Save to This Device')}
-                </h4>
-                <p className={`text-sm ${
-                  darkMode ? 'text-gray-300' : 'text-gray-600'
-                }`}>
-                  {t('cloud.private_offline_device_only', 'Private • Works offline • This device only')}
-                </p>
-              </div>
-            </div>
-            <div className={`transition-transform group-hover:translate-x-1 ${
-              isSaving && saveType === 'local' ? 'animate-spin' : ''
-            }`}>
-              {isSaving && saveType === 'local' ? (
-                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <ChevronRight className={`w-5 h-5 ${
-                  darkMode ? 'text-gray-400' : 'text-gray-500'
-                }`} />
-              )}
-            </div>
-          </button> 
-
-          <div className="relative">
-            <div className={`absolute inset-0 flex items-center ${darkMode ? '' : ''}`}>
-              <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className={`px-2 ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'}`}>
-                {t('revamp.or')}
-              </span>
-            </div>
-          </div>
-
-          {!canSaveToCloud && (
-            <div className={`p-3 rounded-lg ${
-              darkMode ? 'bg-blue-900/10 border border-blue-800/30' : 'bg-blue-50 border border-blue-200'
-            }`}>
-              <p className={`text-sm font-medium mb-2 ${
-                darkMode ? 'text-blue-300' : 'text-blue-800'
-              }`}>
-                {t('cloud.connect_cloud_device_sync_tip', '💡 Connect cloud storage for device sync')}
-              </p>
-              <p className={`text-xs ${
-                darkMode ? 'text-blue-400' : 'text-blue-600'
-              }`}>
-                {t('cloud.cv_accessible_any_device', 'Your CV will be accessible from any device with your account')}
-              </p>
-            </div>
-          )}
         </div>
 
-        <div className={`mt-6 p-3 rounded-lg ${
-          darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
-        }`}>
-          <p className={`text-xs text-center ${
-            darkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}>
-            {t('cloud.auto_saved_tip', '💡 Your work is auto-saved as you type - you won\'t lose anything!')}
-          </p>
+        {/* Footer */}
+        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+          <div className="flex justify-between items-center">
+            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              {t('cloud.privacy_note')}
+            </p>
+            
+            <button
+              onClick={onClose}
+              className={`text-sm ${
+                darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('common.cancel')}
+            </button>
+          </div>
         </div>
-
       </div>
     </div>
   );

@@ -173,15 +173,13 @@ function App() {
    
   // Initialize app on load - ONLY ONCE, no dependencies
   useEffect(() => {
-    if (!isInitialized) {
-      console.log('🚀 App.jsx: Starting initialization...');
-      setIsInitialized(true);
-      
-      // Call initialize directly from the store state, not from the hook
-      useSessionStore.getState().initialize().catch(console.error);
-    }
-  }, [isInitialized]); // Remove 'initialize' from dependencies
-
+  if (!isInitialized) {
+    console.log('🚀 App.jsx: Starting initialization...');
+    setIsInitialized(true);
+    
+    useSessionStore.getState().initialize().catch(console.error);
+  }
+}, []); // Empty dependency array to run only once
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     

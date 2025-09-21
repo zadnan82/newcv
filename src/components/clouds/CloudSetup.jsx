@@ -1,4 +1,4 @@
-// src/components/clouds/CloudSetup.jsx - Google Drive focused
+// src/components/clouds/CloudSetup.jsx - Updated with OneDrive support
 import React, { useState } from 'react';
 import { ArrowLeft, Shield, HardDrive, Cloud, CheckCircle } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +13,39 @@ const CloudSetup = ({ darkMode }) => {
   const handleBack = () => {
     navigate(-1);
   };
+
+  const providers = [
+    {
+      id: 'google_drive',
+      name: 'Google Drive',
+      icon: '📄',
+      description: t('cloud.google_drive_description', 'Store your CVs in Google Drive'),
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-700',
+      benefits: [
+        t('cloud.15gb_free_storage', '15GB free storage'),
+        t('cloud.automatic_sync', 'Automatic sync across devices'),
+        t('cloud.google_ecosystem', 'Integrates with Google ecosystem')
+      ]
+    },
+    {
+      id: 'onedrive',
+      name: 'OneDrive',
+      icon: '☁️',
+      description: t('cloud.onedrive_description', 'Store your CVs in Microsoft OneDrive'),
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50',
+      textColor: 'text-purple-700',
+      benefits: [
+        t('cloud.5gb_free_storage', '5GB free storage'),
+        t('cloud.office_integration', 'Office 365 integration'),
+        t('cloud.microsoft_ecosystem', 'Works with Microsoft ecosystem')
+      ]
+    }
+  ];
+
+  const selectedProviderData = providers.find(p => p.id === selectedProvider);
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-purple-50'} py-12 px-4`}>
@@ -34,6 +67,55 @@ const CloudSetup = ({ darkMode }) => {
           </h1>
         </div>
 
+        {/* Provider Selection */}
+        <div className="mb-8">
+          <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+            {t('cloud.choose_provider', 'Choose Your Cloud Provider')}
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            {providers.map((provider) => (
+              <div
+                key={provider.id}
+                onClick={() => setSelectedProvider(provider.id)}
+                className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  selectedProvider === provider.id
+                    ? `border-transparent bg-gradient-to-r ${provider.color} text-white shadow-lg`
+                    : darkMode
+                      ? 'border-gray-600 bg-gray-800 hover:border-gray-500 text-gray-300'
+                      : `border-gray-200 bg-white hover:border-gray-300 text-gray-700 hover:${provider.bgColor}`
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">{provider.icon}</span>
+                  <div>
+                    <h3 className="font-semibold">{provider.name}</h3>
+                    <p className={`text-sm ${
+                      selectedProvider === provider.id 
+                        ? 'text-white/80' 
+                        : darkMode 
+                          ? 'text-gray-400' 
+                          : 'text-gray-600'
+                    }`}>
+                      {provider.description}
+                    </p>
+                  </div>
+                </div>
+                {selectedProvider === provider.id && (
+                  <div className="mt-3 space-y-1">
+                    {provider.benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-center text-sm">
+                        <CheckCircle className="w-4 h-4 mr-2 text-white/80" />
+                        <span className="text-white/90">{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Main Content */}
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left Side - Information */}
@@ -43,16 +125,16 @@ const CloudSetup = ({ darkMode }) => {
             <h2 className={`text-xl font-semibold mb-4 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              {t('cloud.save_to_google_drive')}
+              {t('cloud.save_to_provider', { provider: selectedProviderData?.name || 'Cloud Storage' })}
             </h2>
             
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className={`p-2 rounded-lg mr-4 ${
-                  darkMode ? 'bg-blue-900/30' : 'bg-blue-100'
+                  darkMode ? 'bg-blue-900/30' : selectedProviderData?.bgColor || 'bg-blue-100'
                 }`}>
                   <Cloud className={`w-5 h-5 ${
-                    darkMode ? 'text-blue-400' : 'text-blue-600'
+                    darkMode ? 'text-blue-400' : selectedProviderData?.textColor || 'text-blue-600'
                   }`} />
                 </div>
                 <div>
@@ -108,29 +190,40 @@ const CloudSetup = ({ darkMode }) => {
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    {t('cloud.data_stays_in_your_drive')}
+                    {t('cloud.data_stays_in_your_provider', { provider: selectedProviderData?.name })}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className={`mt-6 p-4 rounded-lg ${
-              darkMode ? 'bg-blue-900/20 border border-blue-700' : 'bg-blue-50 border border-blue-200'
+              darkMode 
+                ? `bg-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-900/20 border border-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-700` 
+                : `${selectedProviderData?.bgColor} border border-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-200`
             }`}>
               <div className="flex items-start">
                 <CheckCircle className={`w-5 h-5 mt-0.5 mr-3 ${
-                  darkMode ? 'text-blue-400' : 'text-blue-600'
+                  darkMode 
+                    ? `text-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-400` 
+                    : selectedProviderData?.textColor
                 }`} />
                 <div>
                   <p className={`text-sm font-medium ${
-                    darkMode ? 'text-blue-300' : 'text-blue-700'
+                    darkMode 
+                      ? `text-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-300` 
+                      : selectedProviderData?.textColor
                   }`}>
-                    {t('cloud.why_google_drive')}
+                    {t('cloud.why_provider', { provider: selectedProviderData?.name })}
                   </p>
                   <p className={`text-sm mt-1 ${
-                    darkMode ? 'text-blue-400' : 'text-blue-600'
+                    darkMode 
+                      ? `text-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-400` 
+                      : selectedProviderData?.textColor?.replace('700', '600')
                   }`}>
-                    {t('cloud.google_drive_benefits')}
+                    {selectedProvider === 'onedrive' 
+                      ? t('cloud.onedrive_benefits', 'Reliable Microsoft cloud storage with Office integration')
+                      : t('cloud.google_drive_benefits', 'Reliable cloud storage with excellent integration')
+                    }
                   </p>
                 </div>
               </div>
@@ -139,7 +232,7 @@ const CloudSetup = ({ darkMode }) => {
 
           {/* Right Side - Connection */}
           <div>
-            <SimpleCloudConnect darkMode={darkMode} />
+            <SimpleCloudConnect darkMode={darkMode} selectedProvider={selectedProvider} />
             
             {/* Local Storage Info */}
             <div className={`mt-6 p-6 rounded-xl ${

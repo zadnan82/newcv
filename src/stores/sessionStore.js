@@ -1,8 +1,8 @@
-// src/stores/sessionStore.js - Fixed version with proper Google Drive CV loading
-
+// src/stores/sessionStore.js - Updated for multi-provider support
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { API_BASE_URL, checkBackendAvailability, GOOGLE_DRIVE_ENDPOINTS } from '../config';
+import { API_BASE_URL, checkBackendAvailability } from '../config';
+import cloudProviderService from '../services/cloudProviderService';
 
 let globalInitialized = false;
 
@@ -14,15 +14,18 @@ const useSessionStore = create(
       sessionToken: null,
       isSessionActive: false,
       
-      // Google Drive connection state - SIMPLIFIED
-      connectedProviders: [],
+      // Multi-provider state
+      connectedProviders: [], // Array of connected provider names
+      providerStatuses: {}, // Object with provider status details
+      
+      // Backward compatibility
       googleDriveConnected: false,
       googleDriveStatus: null,
       
       // Local storage
       localCVs: [],
       
-      // Capabilities - for backward compatibility
+      // Capabilities
       capabilities: {
         canBuildLocally: true,
         canSaveLocally: true,
@@ -38,9 +41,428 @@ const useSessionStore = create(
       initializing: false,
       backendAvailable: false,
 
+      // ================== MULTI-PROVIDER METHODS ==================
+
+      // In sessionStore.js - update the connectToCloudProvider method
+connectToCloudProvider: async (provider) => {
+  console.log(`🔗 Connecting to ${provider}...`);
+  set({ loading: true, error: null });
+  
+  try {
+    // Ensure we have a session
+    await get().createOrRestoreSession();
+    
+    // Set session token in service
+    cloudProviderService.setSessionToken(get().sessionToken);
+    
+    // Use the unified service (this already uses correct endpoints)
+    await cloudProviderService.connectToProvider(provider);
+    
+    return true;
+  } catch (error) {
+    console.error(`❌ ${provider} connection error:`, error);
+    set({ error: error.message, loading: false });
+    throw error;
+  }
+},
+
+      // In sessionStore.js - update checkAllProviderStatuses
+checkAllProviderStatuses: async () => {
+  const { sessionToken } = get();
+  
+  if (!sessionToken) {
+    return {};
+  }
+
+  cloudProviderService.setSessionToken(sessionToken);
+  
+  const availableProviders = cloudProviderService.getAvailableProviders();
+  const statuses = {};
+  const connectedProviders = [];
+  
+  for (const provider of availableProviders) {
+    try {
+      // This uses the correct provider-specific endpoints
+      const status = await cloudProviderService.checkProviderStatus(provider);
+      statuses[provider] = status;
+      
+      if (status.connected) {
+        connectedProviders.push(provider);
+      }
+    } catch (error) {
+      console.warn(`Failed to check ${provider} status:`, error);
+      statuses[provider] = { connected: false, provider, error: error.message };
+    }
+  }
+
+  // Update state
+  set({
+    connectedProviders,
+    providerStatuses: statuses,
+    googleDriveConnected: connectedProviders.includes('google_drive'),
+    googleDriveStatus: statuses.google_drive || null,
+    capabilities: {
+      ...get().capabilities,
+      canSaveToCloud: connectedProviders.length > 0,
+      canAccessSavedCVs: get().localCVs.length > 0 || connectedProviders.length > 0,
+      canSyncAcrossDevices: connectedProviders.length > 0
+    }
+  });
+
+  return statuses;
+},
+
+
+      // In sessionStore.js - make sure this method uses the provider parameter
+handleOAuthReturn: async (provider) => {
+  console.log(`✅ Handling ${provider} OAuth return`); // Should log "onedrive" not "google_drive"
+  
+  try {
+    set({ loading: true });
+    
+    // Give backend a moment to process
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Check all provider statuses (this should call the right endpoints)
+    await get().checkAllProviderStatuses();
+    
+    const { connectedProviders, providerStatuses } = get();
+    
+    if (connectedProviders.includes(provider)) {
+      const status = providerStatuses[provider];
+      
+      set({ loading: false, error: null });
+      
+      return { 
+        success: true, 
+        provider,
+        message: `Successfully connected to ${provider}`,
+        email: status.email
+      };
+    } else {
+      throw new Error(`${provider} connection verification failed`);
+    }
+    
+  } catch (error) {
+    console.error(`❌ ${provider} OAuth return handling failed:`, error);
+    set({ 
+      loading: false, 
+      error: `Failed to verify ${provider} connection: ${error.message}` 
+    });
+    return { success: false, error: error.message };
+  }
+},
+
+      // Disconnect from specific provider
+      disconnectFromProvider: async (provider) => {
+        try {
+          console.log(`🔓 Disconnecting from ${provider}...`);
+          
+          cloudProviderService.setSessionToken(get().sessionToken);
+          await cloudProviderService.disconnectFromProvider(provider);
+          
+          // Update state
+          const { connectedProviders, providerStatuses } = get();
+          const updatedProviders = connectedProviders.filter(p => p !== provider);
+          const updatedStatuses = { ...providerStatuses };
+          updatedStatuses[provider] = { connected: false, provider };
+          
+          set({
+            connectedProviders: updatedProviders,
+            providerStatuses: updatedStatuses,
+            // Backward compatibility
+            googleDriveConnected: updatedProviders.includes('google_drive'),
+            googleDriveStatus: provider === 'google_drive' ? null : get().googleDriveStatus,
+            capabilities: {
+              ...get().capabilities,
+              canSaveToCloud: updatedProviders.length > 0,
+              canAccessSavedCVs: get().localCVs.length > 0 || updatedProviders.length > 0,
+              canSyncAcrossDevices: updatedProviders.length > 0
+            }
+          });
+          
+          console.log(`✅ ${provider} disconnected successfully`);
+          return true;
+        } catch (error) {
+          console.error(`❌ ${provider} disconnect failed:`, error);
+          throw error;
+        }
+      },
+
+      // ================== UNIFIED CV OPERATIONS ==================
+
+      // Save CV to any connected provider (or specific provider)
+      saveToConnectedCloud: async (cvData, preferredProvider = null) => {
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!sessionToken) {
+          return { 
+            success: false, 
+            error: 'Session expired. Please reconnect.' 
+          };
+        }
+
+        if (connectedProviders.length === 0) {
+          return {
+            success: false,
+            error: 'No cloud providers connected. Please connect first.',
+            needsConnection: true
+          };
+        }
+
+        // Determine which provider to use
+        let targetProvider = preferredProvider;
+        if (!targetProvider || !connectedProviders.includes(targetProvider)) {
+          // Use first connected provider as fallback
+          targetProvider = connectedProviders[0];
+        }
+
+        console.log(`💾 Saving CV to ${targetProvider}...`);
+
+        try {
+          set({ loading: true, error: null });
+          
+          cloudProviderService.setSessionToken(sessionToken);
+          
+          // Clean the data before sending
+          const cleanedData = get().cleanCVDataForAPI(cvData);
+          
+          const result = await cloudProviderService.saveCVToProvider(targetProvider, cleanedData);
+          
+          set({ loading: false });
+          
+          return {
+            success: true,
+            provider: targetProvider,
+            fileId: result.file_id,
+            message: result.message || `CV saved to ${cloudProviderService.getProviderConfig(targetProvider).name} successfully`
+          };
+
+        } catch (error) {
+          console.error(`❌ Save to ${targetProvider} failed:`, error);
+          set({ loading: false, error: error.message });
+          
+          return { 
+            success: false, 
+            error: error.message,
+            provider: targetProvider
+          };
+        }
+      },
+
+      // Update CV in specific provider
+      updateConnectedCloudCV: async (cvData, fileId, provider) => {
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!sessionToken) {
+          return { 
+            success: false, 
+            error: 'Session expired. Please reconnect.' 
+          };
+        }
+
+        if (!connectedProviders.includes(provider)) {
+          return {
+            success: false,
+            error: `${cloudProviderService.getProviderConfig(provider).name} not connected. Please connect first.`,
+            needsConnection: true
+          };
+        }
+
+        if (!fileId) {
+          return {
+            success: false,
+            error: 'File ID is required for updates'
+          };
+        }
+
+        console.log(`🔄 Updating CV in ${provider}...`, { fileId, title: cvData.title });
+
+        try {
+          cloudProviderService.setSessionToken(sessionToken);
+          
+          const result = await cloudProviderService.updateCVInProvider(provider, fileId, cvData);
+          
+          return {
+            success: true,
+            file_id: result.file_id || fileId,
+            message: result.message || `CV updated in ${cloudProviderService.getProviderConfig(provider).name} successfully`,
+            provider
+          };
+
+        } catch (error) {
+          console.error(`❌ Update to ${provider} failed:`, error);
+          return {
+            success: false,
+            error: error.message,
+            provider
+          };
+        }
+      },
+
+      // List CVs from all connected providers
+      listAllCloudCVs: async () => {
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!sessionToken || connectedProviders.length === 0) {
+          return [];
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        
+        const allCVs = [];
+        
+        for (const provider of connectedProviders) {
+          try {
+            const files = await cloudProviderService.listCVsFromProvider(provider);
+            allCVs.push(...files);
+          } catch (error) {
+            console.error(`Failed to list CVs from ${provider}:`, error);
+            // Continue with other providers
+          }
+        }
+        
+        return allCVs;
+      },
+
+      // List CVs from specific provider
+      listCVsFromProvider: async (provider) => {
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!sessionToken) {
+          throw new Error('No session token available');
+        }
+
+        if (!connectedProviders.includes(provider)) {
+          throw new Error(`${provider} not connected`);
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        return await cloudProviderService.listCVsFromProvider(provider);
+      },
+
+      // Load CV from specific provider
+      loadCVFromProvider: async (provider, fileId) => {
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!sessionToken) {
+          throw new Error('No session token available');
+        }
+
+        if (!connectedProviders.includes(provider)) {
+          throw new Error(`${provider} not connected`);
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        return await cloudProviderService.loadCVFromProvider(provider, fileId);
+      },
+
+      // Delete CV from specific provider
+      deleteCVFromProvider: async (provider, fileId) => {
+        const { connectedProviders, sessionToken } = get();
+        
+        if (!sessionToken) {
+          throw new Error('No session token available');
+        }
+
+        if (!connectedProviders.includes(provider)) {
+          throw new Error(`${provider} not connected`);
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        return await cloudProviderService.deleteCVFromProvider(provider, fileId);
+      },
+
+      // ================== BACKWARD COMPATIBILITY METHODS ==================
+      
+      // Legacy Google Drive methods (for backward compatibility)
+      listGoogleDriveCVs: async () => {
+        return await get().listCVsFromProvider('google_drive');
+      },
+
+      loadGoogleDriveCV: async (fileId) => {
+        return await get().loadCVFromProvider('google_drive', fileId);
+      },
+
+      deleteGoogleDriveCV: async (fileId) => {
+        return await get().deleteCVFromProvider('google_drive', fileId);
+      },
+
+      disconnectGoogleDrive: async () => {
+        return await get().disconnectFromProvider('google_drive');
+      },
+
+      checkGoogleDriveStatus: async () => {
+        const { sessionToken } = get();
+        
+        if (!sessionToken) {
+          return { connected: false, provider: 'google_drive' };
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        return await cloudProviderService.checkProviderStatus('google_drive');
+      },
+
+      getGoogleDriveDebugInfo: async () => {
+        const { sessionToken } = get();
+        
+        if (!sessionToken) {
+          throw new Error('No session token available');
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        return await cloudProviderService.getProviderDebugInfo('google_drive');
+      },
+
+      testMinimalSave: async (provider = 'google_drive') => {
+        const { sessionToken } = get();
+        
+        if (!sessionToken) {
+          throw new Error('No session token available');
+        }
+
+        cloudProviderService.setSessionToken(sessionToken);
+        return await cloudProviderService.testMinimalSave(provider);
+      },
+
+      // ================== PROVIDER PREFERENCE METHODS ==================
+
+      getPreferredProvider: () => {
+        const { connectedProviders } = get();
+        
+        // Check user preference
+        const storedPreference = localStorage.getItem('preferred_cv_provider');
+        if (storedPreference && connectedProviders.includes(storedPreference)) {
+          return storedPreference;
+        }
+        
+        // Fallback to first connected provider
+        if (connectedProviders.length > 0) {
+          return connectedProviders[0];
+        }
+        
+        // Final fallback to local
+        return 'local';
+      },
+
+      setPreferredProvider: (provider) => {
+        const { connectedProviders } = get();
+        
+        if (provider === 'local' || connectedProviders.includes(provider)) {
+          localStorage.setItem('preferred_cv_provider', provider);
+          return true;
+        }
+        
+        console.warn(`Cannot set ${provider} as preferred - not connected`);
+        return false;
+      },
+
+      getStoredPreferredProvider: () => {
+        return localStorage.getItem('preferred_cv_provider') || 'local';
+      },
+
       // ================== HELPER METHODS ==================
       
-      // Helper methods with comprehensive validation and formatting
       cleanCVDataForAPI: (cvData) => {
         console.log('🧹 Cleaning CV data for API...');
         const cleaned = JSON.parse(JSON.stringify(cvData)); // Deep clone
@@ -182,576 +604,6 @@ const useSessionStore = create(
         return cleaned;
       },
 
-      // ================== GOOGLE DRIVE CONNECTION ==================
-      
-      // Connect to Google Drive (simplified)
-      connectToCloudProvider: async (provider) => {
-        if (provider !== 'google_drive') {
-          throw new Error('Only Google Drive is currently supported');
-        }
-        
-        console.log('🔗 Connecting to Google Drive...');
-        set({ loading: true, error: null });
-        
-        try {
-          // Ensure we have a session
-          await get().createOrRestoreSession();
-          
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.CONNECT, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${get().sessionToken}`
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log('🔗 Got Google Drive OAuth URL, redirecting...');
-            
-            // Store simple context for return
-            localStorage.setItem('oauth_return_context', JSON.stringify({
-              provider: 'google_drive',
-              action: 'connect_only',
-              timestamp: Date.now()
-            }));
-            
-            // Redirect to OAuth
-            window.location.href = data.auth_url;
-            return true;
-          } else {
-            const errorText = await response.text();
-            throw new Error(`Connection failed: ${errorText}`);
-          }
-        } catch (error) {
-          console.error('❌ Google Drive connection error:', error);
-          set({ error: error.message, loading: false });
-          throw error;
-        }
-      },
-
-      // Handle successful OAuth return for Google Drive
-      handleOAuthReturn: async (provider) => {
-        if (provider !== 'google_drive') {
-          throw new Error('Only Google Drive is currently supported');
-        }
-        
-        console.log('✅ Handling Google Drive OAuth return');
-        
-        try {
-          set({ loading: true });
-          
-          // Give backend a moment to process the OAuth
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Check Google Drive status
-          const status = await get().checkGoogleDriveStatus();
-          
-          if (status.connected) {
-            // Update state with successful connection
-            set({
-              connectedProviders: ['google_drive'],
-              googleDriveConnected: true,
-              googleDriveStatus: status,
-              capabilities: {
-                canBuildLocally: true,
-                canSaveLocally: true,
-                canSaveToCloud: true,
-                canAccessSavedCVs: true,
-                canSyncAcrossDevices: true
-              },
-              loading: false,
-              error: null
-            });
-            
-            // Clear OAuth context
-            localStorage.removeItem('oauth_return_context');
-            
-            console.log('✅ Google Drive connection verified and saved');
-            return { 
-              success: true, 
-              provider: 'google_drive',
-              message: 'Successfully connected to Google Drive',
-              email: status.email
-            };
-          } else {
-            throw new Error('Google Drive connection verification failed');
-          }
-          
-        } catch (error) {
-          console.error('❌ Google Drive OAuth return handling failed:', error);
-          set({ 
-            loading: false, 
-            error: `Failed to verify Google Drive connection: ${error.message}` 
-          });
-          return { success: false, error: error.message };
-        }
-      },
-
-      // Check Google Drive status
-      checkGoogleDriveStatus: async () => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          return { connected: false, provider: 'google_drive' };
-        }
-
-        try {
-          console.log('🔍 Checking Google Drive status...');
-          
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.STATUS, {
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
-          });
-
-          if (response.ok) {
-            const status = await response.json();
-            console.log('🔍 Google Drive status:', status);
-            return status;
-          } else {
-            console.error('❌ Google Drive status check failed:', response.status);
-            return { connected: false, provider: 'google_drive' };
-          }
-        } catch (error) {
-          console.error('❌ Google Drive status check error:', error);
-          return { connected: false, provider: 'google_drive' };
-        }
-      },
-
-      // ================== GOOGLE DRIVE CV OPERATIONS ==================
-
-
-
-   updateConnectedCloudCV: async (cvData, fileId, provider = 'google_drive') => {
-  const { connectedProviders, sessionToken } = get();
-  
-  // Validate session token first
-  if (!sessionToken) {
-    return { 
-      success: false, 
-      error: 'Session expired. Please reconnect.' 
-    };
-  }
-
-  // Check if provider is connected
-  if (!connectedProviders.includes(provider)) {
-    return {
-      success: false,
-      error: `${provider.replace('_', ' ').toUpperCase()} not connected. Please connect first.`,
-      needsConnection: true
-    };
-  }
-
-  // Validate required parameters
-  if (!fileId) {
-    return {
-      success: false,
-      error: 'File ID is required for updates'
-    };
-  }
-
-  if (!cvData || Object.keys(cvData).length === 0) {
-    return {
-      success: false,
-      error: 'CV data is required for updates'
-    };
-  }
-
-  console.log(`🔄 Updating CV in ${provider}...`, { fileId, title: cvData.title });
-
-  try {
-     if (provider === 'google_drive') {
-    // FIXED: Call the UPDATE function with fileId
-    const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.UPDATE(fileId), {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`
-      },
-      body: JSON.stringify(cvData)
-    });
-
-      // Handle non-OK responses
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { error: `HTTP error ${response.status}: ${response.statusText}` };
-        }
-        throw new Error(errorData.error || 'Failed to update CV in Google Drive');
-      }
-
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Google Drive update failed');
-      }
-
-      return {
-        success: true,
-        file_id: result.file_id || fileId,
-        message: result.message || 'CV updated in Google Drive successfully',
-        provider: 'google_drive'
-      };
-    }
-
-    throw new Error(`Update not supported for provider: ${provider}`);
-
-  } catch (error) {
-    console.error('❌ Update to connected cloud failed:', error);
-    return {
-      success: false,
-      error: error.message,
-      provider
-    };
-  }
-},
-
-
-      saveToConnectedCloud: async (cvData, provider = 'google_drive') => {
-        if (provider !== 'google_drive') {
-          return {
-            success: false,
-            error: 'Only Google Drive is currently supported',
-            needsConnection: true
-          };
-        }
-        
-        console.log('💾 Saving to Google Drive...');
-        
-        const { connectedProviders, sessionToken } = get();
-        
-        if (!connectedProviders.includes('google_drive')) {
-          return {
-            success: false,
-            error: 'Google Drive not connected. Please connect first.',
-            needsConnection: true
-          };
-        }
-
-        if (!sessionToken) {
-          return { 
-            success: false, 
-            error: 'Session expired. Please reconnect.' 
-          };
-        }
-
-        try {
-          set({ loading: true, error: null });
-          
-          // Clean the data before sending
-          const cleanedData = get().cleanCVDataForAPI(cvData);
-          
-          // Check data size before sending
-          const dataSize = JSON.stringify(cleanedData).length;
-          const dataSizeKB = (dataSize / 1024).toFixed(1);
-          
-          console.log('💾 Sending cleaned CV to Google Drive API...');
-          console.log(`📊 Final CV data size: ${dataSizeKB}KB (${dataSize} bytes)`);
-
-          // Add timeout handling - increased to 90 seconds
-          const controller = new AbortController();
-          
-          const timeoutId = setTimeout(() => {
-            console.error('⏰ Request timed out after 90 seconds');
-            controller.abort();
-          }, 90000);
-
-          const startTime = Date.now();
-          console.log('🚀 Starting fetch request at:', new Date().toISOString());
-
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${sessionToken}`,
-            },
-            body: JSON.stringify(cleanedData),
-            signal: controller.signal
-          });
-
-          clearTimeout(timeoutId);
-          
-          const endTime = Date.now();
-          const duration = ((endTime - startTime) / 1000).toFixed(2);
-          console.log(`📊 Request completed in ${duration} seconds`);
-
-          if (response.ok) {
-            const responseText = await response.text();
-            
-            let result;
-            try {
-              result = JSON.parse(responseText);
-            } catch (parseError) {
-              console.error('❌ Failed to parse JSON response:', parseError);
-              throw new Error('Invalid response from server');
-            }
-            
-            console.log('✅ Google Drive save successful:', result);
-            
-            set({ loading: false });
-            
-            return {
-              success: true,
-              provider: 'google_drive',
-              fileId: result.file_id,
-              message: result.message || 'CV saved to Google Drive successfully'
-            };
-          } else {
-            const responseText = await response.text();
-            console.error('❌ Google Drive save failed:', response.status, responseText);
-            
-            set({ loading: false });
-            
-            let errorMessage = `Save failed: ${response.status}`;
-            
-            try {
-              const errorData = JSON.parse(responseText);
-              errorMessage = errorData.detail || errorData.message || errorMessage;
-            } catch (e) {
-              if (responseText.includes('504 Gateway Time-out')) {
-                errorMessage = 'Request timed out. The file might be too large. Try with a smaller image.';
-              } else if (responseText.includes('413 Request Entity Too Large')) {
-                errorMessage = 'File too large. Please use a smaller image.';
-              } else if (responseText.includes('502 Bad Gateway')) {
-                errorMessage = 'Server temporarily unavailable. Please try again in a moment.';
-              } else {
-                errorMessage = responseText || errorMessage;
-              }
-            }
-            
-            return { 
-              success: false, 
-              error: errorMessage 
-            };
-          }
-          
-        } catch (error) {
-          console.error('❌ Google Drive save error:', error);
-          set({ loading: false, error: error.message });
-          
-          // Handle specific error types
-          if (error.name === 'AbortError') {
-            const dataSize = JSON.stringify(cvData).length;
-            const sizeKB = (dataSize / 1024).toFixed(1);
-            
-            let message = `Request timed out after 90 seconds (CV size: ${sizeKB}KB).`;
-            
-            if (dataSize > 500000) {
-              message += ' Your CV appears to have large image data. Try compressing or removing the photo, or use a smaller image.';
-            } else if (dataSize > 100000) {
-              message += ' Try reducing the image size or check your internet connection.';
-            } else {
-              message += ' This might be due to a slow connection or server issue. Please try again.';
-            }
-            
-            return { 
-              success: false, 
-              error: message 
-            };
-          }
-          
-          return { 
-            success: false, 
-            error: `Save failed: ${error.message}` 
-          };
-        }
-      },
-
-      // FIXED: List CVs from Google Drive - using config endpoints
-      listGoogleDriveCVs: async () => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          throw new Error('No session token available');
-        }
-
-        try {
-          console.log('📋 Listing CVs from Google Drive...');
-          
-          // Use the predefined endpoint from config.js
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.LIST, {
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('📋 Google Drive API response:', result);
-            
-            // Handle the response structure properly
-            let files = [];
-            
-            if (result.files && Array.isArray(result.files)) {
-              // If result has a files property with an array
-              files = result.files;
-            } else if (Array.isArray(result)) {
-              // If result is directly an array
-              files = result;
-            } else {
-              console.warn('⚠️ Unexpected Google Drive API response structure:', result);
-              files = [];
-            }
-            
-            console.log(`📋 Extracted ${files.length} Google Drive files:`, files);
-            
-            return files; // Return just the files array
-          } else {
-            const errorText = await response.text();
-            console.error('❌ Google Drive list API error:', response.status, errorText);
-            throw new Error(`List failed: ${errorText}`);
-          }
-        } catch (error) {
-          console.error('❌ Google Drive list failed:', error);
-          throw error;
-        }
-      },
-
-      // Load CV from Google Drive - using config endpoints  
-      loadGoogleDriveCV: async (fileId) => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          throw new Error('No session token available');
-        }
-
-        try {
-          console.log('📥 Loading CV from Google Drive:', fileId);
-          
-          // Use the predefined endpoint from config.js
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.LOAD(fileId), {
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('📥 Google Drive CV load response:', result);
-            
-            // The backend returns: {"success": True, "provider": "google_drive", "cv_data": response_data}
-            if (result.success && result.cv_data) {
-              console.log(`✅ Successfully loaded CV from Google Drive: ${fileId}`);
-              return result.cv_data; // Return just the CV data
-            } else {
-              console.error('❌ Invalid response structure from Google Drive load:', result);
-              return null;
-            }
-          } else {
-            const errorText = await response.text();
-            console.error('❌ Google Drive load failed:', response.status, errorText);
-            throw new Error(`Load failed: ${response.status} - ${errorText}`);
-          }
-        } catch (error) {
-          console.error('❌ Google Drive load error:', error);
-          throw error;
-        }
-      },
-
-      // Delete CV from Google Drive - using config endpoints
-      deleteGoogleDriveCV: async (fileId) => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          throw new Error('No session token available');
-        }
-
-        try {
-          console.log('🗑️ Deleting CV from Google Drive:', fileId);
-          
-          // Use the predefined endpoint from config.js
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.DELETE(fileId), {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('✅ Google Drive delete successful:', result);
-            return result;
-          } else {
-            const errorText = await response.text();
-            throw new Error(`Delete failed: ${errorText}`);
-          }
-        } catch (error) {
-          console.error('❌ Google Drive delete failed:', error);
-          throw error;
-        }
-      },
-
-      // Disconnect Google Drive - using config endpoints
-      disconnectGoogleDrive: async () => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          throw new Error('No session token available');
-        }
-
-        try {
-          console.log('🔓 Disconnecting Google Drive...');
-          
-          // Use the predefined endpoint from config.js
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.DISCONNECT, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('✅ Google Drive disconnected:', result);
-            
-            // Update state
-            set({
-              connectedProviders: [],
-              googleDriveConnected: false,
-              googleDriveStatus: null,
-              capabilities: {
-                canBuildLocally: true,
-                canSaveLocally: true,
-                canSaveToCloud: false,
-                canAccessSavedCVs: get().localCVs.length > 0,
-                canSyncAcrossDevices: false
-              }
-            });
-            
-            return result;
-          } else {
-            const errorText = await response.text();
-            throw new Error(`Disconnect failed: ${errorText}`);
-          }
-        } catch (error) {
-          console.error('❌ Google Drive disconnect failed:', error);
-          throw error;
-        }
-      },
-
-      // Get debug info - using config endpoints
-      getGoogleDriveDebugInfo: async () => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          throw new Error('No session token available');
-        }
-
-        try {
-          console.log('🐛 Getting Google Drive debug info...');
-          
-          // Use the predefined endpoint from config.js
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.DEBUG, {
-            headers: { 'Authorization': `Bearer ${sessionToken}` }
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('🐛 Google Drive debug info:', result);
-            return result;
-          } else {
-            const errorText = await response.text();
-            throw new Error(`Debug failed: ${errorText}`);
-          }
-        } catch (error) {
-          console.error('❌ Google Drive debug failed:', error);
-          throw error;
-        }
-      },
-
       // ================== SESSION MANAGEMENT ==================
       
       createOrRestoreSession: async () => {
@@ -778,62 +630,6 @@ const useSessionStore = create(
         } catch (error) {
           console.error('Session creation failed:', error);
           return { success: false };
-        }
-      },
-
-      // Test Google Drive connection with minimal data - using config endpoints
-      testMinimalSave: async () => {
-        const { sessionToken } = get();
-        
-        if (!sessionToken) {
-          throw new Error('No session token available');
-        }
-
-        try {
-          console.log('🧪 Testing minimal save to Google Drive...');
-          
-          // Create minimal test CV
-          const testCV = {
-            title: "Test CV",
-            is_public: false,
-            personal_info: {
-              full_name: "Test User"
-            },
-            educations: [],
-            experiences: [],
-            skills: [],
-            languages: [],
-            referrals: [],
-            custom_sections: [],
-            extracurriculars: [],
-            hobbies: [],
-            courses: [],
-            internships: [],
-            photo: { photolink: null }
-          };
-          
-          // Use the predefined endpoint from config.js
-          const response = await fetch(GOOGLE_DRIVE_ENDPOINTS.SAVE, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${sessionToken}`,
-            },
-            body: JSON.stringify(testCV)
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('✅ Minimal save test successful:', result);
-            return { success: true, result };
-          } else {
-            const errorText = await response.text();
-            console.error('❌ Minimal save test failed:', response.status, errorText);
-            return { success: false, error: errorText };
-          }
-        } catch (error) {
-          console.error('❌ Minimal save test error:', error);
-          return { success: false, error: error.message };
         }
       },
 
@@ -914,23 +710,21 @@ const useSessionStore = create(
           const localCVs = get().loadLocalCVs();
           
           let connectedProviders = [];
-          let googleDriveConnected = false;
-          let googleDriveStatus = null;
+          let providerStatuses = {};
           
           if (backendAvailable) {
             try {
               const sessionResult = await get().createOrRestoreSession();
               
               if (sessionResult.success) {
-                const status = await get().checkGoogleDriveStatus();
-                if (status.connected) {
-                  connectedProviders = ['google_drive'];
-                  googleDriveConnected = true;
-                  googleDriveStatus = status;
-                }
+                // Check all provider statuses
+                providerStatuses = await get().checkAllProviderStatuses();
+                connectedProviders = Object.keys(providerStatuses).filter(
+                  provider => providerStatuses[provider].connected
+                );
               }
             } catch (error) {
-              console.warn('Google Drive initialization failed:', error.message);
+              console.warn('Provider initialization failed:', error.message);
             }
           }
           
@@ -938,14 +732,16 @@ const useSessionStore = create(
             backendAvailable,
             localCVs,
             connectedProviders,
-            googleDriveConnected,
-            googleDriveStatus,
+            providerStatuses,
+            // Backward compatibility
+            googleDriveConnected: connectedProviders.includes('google_drive'),
+            googleDriveStatus: providerStatuses.google_drive || null,
             capabilities: {
               canBuildLocally: true,
               canSaveLocally: true,
-              canSaveToCloud: googleDriveConnected,
-              canAccessSavedCVs: localCVs.length > 0 || googleDriveConnected,
-              canSyncAcrossDevices: googleDriveConnected
+              canSaveToCloud: connectedProviders.length > 0,
+              canAccessSavedCVs: localCVs.length > 0 || connectedProviders.length > 0,
+              canSyncAcrossDevices: connectedProviders.length > 0
             },
             loading: false,
             initializing: false,
@@ -953,6 +749,7 @@ const useSessionStore = create(
           });
           
           console.log('✅ Session store initialized successfully');
+          console.log('📊 Connected providers:', connectedProviders);
           return true;
           
         } catch (error) {
@@ -961,6 +758,7 @@ const useSessionStore = create(
             backendAvailable: false,
             localCVs: get().loadLocalCVs(),
             connectedProviders: [],
+            providerStatuses: {},
             googleDriveConnected: false,
             googleDriveStatus: null,
             loading: false,
@@ -971,45 +769,30 @@ const useSessionStore = create(
         }
       },
 
- 
-// ================== PROVIDER PREFERENCE METHODS ==================
-
-getPreferredProvider: () => {
-  const { connectedProviders, googleDriveConnected } = get();
-  
-  // Return the preferred provider for CV operations
-  if (googleDriveConnected && connectedProviders.includes('google_drive')) {
-    return 'google_drive';
-  }
-  
-  // Fallback to local storage
-  return 'local';
-},
-
-setPreferredProvider: (provider) => {
-  // For now, this is mainly for future extensibility
-  // We could store user preference in localStorage
-  if (provider === 'google_drive' && !get().canSaveToCloud()) {
-    console.warn('Cannot set Google Drive as preferred - not connected');
-    return false;
-  }
-  
-  localStorage.setItem('preferred_cv_provider', provider);
-  return true;
-},
-
-getStoredPreferredProvider: () => {
-  return localStorage.getItem('preferred_cv_provider') || 'local';
-},
-
       // ================== UI HELPERS ==================
       
       clearError: () => set({ error: null }),
       setShowCloudSetup: (show) => set({ showCloudSetup: show }),
       
       // Capabilities
-      canSaveToCloud: () => get().googleDriveConnected,
-      hasCloudConnection: () => get().googleDriveConnected
+      canSaveToCloud: () => get().connectedProviders.length > 0,
+      hasCloudConnection: () => get().connectedProviders.length > 0,
+      hasConnectedProviders: () => get().connectedProviders.length > 0,
+      
+      // Get provider status
+      getProviderStatus: (provider) => {
+        return get().providerStatuses[provider] || { connected: false, provider };
+      },
+      
+      // Get all connected provider details
+      getConnectedProviderDetails: () => {
+        const { connectedProviders, providerStatuses } = get();
+        return connectedProviders.map(provider => ({
+          provider,
+          name: cloudProviderService.getProviderConfig(provider).name,
+          status: providerStatuses[provider]
+        }));
+      }
     }),
     {
       name: 'session-storage',
@@ -1017,6 +800,8 @@ getStoredPreferredProvider: () => {
         sessionId: state.sessionId,
         sessionToken: state.sessionToken,
         connectedProviders: state.connectedProviders,
+        providerStatuses: state.providerStatuses,
+        // Backward compatibility
         googleDriveConnected: state.googleDriveConnected,
         googleDriveStatus: state.googleDriveStatus,
         localCVs: state.localCVs

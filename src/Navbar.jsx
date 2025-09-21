@@ -1,7 +1,7 @@
-// src/Navbar.jsx - FIXED VERSION with proper translations
+// src/Navbar.jsx - FIXED VERSION with proper structure and OneDrive support
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom'; 
-import { Menu, X, Moon, Sun, User, FileText, Settings, LogOut, FileSignature, ChevronDown, Shield, MessageSquare, LogIn, Cloud, CloudOff } from 'lucide-react';
+import { Menu, X, Moon, Sun, FileText, LogOut, FileSignature, ChevronDown, Cloud, CloudOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from './assets/logo.png';
 import logo2 from './assets/logo2.png';
@@ -12,7 +12,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   const location = useLocation();
   const { t, i18n } = useTranslation(); 
   
-  // Updated to use session store
+  // Session store
   const { 
     isSessionActive, 
     connectedProviders,
@@ -22,14 +22,19 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     backendAvailable
   } = useSessionStore();
   
+  // Local state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showCloudStatus, setShowCloudStatus] = useState(false);
+  
+  // Refs
   const menuRef = useRef(null);
   const languageMenuRef = useRef(null);
   const cloudStatusRef = useRef(null);
+  
   const isRTL = i18n.dir() === 'rtl';
 
+  // Language change handler
   const changeLanguage = (langCode) => {
     i18n.changeLanguage(langCode);
     localStorage.setItem('preferredLanguage', langCode);
@@ -37,11 +42,8 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     setMobileMenuOpen(false);
   };
 
+  // Click outside handler
   useEffect(() => {
-    // Close mobile menu when route changes
-    setMobileMenuOpen(false);
-  
-    // Click outside to close menus
     const handleClickOutside = (event) => {
       if (languageMenuRef.current && !languageMenuRef.current.contains(event.target)) {
         setShowLanguageMenu(false);
@@ -50,15 +52,17 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         setShowCloudStatus(false);
       }
     };
-  
-    document.addEventListener('mousedown', handleClickOutside);
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
   }, [location]);
 
-  // Initialize session if not active and backend is available
+  // Initialize session if needed
   useEffect(() => {
     if (backendAvailable && !isSessionActive) {
       initialize().catch(console.error);
@@ -67,8 +71,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
 
   // Listen for cloud connection changes
   useEffect(() => {
-    const handleCloudConnected = (event) => {
-      // Refresh the navbar when cloud connections change
+    const handleCloudConnected = () => {
       console.log('Cloud connection changed, refreshing navbar state');
     };
 
@@ -76,6 +79,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     return () => window.removeEventListener('cloudConnected', handleCloudConnected);
   }, []);
 
+  // Navigation handlers
   const handleSignOut = async () => {
     try {
       await clearSession();
@@ -100,7 +104,6 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         console.error('Failed to initialize session:', error);
       }
     }
-    
     navigate('/my-resumes');
     setMobileMenuOpen(false);
   };
@@ -113,29 +116,28 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         console.error('Failed to initialize session:', error);
       }
     }
-    
     navigate('/cover-letters');
     setMobileMenuOpen(false);
   };
- 
- const isActive = (path) => {
-  if (path === '/') {
-    return location.pathname === '/';
-  }
-  
-  // Handle exact matches for similar paths
-  if (path === '/cover-letter') {
-    return location.pathname === '/cover-letter';
-  }
-  
-  if (path === '/cover-letters') {
-    return location.pathname.startsWith('/cover-letters');
-  }
-  
-  // Default behavior for other paths
-  return location.pathname.startsWith(path);
-};
- 
+
+  // Active route checker
+  const isActive = (path) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    
+    if (path === '/cover-letter') {
+      return location.pathname === '/cover-letter';
+    }
+    
+    if (path === '/cover-letters') {
+      return location.pathname.startsWith('/cover-letters');
+    }
+    
+    return location.pathname.startsWith(path);
+  };
+
+  // Language configuration
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'es', name: 'Español', flag: '🇪🇸' },
@@ -154,35 +156,61 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
-  // FIXED: Cloud status indicator component
+  // Cloud Status Indicator Component
   const CloudStatusIndicator = () => {
-    // Only show if backend is available
     if (!backendAvailable) return null;
 
     const cloudCount = connectedProviders?.length || 0;
     const hasProviders = cloudCount > 0;
 
-    // Google Drive specific icon
     const getProviderIcon = () => {
-      if (googleDriveConnected) {
+      const hasGoogleDrive = connectedProviders?.includes('google_drive') || googleDriveConnected;
+      const hasOneDrive = connectedProviders?.includes('onedrive');
+
+      if (hasGoogleDrive && hasOneDrive) {
+        return (
+          <div className="flex items-center space-x-1">
+            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
+            </svg>
+            <span className="text-xs">+</span>
+            <span className="text-xs">☁️</span>
+          </div>
+        );
+      } else if (hasGoogleDrive) {
         return (
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
           </svg>
         );
+      } else if (hasOneDrive) {
+        return <span className="text-xs">☁️</span>;
+      } else if (hasProviders) {
+        return <Cloud className="w-3 h-3" />;
       }
-      return hasProviders ? <Cloud className="w-3 h-3" /> : <CloudOff className="w-3 h-3" />;
+      return <CloudOff className="w-3 h-3" />;
     };
 
     const getStatusText = () => {
-      if (googleDriveConnected) return t('cloud.google_drive');
-      if (hasProviders) return t('cloud.connected_count', { count: cloudCount });
-      return t('cloud.no_cloud');
+      const hasGoogleDrive = connectedProviders?.includes('google_drive') || googleDriveConnected;
+      const hasOneDrive = connectedProviders?.includes('onedrive');
+
+      if (hasGoogleDrive && hasOneDrive) {
+        return t('cloud.multiple_providers', 'Multiple providers');
+      } else if (hasGoogleDrive) {
+        return t('cloud.google_drive', 'Google Drive');
+      } else if (hasOneDrive) {
+        return t('cloud.onedrive', 'OneDrive');
+      } else if (hasProviders) {
+        return t('cloud.connected_count', { count: cloudCount });
+      }
+      return t('cloud.no_cloud', 'No cloud');
     };
 
     const getStatusColor = () => {
-      if (googleDriveConnected) return darkMode ? 'text-green-400 hover:bg-green-800/20' : 'text-green-700 hover:bg-green-100';
-      if (hasProviders) return darkMode ? 'text-blue-400 hover:bg-blue-800/20' : 'text-blue-700 hover:bg-blue-100';
+      if (hasProviders || googleDriveConnected) {
+        return darkMode ? 'text-green-400 hover:bg-green-800/20' : 'text-green-700 hover:bg-green-100';
+      }
       return darkMode ? 'text-gray-400 hover:bg-gray-800/20' : 'text-gray-500 hover:bg-gray-100';
     };
 
@@ -191,7 +219,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         <button 
           onClick={() => setShowCloudStatus(!showCloudStatus)}
           className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${getStatusColor()}`}
-          title={hasProviders ? t('cloud.cloud_storage_connected') : t('cloud.no_cloud_storage_connected')}
+          title={hasProviders || googleDriveConnected ? t('cloud.cloud_storage_connected') : t('cloud.no_cloud_storage_connected')}
         >
           {getProviderIcon()}
           <span className="hidden sm:inline">
@@ -200,33 +228,46 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
           <ChevronDown className="w-3 h-3" />
         </button>
         
-        {/* Cloud status dropdown */}
         {showCloudStatus && (
           <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-2 w-64 rounded-lg shadow-xl z-20 ${
             darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
           }`}>
             <div className="px-3 py-1 border-b border-gray-200 dark:border-gray-700">
               <p className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {t('cloud.cloud_storage_status')}
+                {t('cloud.cloud_storage_status', 'Cloud Storage Status')}
               </p>
             </div>
             
-            {googleDriveConnected ? (
+            {(hasProviders || googleDriveConnected) ? (
               <>
                 <div className="px-3 py-2">
-                  <div className="flex items-center mb-2">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
-                    </svg>
-                    <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
-                      {t('cloud.google_drive_connected')}
-                    </span>
+                  <div className="space-y-2">
+                    {(connectedProviders?.includes('google_drive') || googleDriveConnected) && (
+                      <div className="flex items-center">
+                        <svg className="w-4 h-4 mr-2 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M6.5 14.5L12 4L17.5 14.5H6.5ZM5.5 16.5H12L8.5 22L5.5 16.5ZM12 16.5H18.5L15 22L12 16.5Z" />
+                        </svg>
+                        <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                          {t('cloud.google_drive_connected', 'Google Drive Connected')}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {connectedProviders?.includes('onedrive') && (
+                      <div className="flex items-center">
+                        <span className="text-sm mr-2">☁️</span>
+                        <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                          {t('cloud.onedrive_connected', 'OneDrive Connected')}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
-                    {t('cloud.cvs_sync_devices')}
+                  
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
+                    {t('cloud.cvs_sync_devices', 'CVs sync across devices')}
                   </p>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {t('cloud.automatic_backup_enabled')}
+                    {t('cloud.automatic_backup_enabled', 'Automatic backup enabled')}
                   </p>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
@@ -236,7 +277,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
                     }`}
                   >
-                    {t('cloud.manage_cloud_storage')}
+                    {t('cloud.manage_cloud_storage', 'Manage Cloud Storage')}
                   </button>
                 </div>
               </>
@@ -246,14 +287,14 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                   <div className="flex items-center mb-2">
                     <CloudOff className={`w-4 h-4 mr-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                     <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {t('cloud.no_cloud_storage')}
+                      {t('cloud.no_cloud_storage', 'No Cloud Storage')}
                     </span>
                   </div>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
-                    {t('cloud.cvs_saved_locally_only')}
+                    {t('cloud.cvs_saved_locally_only', 'CVs saved locally only')}
                   </p>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {t('cloud.connect_cloud_device_sync')}
+                    {t('cloud.connect_cloud_device_sync', 'Connect cloud for device sync')}
                   </p>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
@@ -263,7 +304,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
                     }`}
                   >
-                    {t('cloud.connect_cloud_storage')}
+                    {t('cloud.connect_cloud_storage', 'Connect Cloud Storage')}
                   </button>
                 </div>
               </>
@@ -300,7 +341,6 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
           {/* Desktop Navigation - centered */}
           <div className={`hidden md:flex md:items-center md:justify-center flex-1 ${isRTL ? 'order-1 mr-4 ml-4' : 'order-2 ml-4 mr-4'}`}>
             <div className="rounded-full px-1 py-1 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-sm flex items-center">
-              {/* Always show these public links */}
               <Link 
                 to="/rc-public" 
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
@@ -340,7 +380,6 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                 <FileText className="w-3 h-3" /> {t('navigation.coverLetter', 'Cover Letter')}
               </Link>
 
-              {/* Show these when backend is available */}
               {backendAvailable && (
                 <>
                   <button
@@ -393,7 +432,6 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                 <ChevronDown className="w-3 h-3" />
               </button>
               
-              {/* Language dropdown menu */}
               {showLanguageMenu && (
                 <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 py-1.5 w-40 rounded-lg shadow-xl z-20 ${
                   darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
@@ -444,9 +482,9 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                     ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
                     : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
                 }`}
-                title={t('cloud.clear_session_cloud_connections')}
+                title={t('cloud.clear_session_cloud_connections', 'Clear session and cloud connections')}
               >
-                <LogOut className="w-3 h-3" /> {t('cloud.clear_session')}
+                <LogOut className="w-3 h-3" /> {t('cloud.clear_session', 'Clear Session')}
               </button>
             )}
             
@@ -466,7 +504,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         </div>
       </div>
 
-      {/* Mobile menu - slide down animation */}
+      {/* Mobile menu */}
       <div 
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           mobileMenuOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
@@ -474,7 +512,6 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         <div className="px-3 py-3 space-y-2">
-          {/* Always show public links */}
           <Link 
             to="/rc-public" 
             onClick={() => setMobileMenuOpen(false)}
@@ -517,7 +554,6 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             <FileText className="w-4 h-4" /> {t('navigation.coverLetter', 'Cover Letter')}
           </Link>
 
-          {/* Show session-dependent links when backend available */}
           {backendAvailable && (
             <>
               <button
@@ -530,23 +566,9 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
                 }`}
               >
-                <FileText className="w-4 h-4" /> {t('navigation.myResumes', 'My Resumes')}
-              </button>
-              
-              <button
-                onClick={handleCoverLetters}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
-                  isActive('/cover-letters')
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
-                    : darkMode
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
-                }`}
-              >
                 <FileSignature className="w-4 h-4" /> {t('navigation.coverLetters', 'Cover Letters')}
               </button>
 
-              {/* Cloud Storage Management */}
               <button
                 onClick={handleCloudSetup}
                 className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
@@ -569,7 +591,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
                   }`}
                 >
-                  <LogOut className="w-4 h-4" /> {t('cloud.clear_session')}
+                  <LogOut className="w-4 h-4" /> {t('cloud.clear_session', 'Clear Session')}
                 </button>
               )}
             </>
@@ -607,4 +629,4 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   );
 };
 
-export default Navbar;
+export default Navbar; 

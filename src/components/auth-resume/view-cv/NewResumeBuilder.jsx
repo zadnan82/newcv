@@ -310,45 +310,69 @@ const NewResumeBuilder = ({ darkMode }) => {
     }
   }, [hasUserStartedFilling, formData, saveLocally, showToast, clearAutoSave, t]);
 
-  const handleSaveCloud = useCallback(async () => {
-    if (!hasUserStartedFilling) {
-      showToast(t('common.error'), 'error');
-      return;
-    }
+  const handleSaveCloud = useCallback(async (preferredProvider = null) => {
+  if (!hasUserStartedFilling) {
+    showToast(t('common.error'), 'error');
+    return;
+  }
 
-    if (!canSaveToCloud()) {
-      setShowCloudSetup(true);
-      return;
-    }
+  if (!canSaveToCloud()) {
+    setShowCloudSetup(true);
+    return;
+  }
 
-    setIsSaving(true);
-    setSaveType('cloud');
-    setSaveResult(null);
+  setIsSaving(true);
+  setSaveType('cloud');
+  setSaveResult(null);
 
-    try {
-      const result = await saveToConnectedCloud(formData, 'google_drive');
-      setSaveResult(result);
-      if (result.success) {
-        localStorage.setItem('last_save_method', 'cloud');
-        setShowStorageChoice(false);
-        clearAutoSave();
-        showToast(result.message || t('cloud.save_to_drive'), 'success');
-        localStorage.removeItem('cv_draft');
+  try {
+    // Determine which provider to use
+    let targetProvider = preferredProvider;
+    
+    if (!targetProvider) {
+      // Check if user has a preferred provider stored
+      const storedProvider = localStorage.getItem('preferred_cloud_provider');
+      if (storedProvider && connectedProviders.includes(storedProvider)) {
+        targetProvider = storedProvider;
       } else {
-        showToast(result.error || t('common.error'), 'error');
+        // Use first connected provider as fallback
+        targetProvider = connectedProviders[0];
       }
-    } catch (error) {
-      const errorResult = {
-        success: false,
-        error: error.message || t('common.error')
-      };
-      setSaveResult(errorResult);
-      showToast(errorResult.error, 'error');
-    } finally {
-      setIsSaving(false);
     }
-  }, [hasUserStartedFilling, formData, canSaveToCloud, saveToConnectedCloud, showToast, clearAutoSave, t]);
-  
+
+    console.log(`Saving to cloud provider: ${targetProvider}`);
+    
+    const result = await saveToConnectedCloud(formData, targetProvider);
+    setSaveResult(result);
+    
+    if (result.success) {
+      // Store the successful provider for future use
+      localStorage.setItem('preferred_cloud_provider', targetProvider);
+      localStorage.setItem('last_save_method', 'cloud');
+      setShowStorageChoice(false);
+      clearAutoSave();
+      
+      const providerName = targetProvider === 'google_drive' ? 'Google Drive' : 
+                          targetProvider === 'onedrive' ? 'OneDrive' : targetProvider;
+      
+      showToast(result.message || `CV saved to ${providerName} successfully`, 'success');
+      localStorage.removeItem('cv_draft');
+    } else {
+      showToast(result.error || t('common.error'), 'error');
+    }
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      error: error.message || t('common.error')
+    };
+    setSaveResult(errorResult);
+    showToast(errorResult.error, 'error');
+  } finally {
+    setIsSaving(false);
+  }
+}, [hasUserStartedFilling, formData, canSaveToCloud, saveToConnectedCloud, connectedProviders, showToast, clearAutoSave, t]);
+
+
   const handleSave = useCallback(() => {
     if (!hasUserStartedFilling) {
       showToast(t('common.error'), 'error');
@@ -847,42 +871,75 @@ const NewResumeBuilder = ({ darkMode }) => {
                     </>
                   )}
                 </button>
-
+ 
                 {/* Save Method Indicator */}
-                <div className="text-xs text-gray-500 flex items-center">
-                  {(() => {
-                    const lastMethod = localStorage.getItem('last_save_method');
-                    if (lastMethod === 'cloud' && canSaveToCloud()) {
-                      return (
-                        <span className="flex items-center text-purple-600">
-                          <Cloud size={12} className="mr-1" />
-                          {t('cloud.google_drive')}
-                        </span>
-                      );
-                    } else if (lastMethod === 'local') {
-                      return (
-                        <span className="flex items-center text-blue-600">
-                          <HardDrive size={12} className="mr-1" />
-                          {t('cloud.this_device')}
-                        </span>
-                      );
-                    } else if (canSaveToCloud()) {
-                      return (
-                        <span className="flex items-center">
-                          <Cloud size={12} className="mr-1" />
-                          {t('cloud.choose_destination')}
-                        </span>
-                      );
-                    } else {
-                      return (
-                        <span className="flex items-center">
-                          <HardDrive size={12} className="mr-1" />
-                          {t('cloud.local_only')}
-                        </span>
-                      );
-                    }
-                  })()}
-                </div>
+<div className="text-xs text-gray-500 flex items-center">
+  {(() => {
+    const lastMethod = localStorage.getItem('last_save_method');
+    const preferredProvider = localStorage.getItem('preferred_cloud_provider');
+    
+    if (lastMethod === 'cloud' && canSaveToCloud()) {
+      if (preferredProvider === 'onedrive' && connectedProviders.includes('onedrive')) {
+        return (
+          <span className="flex items-center text-purple-600">
+            <Cloud size={12} className="mr-1" />
+            OneDrive
+          </span>
+        );
+      } else if (preferredProvider === 'google_drive' && connectedProviders.includes('google_drive')) {
+        return (
+          <span className="flex items-center text-purple-600">
+            <Cloud size={12} className="mr-1" />
+            Google Drive
+          </span>
+        );
+      } else if (connectedProviders.length > 0) {
+        const provider = connectedProviders[0];
+        const providerName = provider === 'google_drive' ? 'Google Drive' : 
+                           provider === 'onedrive' ? 'OneDrive' : provider;
+        return (
+          <span className="flex items-center text-purple-600">
+            <Cloud size={12} className="mr-1" />
+            {providerName}
+          </span>
+        );
+      }
+    } else if (lastMethod === 'local') {
+      return (
+        <span className="flex items-center text-blue-600">
+          <HardDrive size={12} className="mr-1" />
+          {t('cloud.this_device')}
+        </span>
+      );
+    } else if (canSaveToCloud()) {
+      if (connectedProviders.length > 1) {
+        return (
+          <span className="flex items-center">
+            <Cloud size={12} className="mr-1" />
+            {connectedProviders.length} providers connected
+          </span>
+        );
+      } else if (connectedProviders.length === 1) {
+        const provider = connectedProviders[0];
+        const providerName = provider === 'google_drive' ? 'Google Drive' : 
+                           provider === 'onedrive' ? 'OneDrive' : provider;
+        return (
+          <span className="flex items-center">
+            <Cloud size={12} className="mr-1" />
+            {providerName}
+          </span>
+        );
+      }
+    } else {
+      return (
+        <span className="flex items-center">
+          <HardDrive size={12} className="mr-1" />
+          {t('cloud.local_only')}
+        </span>
+      );
+    }
+  })()}
+</div>
               </div>
 
               {/* Right Side - Enhancement Actions */}
