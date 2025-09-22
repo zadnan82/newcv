@@ -119,6 +119,8 @@ const getSourceLabel = (source, provider = null) => {
         return t('cloud.onedrive') || 'OneDrive';
       } else if (provider === 'google_drive') {
         return t('cloud.google_drive') || 'Google Drive';
+      } else if (provider === 'dropbox') {
+        return t('cloud.dropbox') || 'Dropbox';
       } else {
         return t('cloud.cloud_storage') || 'Cloud Storage';
       }
@@ -138,6 +140,8 @@ const getSourceIcon = (source, provider = null) => {
         return <Cloud className="w-4 h-4 text-purple-500" />; // Purple for OneDrive
       } else if (provider === 'google_drive') {
         return <Cloud className="w-4 h-4 text-blue-500" />; // Blue for Google Drive
+        } else if (provider === 'dropbox') {
+        return <Cloud className="w-4 h-4 text-yellow-500" />; // Blue for Google Drive
       } else {
         return <Cloud className="w-4 h-4 text-blue-500" />; // Default blue
       }
@@ -357,6 +361,8 @@ const getSourceIcon = (source, provider = null) => {
         ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
       source === 'cloud' && cv.provider === 'google_drive' 
         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+          source === 'cloud' && cv.provider === 'dropbox' 
+        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
       source === 'cloud' 
         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
       source === 'draft' 
@@ -369,6 +375,7 @@ const getSourceIcon = (source, provider = null) => {
       <span className="ml-1">
         {source === 'cloud' && cv.provider === 'onedrive' ? 'OneDrive' :
          source === 'cloud' && cv.provider === 'google_drive' ? 'Google Drive' :
+         source === 'cloud' && cv.provider === 'dropbox' ? 'Dropbox' :
          source === 'cloud' ? t('cloud.cloud') : 
          source === 'draft' ? t('cloud.draft') : 
          source === 'local' ? t('cloud.local') : 
@@ -455,6 +462,8 @@ const CompactCVSelector = ({
           return <Cloud className="w-4 h-4 text-purple-500" />;
         } else if (provider === 'google_drive') {
           return <Cloud className="w-4 h-4 text-blue-500" />;
+           } else if (provider === 'dropbox') {
+          return <Cloud className="w-4 h-4 text-blue-500" />;
         } else {
           return <Cloud className="w-4 h-4 text-blue-500" />;
         }
@@ -472,6 +481,8 @@ const CompactCVSelector = ({
           return 'OneDrive';
         } else if (provider === 'google_drive') {
           return 'Google Drive';
+           } else if (provider === 'dropbox') {
+          return 'Dropbox';
         } else {
           return t('cloud.cloud');
         }
@@ -599,16 +610,29 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
     return cv._original_provider;
   }
   
-  // Check source type
+  // Check source type with enhanced Dropbox detection
   if (cv.source === 'cloud' && cv.cloudFile) {
-    // Could check file structure or other indicators
-    return 'google_drive'; // Default assumption
+    // Enhanced provider detection
+    if (cv.cloudFile.provider) {
+      return cv.cloudFile.provider;
+    }
+    
+    // File ID pattern detection for Dropbox
+    if (cv.cloudFile.file_id && cv.cloudFile.file_id.startsWith('id:')) {
+      return 'dropbox';
+    }
+    
+    // File name pattern for Dropbox
+    if (cv.cloudFile.name && cv.cloudFile.name.includes('.dropbox')) {
+      return 'dropbox';
+    }
   }
   
-  return null;
+  return 'google_drive'; // Default fallback
 };
 
 // Helper to load CV content based on provider
+// Helper to load CV content based on provider - MAKE DROPBOX LIKE OTHERS
 const loadCVContentByProvider = async (file, provider = null) => {
   try {
     console.log(`📥 Loading CV content:`, {
@@ -617,48 +641,97 @@ const loadCVContentByProvider = async (file, provider = null) => {
       provider: provider || 'auto-detect'
     });
     
-    // Auto-detect provider if not specified
-    if (!provider) {
-      // Try to detect from file structure or other metadata
-      provider = 'google_drive'; // Default fallback
-      
-      // Add logic to detect OneDrive vs Google Drive files
-      // OneDrive file IDs typically have a different format
-      if (file.file_id && file.file_id.includes('!')) {
-        provider = 'onedrive';
-      }
+    // Use the session store methods for ALL providers
+    const storeState = useSessionStore.getState();
+    
+    // METHOD 1: First try using the generic provider method (like Google Drive/OneDrive)
+    if (storeState.loadCVFromProvider) {
+      console.log(`🔄 Using loadCVFromProvider for ${provider}`);
+      const fileContent = await storeState.loadCVFromProvider(provider, file.file_id);
+      console.log(`✅ Successfully loaded via loadCVFromProvider:`, {
+        hasContent: !!fileContent,
+        provider: provider
+      });
+      return { fileContent, provider };
     }
     
-    console.log(`🔄 Using provider: ${provider} for file: ${file.name}`);
+    // METHOD 2: If generic method not available, use specific methods
+    console.log(`🔄 Using specific method for ${provider}`);
     
-    let fileContent;
-    
-    if (provider === 'onedrive') {
-      // Use OneDrive loading method
-      const storeState = useSessionStore.getState();
-      if (storeState.loadCVFromProvider) {
-        fileContent = await storeState.loadCVFromProvider('onedrive', file.file_id);
-      } else {
-        // Fallback to direct API call
-        fileContent = await loadOneDriveCVDirect(file.file_id);
-      }
-    } else if (provider === 'google_drive') {
-      // Use Google Drive loading method
-      fileContent = await loadGoogleDriveCV(file.file_id);
+    if (provider === 'google_drive') {
+      const fileContent = await loadGoogleDriveCV(file.file_id);
+      return { fileContent, provider };
+      
+    } else if (provider === 'onedrive') {
+      // Use the same approach as Google Drive
+      const fileContent = await loadOneDriveCVDirect(file.file_id);
+      return { fileContent, provider };
+      
+    } else if (provider === 'dropbox') {
+      // MAKE DROPBOX WORK EXACTLY LIKE ONEDRIVE
+      const fileContent = await loadDropboxCV(file.file_id);
+      return { fileContent, provider };
+      
     } else {
       throw new Error(`Unsupported provider: ${provider}`);
     }
     
-    console.log(`✅ Loaded content for ${file.name}:`, {
-      hasContent: !!fileContent,
-      contentType: typeof fileContent,
-      provider: provider
-    });
-    
-    return { fileContent, provider };
-    
   } catch (error) {
-    console.error(`❌ Failed to load CV content:`, error);
+    console.error(`❌ Failed to load CV content from ${provider}:`, error);
+    throw error;
+  }
+};
+
+
+const loadDropboxCV = async (fileId) => {
+  try {
+    console.log('📄 Loading Dropbox CV like OneDrive...');
+    
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    
+    if (!token) {
+      throw new Error('No session token found');
+    }
+    
+    // Clean the fileId like other providers do
+    let cleanFileId = fileId;
+    if (cleanFileId.startsWith('/')) {
+      cleanFileId = cleanFileId.substring(1);
+    }
+    
+    const encodedFileId = encodeURIComponent(cleanFileId);
+    
+    const response = await fetch(`http://localhost:8000/api/dropbox/load/${encodedFileId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('📡 Dropbox API response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Dropbox API error:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    
+    // CRITICAL: Return the EXACT SAME structure as Google Drive/OneDrive
+    console.log('🔍 Dropbox raw result:', result);
+    
+    if (result.success && result.cv_data) {
+      console.log('✅ Dropbox CV loaded successfully - returning cv_data directly');
+      // Return the cv_data directly, just like other providers
+      return result.cv_data;
+    } else {
+      console.error('❌ Dropbox response format unexpected:', result);
+      throw new Error(result.error || 'Unexpected response format from Dropbox');
+    }
+  } catch (error) {
+    console.error('❌ Dropbox load failed:', error);
     throw error;
   }
 };
@@ -687,8 +760,9 @@ const loadOneDriveCVDirect = async (fileId) => {
 
     const result = await response.json();
     
+    // RETURN THE SAME STRUCTURE AS DROPBOX
     if (result.success && result.cv_data) {
-      return result.cv_data;
+      return result.cv_data; // Return cv_data directly
     } else {
       throw new Error(result.error || 'Failed to load CV from OneDrive');
     }
@@ -783,131 +857,77 @@ const loadAvailableCVs = async () => {
     }
 
     // 3. Load from ALL connected cloud providers - UPDATED SECTION
-    if (canSaveToCloud()) {
+    // 3. Load from ALL connected cloud providers - SIMPLIFIED VERSION
+if (canSaveToCloud()) {
+  try {
+    console.log('☁️ Loading CVs from all connected cloud providers...');
+    
+    const storeState = useSessionStore.getState();
+    const providers = storeState.connectedProviders || [];
+    
+    console.log('☁️ Connected providers:', providers);
+    
+    for (const provider of providers) {
       try {
-        console.log('☁️ Loading CVs from all connected cloud providers...');
+        console.log(`☁️ Loading CVs from ${provider}...`);
         
-        // Get list of connected providers
-        const storeState = useSessionStore.getState();
-        const providers = storeState.connectedProviders || [];
+        let cloudFiles;
         
-        console.log('☁️ Connected providers:', providers);
-        
-        if (providers.length === 0) {
-          console.log('ℹ️ No cloud providers connected');
+        // USE THE SAME PATTERN FOR ALL PROVIDERS
+        if (storeState.listCVsFromProvider) {
+          cloudFiles = await storeState.listCVsFromProvider(provider);
         } else {
-          // Load from each connected provider
-          for (const provider of providers) {
+          // Fallback for individual methods
+          if (provider === 'google_drive') {
+            cloudFiles = await listGoogleDriveCVs();
+          } else {
+            console.warn(`⚠️ No list method available for ${provider}`);
+            continue;
+          }
+        }
+        
+        console.log(`📁 Found ${cloudFiles?.length || 0} files from ${provider}`);
+        
+        if (cloudFiles && Array.isArray(cloudFiles)) {
+          for (const file of cloudFiles) {
             try {
-              console.log(`☁️ Loading CVs from ${provider}...`);
+              // USE THE SAME LOADING METHOD FOR ALL PROVIDERS
+              const { fileContent } = await loadCVContentByProvider(file, provider);
               
-              let cloudData;
-              
-              if (provider === 'google_drive') {
-                cloudData = await listGoogleDriveCVs();
-              } else if (provider === 'onedrive') {
-                if (storeState.listCVsFromProvider) {
-                  cloudData = await storeState.listCVsFromProvider('onedrive');
-                } else {
-                  console.warn(`⚠️ listCVsFromProvider not available for ${provider}`);
-                  continue;
-                }
-              } else {
-                console.warn(`⚠️ Unsupported provider: ${provider}`);
+              if (!fileContent) {
+                console.log(`⚠️ Skipping empty file from ${provider}: ${file.name}`);
                 continue;
               }
               
-              console.log(`☁️ Raw ${provider} response:`, cloudData);
+              // USE THE SAME STRUCTURE FOR ALL PROVIDERS
+              cvs.push({
+                id: file.file_id,
+                source: 'cloud',
+                title: file.name?.replace('.json', '') || `CV from ${provider}`,
+                name: file.name || 'Untitled',
+                content: fileContent, // Use the content directly
+                modifiedTime: file.last_modified,
+                personal_info: fileContent.personal_info,
+                priority: 2,
+                provider: provider,
+                cloudFile: file
+              });
               
-              if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
-                console.log(`📁 Processing ${cloudData.length} ${provider} files...`);
-                
-                // Process files in parallel
-                const providerCVPromises = cloudData.map(async (file, index) => {
-                  try {
-                    console.log(`📥 Processing ${provider} file ${index + 1}/${cloudData.length}:`, {
-                      name: file.name,
-                      id: file.file_id,
-                      size: file.size_bytes
-                    });
-                    
-                    // Load content using provider-specific method
-                    const { fileContent, detectedProvider } = await loadCVContentByProvider(file, provider);
-                    
-                    if (!fileContent || fileContent.error) {
-                      console.log(`⚠️ Skipping ${provider} file: ${file.name} - invalid content or error`);
-                      return null;
-                    }
-                    
-                    // Extract actual content
-                    let actualContent = fileContent;
-                    if (fileContent.cv_data) {
-                      actualContent = fileContent.cv_data;
-                    }
-                    
-                    // Validate content
-                    const hasContent = actualContent?.personal_info?.full_name || 
-                                     (actualContent?.experiences && actualContent.experiences.length > 0) ||
-                                     (actualContent?.educations && actualContent.educations.length > 0) ||
-                                     (actualContent?.skills && actualContent.skills.length > 0);
-                    
-                    if (!hasContent) {
-                      console.log(`⚠️ ${provider} CV appears to be empty: ${file.name}`);
-                      return null;
-                    }
-                    
-                    console.log(`✅ Successfully processed ${provider} file: ${file.name}`);
-                    
-                    return {
-                      id: file.file_id,
-                      source: 'cloud',
-                      title: file.name?.replace('.json', '') || t(`cloud.${provider}_cv`),
-                      name: file.name || t('common.untitled'),
-                      content: actualContent,
-                      modifiedTime: file.last_modified,
-                      personal_info: actualContent.personal_info,
-                      priority: 2,
-                      provider: detectedProvider || provider,  // Store provider info
-                      cloudFile: file  // Store original file metadata
-                    };
-                  } catch (fileError) {
-                    console.error(`❌ Error processing ${provider} file ${file.file_id}:`, fileError);
-                    return null;
-                  }
-                });
-                
-                console.log(`🔄 Waiting for all ${providerCVPromises.length} ${provider} files to process...`);
-                const providerCVs = await Promise.all(providerCVPromises);
-                
-                // Filter out null results and add to CVs array
-                const validProviderCVs = providerCVs.filter(cv => cv !== null);
-                console.log(`✅ Successfully processed ${validProviderCVs.length}/${cloudData.length} ${provider} CVs`);
-                
-                if (validProviderCVs.length > 0) {
-                  console.log(`✅ Adding ${provider} CVs to list:`, validProviderCVs.map(cv => ({
-                    title: cv.title,
-                    provider: cv.provider,
-                    hasContent: !!cv.content
-                  })));
-                  cvs.push(...validProviderCVs);
-                } else {
-                  console.warn(`⚠️ No valid ${provider} CVs found after processing`);
-                }
-              } else {
-                console.log(`ℹ️ No ${provider} files found or invalid response structure`);
-              }
-            } catch (providerError) {
-              console.error(`❌ Error loading from ${provider}:`, providerError);
+              console.log(`✅ Added CV from ${provider}: ${file.name}`);
+              
+            } catch (fileError) {
+              console.error(`❌ Error processing ${provider} file:`, fileError);
             }
           }
         }
-      } catch (error) {
-        console.error('❌ Error loading from cloud providers:', error);
+      } catch (providerError) {
+        console.error(`❌ Error loading from ${provider}:`, providerError);
       }
-    } else {
-      console.log('ℹ️ No cloud providers connected, skipping cloud CVs');
     }
-
+  } catch (error) {
+    console.error('❌ Error loading from cloud providers:', error);
+  }
+}
     // 4. Add current resume from API if exists (unchanged)
     if (currentResume && currentResume.id) {
       console.log('🌐 Found API resume:', currentResume.title || currentResume.id);
@@ -976,13 +996,14 @@ const loadAvailableCVs = async () => {
  
   // Handle CV selection - COMPLETE ENHANCED VERSION
 const handleSelectCV = (cv) => {
-  console.log('✅ Selected CV:', cv.title, 'from', cv.source);
-  
-  // Enhanced debugging
-  console.group('📋 CV Selection Debug Information');
-  console.log('CV Object:', cv);
-  console.log('Has content?', !!cv.content);
-  console.log('Content type:', typeof cv.content);
+   console.group('🔍 CV SELECTION DEBUG');
+  console.log('📋 Selected CV:', cv);
+  console.log('🏷️ Title:', cv.title);
+  console.log('📦 Source:', cv.source);
+  console.log('☁️ Provider:', cv.provider);
+  console.log('🆔 ID:', cv.id);
+  console.log('📊 Has content?', !!cv.content);
+  console.log('📝 Content type:', typeof cv.content);
   
   if (cv.content) {
     console.log('Content keys:', Object.keys(cv.content));

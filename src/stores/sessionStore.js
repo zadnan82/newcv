@@ -1,4 +1,4 @@
-// src/stores/sessionStore.js - Updated for multi-provider support
+// src/stores/sessionStore.js  
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { API_BASE_URL, checkBackendAvailability } from '../config';
@@ -43,115 +43,111 @@ const useSessionStore = create(
 
       // ================== MULTI-PROVIDER METHODS ==================
 
-      // In sessionStore.js - update the connectToCloudProvider method
-connectToCloudProvider: async (provider) => {
-  console.log(`🔗 Connecting to ${provider}...`);
-  set({ loading: true, error: null });
-  
-  try {
-    // Ensure we have a session
-    await get().createOrRestoreSession();
-    
-    // Set session token in service
-    cloudProviderService.setSessionToken(get().sessionToken);
-    
-    // Use the unified service (this already uses correct endpoints)
-    await cloudProviderService.connectToProvider(provider);
-    
-    return true;
-  } catch (error) {
-    console.error(`❌ ${provider} connection error:`, error);
-    set({ error: error.message, loading: false });
-    throw error;
-  }
-},
+      connectToCloudProvider: async (provider) => {
+        console.log(`🔗 Connecting to ${provider}...`);
+        set({ loading: true, error: null });
+        
+        try {
+          // Ensure we have a session
+          await get().createOrRestoreSession();
+          
+          // Set session token in service
+          cloudProviderService.setSessionToken(get().sessionToken);
+          
+          // Use the unified service (this already uses correct endpoints)
+          await cloudProviderService.connectToProvider(provider);
+          
+          return true;
+        } catch (error) {
+          console.error(`❌ ${provider} connection error:`, error);
+          set({ error: error.message, loading: false });
+          throw error;
+        }
+      },
 
-      // In sessionStore.js - update checkAllProviderStatuses
-checkAllProviderStatuses: async () => {
-  const { sessionToken } = get();
-  
-  if (!sessionToken) {
-    return {};
-  }
+      checkAllProviderStatuses: async () => {
+        const { sessionToken } = get();
+        
+        if (!sessionToken) {
+          return {};
+        }
 
-  cloudProviderService.setSessionToken(sessionToken);
-  
-  const availableProviders = cloudProviderService.getAvailableProviders();
-  const statuses = {};
-  const connectedProviders = [];
-  
-  for (const provider of availableProviders) {
-    try {
-      // This uses the correct provider-specific endpoints
-      const status = await cloudProviderService.checkProviderStatus(provider);
-      statuses[provider] = status;
-      
-      if (status.connected) {
-        connectedProviders.push(provider);
-      }
-    } catch (error) {
-      console.warn(`Failed to check ${provider} status:`, error);
-      statuses[provider] = { connected: false, provider, error: error.message };
-    }
-  }
+        cloudProviderService.setSessionToken(sessionToken);
+        
+        const availableProviders = ['google_drive', 'onedrive', 'dropbox'];  
+        const statuses = {};
+        const connectedProviders = [];
+        
+        for (const provider of availableProviders) {
+          try {
+            // This uses the correct provider-specific endpoints
+            const status = await cloudProviderService.checkProviderStatus(provider);
+            statuses[provider] = status;
+            
+            if (status.connected) {
+              connectedProviders.push(provider);
+            }
+          } catch (error) {
+            console.warn(`Failed to check ${provider} status:`, error);
+            statuses[provider] = { connected: false, provider, error: error.message };
+          }
+        }
 
-  // Update state
-  set({
-    connectedProviders,
-    providerStatuses: statuses,
-    googleDriveConnected: connectedProviders.includes('google_drive'),
-    googleDriveStatus: statuses.google_drive || null,
-    capabilities: {
-      ...get().capabilities,
-      canSaveToCloud: connectedProviders.length > 0,
-      canAccessSavedCVs: get().localCVs.length > 0 || connectedProviders.length > 0,
-      canSyncAcrossDevices: connectedProviders.length > 0
-    }
-  });
+        // Update state
+        set({
+          connectedProviders,
+          providerStatuses: statuses,
+          googleDriveConnected: connectedProviders.includes('google_drive'),
+          googleDriveStatus: statuses.google_drive || null,
+          capabilities: {
+            ...get().capabilities,
+            canSaveToCloud: connectedProviders.length > 0,
+            canAccessSavedCVs: get().localCVs.length > 0 || connectedProviders.length > 0,
+            canSyncAcrossDevices: connectedProviders.length > 0
+          }
+        });
 
-  return statuses;
-},
+        return statuses;
+      },
 
-
-      // In sessionStore.js - make sure this method uses the provider parameter
-handleOAuthReturn: async (provider) => {
-  console.log(`✅ Handling ${provider} OAuth return`); // Should log "onedrive" not "google_drive"
-  
-  try {
-    set({ loading: true });
-    
-    // Give backend a moment to process
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Check all provider statuses (this should call the right endpoints)
-    await get().checkAllProviderStatuses();
-    
-    const { connectedProviders, providerStatuses } = get();
-    
-    if (connectedProviders.includes(provider)) {
-      const status = providerStatuses[provider];
-      
-      set({ loading: false, error: null });
-      
-      return { 
-        success: true, 
-        provider,
-        message: `Successfully connected to ${provider}`,
-        email: status.email
-      };
-    } else {
-      throw new Error(`${provider} connection verification failed`);
-    }
-    
-  } catch (error) {
-    console.error(`❌ ${provider} OAuth return handling failed:`, error);
-    set({ 
-      loading: false, 
-      error: `Failed to verify ${provider} connection: ${error.message}` 
-    });
-    return { success: false, error: error.message };
-  }
-},
+      handleOAuthReturn: async (provider) => {
+        console.log(`✅ Handling ${provider} OAuth return`);
+        
+        try {
+          set({ loading: true });
+          
+          // Give backend a moment to process
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Check all provider statuses (this should call the right endpoints)
+          await get().checkAllProviderStatuses();
+          
+          const { connectedProviders, providerStatuses } = get();
+          
+          if (connectedProviders.includes(provider)) {
+            const status = providerStatuses[provider];
+            
+            set({ loading: false, error: null });
+            
+            return { 
+              success: true, 
+              provider,
+              message: `Successfully connected to ${provider}`,
+              email: status.email
+            };
+          } else {
+            throw new Error(`${provider} connection verification failed`);
+          }
+          
+        } catch (error) {
+          console.error(`❌ ${provider} OAuth return handling failed:`, error);
+          set({ 
+            loading: false, 
+            error: `Failed to verify ${provider} connection: ${error.message}` 
+          });
+          return { success: false, error: error.message };
+        }
+      },
 
       // Disconnect from specific provider
       disconnectFromProvider: async (provider) => {

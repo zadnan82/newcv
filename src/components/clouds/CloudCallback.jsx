@@ -1,4 +1,4 @@
-// src/components/clouds/CloudCallback.jsx - FIXED VERSION with timeout
+// src/components/clouds/CloudCallback.jsx - FIXED VERSION with Dropbox support
 import React, { useLayoutEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader, Shield } from 'lucide-react';
@@ -6,6 +6,7 @@ import useSessionStore from '../../stores/sessionStore';
 import { useTranslation } from 'react-i18next';
 
 const CloudCallback = ({ darkMode }) => {
+  
   const { provider } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -18,7 +19,42 @@ const CloudCallback = ({ darkMode }) => {
 
   const { handleOAuthReturn } = useSessionStore();
 
+  // Provider configurations for display
+  const providerConfigs = {
+    'google_drive': {
+      name: 'Google Drive',
+      icon: '📄',
+      displayName: 'Google Drive'
+    },
+    'onedrive': {
+      name: 'OneDrive', 
+      icon: '☁️',
+      displayName: 'Microsoft OneDrive'
+    },
+    'dropbox': {
+      name: 'Dropbox',
+      icon: '📦', 
+      displayName: 'Dropbox'
+    }
+  };
+
+  const currentProvider = providerConfigs[provider] || { 
+    name: provider, 
+    icon: '📁', 
+    displayName: provider 
+  };
+
   useLayoutEffect(() => {
+    console.log(`🔧 CloudCallback: Processing ${provider} OAuth return...`);
+    console.log(`🔧 URL params:`, Object.fromEntries(searchParams.entries()));
+    
+    // Make sure we're using the correct provider
+    if (!provider) {
+      console.error('❌ No provider detected in URL params');
+      setStatus('error');
+      setMessage('No provider specified in callback');
+      return;
+    }
     if (processed) return;
     
     console.log(`🔧 CloudCallback: Processing ${provider} OAuth return...`);
@@ -87,7 +123,7 @@ const CloudCallback = ({ darkMode }) => {
               navigate('/new-resume', {
                 replace: true,
                 state: {
-                  message: `${provider} connected successfully`,
+                  message: `${currentProvider.displayName} connected successfully`,
                   provider: provider,
                   email: verificationResult.email
                 }
@@ -113,7 +149,7 @@ const CloudCallback = ({ darkMode }) => {
       setStatus('error');
       setMessage(`${t('cloud.processing_error')}: ${err.message}`);
     });
-  }, [processed, provider, searchParams, navigate, handleOAuthReturn, t]);
+  }, [processed, provider, searchParams, navigate, handleOAuthReturn, t, currentProvider.displayName]);
 
   const handleContinueAnyway = () => {
     // Force success and continue
@@ -135,13 +171,12 @@ const CloudCallback = ({ darkMode }) => {
     navigate('/new-resume', {
       replace: true,
       state: {
-        message: `${provider} connection assumed successful`,
+        message: `${currentProvider.displayName} connection assumed successful`,
         provider: provider,
         assumeConnected: true
       }
     });
   };
-
 
   const handleRetry = () => {
     navigate('/cloud-setup', { replace: true });
@@ -190,14 +225,17 @@ const CloudCallback = ({ darkMode }) => {
           )}
         </div>
 
-        {/* Title */}
-        <h1 className={`text-2xl font-bold mb-4 ${
-          darkMode ? 'text-white' : 'text-gray-900'
-        }`}>
-          {status === 'processing' && `Connecting to ${provider}`}
-          {status === 'success' && 'Connection Successful!'}
-          {status === 'error' && 'Connection Issue'}
-        </h1>
+        {/* Provider Icon and Title */}
+        <div className="mb-4">
+          <span className="text-3xl mb-2 block">{currentProvider.icon}</span>
+          <h1 className={`text-2xl font-bold ${
+            darkMode ? 'text-white' : 'text-gray-900'
+          }`}>
+            {status === 'processing' && `Connecting to ${currentProvider.displayName}`}
+            {status === 'success' && 'Connection Successful!'}
+            {status === 'error' && 'Connection Issue'}
+          </h1>
+        </div>
 
         {/* Message */}
         <p className={`text-base mb-6 ${

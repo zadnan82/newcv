@@ -157,8 +157,7 @@ const CoverLetterDashboard = ({ darkMode }) => {
   };
   
   const filteredAndSortedCoverLetters = () => {
-    let filtered = [...coverLetters];
-    
+    let filtered = [...coverLetters]; 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(letter => {
@@ -203,6 +202,8 @@ const CoverLetterDashboard = ({ darkMode }) => {
         return valueA < valueB ? 1 : -1;
       }
     });
+
+     
   };
   
   const handleSortChange = (field) => {
@@ -215,52 +216,68 @@ const CoverLetterDashboard = ({ darkMode }) => {
   };
   
   // Enhanced storage source detection for multi-provider support
-  const getStorageSource = (letter) => {
-    // Check for explicit storage type first
-    if (letter.storageType) {
-      return letter.storageType;
-    }
-    
-    // Check for provider field
-    if (letter.provider && connectedProviders.includes(letter.provider)) {
-      return letter.provider;
-    }
-    
-    // Check for local storage indicators
-    if (letter.syncedToCloud === false || 
-        letter.id?.startsWith('local_cl_') ||
-        letter.localStorage_only ||
-        letter.local_only) {
-      return 'local';
-    }
-    
-    // Check for specific provider indicators
-    if (letter.file_id || letter.drive_file_id || letter.google_drive_id) {
-      return 'google_drive';
-    }
-    
-    // Check for OneDrive indicators (file IDs with exclamation marks)
-    if (letter.id && letter.id.includes('!')) {
-      return 'onedrive';
-    }
-    
-    // Default to local if we can't determine the source
+const getStorageSource = (letter) => {
+  // Check for explicit storage type first
+  if (letter.storageType) {
+    return letter.storageType;
+  }
+  
+  // Check for provider field
+  if (letter.provider && connectedProviders.includes(letter.provider)) {
+    return letter.provider;
+  }
+  
+  // Check for local storage indicators
+  if (letter.syncedToCloud === false || 
+      letter.id?.startsWith('local_cl_') ||
+      letter.localStorage_only ||
+      letter.local_only) {
     return 'local';
-  };
+  }
+  
+  // Check for Google Drive indicators
+  if (letter.file_id || letter.drive_file_id || letter.google_drive_id) {
+    return 'google_drive';
+  }
+  
+  // Check for OneDrive indicators (file IDs with exclamation marks)
+  if (letter.id && letter.id.includes('!')) {
+    return 'onedrive';
+  }
+  
+  // Check for Dropbox indicators
+   if (letter.dropbox_file_id || 
+      letter.dropbox_id ||
+      letter.path_lower || 
+      letter.id?.includes('dbx:') ||
+      letter.id?.startsWith('/') || // Dropbox paths start with /
+      (letter.metadata && letter.metadata.dropbox) ||
+      letter.cv_provider === 'dropbox' || // Add this line
+      letter.cv_source === 'dropbox') {   // Add this line
+    return 'dropbox';
+  }
+  
+  // Default to local if we can't determine the source
+  return 'local';
+};
 
-  // Get provider display info
-  const getProviderDisplayInfo = (provider) => {
-    switch (provider) {
-      case 'google_drive':
-        return { name: 'Google Drive', icon: '📄', color: 'blue' };
-      case 'onedrive':
-        return { name: 'OneDrive', icon: '☁️', color: 'purple' };
-      case 'local':
-        return { name: 'Local Storage', icon: '💾', color: 'gray' };
-      default:
-        return { name: provider, icon: '🗃️', color: 'gray' };
-    }
-  };
+// Get provider display info
+const getProviderDisplayInfo = (provider) => {
+  switch (provider) {
+    case 'google_drive':
+      return { name: 'Google Drive', icon: '📄', color: 'blue' };
+    case 'onedrive':
+      return { name: 'OneDrive', icon: '☁️', color: 'purple' };
+    case 'dropbox':
+      return { name: 'Dropbox', icon: '📦', color: 'blue' };
+    case 'local':
+      return { name: 'Local Storage', icon: '💾', color: 'gray' };
+    default:
+      return { name: provider, icon: '🗃️', color: 'gray' };
+  }
+};
+
+   
 
   // Storage source indicator component with multi-provider support
   const StorageSourceBadge = ({ source, size = 'sm' }) => {
@@ -268,16 +285,16 @@ const CoverLetterDashboard = ({ darkMode }) => {
     const sizeClasses = size === 'xs' ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-1';
     
     const colorClasses = {
-      blue: darkMode 
-        ? 'bg-blue-900/30 text-blue-300 border border-blue-700/30'
-        : 'bg-blue-100 text-blue-700 border border-blue-200',
-      purple: darkMode
-        ? 'bg-purple-900/30 text-purple-300 border border-purple-700/30'
-        : 'bg-purple-100 text-purple-700 border border-purple-200',
-      gray: darkMode
-        ? 'bg-gray-700/50 text-gray-300 border border-gray-600/30'
-        : 'bg-gray-100 text-gray-600 border border-gray-300'
-    };
+  blue: darkMode 
+    ? 'bg-blue-900/30 text-blue-300 border border-blue-700/30'
+    : 'bg-blue-100 text-blue-700 border border-blue-200',
+  purple: darkMode
+    ? 'bg-purple-900/30 text-purple-300 border border-purple-700/30'
+    : 'bg-purple-100 text-purple-700 border border-purple-200',
+  gray: darkMode
+    ? 'bg-gray-700/50 text-gray-300 border border-gray-600/30'
+    : 'bg-gray-100 text-gray-600 border border-gray-300'
+};
     
     return (
       <span 
@@ -416,7 +433,16 @@ const CoverLetterDashboard = ({ darkMode }) => {
           </button>
           
           <button
-            onClick={() => navigate(`/cover-letters/${letter.id}/edit`)}
+            // In the CoverLetterDashboard.jsx, add this to the Edit button onClick:
+onClick={() => {
+    // FIXED CODE:
+    let cleanId = letter.id;
+    if (cleanId.startsWith('/')) {
+      cleanId = cleanId.substring(1);
+    }
+    const encodedId = encodeURIComponent(cleanId);
+    navigate(`/cover-letters/${encodedId}/edit`);
+  }}
             className="px-3 py-1.5 rounded-md text-xs bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-md transition-all duration-300 hover:shadow-md hover:shadow-green-500/20 hover:scale-102 ml-auto"
           >
             {t('common.edit', 'Edit')}
@@ -591,9 +617,21 @@ const CoverLetterDashboard = ({ darkMode }) => {
           </button>
 
           <button
-            onClick={() => navigate(`/cover-letters/${letter.id}/edit`)}
-            className="px-2 py-1 text-xs rounded-md bg-gradient-to-r from-green-600/10 to-green-600/5 hover:from-green-600/20 hover:to-green-600/10 transition-colors"
-          >
+  onClick={() => {
+    // ORIGINAL BROKEN CODE:
+    // const encodedId = encodeURIComponent(letter.id).replace(/^\/+/, '/');
+    // navigate(`/cover-letters/${encodedId}/edit`);
+    
+    // FIXED CODE:
+    let cleanId = letter.id;
+    if (cleanId.startsWith('/')) {
+      cleanId = cleanId.substring(1);
+    }
+    const encodedId = encodeURIComponent(cleanId);
+    navigate(`/cover-letters/${encodedId}/edit`);
+  }}
+  className="px-2 py-1 text-xs rounded-md bg-gradient-to-r from-green-600/10 to-green-600/5 hover:from-green-600/20 hover:to-green-600/10 transition-colors"
+>
             <span className={darkMode ? 'text-green-400' : 'text-green-600'}>
               {t('common.edit', 'Edit')}
             </span>
@@ -802,6 +840,7 @@ const CoverLetterDashboard = ({ darkMode }) => {
             {!isLoading && coverLetters.length > 0 && isCardView && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredAndSortedCoverLetters().map(letter => (
+                  
                   <CoverLetterCard key={letter.id} letter={letter} />
                 ))}
               </div>
@@ -968,7 +1007,15 @@ const CoverLetterDashboard = ({ darkMode }) => {
                               </button>
 
                               <button
-                                onClick={() => navigate(`/cover-letters/${letter.id}/edit`)}
+                               onClick={() => { 
+    // FIXED CODE:
+    let cleanId = letter.id;
+    if (cleanId.startsWith('/')) {
+      cleanId = cleanId.substring(1);
+    }
+    const encodedId = encodeURIComponent(cleanId);
+    navigate(`/cover-letters/${encodedId}/edit`);
+  }}
                                 className={`p-1 rounded-full ${darkMode ? 'text-green-400 hover:bg-green-600/20' : 'text-green-600 hover:bg-green-100/50'}`}
                                 title={t('common.edit', 'Edit')}
                               >

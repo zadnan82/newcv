@@ -1,16 +1,22 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useNewCoverLetterStore from '../../stores/coverLetterStore';
 import useSessionStore from '../../stores/sessionStore';
 import toast from 'react-hot-toast';
+import useCoverLetterStore from '../../stores/coverLetterStore';
 
 const CoverLetterEditor = ({ darkMode }) => {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const { sessionToken, googleDriveConnected } = useSessionStore();
+  // FIXED: Get multi-provider session data
+  const { 
+    sessionToken, 
+    connectedProviders,
+    hasCloudConnection 
+  } = useSessionStore();
   
   const {
     currentLetter,
@@ -20,7 +26,7 @@ const CoverLetterEditor = ({ darkMode }) => {
     error,
     clearError,
     formatCoverLetter
-  } = useNewCoverLetterStore();
+  } = useCoverLetterStore();
   
   // Local state
   const [formData, setFormData] = useState({
@@ -35,39 +41,54 @@ const CoverLetterEditor = ({ darkMode }) => {
   const [previewMode, setPreviewMode] = useState(false);
   const [formattedLetter, setFormattedLetter] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-   
+  const [isInitialized, setIsInitialized] = useState(false); 
+
   useEffect(() => {
-    if (!sessionToken) {
+    console.log('🔍 Editor useEffect - ID:', id);
+    console.log('🔍 Editor useEffect - sessionToken:', !!sessionToken);
+    console.log('🔍 Editor useEffect - connectedProviders:', connectedProviders);
+    console.log('🔍 Editor useEffect - hasCloudConnection:', hasCloudConnection);
+     
+    // FIXED: Don't redirect immediately, wait for session to load
+    if (!sessionToken && isInitialized) {
+      console.log('❌ No session token - redirecting to home');
       navigate('/', { replace: true });
       toast.error(t('auth.error.return_to_login', 'Please refresh the page to continue'));
       return;
     }
     
-    if (!googleDriveConnected) {
+    // FIXED: Only require ANY cloud connection, not specifically Google Drive
+    if (sessionToken && connectedProviders.length === 0 && isInitialized) {
+      console.log('❌ No cloud providers connected - redirecting to cloud setup');
       navigate('/cloud-setup', { replace: true });
-      toast.info(t('cloud.connect_drive_to_edit', 'Connect Google Drive to edit cover letters'));
+      toast.info(t('cloud.connect_provider_to_edit', 'Connect a cloud provider to edit cover letters'));
       return;
     }
     
-    // Load the cover letter
-    const loadCoverLetter = async () => {
-      try {
-        console.log('📥 Loading cover letter for editing:', id);
-        await getCoverLetter(id);
-      } catch (err) {
-        console.error('❌ Error loading cover letter:', err);
-        toast.error(t('coverLetterDetail.errors.load', 'Failed to load cover letter'));
-        navigate('/cover-letters', { replace: true });
-      }
-    };
+    // Mark as initialized after first render
+    if (!isInitialized) {
+      setIsInitialized(true);
+    }
     
-    if (id) {
+    // Load the cover letter if we have session and ID
+    if (sessionToken && connectedProviders.length > 0 && id && isInitialized) {
+      const loadCoverLetter = async () => {
+        try {
+          console.log('📥 Loading cover letter for editing:', id);
+          await getCoverLetter(id);
+        } catch (err) {
+          console.error('❌ Error loading cover letter:', err);
+          toast.error(t('coverLetterDetail.errors.load', 'Failed to load cover letter'));
+          navigate('/cover-letters', { replace: true });
+        }
+      };
+      
       loadCoverLetter();
     }
-  }, [id, sessionToken, googleDriveConnected, navigate]);
+  }, [id, sessionToken, connectedProviders, navigate, isInitialized]);
   
   // Set form data when letter loads
-  useEffect(() => {
+  useEffect(() => { 
     if (currentLetter) {
       console.log("📝 Setting form data from current letter:", currentLetter);
       
@@ -125,7 +146,7 @@ const CoverLetterEditor = ({ darkMode }) => {
   }, [currentLetter, formatCoverLetter, t]); 
   
   // Update preview when in preview mode (with safety checks)
-  useEffect(() => {
+  useEffect(() => { 
     if (previewMode && formData.coverLetterContent) {
       try {
         // Don't interfere with editing by creating a temporary object
@@ -146,7 +167,7 @@ const CoverLetterEditor = ({ darkMode }) => {
         const formatted = formatCoverLetter(tempLetter);
         setFormattedLetter(formatted);
         
-        console.log("🔍 Preview updated (preview mode only)");
+        console.log("📰 Preview updated (preview mode only)");
       } catch (err) {
         console.error('❌ Error formatting preview:', err);
         // Don't show error toast for preview issues to avoid disrupting editing
@@ -155,7 +176,7 @@ const CoverLetterEditor = ({ darkMode }) => {
   }, [previewMode, formData, currentLetter, formatCoverLetter, id]); // Only update when in preview mode
 
   // Handle error display
-  useEffect(() => {
+  useEffect(() => { 
     if (error) {
       toast.error(error);
       clearError();
@@ -489,7 +510,8 @@ const CoverLetterEditor = ({ darkMode }) => {
     }
   };
   
-  if (isLoading) {
+  // Show loading state if still initializing or loading data
+  if (!isInitialized || isLoading) {
     return (
       <div className={`min-h-screen flex justify-center items-center ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
         <div className="text-center">
@@ -521,7 +543,7 @@ const CoverLetterEditor = ({ darkMode }) => {
             <div>
               <h1 className="text-xl font-bold">{t('coverLetterEditor.title', 'Edit Cover Letter')}</h1>
               <p className="text-sm opacity-75">
-                {currentLetter?.title || t('common.loading', 'Loading...')}
+                {currentLetter?.title || formData.title || t('common.loading', 'Loading...')}
               </p>
             </div>
             
@@ -642,9 +664,67 @@ const CoverLetterEditor = ({ darkMode }) => {
                     onChange={handleInputChange}
                     required
                     className={`w-full p-2 text-sm rounded border ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}
-                    placeholder={t('coverLetterEditor.placeholders.recipientTitle', 'Hiring Manager Title')}
+                    placeholder={t('coverLetterEditor.placeholders.title', 'Enter cover letter title')}
                   />
                 </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('coverLetterEditor.fields.companyName', 'Company Name')}
+                  </label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={formData.companyName}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 text-sm rounded border ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}
+                    placeholder={t('coverLetterEditor.placeholders.companyName', 'Enter company name')}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('coverLetterEditor.fields.jobTitle', 'Job Title')}
+                  </label>
+                  <input
+                    type="text"
+                    name="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 text-sm rounded border ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}
+                    placeholder={t('coverLetterEditor.placeholders.jobTitle', 'Enter job title')}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('coverLetterEditor.fields.recipientName', 'Recipient Name')}
+                  </label>
+                  <input
+                    type="text"
+                    name="recipientName"
+                    value={formData.recipientName}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 text-sm rounded border ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}
+                    placeholder={t('coverLetterEditor.placeholders.recipientName', 'Hiring Manager Name')}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t('coverLetterEditor.fields.recipientTitle', 'Recipient Title')}
+                </label>
+                <input
+                  type="text"
+                  name="recipientTitle"
+                  value={formData.recipientTitle}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 text-sm rounded border ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}
+                  placeholder={t('coverLetterEditor.placeholders.recipientTitle', 'Hiring Manager Title')}
+                />
               </div>
               
               <div>
@@ -678,4 +758,4 @@ const CoverLetterEditor = ({ darkMode }) => {
   );
 };
 
-export default CoverLetterEditor; 
+export default CoverLetterEditor;

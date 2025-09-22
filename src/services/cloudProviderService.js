@@ -4,6 +4,9 @@
 import { API_BASE_URL } from '../config';
 
 // Provider configurations
+// In your existing src/services/cloudProviderService.js
+// Replace the incomplete dropbox entry with this complete one:
+
 const PROVIDERS = {
   'google_drive': {
     name: 'Google Drive',
@@ -36,9 +39,36 @@ const PROVIDERS = {
       DISCONNECT: `${API_BASE_URL}/api/onedrive/disconnect`,
       DEBUG: `${API_BASE_URL}/api/onedrive/debug`,
     }
+  },
+  // REPLACE your incomplete dropbox entry with this complete one:
+  // In cloudProviderService.js, update the LOAD endpoint for Dropbox:
+'dropbox': {
+  name: 'Dropbox',
+  icon: '📦',
+  color: 'bg-blue-500',
+  endpoints: {
+    CONNECT: `${API_BASE_URL}/api/dropbox/connect`,
+    STATUS: `${API_BASE_URL}/api/dropbox/status`,
+    SAVE: `${API_BASE_URL}/api/dropbox/save`,
+    LIST: `${API_BASE_URL}/api/dropbox/list`,
+    LOAD: (fileId) => {
+      // Remove leading slash from fileId if it exists
+      const cleanFileId = fileId.startsWith('/') ? fileId.substring(1) : fileId;
+      return `${API_BASE_URL}/api/dropbox/load/${cleanFileId}`;
+    },
+    DELETE: (fileId) => {
+      const cleanFileId = fileId.startsWith('/') ? fileId.substring(1) : fileId;
+      return `${API_BASE_URL}/api/dropbox/delete/${cleanFileId}`;
+    },
+    UPDATE: (fileId) => {
+      const cleanFileId = fileId.startsWith('/') ? fileId.substring(1) : fileId;
+      return `${API_BASE_URL}/api/dropbox/update-file/${cleanFileId}`;
+    },
+    DISCONNECT: `${API_BASE_URL}/api/dropbox/disconnect`,
+    DEBUG: `${API_BASE_URL}/api/dropbox/debug`,
   }
+}
 };
-
 class CloudProviderService {
   constructor() {
     this.sessionToken = null;
@@ -201,6 +231,7 @@ async listCVsFromProvider(provider) {
 }
 
 // Generic load method that routes to the correct provider
+// In your cloudProviderService.js - update the loadCVFromProvider method
 async loadCVFromProvider(provider, fileId) {
   console.log(`📥 Loading CV from ${provider}...`);
   
@@ -209,14 +240,66 @@ async loadCVFromProvider(provider, fileId) {
   }
 
   const config = this.getProviderConfig(provider);
-  const token = this.getSessionToken();
   
   try {
     const response = await this.makeApiCall(config.endpoints.LOAD(fileId));
     
     if (response.success && response.cv_data) {
-      console.log(`✅ CV loaded from ${provider} successfully`);
-      return response.cv_data;
+      let cvData = response.cv_data;
+      
+      // UNIVERSAL UNWRAPPING - All cloud providers use nested metadata structure
+      if (cvData && typeof cvData === 'object') {
+        console.log(`🔍 Raw ${provider} CV structure:`, {
+          keys: Object.keys(cvData),
+          hasMetadata: !!cvData.metadata,
+          hasCvData: !!cvData.cv_data,
+          hasDirectPersonalInfo: !!cvData.personal_info
+        });
+        
+        // Check if it's wrapped in metadata structure (Google Drive, OneDrive, Dropbox all use this)
+        if (cvData.cv_data && cvData.metadata) {
+          console.log(`📦 Unwrapping cv_data from ${provider} metadata structure`);
+          cvData = cvData.cv_data;
+        }
+        
+        // Check for double nesting (shouldn't happen but safety check)
+        if (cvData.cv_data && !cvData.personal_info) {
+          console.log(`📦 Unwrapping double-nested cv_data from ${provider}`);
+          cvData = cvData.cv_data;
+        }
+        
+        // Ensure required structure exists
+        if (!cvData.personal_info) {
+          console.warn(`⚠️ ${provider} CV missing personal_info, adding empty object`);
+          cvData.personal_info = {};
+        }
+        
+        // Ensure arrays exist (prevent validation errors)
+        cvData.experiences = cvData.experiences || [];
+        cvData.educations = cvData.educations || [];
+        cvData.skills = cvData.skills || [];
+        cvData.languages = cvData.languages || [];
+        cvData.referrals = cvData.referrals || [];
+        cvData.custom_sections = cvData.custom_sections || [];
+        cvData.extracurriculars = cvData.extracurriculars || [];
+        cvData.hobbies = cvData.hobbies || [];
+        cvData.courses = cvData.courses || [];
+        cvData.internships = cvData.internships || [];
+        
+        // Ensure photo field exists
+        if (!cvData.photo) {
+          cvData.photo = { photolink: null };
+        }
+      }
+      
+      console.log(`✅ CV loaded and processed from ${provider}:`, {
+        title: cvData.title || 'Untitled',
+        hasPersonalInfo: !!cvData.personal_info?.full_name,
+        experienceCount: (cvData.experiences || []).length,
+        provider: provider
+      });
+      
+      return cvData;
     } else {
       throw new Error(response.error || 'Load failed');
     }

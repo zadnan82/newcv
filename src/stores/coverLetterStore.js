@@ -163,9 +163,11 @@ fetchCoverLetters: async () => {
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    ...coverLetterData,
-                    cloud_provider: targetProvider
-                  })
+  ...coverLetterData,
+  save_to_cloud: true,           // ✅ CORRECT - tells backend to save to cloud
+  preferred_provider: targetProvider, // ✅ CORRECT - tells backend which provider
+  session_token: sessionToken
+})
                 });
                 
                 if (response.ok) {
@@ -206,7 +208,7 @@ fetchCoverLetters: async () => {
       },
 
       // ================== SIMPLIFIED GET COVER LETTER ==================
-     // ================== FIXED GET COVER LETTER ==================
+    // Fixed getCoverLetter function in coverLetterStore.js
 getCoverLetter: async (id) => {
   set({ isLoading: true, error: null });
   
@@ -226,7 +228,7 @@ getCoverLetter: async (id) => {
       return localLetter;
     }
     
-    // Try to find which provider has this cover letter
+    // DETERMINE PROVIDER FROM FILE ID
     const sessionStore = useSessionStore.getState();
     const { connectedProviders, sessionToken } = sessionStore;
     
@@ -234,16 +236,65 @@ getCoverLetter: async (id) => {
       throw new Error('No cloud providers connected');
     }
     
-    // URL encode the ID to handle special characters like ! in OneDrive IDs
+    // URL encode the ID to handle special characters
     const encodedId = encodeURIComponent(id);
     
-    // Try each connected provider using existing API
-    for (const provider of connectedProviders) {
+    // IMPROVED PROVIDER DETECTION
+    let providersToTry = [];
+    
+    if (id.includes('!')) {
+      // OneDrive file ID pattern (contains exclamation mark)
+      if (connectedProviders.includes('onedrive')) {
+        providersToTry.push('onedrive');
+      }
+    // } else if (id.startsWith('/')) {
+    //   // Dropbox file path pattern (starts with /)
+    //   if (connectedProviders.includes('dropbox')) {
+    //     providersToTry.push('dropbox');
+    //   }
+    } else {
+      // Assume Google Drive for other patterns (typically alphanumeric)
+      if (connectedProviders.includes('google_drive')) {
+        providersToTry.push('google_drive');
+      }
+    }
+    
+    // Add remaining providers as fallback
+    connectedProviders.forEach(provider => {
+      if (!providersToTry.includes(provider)) {
+        providersToTry.push(provider);
+      }
+    });
+    
+    console.log(`🔍 Will try providers in this order: ${providersToTry.join(', ')}`);
+    
+    // Try each provider in order
+    for (const provider of providersToTry) {
       try {
         console.log(`🔍 Trying to load cover letter from ${provider}...`);
         
-        // FIXED: Use your existing API endpoint with proper URL encoding
-        const response = await fetch(`${API_BASE_URL}/api/cover-letter/${encodedId}?provider=${provider}`, {
+let apiUrl;
+// Clean the encoded ID to prevent double slashes
+let cleanEncodedId = encodedId;
+if (cleanEncodedId.startsWith('/')) {
+  cleanEncodedId = cleanEncodedId.substring(1);
+}
+
+if (provider === 'dropbox') {
+  // FIXED: Use the correct Dropbox endpoint for cover letters with clean ID
+  apiUrl = `${API_BASE_URL}/api/dropbox/cover-letters/${cleanEncodedId}`;
+} else if (provider === 'google_drive') {
+  // FIXED: Use the cover letter specific endpoint for Google Drive with clean ID
+  apiUrl = `${API_BASE_URL}/api/google-drive/cover-letters/${cleanEncodedId}`;
+} else if (provider === 'onedrive') {
+  // FIXED: Use the cover letter specific endpoint for OneDrive with clean ID
+  apiUrl = `${API_BASE_URL}/api/onedrive/cover-letters/${cleanEncodedId}`;
+} else {
+  // Fallback to generic cover letter API with clean ID
+  apiUrl = `${API_BASE_URL}/api/cover-letter/${cleanEncodedId}?provider=${provider}`;
+}
+        
+        const response = await fetch(apiUrl, {
           headers: {
             'Authorization': `Bearer ${sessionToken}`,
             'Content-Type': 'application/json',
@@ -252,9 +303,20 @@ getCoverLetter: async (id) => {
         
         if (response.ok) {
           const result = await response.json();
-          const coverLetter = { ...result.cover_letter_data, provider };
+          let coverLetter;
           
-          console.log(`✅ Cover letter found in ${provider}:`, coverLetter);
+          if (result.cv_data) {
+            // Dropbox format
+            coverLetter = { ...result.cv_data, provider };
+          } else if (result.cover_letter_data) {
+            // Cover letter specific format
+            coverLetter = { ...result.cover_letter_data, provider };
+          } else {
+            // Direct format
+            coverLetter = { ...result, provider };
+          }
+          
+          console.log(`✅ Cover letter found in ${provider}:`, coverLetter.title || 'Untitled');
           
           set({ 
             currentLetter: coverLetter,
@@ -262,6 +324,8 @@ getCoverLetter: async (id) => {
           });
           
           return coverLetter;
+        } else {
+          console.log(`❌ Cover letter not found in ${provider} (HTTP ${response.status})`);
         }
       } catch (providerError) {
         console.log(`❌ Cover letter not found in ${provider}:`, providerError.message);
@@ -281,6 +345,8 @@ getCoverLetter: async (id) => {
 },
 
       // ================== FIXED DELETE ==================
+// Replace your deleteCoverLetter function in coverLetterStore.js with this fixed version:
+
 deleteCoverLetter: async (id) => {
   set({ isLoading: true, error: null });
   
@@ -306,7 +372,7 @@ deleteCoverLetter: async (id) => {
       }
     }
     
-    // Try to delete from cloud providers
+    // Try to delete from cloud providers using provider-specific endpoints
     const sessionStore = useSessionStore.getState();
     const { connectedProviders, sessionToken } = sessionStore;
     
@@ -314,49 +380,89 @@ deleteCoverLetter: async (id) => {
       throw new Error('No cloud providers connected');
     }
     
-    // URL encode the ID to handle special characters like ! in OneDrive IDs
-    const encodedId = encodeURIComponent(id);
+    // Clean the ID for URL encoding (remove leading slash if present)
+    let cleanId = id;
+    if (cleanId.startsWith('/')) {
+      cleanId = cleanId.substring(1);
+    }
+    const encodedId = encodeURIComponent(cleanId);
     
-    // Try each connected provider using existing API
-    for (const provider of connectedProviders) {
-      try {
-        console.log(`🔍 Trying to delete cover letter from ${provider}...`);
-        
-        // FIXED: Use your existing delete endpoint with proper URL encoding
-        const response = await fetch(`${API_BASE_URL}/api/cover-letter/delete/${encodedId}?provider=${provider}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${sessionToken}`,
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          
-          if (result.success) {
-            console.log(`✅ Cover letter deleted from ${provider}`);
-            
-            // Remove from favorites
-            const favoritesList = get().loadFavoritesFromStorage();
-            const updatedFavorites = favoritesList.filter(fav => fav !== id);
-            get().saveFavoritesToStorage(updatedFavorites);
-            
-            // Update state
-            set(state => ({
-              coverLetters: state.coverLetters.filter(letter => letter.id !== id),
-              isLoading: false
-            }));
-            
-            return result;
-          }
-        }
-      } catch (providerError) {
-        console.log(`❌ Delete failed in ${provider}:`, providerError.message);
-      }
+    // Determine the provider based on ID format
+    let provider;
+    if (id.includes('!')) {
+      provider = 'onedrive';
+    } else if (id.startsWith('/') || id.includes('Cover_Letters/') || id.includes('CVs/')) {
+      provider = 'dropbox';
+    } else {
+      provider = 'google_drive';
     }
     
-    throw new Error('Cover letter not found in any connected provider');
+    // Make sure the determined provider is actually connected
+    if (!connectedProviders.includes(provider)) {
+      // Fallback to first available provider
+      provider = connectedProviders[0];
+      console.log(`🔄 Provider fallback to: ${provider}`);
+    }
+    
+    console.log(`🗑️ Deleting cover letter from ${provider} with ID: ${encodedId}`);
+    
+    let response;
+    if (provider === 'dropbox') {
+      // Use Dropbox-specific endpoint
+      response = await fetch(`${API_BASE_URL}/api/dropbox/cover-letters/${encodedId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
+    } else if (provider === 'google_drive') {
+      // Use Google Drive-specific endpoint  
+      response = await fetch(`${API_BASE_URL}/api/google-drive/cover-letters/${encodedId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
+    } else if (provider === 'onedrive') {
+      // Use OneDrive-specific endpoint
+      response = await fetch(`${API_BASE_URL}/api/onedrive/cover-letters/${encodedId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
+    } else {
+      throw new Error(`Unsupported provider: ${provider}`);
+    }
+    
+    if (response.ok) {
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log(`✅ Cover letter deleted from ${provider}`);
+        
+        // Remove from favorites
+        const favoritesList = get().loadFavoritesFromStorage();
+        const updatedFavorites = favoritesList.filter(fav => fav !== id);
+        get().saveFavoritesToStorage(updatedFavorites);
+        
+        // Update state
+        set(state => ({
+          coverLetters: state.coverLetters.filter(letter => letter.id !== id),
+          isLoading: false
+        }));
+        
+        return result;
+      } else {
+        throw new Error(result.error || `Delete failed in ${provider}`);
+      }
+    } else {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
     
   } catch (error) {
     console.error('❌ Error deleting cover letter:', error);
@@ -369,11 +475,12 @@ deleteCoverLetter: async (id) => {
 },
 
 // ================== FIXED UPDATE ==================
+ 
 updateCoverLetter: async (id, updateData) => {
   set({ isLoading: true, error: null });
   
   try {
-    console.log("📄 Updating cover letter:", id);
+    console.log("📝 Updating cover letter:", id);
     
     // First check if it's a local cover letter
     const localLetters = get().loadLocalCoverLetters();
@@ -396,7 +503,7 @@ updateCoverLetter: async (id, updateData) => {
       }
     }
     
-    // Try to update in cloud providers
+    // Try to update in cloud providers using provider-specific endpoints
     const sessionStore = useSessionStore.getState();
     const { connectedProviders, sessionToken } = sessionStore;
     
@@ -404,46 +511,88 @@ updateCoverLetter: async (id, updateData) => {
       throw new Error('No cloud providers connected');
     }
     
-    // URL encode the ID to handle special characters like ! in OneDrive IDs
-    const encodedId = encodeURIComponent(id);
+    // Clean the ID for URL encoding (remove leading slash if present)
+    let cleanId = id;
+    if (cleanId.startsWith('/')) {
+      cleanId = cleanId.substring(1);
+    }
+    const encodedId = encodeURIComponent(cleanId);
     
-    // Try each connected provider using existing API
-    for (const provider of connectedProviders) {
-      try {
-        console.log(`🔍 Trying to update cover letter in ${provider}...`);
-        
-        // FIXED: Use your existing update endpoint with proper URL encoding
-        const response = await fetch(`${API_BASE_URL}/api/cover-letter/update/${encodedId}?provider=${provider}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${sessionToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData)
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          
-          if (result.success) {
-            console.log(`✅ Cover letter updated in ${provider}`);
-            
-            set(state => ({
-              coverLetters: state.coverLetters.map(letter => 
-                letter.id === id ? { ...letter, ...updateData } : letter
-              ),
-              isLoading: false
-            }));
-            
-            return result;
-          }
-        }
-      } catch (providerError) {
-        console.log(`❌ Update failed in ${provider}:`, providerError.message);
-      }
+    // Determine the provider based on ID format
+    let provider;
+    if (id.includes('!')) {
+      provider = 'onedrive';
+    } else if (id.startsWith('/') || id.includes('Cover_Letters/') || id.includes('CVs/')) {
+      provider = 'dropbox';
+    } else {
+      provider = 'google_drive';
     }
     
-    throw new Error('Cover letter not found in any connected provider');
+    // Make sure the determined provider is actually connected
+    if (!connectedProviders.includes(provider)) {
+      // Fallback to first available provider
+      provider = connectedProviders[0];
+      console.log(`🔄 Provider fallback to: ${provider}`);
+    }
+    
+    console.log(`📝 Updating cover letter in ${provider} with ID: ${encodedId}`);
+    
+    let response;
+    if (provider === 'dropbox') {
+      // Use Dropbox-specific endpoint
+      response = await fetch(`${API_BASE_URL}/api/dropbox/cover-letters/${encodedId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      });
+    } else if (provider === 'google_drive') {
+      // Use Google Drive-specific endpoint  
+      response = await fetch(`${API_BASE_URL}/api/google-drive/cover-letters/${encodedId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      });
+    } else if (provider === 'onedrive') {
+      // Use OneDrive-specific endpoint
+      response = await fetch(`${API_BASE_URL}/api/onedrive/cover-letters/${encodedId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      });
+    } else {
+      throw new Error(`Unsupported provider: ${provider}`);
+    }
+    
+    if (response.ok) {
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log(`✅ Cover letter updated in ${provider}`);
+        
+        set(state => ({
+          coverLetters: state.coverLetters.map(letter => 
+            letter.id === id ? { ...letter, ...updateData } : letter
+          ),
+          isLoading: false
+        }));
+        
+        return result;
+      } else {
+        throw new Error(result.error || `Update failed in ${provider}`);
+      }
+    } else {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
     
   } catch (error) {
     console.error('❌ Error updating cover letter:', error);
@@ -766,98 +915,105 @@ updateCoverLetter: async (id, updateData) => {
 },
 
       formatCoverLetter: (letter) => {
-        try {
-          console.log("📝 Formatting cover letter:", letter);
-          
-          let formattedLetter = '';
-          let contentObj = null;
-          
-          // Handle different content structures
-          if (letter.cover_letter_content) {
-            try {
-              if (typeof letter.cover_letter_content === 'string') {
-                contentObj = JSON.parse(letter.cover_letter_content);
-              } else {
-                contentObj = letter.cover_letter_content;
-              }
-            } catch (e) {
-              console.warn("Failed to parse cover letter content as JSON:", e);
-              return letter.cover_letter_content;
-            }
-          } else if (letter.cover_letter) {
-            contentObj = letter.cover_letter;
-          } else {
-            contentObj = {
-              greeting: 'Dear Hiring Manager,',
-              introduction: '',
-              body_paragraphs: [''],
-              closing: '',
-              signature: 'Sincerely,'
-            };
-          }
-          
-          // Get personal info for header
-          const personalInfo = {
-            full_name: letter.author_name || letter.applicant_info?.name || '',
-            email: letter.author_email || letter.applicant_info?.email || '',
-            mobile: letter.author_phone || letter.applicant_info?.phone || ''
-          };
-          
-          // Build formatted letter
-          if (personalInfo.full_name) formattedLetter += `${personalInfo.full_name}\n`;
-          if (personalInfo.email) formattedLetter += `${personalInfo.email}\n`;
-          if (personalInfo.mobile) formattedLetter += `${personalInfo.mobile}\n\n`;
-          
-          // Add date
-          formattedLetter += `${new Date().toLocaleDateString()}\n\n`;
-          
-          // Add company info
-          if (letter.company_name) formattedLetter += `${letter.company_name}\n`;
-          if (letter.recipient_name) formattedLetter += `${letter.recipient_name}\n`;
-          if (letter.recipient_title) formattedLetter += `${letter.recipient_title}\n`;
-          formattedLetter += '\n';
-          
-          // Add greeting
-          if (contentObj.greeting) {
-            formattedLetter += `${contentObj.greeting}\n\n`;
-          }
-          
-          // Add introduction
-          if (contentObj.introduction) {
-            formattedLetter += `${contentObj.introduction}\n\n`;
-          }
-          
-          // Add body paragraphs
-          if (Array.isArray(contentObj.body_paragraphs)) {
-            contentObj.body_paragraphs.forEach(paragraph => {
-              if (paragraph) formattedLetter += `${paragraph}\n\n`;
-            });
-          } else if (Array.isArray(contentObj.body)) {
-            contentObj.body.forEach(paragraph => {
-              if (paragraph) formattedLetter += `${paragraph}\n\n`;
-            });
-          }
-          
-          // Add closing
-          if (contentObj.closing) {
-            formattedLetter += `${contentObj.closing}\n\n`;
-          }
-          
-          // Add signature
-          if (contentObj.signature) {
-            formattedLetter += contentObj.signature.replace(/\\n/g, '\n');
-          } else {
-            formattedLetter += `Sincerely,\n${personalInfo.full_name}`;
-          }
-          
-          console.log("✅ Cover letter formatted successfully");
-          return formattedLetter;
-          
-        } catch (error) {
-          console.error("❌ Error formatting cover letter:", error);
-          return "Error formatting cover letter content.";
+  try {
+    console.log("🔍 Formatting cover letter:", letter);
+    
+    let formattedLetter = '';
+    let contentObj = null;
+    
+    // Handle Dropbox structure (nested in cover_letter_data)
+    let coverLetterData = letter;
+    if (letter.cover_letter_data) {
+      coverLetterData = letter.cover_letter_data;
+    }
+    
+    // Handle different content structures
+    if (coverLetterData.cover_letter_content) {
+      try {
+        if (typeof coverLetterData.cover_letter_content === 'string') {
+          contentObj = JSON.parse(coverLetterData.cover_letter_content);
+        } else {
+          contentObj = coverLetterData.cover_letter_content;
         }
-      },
+      } catch (e) {
+        console.warn("Failed to parse cover letter content as JSON:", e);
+        return coverLetterData.cover_letter_content;
+      }
+    } else if (coverLetterData.cover_letter) {
+      contentObj = coverLetterData.cover_letter;
+    } else {
+      contentObj = {
+        greeting: 'Dear Hiring Manager,',
+        introduction: '',
+        body_paragraphs: [''],
+        closing: '',
+        signature: 'Sincerely,'
+      };
+    }
+    
+    // Get personal info for header - check both locations
+    const applicantInfo = coverLetterData.applicant_info || letter.applicant_info || {};
+    const personalInfo = {
+      full_name: applicantInfo.name || coverLetterData.author_name || letter.author_name || '',
+      email: applicantInfo.email || coverLetterData.author_email || letter.author_email || '',
+      mobile: applicantInfo.phone || coverLetterData.author_phone || letter.author_phone || ''
+    };
+    
+    // Build formatted letter
+    if (personalInfo.full_name) formattedLetter += `${personalInfo.full_name}\n`;
+    if (personalInfo.email) formattedLetter += `${personalInfo.email}\n`;
+    if (personalInfo.mobile) formattedLetter += `${personalInfo.mobile}\n\n`;
+    
+    // Add date
+    formattedLetter += `${new Date().toLocaleDateString()}\n\n`;
+    
+    // Add company info
+    if (coverLetterData.company_name) formattedLetter += `${coverLetterData.company_name}\n`;
+    if (coverLetterData.recipient_name) formattedLetter += `${coverLetterData.recipient_name}\n`;
+    if (coverLetterData.recipient_title) formattedLetter += `${coverLetterData.recipient_title}\n`;
+    formattedLetter += '\n';
+    
+    // Add greeting
+    if (contentObj.greeting) {
+      formattedLetter += `${contentObj.greeting}\n\n`;
+    }
+    
+    // Add introduction
+    if (contentObj.introduction) {
+      formattedLetter += `${contentObj.introduction}\n\n`;
+    }
+    
+    // Add body paragraphs
+    if (Array.isArray(contentObj.body_paragraphs)) {
+      contentObj.body_paragraphs.forEach(paragraph => {
+        if (paragraph) formattedLetter += `${paragraph}\n\n`;
+      });
+    } else if (Array.isArray(contentObj.body)) {
+      contentObj.body.forEach(paragraph => {
+        if (paragraph) formattedLetter += `${paragraph}\n\n`;
+      });
+    }
+    
+    // Add closing
+    if (contentObj.closing) {
+      formattedLetter += `${contentObj.closing}\n\n`;
+    }
+    
+    // Add signature
+    if (contentObj.signature) {
+      formattedLetter += contentObj.signature.replace(/\\n/g, '\n');
+    } else {
+      formattedLetter += `Sincerely,\n${personalInfo.full_name}`;
+    }
+    
+    console.log("✅ Cover letter formatted successfully");
+    return formattedLetter;
+    
+  } catch (error) {
+    console.error("❌ Error formatting cover letter:", error);
+    return "Error formatting cover letter content.";
+  }
+},
 
       getConnectedProviders: () => {
         const sessionStore = useSessionStore.getState();

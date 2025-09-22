@@ -190,12 +190,14 @@ const loadOneDriveCVAlt = async (fileId) => {
       console.log(`☁️ Loading specific cloud CV for editing: ${fileId} from ${provider}`);
       
       if (provider === 'onedrive') {
-        cvData = await loadOneDriveCVAlt(fileId);
-      } else if (provider === 'google_drive') {
-        cvData = await loadGoogleDriveCV(fileId);
-      } else {
-        throw new Error(`Unsupported provider: ${provider}`);
-      }
+  cvData = await loadOneDriveCVAlt(fileId);
+} else if (provider === 'google_drive') {
+  cvData = await loadGoogleDriveCV(fileId);
+} else if (provider === 'dropbox') {
+  cvData = await loadDropboxCV(fileId);
+} else {
+  throw new Error(`Unsupported provider: ${provider}`);
+}
       
       if (cvData) {
         source = 'cloud';
@@ -254,12 +256,11 @@ const loadOneDriveCVAlt = async (fileId) => {
 };
     loadCVData();
   }, [location.state, t]);
-
-
-  const getProviderDisplayName = (provider) => {
+ 
+const getProviderDisplayName = (provider) => {
   switch (provider) {
     case 'google_drive':
-      return t('cloud.google_drive');
+      return t('cloud.google_drive') || 'Google Drive';
     case 'onedrive':
       return t('cloud.onedrive') || 'OneDrive';
     case 'dropbox':
@@ -267,7 +268,7 @@ const loadOneDriveCVAlt = async (fileId) => {
     case 'box':
       return t('cloud.box') || 'Box';
     default:
-      return t('cloud.google_drive'); // Fallback
+      return t('cloud.google_drive') || 'Google Drive'; // Fallback
   }
 };
 
@@ -345,7 +346,152 @@ const getProviderIcon = (provider) => {
     });
   };
 
-  // Save CV function - supports local and cloud saving
+
+
+  const loadDropboxCV = async (fileId) => {
+  try {
+    console.log('📄 Loading Dropbox CV directly via API:', fileId);
+    
+    // Get session token from useSessionStore hook or directly from store
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    
+    console.log('🔑 Session token available:', !!token);
+    
+    if (!token) {
+      throw new Error('No session token found in sessionStore');
+    }
+    
+    // Clean the fileId - remove leading slash if present for API call
+    let cleanFileId = fileId;
+    if (cleanFileId.startsWith('/')) {
+      cleanFileId = cleanFileId.substring(1);
+    }
+    
+    // Encode the file ID for the URL
+    const encodedFileId = encodeURIComponent(cleanFileId);
+    
+    const response = await fetch(`http://localhost:8000/api/dropbox/load/${encodedFileId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('📡 Dropbox API response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('❌ Dropbox API error:', errorData);
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.success && result.cv_data) {
+      console.log('✅ Dropbox CV loaded successfully');
+      return result.cv_data;
+    } else {
+      throw new Error(result.error || 'Failed to load CV from Dropbox');
+    }
+  } catch (error) {
+    console.error('❌ Dropbox load failed:', error);
+    throw error;
+  }
+};
+
+
+// Add these functions to your EditResumeBuilder.jsx file, similar to the OneDrive functions:
+
+const saveToDropbox = async (cvData) => {
+  try {
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    if (!token) {
+      throw new Error('No session token available');
+    }
+
+    const response = await fetch('http://localhost:8000/api/dropbox/save', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cvData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    return {
+      success: result.success,
+      file_id: result.file_id,
+      provider: 'dropbox'
+    };
+  } catch (error) {
+    console.error('❌ Dropbox save failed:', error);
+    return { success: false, error: error.message };
+  }
+}; 
+
+
+const updateDropboxCV = async (fileId, cvData) => {
+  try {
+    const token = sessionToken || useSessionStore.getState().sessionToken;
+    if (!token) {
+      throw new Error('No session token available');
+    }
+
+    // For Dropbox, we need to preserve the leading slash in the file path
+    // but encode it properly for the URL
+    let dropboxFilePath = fileId;
+    
+    // Ensure it starts with / for Dropbox API
+    if (!dropboxFilePath.startsWith('/')) {
+      dropboxFilePath = '/' + dropboxFilePath;
+    }
+    
+    // For the URL, we need to encode but handle the leading slash carefully
+    // Remove leading slash temporarily, encode, then construct URL
+    const pathForUrl = dropboxFilePath.startsWith('/') ? dropboxFilePath.substring(1) : dropboxFilePath;
+    const encodedFileId = encodeURIComponent(pathForUrl);
+
+    console.log('📝 Dropbox update paths:', {
+      originalFileId: fileId,
+      dropboxFilePath: dropboxFilePath,
+      pathForUrl: pathForUrl,
+      encodedFileId: encodedFileId
+    });
+
+    const response = await fetch(`http://localhost:8000/api/dropbox/update-file/${encodedFileId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cvData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const result = await response.json();
+    return {
+      success: result.success,
+      file_id: fileId, // Return the original file ID
+      provider: 'dropbox'
+    };
+  } catch (error) {
+    console.error('❌ Dropbox update failed:', error);
+    return { success: false, error: error.message };
+  }
+};
+ 
+ 
 const handleSaveCV = async (saveToCloud = false) => {
   if (!formData) return;
   
@@ -368,45 +514,51 @@ const handleSaveCV = async (saveToCloud = false) => {
     let result;
     
     if (saveToCloud && canSaveToCloud()) {
-      // Save to cloud - use the correct provider
-      const targetProvider = originalProvider || 'google_drive'; // Default to Google Drive if no provider specified
-      
-      if (cvSource === 'cloud' && originalCvId) {
-        // UPDATE existing cloud file
-        console.log(`📝 Updating existing cloud file: ${originalCvId} in ${targetProvider}`);
-        
-        if (targetProvider === 'onedrive') {
-          // Use OneDrive update method
-          result = await updateOneDriveCV(originalCvId, cvToSave);
-        } else {
-          // Use the existing Google Drive method
-          result = await updateConnectedCloudCV(cvToSave, originalCvId, targetProvider);
-        }
-        
-        if (result.success) {
-          showToast(`${t('common.success')} (${getProviderDisplayName(targetProvider)})`, 'success');
-        }
-      } else {
-        // CREATE new cloud file
-        console.log(`📝 Creating new cloud file in ${targetProvider}`);
-        
-        if (targetProvider === 'onedrive') {
-          // Use OneDrive save method
-          result = await saveToOneDrive(cvToSave);
-        } else {
-          // Use the existing Google Drive method
-          result = await saveToConnectedCloud(cvToSave, targetProvider);
-        }
-        
-        if (result.success) {
-          showToast(`${t('common.success')} (${getProviderDisplayName(targetProvider)})`, 'success');
-          setCvSource('cloud');
-          setOriginalCvId(result.file_id || result.fileId);
-          setOriginalProvider(targetProvider);
-        }
-      }
-      
+  // Save to cloud - use the correct provider
+  const targetProvider = originalProvider || 'google_drive'; // Default to Google Drive if no provider specified
+  
+  if (cvSource === 'cloud' && originalCvId) {
+    // UPDATE existing cloud file
+    console.log(`🔄 Updating existing cloud file: ${originalCvId} in ${targetProvider}`);
+    
+    if (targetProvider === 'onedrive') {
+      // Use OneDrive update method
+      result = await updateOneDriveCV(originalCvId, cvToSave);
+    } else if (targetProvider === 'dropbox') {
+      // Use Dropbox update method
+      result = await updateDropboxCV(originalCvId, cvToSave);
     } else {
+      // Use the existing Google Drive method
+      result = await updateConnectedCloudCV(cvToSave, originalCvId, targetProvider);
+    }
+    
+    if (result.success) {
+      showToast(`${t('common.success')} (${getProviderDisplayName(targetProvider)})`, 'success');
+    }
+  } else {
+    // CREATE new cloud file
+    console.log(`🆕 Creating new cloud file in ${targetProvider}`);
+    
+    if (targetProvider === 'onedrive') {
+      // Use OneDrive save method
+      result = await saveToOneDrive(cvToSave);
+    } else if (targetProvider === 'dropbox') {
+      // Use Dropbox save method
+      result = await saveToDropbox(cvToSave);
+    } else {
+      // Use the existing Google Drive method
+      result = await saveToConnectedCloud(cvToSave, targetProvider);
+    }
+    
+    if (result.success) {
+      showToast(`${t('common.success')} (${getProviderDisplayName(targetProvider)})`, 'success');
+      setCvSource('cloud');
+      setOriginalCvId(result.file_id || result.fileId);
+      setOriginalProvider(targetProvider);
+    }
+  }
+}
+ else {
       // Save locally (existing logic remains the same)
       if (cvSource === 'local' && originalCvId) {
         // UPDATE existing local CV

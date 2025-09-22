@@ -1,4 +1,4 @@
-// src/components/clouds/SimpleCloudConnect.jsx - Updated with OneDrive support
+// src/components/clouds/SimpleCloudConnect.jsx - Updated with Dropbox support
 import React, { useState } from 'react';
 import { Cloud, CheckCircle, Loader2, Shield } from 'lucide-react';
 import useSessionStore from '../../stores/sessionStore';
@@ -44,33 +44,44 @@ const SimpleCloudConnect = ({ darkMode, selectedProvider = 'google_drive' }) => 
       connectedText: t('cloud.onedrive_connected', 'OneDrive Connected'),
       connectText: t('cloud.connect_onedrive', 'Connect OneDrive'),
       privacyText: t('cloud.never_access_files'),
+    },
+    'dropbox': {
+      name: 'Dropbox',
+      icon: '📦',
+      color: 'from-blue-600 to-blue-800',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-300',
+      textColor: 'text-blue-600',
+      description: t('cloud.save_cvs_securely_dropbox', 'Save your CVs securely to Dropbox'),
+      connectedText: t('cloud.dropbox_connected', 'Dropbox Connected'),
+      connectText: t('cloud.connect_dropbox', 'Connect Dropbox'),
+      privacyText: t('cloud.never_access_files'),
     }
   };
 
   const config = providerConfigs[selectedProvider] || providerConfigs['google_drive'];
 
-  // In SimpleCloudConnect.jsx - update the handleConnect method
-const handleConnect = async () => {
-  setConnecting(true);
-  clearError();
-  
-  try {
-    console.log(`🔗 User clicked connect to ${config.name}`);
+  const handleConnect = async () => {
+    setConnecting(true);
+    clearError();
     
-    // Always use the cloudProviderService
-    const sessionStore = useSessionStore.getState();
-    if (sessionStore.sessionToken) {
-      cloudProviderService.setSessionToken(sessionStore.sessionToken);
+    try {
+      console.log(`🔗 User clicked connect to ${config.name}`);
+      
+      // Always use the cloudProviderService
+      const sessionStore = useSessionStore.getState();
+      if (sessionStore.sessionToken) {
+        cloudProviderService.setSessionToken(sessionStore.sessionToken);
+      }
+      
+      await cloudProviderService.connectToProvider(selectedProvider);
+      
+      // If successful, this will redirect to OAuth, so we won't reach here
+    } catch (error) {
+      console.error('❌ Connection failed:', error);
+      setConnecting(false);
     }
-    
-    await cloudProviderService.connectToProvider(selectedProvider);
-    
-    // If successful, this will redirect to OAuth, so we won't reach here
-  } catch (error) {
-    console.error('❌ Connection failed:', error);
-    setConnecting(false);
-  }
-};
+  };
 
   // Check if the selected provider is connected
   const isConnected = selectedProvider === 'google_drive' 
@@ -138,7 +149,7 @@ const handleConnect = async () => {
       <div className="text-center">
         <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
           darkMode 
-            ? `bg-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-900/30` 
+            ? `bg-${getProviderColorClass(selectedProvider)}-900/30` 
             : config.bgColor
         }`}>
           <span className="text-2xl">{config.icon}</span>
@@ -211,6 +222,19 @@ const handleConnect = async () => {
       </div>
     </div>
   );
+};
+
+// Helper function to get provider color class
+const getProviderColorClass = (provider) => {
+  switch (provider) {
+    case 'onedrive':
+      return 'purple';
+    case 'dropbox':
+      return 'blue';
+    case 'google_drive':
+    default:
+      return 'blue';
+  }
 };
 
 export default SimpleCloudConnect;

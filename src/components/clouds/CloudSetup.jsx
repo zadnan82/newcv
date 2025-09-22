@@ -1,4 +1,4 @@
-// src/components/clouds/CloudSetup.jsx - Updated with OneDrive support
+// src/components/clouds/CloudSetup.jsx - Updated with Dropbox support
 import React, { useState } from 'react';
 import { ArrowLeft, Shield, HardDrive, Cloud, CheckCircle } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +23,7 @@ const CloudSetup = ({ darkMode }) => {
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50',
       textColor: 'text-blue-700',
+      status: 'fully_supported',
       benefits: [
         t('cloud.15gb_free_storage', '15GB free storage'),
         t('cloud.automatic_sync', 'Automatic sync across devices'),
@@ -37,15 +38,58 @@ const CloudSetup = ({ darkMode }) => {
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50',
       textColor: 'text-purple-700',
+      status: 'fully_supported',
       benefits: [
         t('cloud.5gb_free_storage', '5GB free storage'),
         t('cloud.office_integration', 'Office 365 integration'),
         t('cloud.microsoft_ecosystem', 'Works with Microsoft ecosystem')
       ]
+    },
+    {
+      id: 'dropbox',
+      name: 'Dropbox',
+      icon: '📦',
+      description: t('cloud.dropbox_description', 'Store your CVs in Dropbox'),
+      color: 'from-blue-500 to-blue-700',
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-700',
+      status: 'available',
+      benefits: [
+        t('cloud.2gb_free_storage', '2GB free storage'),
+        t('cloud.reliable_sync', 'Reliable file synchronization'),
+        t('cloud.cross_platform', 'Works on all platforms')
+      ]
     }
   ];
 
   const selectedProviderData = providers.find(p => p.id === selectedProvider);
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'fully_supported':
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            {t('cloud.fully_supported', 'Fully Supported')}
+          </span>
+        );
+      case 'available':
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <Cloud className="w-3 h-3 mr-1" />
+            {t('cloud.available', 'Available')}
+          </span>
+        );
+      case 'coming_soon':
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            {t('cloud.coming_soon', 'Coming Soon')}
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-purple-50'} py-12 px-4`}>
@@ -73,7 +117,7 @@ const CloudSetup = ({ darkMode }) => {
             {t('cloud.choose_provider', 'Choose Your Cloud Provider')}
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             {providers.map((provider) => (
               <div
                 key={provider.id}
@@ -86,23 +130,32 @@ const CloudSetup = ({ darkMode }) => {
                       : `border-gray-200 bg-white hover:border-gray-300 text-gray-700 hover:${provider.bgColor}`
                 }`}
               >
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">{provider.icon}</span>
-                  <div>
-                    <h3 className="font-semibold">{provider.name}</h3>
-                    <p className={`text-sm ${
-                      selectedProvider === provider.id 
-                        ? 'text-white/80' 
-                        : darkMode 
-                          ? 'text-gray-400' 
-                          : 'text-gray-600'
-                    }`}>
-                      {provider.description}
-                    </p>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{provider.icon}</span>
+                    <div>
+                      <h3 className="font-semibold">{provider.name}</h3>
+                    </div>
                   </div>
+                  {!selectedProvider || selectedProvider !== provider.id ? (
+                    <div className="text-right">
+                      {getStatusBadge(provider.status)}
+                    </div>
+                  ) : null}
                 </div>
+                
+                <p className={`text-sm mb-3 ${
+                  selectedProvider === provider.id 
+                    ? 'text-white/80' 
+                    : darkMode 
+                      ? 'text-gray-400' 
+                      : 'text-gray-600'
+                }`}>
+                  {provider.description}
+                </p>
+
                 {selectedProvider === provider.id && (
-                  <div className="mt-3 space-y-1">
+                  <div className="space-y-1">
                     {provider.benefits.map((benefit, index) => (
                       <div key={index} className="flex items-center text-sm">
                         <CheckCircle className="w-4 h-4 mr-2 text-white/80" />
@@ -222,6 +275,8 @@ const CloudSetup = ({ darkMode }) => {
                   }`}>
                     {selectedProvider === 'onedrive' 
                       ? t('cloud.onedrive_benefits', 'Reliable Microsoft cloud storage with Office integration')
+                      : selectedProvider === 'dropbox'
+                      ? t('cloud.dropbox_benefits', 'Trusted cloud storage with excellent reliability and sync')
                       : t('cloud.google_drive_benefits', 'Reliable cloud storage with excellent integration')
                     }
                   </p>

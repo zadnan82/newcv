@@ -1581,7 +1581,28 @@
     "create_cv_to_customize": "We couldn't find any CVs to customize. Create one first!",
     "create_new_cv": "Create New CV",
     "select_cv_to_customize": "Select CV to Customize",
-    "choose_cv_to_customize": "Choose which CV you'd like to customize"
+    "choose_cv_to_customize": "Choose which CV you'd like to customize",
+
+
+
+
+
+ 
+    "dropbox_description": "Store your CVs in Dropbox",
+    "dropbox_connected": "Dropbox Connected",
+    "connect_dropbox": "Connect Dropbox",
+    "save_cvs_securely_dropbox": "Save your CVs securely to Dropbox",
+    "dropbox_benefits": "Trusted cloud storage with excellent reliability and sync",
+     
+    "2gb_free_storage": "2GB free storage",
+    "reliable_sync": "Reliable file synchronization",
+    "cross_platform": "Works on all platforms",
+      
+    "can_save_cvs_to_provider": "You can now save your CVs to {{provider}}",
+    "data_stays_in_your_provider": "Your data stays in your {{provider}} account",
+    "why_provider": "Why {{provider}}?",
+     
+    "fully_supported": "Fully Supported"
   }, 
   "terms": {
     "title": "Terms and Conditions",
