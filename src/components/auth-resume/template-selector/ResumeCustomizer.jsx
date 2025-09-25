@@ -16,8 +16,7 @@ import { exportToDocx } from '../view-cv/js/Exportdocx';
 import SaveConfirmationModal from './SaveConfirmationModal';
 import API_BASE_URL from '../../../config';
 import PublicCVManager from './PublicCVManager';
-import CustomizationManager from './CustomizationManager';
-import useAuthStore from '../../../stores/authStore';
+import CustomizationManager from './CustomizationManager'; 
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
@@ -541,8 +540,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
   const navigate = useNavigate(); 
   const resumeId = location.state?.resumeId; 
   
-  // Stores
-  const { token } = useAuthStore();
+  // Stores 
   const { currentResume, loading, fetchResume } = useResumeStore();  
   const { 
   listGoogleDriveCVs,

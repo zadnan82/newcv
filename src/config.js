@@ -1,5 +1,5 @@
 // config.js - FIXED with clean cover letter endpoints
-import useAuthStore from './stores/authStore';
+//import useAuthStore from './stores/authStore';
 
 // ================== ENVIRONMENT DETECTION ==================
 const isDevelopment = process.env.NODE_ENV === 'development' || 

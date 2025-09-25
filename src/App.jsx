@@ -20,9 +20,7 @@ import NewResumeBuilder from './components/auth-resume/view-cv/NewResumeBuilder'
 import EditResumeBuilder from './components/auth-resume/view-cv/EditResumeBuilder';
 import CoverLetterDashboard from './components/auth-coverletter/CoverLetterDashboard';
 import CoverLetterEditor from './components/auth-coverletter/CoverLetterEditor';
-import CookieConsent from './components/legal/CookieConsent';
-import FeedbackButton from './components/feedback/FeedbackButton'; 
-import FeedbackPage from './components/feedback/FeedbackPage';
+import CookieConsent from './components/legal/CookieConsent'; 
 import RCPublic from './components/customizer-public/RCPublic';
 import JobMatching from './components/job-matching/JobMatching'; 
 
@@ -30,9 +28,7 @@ import JobMatching from './components/job-matching/JobMatching';
 import useSessionStore from './stores/sessionStore';
 import CloudSetup from './components/clouds/CloudSetup';
 import CloudCallback from './components/clouds/CloudCallback';
-import CloudConnected from './components/clouds/CloudConnected';  
-import ErrorBoundary from './components/shared/ErrorBoundary';
-import TestCV from './TestCV';
+import CloudConnected from './components/clouds/CloudConnected';    
 import CVAIEnhancement from './components/auth-resume/view-cv/CVAIEnhancement';
 
 // ============ START OF HTTPS ENFORCEMENT ============
@@ -126,7 +122,7 @@ const MainLayout = ({ children, darkMode, toggleDarkMode }) => (
       {children}
     </main>
     <Footer darkMode={darkMode} />
-    <FeedbackButton darkMode={darkMode} />
+    {/* <FeedbackButton darkMode={darkMode} /> */}
   </>
 );
 
@@ -244,7 +240,7 @@ function App() {
                 <Route path="/data-deletion" element={<DataDeletion darkMode={darkMode} />} />
                 <Route path="/cookies" element={<CookiePolicy darkMode={darkMode} />} />
                 <Route path="/contact" element={<Contact darkMode={darkMode} />} />
-                <Route path="/feedback" element={<FeedbackPage darkMode={darkMode} />} />
+                {/* <Route path="/feedback" element={<FeedbackPage darkMode={darkMode} />} /> */}
                 
                 <Route path="/rc-public" element={<RCPublic darkMode={darkMode} />} />  
                 
