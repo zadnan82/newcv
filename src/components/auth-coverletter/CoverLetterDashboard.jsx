@@ -474,7 +474,7 @@ onClick={() => {
           <div className="text-blue-500 text-xl">💡</div>
           <div>
             <p className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
-              {t('cloud.tip_connect_providers', 'Tip: Connect cloud providers to sync your cover letters across devices!')}
+              {t('cloud3.tip_connect_providers', 'Tip: Connect cloud providers to sync your cover letters across devices!')}
             </p>
           </div>
         </div>
@@ -498,7 +498,7 @@ onClick={() => {
           </h2>
           <p className={`mb-6 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             {connectedProviderDetails.length === 0 
-              ? t('cloud.connect_storage_to_save', 'Connect cloud storage to save and access your AI-generated cover letters')
+              ? t('cloud3.connect_storage_to_save', 'Connect cloud storage to save and access your AI-generated cover letters')
               : t('coverLetters.empty.message', 'Start building your professional cover letters and take the next step in your career!')
             }
           </p>
@@ -522,7 +522,7 @@ onClick={() => {
                 }`}
               >
                 <Cloud size={20} />
-                {t('cloud.connect_storage', 'Connect Cloud Storage')}
+                {t('cloud3.connect_storage', 'Connect Cloud Storage')}
               </Link>
             )}
           </div>
@@ -534,7 +534,7 @@ onClick={() => {
             <div className="flex items-center justify-center gap-2 mb-2">
               <div className="text-green-500 text-xl">✅</div>
               <p className={`text-sm font-medium ${darkMode ? 'text-green-300' : 'text-green-800'}`}>
-                {t('cloud.connected_providers', 'Connected Storage Providers')}:
+                {t('cloud3.connected_providers', 'Connected Storage Providers')}:
               </p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center">
@@ -551,8 +551,8 @@ onClick={() => {
             <div>
               <p className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
                 {connectedProviderDetails.length === 0 
-                  ? t('cloud.tip_connect_providers', 'Tip: Connect cloud providers to sync your cover letters across devices!')
-                  : t('cloud.tip_create_first', 'Tip: Generate your first cover letter using AI to get started!')
+                  ? t('cloud3.tip_connect_providers', 'Tip: Connect cloud providers to sync your cover letters across devices!')
+                  : t('cloud3.tip_create_first', 'Tip: Generate your first cover letter using AI to get started!')
                 }
               </p>
               {connectedProviderDetails.length === 0 && (
@@ -560,7 +560,7 @@ onClick={() => {
                   to="/cloud-setup"
                   className={`inline-block mt-2 text-sm underline ${darkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-800'}`}
                 >
-                  {t('cloud.connect_storage', 'Connect Cloud Storage')}
+                  {t('cloud3.connect_storage', 'Connect Cloud Storage')}
                 </Link>
               )}
             </div>
@@ -691,7 +691,7 @@ onClick={() => {
               </h1>
               <div className="flex items-center gap-2">
                 <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {t('coverLetters.description_multi', 'Manage your AI-generated cover letters from all sources')}
+                  {t('cloud3.description_multi', 'Manage your AI-generated cover letters from all sources')}
                 </p>
                 {connectedProviders.length > 0 && (
                   <div className="flex gap-1">
@@ -804,7 +804,7 @@ onClick={() => {
                           : 'bg-white border-gray-300 text-gray-800'
                       }`}
                     >
-                      <option value="all">{t('common.all_sources', 'All Sources')}</option>
+                      <option value="all">{t('cloud3.all_sources', 'All Sources')}</option>
                       {getAvailableProviders().map(provider => {
                         const info = getProviderDisplayInfo(provider);
                         return (

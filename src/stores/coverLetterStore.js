@@ -35,13 +35,13 @@ fetchCoverLetters: async () => {
   set({ isLoading: true, error: null });
   
   try {
-    console.log("📄 Fetching cover letters from all sources...");
+    console.log("ðŸ“„ Fetching cover letters from all sources...");
     
     const allCoverLetters = [];
     
     // 1. Load from local storage
     const localLetters = get().loadLocalCoverLetters();
-    console.log("📱 Local cover letters:", localLetters.length);
+    console.log("ðŸ“± Local cover letters:", localLetters.length);
     allCoverLetters.push(...localLetters);
     
     // 2. Load from all connected cloud providers using existing API
@@ -53,7 +53,7 @@ fetchCoverLetters: async () => {
       
       for (const provider of connectedProviders) {
         try {
-          console.log(`☁️ Loading cover letters from ${provider}...`);
+          console.log(`â˜ï¸ Loading cover letters from ${provider}...`);
           
           // FIXED: Use your existing API endpoint
           const response = await fetch(`${API_BASE_URL}/api/cover-letter/list-cover-letters?provider=${provider}`, {
@@ -66,7 +66,7 @@ fetchCoverLetters: async () => {
           if (response.ok) {
             const result = await response.json();
             const cloudLetters = result.cover_letters || [];
-            console.log(`☁️ ${provider}: Found ${cloudLetters.length} cover letters`);
+            console.log(`â˜ï¸ ${provider}: Found ${cloudLetters.length} cover letters`);
             
             // Process cloud letters - FIXED: Proper variable scoping
             const processedCloudLetters = cloudLetters.map(letter => {
@@ -95,11 +95,11 @@ fetchCoverLetters: async () => {
             
             allCoverLetters.push(...processedCloudLetters);
           } else {
-            console.warn(`⚠️ ${provider} returned status: ${response.status}`);
+            console.warn(`âš ï¸ ${provider} returned status: ${response.status}`);
           }
           
         } catch (providerError) {
-          console.warn(`⚠️ Failed to load cover letters from ${provider}:`, providerError);
+          console.warn(`âš ï¸ Failed to load cover letters from ${provider}:`, providerError);
         }
       }
     }
@@ -107,7 +107,7 @@ fetchCoverLetters: async () => {
     // 3. Remove duplicates
     const uniqueLetters = get().removeDuplicatesByContent(allCoverLetters);
     
-    console.log("✅ Total unique cover letters:", uniqueLetters.length);
+    console.log("âœ… Total unique cover letters:", uniqueLetters.length);
     
     set({ 
       coverLetters: uniqueLetters,
@@ -117,7 +117,7 @@ fetchCoverLetters: async () => {
     
     return uniqueLetters;
   } catch (error) {
-    console.error('❌ Error fetching cover letters:', error);
+    console.error('âŒ Error fetching cover letters:', error);
     set({ 
       isLoading: false, 
       error: error.message || 'Failed to fetch cover letters' 
@@ -137,7 +137,7 @@ fetchCoverLetters: async () => {
 
         try {
           // ALWAYS save to local storage first
-          console.log('💾 Saving cover letter locally...');
+          console.log('ðŸ’¾ Saving cover letter locally...');
           const localSave = get().saveLocalCoverLetter(coverLetterData);
           results.localResult = localSave;
           
@@ -153,7 +153,7 @@ fetchCoverLetters: async () => {
               }
               
               try {
-                console.log(`☁️ Saving cover letter to ${targetProvider}...`);
+                console.log(`â˜ï¸ Saving cover letter to ${targetProvider}...`);
                 
                 // FIXED: Use your existing save endpoint
                 const response = await fetch(`${API_BASE_URL}/api/cover-letter/save`, {
@@ -164,8 +164,8 @@ fetchCoverLetters: async () => {
                   },
                   body: JSON.stringify({
   ...coverLetterData,
-  save_to_cloud: true,           // ✅ CORRECT - tells backend to save to cloud
-  preferred_provider: targetProvider, // ✅ CORRECT - tells backend which provider
+  save_to_cloud: true,           // âœ… CORRECT - tells backend to save to cloud
+  preferred_provider: targetProvider, // âœ… CORRECT - tells backend which provider
   session_token: sessionToken
 })
                 });
@@ -178,7 +178,7 @@ fetchCoverLetters: async () => {
                     file_id: cloudSaveResult.file_id,
                     message: cloudSaveResult.message
                   };
-                  console.log(`✅ Cover letter saved to ${targetProvider}:`, cloudSaveResult.file_id);
+                  console.log(`âœ… Cover letter saved to ${targetProvider}:`, cloudSaveResult.file_id);
                 } else {
                   const errorText = await response.text();
                   throw new Error(`${targetProvider} save failed: ${response.status} - ${errorText}`);
@@ -201,7 +201,7 @@ fetchCoverLetters: async () => {
           return results;
           
         } catch (error) {
-          console.error('❌ Save operation failed:', error);
+          console.error('âŒ Save operation failed:', error);
           results.error = error.message;
           return results;
         }
@@ -213,14 +213,14 @@ getCoverLetter: async (id) => {
   set({ isLoading: true, error: null });
   
   try {
-    console.log("📄 Loading cover letter:", id);
+    console.log("ðŸ“„ Loading cover letter:", id);
     
     // First check if it's a local cover letter
     const localLetters = get().loadLocalCoverLetters();
     const localLetter = localLetters.find(letter => letter.id === id);
     
     if (localLetter) {
-      console.log("📄 Cover letter found locally:", localLetter);
+      console.log("ðŸ“„ Cover letter found locally:", localLetter);
       set({ 
         currentLetter: localLetter,
         isLoading: false 
@@ -266,12 +266,12 @@ getCoverLetter: async (id) => {
       }
     });
     
-    console.log(`🔍 Will try providers in this order: ${providersToTry.join(', ')}`);
+    console.log(`ðŸ” Will try providers in this order: ${providersToTry.join(', ')}`);
     
     // Try each provider in order
     for (const provider of providersToTry) {
       try {
-        console.log(`🔍 Trying to load cover letter from ${provider}...`);
+        console.log(`ðŸ” Trying to load cover letter from ${provider}...`);
         
 let apiUrl;
 // Clean the encoded ID to prevent double slashes
@@ -316,7 +316,7 @@ if (provider === 'dropbox') {
             coverLetter = { ...result, provider };
           }
           
-          console.log(`✅ Cover letter found in ${provider}:`, coverLetter.title || 'Untitled');
+          console.log(`âœ… Cover letter found in ${provider}:`, coverLetter.title || 'Untitled');
           
           set({ 
             currentLetter: coverLetter,
@@ -325,17 +325,17 @@ if (provider === 'dropbox') {
           
           return coverLetter;
         } else {
-          console.log(`❌ Cover letter not found in ${provider} (HTTP ${response.status})`);
+          console.log(`âŒ Cover letter not found in ${provider} (HTTP ${response.status})`);
         }
       } catch (providerError) {
-        console.log(`❌ Cover letter not found in ${provider}:`, providerError.message);
+        console.log(`âŒ Cover letter not found in ${provider}:`, providerError.message);
       }
     }
     
     throw new Error('Cover letter not found in any connected provider');
     
   } catch (error) {
-    console.error('❌ Error fetching cover letter:', error);
+    console.error('âŒ Error fetching cover letter:', error);
     set({ 
       isLoading: false, 
       error: error.message || 'Failed to fetch cover letter' 
@@ -351,7 +351,7 @@ deleteCoverLetter: async (id) => {
   set({ isLoading: true, error: null });
   
   try {
-    console.log("🗑️ Deleting cover letter:", id);
+    console.log("ðŸ—‘ï¸ Deleting cover letter:", id);
     
     // First check if it's a local cover letter
     const localLetters = get().loadLocalCoverLetters();
@@ -401,10 +401,10 @@ deleteCoverLetter: async (id) => {
     if (!connectedProviders.includes(provider)) {
       // Fallback to first available provider
       provider = connectedProviders[0];
-      console.log(`🔄 Provider fallback to: ${provider}`);
+      console.log(`ðŸ”„ Provider fallback to: ${provider}`);
     }
     
-    console.log(`🗑️ Deleting cover letter from ${provider} with ID: ${encodedId}`);
+    console.log(`ðŸ—‘ï¸ Deleting cover letter from ${provider} with ID: ${encodedId}`);
     
     let response;
     if (provider === 'dropbox') {
@@ -442,7 +442,7 @@ deleteCoverLetter: async (id) => {
       const result = await response.json();
       
       if (result.success) {
-        console.log(`✅ Cover letter deleted from ${provider}`);
+        console.log(`âœ… Cover letter deleted from ${provider}`);
         
         // Remove from favorites
         const favoritesList = get().loadFavoritesFromStorage();
@@ -465,7 +465,7 @@ deleteCoverLetter: async (id) => {
     }
     
   } catch (error) {
-    console.error('❌ Error deleting cover letter:', error);
+    console.error('âŒ Error deleting cover letter:', error);
     set({ 
       isLoading: false, 
       error: error.message || 'Failed to delete cover letter' 
@@ -480,7 +480,7 @@ updateCoverLetter: async (id, updateData) => {
   set({ isLoading: true, error: null });
   
   try {
-    console.log("📝 Updating cover letter:", id);
+    console.log("ðŸ“ Updating cover letter:", id);
     
     // First check if it's a local cover letter
     const localLetters = get().loadLocalCoverLetters();
@@ -532,10 +532,10 @@ updateCoverLetter: async (id, updateData) => {
     if (!connectedProviders.includes(provider)) {
       // Fallback to first available provider
       provider = connectedProviders[0];
-      console.log(`🔄 Provider fallback to: ${provider}`);
+      console.log(`ðŸ”„ Provider fallback to: ${provider}`);
     }
     
-    console.log(`📝 Updating cover letter in ${provider} with ID: ${encodedId}`);
+    console.log(`ðŸ“ Updating cover letter in ${provider} with ID: ${encodedId}`);
     
     let response;
     if (provider === 'dropbox') {
@@ -576,7 +576,7 @@ updateCoverLetter: async (id, updateData) => {
       const result = await response.json();
       
       if (result.success) {
-        console.log(`✅ Cover letter updated in ${provider}`);
+        console.log(`âœ… Cover letter updated in ${provider}`);
         
         set(state => ({
           coverLetters: state.coverLetters.map(letter => 
@@ -595,7 +595,7 @@ updateCoverLetter: async (id, updateData) => {
     }
     
   } catch (error) {
-    console.error('❌ Error updating cover letter:', error);
+    console.error('âŒ Error updating cover letter:', error);
     set({ 
       isLoading: false, 
       error: error.message || 'Failed to update cover letter' 
@@ -609,7 +609,7 @@ updateCoverLetter: async (id, updateData) => {
         set({ isLoading: true, error: null });
         
         try {
-          console.log("🤖 Generating cover letter...");
+          console.log("ðŸ¤– Generating cover letter...");
           
           const sessionStore = useSessionStore.getState();
           const { sessionToken } = sessionStore;
@@ -633,7 +633,7 @@ updateCoverLetter: async (id, updateData) => {
           }
           
           const result = await response.json();
-          console.log("✅ Cover letter generation response:", result);
+          console.log("âœ… Cover letter generation response:", result);
           
           if (result.task_id) {
             set({ 
@@ -648,7 +648,7 @@ updateCoverLetter: async (id, updateData) => {
           
           return result;
         } catch (error) {
-          console.error("❌ Cover letter generation failed:", error);
+          console.error("âŒ Cover letter generation failed:", error);
           set({ 
             isLoading: false, 
             error: error.message || 'Failed to generate cover letter' 
@@ -716,7 +716,7 @@ updateCoverLetter: async (id, updateData) => {
           
           return result;
         } catch (error) {
-          console.error('❌ Error checking task status:', error);
+          console.error('âŒ Error checking task status:', error);
           return null;
         }
       },
@@ -724,7 +724,7 @@ updateCoverLetter: async (id, updateData) => {
       // ================== LOCAL STORAGE METHODS (unchanged) ==================
       saveLocalCoverLetter: (coverLetterData) => {
         try {
-          console.log("💾 Saving cover letter locally...");
+          console.log("ðŸ’¾ Saving cover letter locally...");
           
           const localCoverLetters = get().loadLocalCoverLetters();
           const clId = coverLetterData.id || generateLocalId();
@@ -754,7 +754,7 @@ updateCoverLetter: async (id, updateData) => {
             coverLetters: allCoverLetters
           });
           
-          console.log("✅ Cover letter saved locally:", clId);
+          console.log("âœ… Cover letter saved locally:", clId);
           
           return { 
             success: true, 
@@ -763,7 +763,7 @@ updateCoverLetter: async (id, updateData) => {
           };
           
         } catch (error) {
-          console.error('❌ Local save error:', error);
+          console.error('âŒ Local save error:', error);
           return { 
             success: false, 
             error: error.message || "Failed to save locally" 
@@ -776,7 +776,7 @@ updateCoverLetter: async (id, updateData) => {
           const stored = localStorage.getItem('local_cover_letters');
           return stored ? JSON.parse(stored) : [];
         } catch (error) {
-          console.error('❌ Error loading local cover letters:', error);
+          console.error('âŒ Error loading local cover letters:', error);
           return [];
         }
       },
@@ -793,10 +793,10 @@ updateCoverLetter: async (id, updateData) => {
             coverLetters: allCoverLetters 
           });
           
-          console.log("✅ Local cover letter deleted:", id);
+          console.log("âœ… Local cover letter deleted:", id);
           return true;
         } catch (error) {
-          console.error('❌ Error deleting local cover letter:', error);
+          console.error('âŒ Error deleting local cover letter:', error);
           return false;
         }
       },
@@ -814,7 +814,7 @@ updateCoverLetter: async (id, updateData) => {
           const favoritesList = JSON.parse(localStorage.getItem('cover_letter_favorites') || '[]');
           return favoritesList;
         } catch (error) {
-          console.warn('⚠️ Failed to load favorites from localStorage:', error);
+          console.warn('âš ï¸ Failed to load favorites from localStorage:', error);
           return [];
         }
       },
@@ -822,9 +822,9 @@ updateCoverLetter: async (id, updateData) => {
       saveFavoritesToStorage: (favoritesList) => {
         try {
           localStorage.setItem('cover_letter_favorites', JSON.stringify(favoritesList));
-          console.log(`💾 Favorites saved to localStorage:`, favoritesList);
+          console.log(`ðŸ’¾ Favorites saved to localStorage:`, favoritesList);
         } catch (storageError) {
-          console.warn('⚠️ Failed to save favorites to localStorage:', storageError);
+          console.warn('âš ï¸ Failed to save favorites to localStorage:', storageError);
         }
       },
 
@@ -872,16 +872,16 @@ updateCoverLetter: async (id, updateData) => {
               is_favorite: newFavoriteStatus,
               updated_at: new Date().toISOString()
             });
-            console.log(`✅ Favorite synced to backend: ${id} = ${newFavoriteStatus}`);
+            console.log(`âœ… Favorite synced to backend: ${id} = ${newFavoriteStatus}`);
           } catch (backendError) {
-            console.warn('⚠️ Failed to sync favorite to backend:', backendError);
+            console.warn('âš ï¸ Failed to sync favorite to backend:', backendError);
           }
           
-          console.log(`📌 Toggled favorite: ${id} = ${newFavoriteStatus}`);
+          console.log(`ðŸ“Œ Toggled favorite: ${id} = ${newFavoriteStatus}`);
           return true;
           
         } catch (error) {
-          console.error('❌ Error toggling favorite:', error);
+          console.error('âŒ Error toggling favorite:', error);
           throw error;
         }
       },
@@ -905,18 +905,18 @@ updateCoverLetter: async (id, updateData) => {
     if (!seen.has(uniqueKey)) {
       seen.set(uniqueKey, letter);
     } else {
-      console.log(`🔄 Skipping duplicate letter: ${uniqueKey}`);
+      console.log(`ðŸ”„ Skipping duplicate letter: ${uniqueKey}`);
     }
   }
   
   const result = Array.from(seen.values());
-  console.log(`✅ Deduplication: ${letters.length} → ${result.length} letters`);
+  console.log(`âœ… Deduplication: ${letters.length} â†’ ${result.length} letters`);
   return result;
 },
 
       formatCoverLetter: (letter) => {
   try {
-    console.log("🔍 Formatting cover letter:", letter);
+    console.log("ðŸ” Formatting cover letter:", letter);
     
     let formattedLetter = '';
     let contentObj = null;
@@ -1006,11 +1006,11 @@ updateCoverLetter: async (id, updateData) => {
       formattedLetter += `Sincerely,\n${personalInfo.full_name}`;
     }
     
-    console.log("✅ Cover letter formatted successfully");
+    console.log("âœ… Cover letter formatted successfully");
     return formattedLetter;
     
   } catch (error) {
-    console.error("❌ Error formatting cover letter:", error);
+    console.error("âŒ Error formatting cover letter:", error);
     return "Error formatting cover letter content.";
   }
 },

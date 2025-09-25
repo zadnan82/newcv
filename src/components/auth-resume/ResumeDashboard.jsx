@@ -632,7 +632,7 @@ const handleDownload = async (cv) => {
       }`}>
         <Cloud size={16} />
         <span className="text-sm">
-          {t('cloud.connected_providers')}: {connectedProviders.map(provider => t(`cloud.${provider}`)).join(', ')}
+          {t('cloud3.connected_providers')}: {connectedProviders.map(provider => t(`cloud.${provider}`)).join(', ')}
         </span>
       </div>
     </div>

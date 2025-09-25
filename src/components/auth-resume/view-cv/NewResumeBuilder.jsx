@@ -277,40 +277,34 @@ const NewResumeBuilder = ({ darkMode }) => {
     localStorage.removeItem('cv_draft_autosave');
   }, []);
   
-  const handleSaveLocal = useCallback(async () => {
-    if (!hasUserStartedFilling) {
-      showToast(t('common.error'), 'error');
-      return;
+const handleSaveLocal = useCallback(async () => {
+  if (!hasUserStartedFilling) {
+    showToast(t('common.error'), 'error');
+    return;
+  }
+
+  setIsSaving(true);
+  setSaveType('local');
+  setSaveResult(null);
+
+  try {
+    const result = await saveLocally(formData);
+    setSaveResult(result);
+    if (result.success) {
+      localStorage.setItem('last_save_method', 'local');
+      setShowStorageChoice(false);
+      clearAutoSave();
+      showToast('CV saved locally on this device', 'success');
+    } else {
+      showToast(result.error || t('common.error'), 'error');
     }
-
-    setIsSaving(true);
-    setSaveType('local');
-    setSaveResult(null);
-
-    try {
-      const result = await saveLocally(formData);
-      setSaveResult(result);
-      if (result.success) {
-        localStorage.setItem('last_save_method', 'local');
-        setShowStorageChoice(false);
-        clearAutoSave();
-        showToast(result.message || t('cloud.saved_locally'), 'success');
-      } else {
-        showToast(result.error || t('common.error'), 'error');
-      }
-    } catch (error) {
-      const errorResult = {
-        success: false,
-        error: error.message || t('common.error')
-      };
-      setSaveResult(errorResult);
-      showToast(errorResult.error, 'error');
-    } finally {
-      setIsSaving(false);
-    }
-  }, [hasUserStartedFilling, formData, saveLocally, showToast, clearAutoSave, t]);
-
-  const handleSaveCloud = useCallback(async (preferredProvider = null) => {
+  } catch (error) {
+    showToast(error.message || t('common.error'), 'error');
+  } finally {
+    setIsSaving(false);
+  }
+}, [hasUserStartedFilling, formData, saveLocally, showToast, clearAutoSave, t]);
+ const handleSaveCloud = useCallback(async (preferredProvider = null) => {
   if (!hasUserStartedFilling) {
     showToast(t('common.error'), 'error');
     return;
@@ -326,16 +320,13 @@ const NewResumeBuilder = ({ darkMode }) => {
   setSaveResult(null);
 
   try {
-    // Determine which provider to use
     let targetProvider = preferredProvider;
     
     if (!targetProvider) {
-      // Check if user has a preferred provider stored
       const storedProvider = localStorage.getItem('preferred_cloud_provider');
       if (storedProvider && connectedProviders.includes(storedProvider)) {
         targetProvider = storedProvider;
       } else {
-        // Use first connected provider as fallback
         targetProvider = connectedProviders[0];
       }
     }
@@ -346,27 +337,26 @@ const NewResumeBuilder = ({ darkMode }) => {
     setSaveResult(result);
     
     if (result.success) {
-      // Store the successful provider for future use
       localStorage.setItem('preferred_cloud_provider', targetProvider);
       localStorage.setItem('last_save_method', 'cloud');
       setShowStorageChoice(false);
       clearAutoSave();
       
-      const providerName = targetProvider === 'google_drive' ? 'Google Drive' : 
-                          targetProvider === 'onedrive' ? 'OneDrive' : targetProvider;
+      // Get provider display name
+      const providerDisplayName = targetProvider === 'google_drive' ? 'Google Drive' : 
+                                   targetProvider === 'onedrive' ? 'OneDrive' : 
+                                   targetProvider === 'dropbox' ? 'Dropbox' : targetProvider;
       
-      showToast(result.message || `CV saved to ${providerName} successfully`, 'success');
+      // CLEAR MESSAGE: Show where it was saved
+      showToast(`CV saved to ${providerDisplayName}`, 'success');
+      
       localStorage.removeItem('cv_draft');
     } else {
-      showToast(result.error || t('common.error'), 'error');
+      showToast(result.error || 'Failed to save', 'error');
     }
   } catch (error) {
-    const errorResult = {
-      success: false,
-      error: error.message || t('common.error')
-    };
-    setSaveResult(errorResult);
-    showToast(errorResult.error, 'error');
+    console.error('Save failed:', error);
+    showToast(error.message || 'Failed to save CV', 'error');
   } finally {
     setIsSaving(false);
   }
@@ -480,34 +470,30 @@ const NewResumeBuilder = ({ darkMode }) => {
       }, 500);
     }
     
-    // Check for auto-saved data (only for new resumes and not already initialized)
-    if ((!paramResumeId || paramResumeId === 'new') && !isInitializedRef.current) {
-      try {
-        const autoSavedData = localStorage.getItem('cv_draft_autosave');
-        if (autoSavedData) {
-          const parsed = JSON.parse(autoSavedData);
-          if (parsed._autoSave) {
-            const timeSinceAutoSave = Date.now() - parsed._autoSave.timestamp;
-            const minutesAgo = Math.floor(timeSinceAutoSave / (1000 * 60));
-            
-            // Only restore if recent and has meaningful content
-            if (timeSinceAutoSave < 24 * 60 * 60 * 1000 && 
-                (parsed.personal_info?.full_name || 
-                 parsed.experiences?.length > 0 || 
-                 parsed.educations?.length > 0)) {
-              
-              const { _autoSave, ...cleanData } = parsed;
-              setFormData(cleanData);
-              
-              const timeMsg = minutesAgo < 1 ? t('cloud.current_draft') : `${minutesAgo} ${t('common.at')}`;
-              showToast(`${t('cloud.current_draft')} ${timeMsg}`, 'info');
-            }
-          }
+   // Check for auto-saved data - SILENTLY restore, no notification
+if ((!paramResumeId || paramResumeId === 'new') && !isInitializedRef.current) {
+  try {
+    const autoSavedData = localStorage.getItem('cv_draft_autosave');
+    if (autoSavedData) {
+      const parsed = JSON.parse(autoSavedData);
+      if (parsed._autoSave) {
+        const timeSinceAutoSave = Date.now() - parsed._autoSave.timestamp;
+        
+        if (timeSinceAutoSave < 24 * 60 * 60 * 1000 && 
+            (parsed.personal_info?.full_name || 
+             parsed.experiences?.length > 0 || 
+             parsed.educations?.length > 0)) {
+          
+          const { _autoSave, ...cleanData } = parsed;
+          setFormData(cleanData);
+          // NO TOAST - Silent restore
         }
-      } catch (error) {
-        console.error('Failed to restore auto-save:', error);
       }
     }
+  } catch (error) {
+    console.error('Failed to restore auto-save:', error);
+  }
+}
     
     // Mark as initialized if not already done
     if (!isInitializedRef.current) {
@@ -588,7 +574,7 @@ const NewResumeBuilder = ({ darkMode }) => {
                 }`}
               >
                 <Save size={16} className="mr-1" />
-                {isSaving ? t('common.saving') : t('common.save')}
+                {isSaving ? t('resume.actions.saving') : t('common.save')}
               </button>
 
               {/* Mobile Template & AI Buttons */}

@@ -19,30 +19,30 @@ const CloudSetup = ({ darkMode }) => {
       id: 'google_drive',
       name: 'Google Drive',
       icon: '📄',
-      description: t('cloud.google_drive_description', 'Store your CVs in Google Drive'),
+      description: t('cloud3.save_cvs_securely_google', 'Store your CVs in Google Drive'),
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50',
       textColor: 'text-blue-700',
       status: 'fully_supported',
       benefits: [
-        t('cloud.15gb_free_storage', '15GB free storage'),
-        t('cloud.automatic_sync', 'Automatic sync across devices'),
-        t('cloud.google_ecosystem', 'Integrates with Google ecosystem')
+        t('cloud3.15gb_free_storage', '15GB free storage'),
+        t('cloud3.automatic_sync', 'Automatic sync across devices'),
+        t('cloud3.google_ecosystem', 'Integrates with Google ecosystem')
       ]
     },
     {
       id: 'onedrive',
       name: 'OneDrive',
       icon: '☁️',
-      description: t('cloud.onedrive_description', 'Store your CVs in Microsoft OneDrive'),
+      description: t('cloud3.save_cvs_securely_onedrive', 'Store your CVs in Microsoft OneDrive'),
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50',
       textColor: 'text-purple-700',
       status: 'fully_supported',
       benefits: [
-        t('cloud.5gb_free_storage', '5GB free storage'),
-        t('cloud.office_integration', 'Office 365 integration'),
-        t('cloud.microsoft_ecosystem', 'Works with Microsoft ecosystem')
+        t('cloud3.5gb_free_storage', '5GB free storage'),
+        t('cloud3.office_integration', 'Office 365 integration'),
+        t('cloud3.microsoft_ecosystem', 'Works with Microsoft ecosystem')
       ]
     },
     {
@@ -114,7 +114,7 @@ const CloudSetup = ({ darkMode }) => {
         {/* Provider Selection */}
         <div className="mb-8">
           <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-            {t('cloud.choose_provider', 'Choose Your Cloud Provider')}
+            {t('cloud3.choose_provider', 'Choose Your Cloud Provider')}
           </h2>
           
           <div className="grid md:grid-cols-3 gap-4">
@@ -178,7 +178,7 @@ const CloudSetup = ({ darkMode }) => {
             <h2 className={`text-xl font-semibold mb-4 ${
               darkMode ? 'text-white' : 'text-gray-800'
             }`}>
-              {t('cloud.save_to_provider', { provider: selectedProviderData?.name || 'Cloud Storage' })}
+              {t('cloud3.save_to', { provider: selectedProviderData?.name || 'Cloud Storage' })}
             </h2>
             
             <div className="space-y-4">
@@ -274,7 +274,7 @@ const CloudSetup = ({ darkMode }) => {
                       : selectedProviderData?.textColor?.replace('700', '600')
                   }`}>
                     {selectedProvider === 'onedrive' 
-                      ? t('cloud.onedrive_benefits', 'Reliable Microsoft cloud storage with Office integration')
+                      ? t('cloud3.onedrive_benefits', 'Reliable Microsoft cloud storage with Office integration')
                       : selectedProvider === 'dropbox'
                       ? t('cloud.dropbox_benefits', 'Trusted cloud storage with excellent reliability and sync')
                       : t('cloud.google_drive_benefits', 'Reliable cloud storage with excellent integration')

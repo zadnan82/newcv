@@ -399,10 +399,7 @@ const getProviderIcon = (provider) => {
     throw error;
   }
 };
-
-
-// Add these functions to your EditResumeBuilder.jsx file, similar to the OneDrive functions:
-
+ 
 const saveToDropbox = async (cvData) => {
   try {
     const token = sessionToken || useSessionStore.getState().sessionToken;

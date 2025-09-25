@@ -82,11 +82,10 @@ export const AUTH_ENDPOINTS = {
 
 // CV AI endpoints 
 export const CV_AI_ENDPOINTS = {
-  IMPROVE_SECTION: `${API_BASE_URL}/cv-ai/improve-section`,
-  IMPROVE_SUMMARY: `${API_BASE_URL}/cv-ai/improve-section`,
-  IMPROVE_FULL_CV: `${API_BASE_URL}/cv-ai/improve-full-cv`,
-  USAGE_LIMIT: `${API_BASE_URL}/cv-ai/usage-limit`,
-  TASK_STATUS: (taskId) => `${API_BASE_URL}/cv-ai/task-status/${taskId}`,  
+  USAGE_LIMIT: `${API_BASE_URL}/api/cv-ai/usage`,
+  IMPROVE_SECTION: `${API_BASE_URL}/api/cv-ai/improve-section`,
+  IMPROVE_FULL_CV: `${API_BASE_URL}/api/cv-ai/improve-full-cv`,
+  TASK_STATUS: (taskId) => `${API_BASE_URL}/api/cv-ai/task-status/${taskId}`,
 };
 
 export const FEEDBACK_ENDPOINTS = {

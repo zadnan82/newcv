@@ -1,7 +1,7 @@
 // src/Navbar.jsx - FIXED VERSION with proper structure and OneDrive support
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom'; 
-import { Menu, X, Moon, Sun, FileText, LogOut, FileSignature, ChevronDown, Cloud, CloudOff } from 'lucide-react';
+import { Menu, X, Moon, Sun, FileText, LogOut, FileSignature, ChevronDown, Cloud, CloudOff, Target } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from './assets/logo.png';
 import logo2 from './assets/logo2.png';
@@ -194,13 +194,16 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     const getStatusText = () => {
       const hasGoogleDrive = connectedProviders?.includes('google_drive') || googleDriveConnected;
       const hasOneDrive = connectedProviders?.includes('onedrive');
+       const hasDropbox = connectedProviders?.includes('dropbox');
 
-      if (hasGoogleDrive && hasOneDrive) {
-        return t('cloud.multiple_providers', 'Multiple providers');
+      if (hasGoogleDrive && hasOneDrive && hasOneDropbox) {
+        return t('cloud3.multiple_providers', 'Multiple providers');
       } else if (hasGoogleDrive) {
         return t('cloud.google_drive', 'Google Drive');
       } else if (hasOneDrive) {
         return t('cloud.onedrive', 'OneDrive');
+         } else if (hasDropbox) {
+        return t('cloud.dropbox', 'Dropbox');
       } else if (hasProviders) {
         return t('cloud.connected_count', { count: cloudCount });
       }
@@ -257,11 +260,22 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                       <div className="flex items-center">
                         <span className="text-sm mr-2">☁️</span>
                         <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
-                          {t('cloud.onedrive_connected', 'OneDrive Connected')}
+                          {t('cloud3.onedrive_connected', 'OneDrive Connected')}
+                        </span>
+                      </div>
+                    )}
+
+                      {connectedProviders?.includes('dropbox') && (
+                      <div className="flex items-center">
+                        <span className="text-sm mr-2">📦</span>
+                        <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                          {t('cloud3.dropbox_connected', 'Dropbox Connected')}
                         </span>
                       </div>
                     )}
                   </div>
+
+                  
                   
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
                     {t('cloud.cvs_sync_devices', 'CVs sync across devices')}
@@ -379,6 +393,21 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
               >
                 <FileText className="w-3 h-3" /> {t('navigation.coverLetter', 'Cover Letter')}
               </Link>
+
+ 
+{/* ADD THIS NEW BUTTON: */}
+<Link 
+  to="/job-matching" 
+  className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 flex items-center gap-1 ${
+    isActive('/job-matching')
+      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-lg shadow-purple-500/20' 
+      : darkMode
+        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
+        : 'text-gray-700 hover:bg-white/20 hover:text-gray-900'
+  }`}
+>
+  <Target className="w-3 h-3" /> {t('jobMatching.jobMatching', 'Job Match')}
+</Link>
 
               {backendAvailable && (
                 <>
@@ -554,6 +583,20 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             <FileText className="w-4 h-4" /> {t('navigation.coverLetter', 'Cover Letter')}
           </Link>
 
+{/* ADD THIS NEW MOBILE BUTTON: */}
+<Link 
+  to="/job-matching"
+  onClick={() => setMobileMenuOpen(false)}
+  className={`flex items-center gap-1.5 px-3 py-2 text-sm w-full rounded-lg transition-colors ${
+    isActive('/job-matching')
+      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white' 
+      : darkMode
+        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
+        : 'text-gray-800 hover:bg-white/20 hover:text-gray-900'
+  }`}
+>
+  <Target className="w-4 h-4" /> {t('jobMatching.jobMatching', 'Job Match')}
+</Link>
           {backendAvailable && (
             <>
               <button

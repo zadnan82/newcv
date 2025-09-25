@@ -6,6 +6,105 @@ import cloudProviderService from '../services/cloudProviderService';
 
 let globalInitialized = false;
 
+
+const formatDateForBackend = (dateStr) => {
+  if (!dateStr) return '';
+  
+  // If it's just YYYY-MM, add -01 for first day of month
+  if (/^\d{4}-\d{2}$/.test(dateStr)) {
+    return `${dateStr}-01`;
+  }
+  
+  // If it's already YYYY-MM-DD, return as is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+  
+  // If it's just YYYY, add -01-01
+  if (/^\d{4}$/.test(dateStr)) {
+    return `${dateStr}-01-01`;
+  }
+  
+  return dateStr;
+};
+
+const validateAndCleanCVData = (cvData) => {
+  const cleaned = { ...cvData };
+  
+  // Clean educations
+  if (cleaned.educations && Array.isArray(cleaned.educations)) {
+    cleaned.educations = cleaned.educations
+      .filter(edu => edu && (edu.institution || edu.degree || edu.field_of_study))
+      .map(edu => ({
+        ...edu,
+        institution: edu.institution || '',
+        degree: edu.degree || '',
+        field_of_study: edu.field_of_study || '',
+        start_date: edu.start_date || '',
+        end_date: edu.end_date || '',
+        description: edu.description || ''
+      }));
+  }
+  
+  // Clean experiences
+  if (cleaned.experiences && Array.isArray(cleaned.experiences)) {
+    cleaned.experiences = cleaned.experiences
+      .filter(exp => exp && (exp.company || exp.position))
+      .map(exp => ({
+        ...exp,
+        company: exp.company || '',
+        position: exp.position || '',
+        start_date: exp.start_date || '',
+        end_date: exp.end_date || '',
+        description: exp.description || '',
+        city: exp.city || ''
+      }));
+  }
+  
+  // Clean skills
+  if (cleaned.skills && Array.isArray(cleaned.skills)) {
+    cleaned.skills = cleaned.skills.filter(skill => 
+      skill && (skill.name || (typeof skill === 'string' && skill.trim()))
+    );
+  }
+  
+  // Clean languages
+  if (cleaned.languages && Array.isArray(cleaned.languages)) {
+    cleaned.languages = cleaned.languages.filter(lang => 
+      lang && (lang.language || (typeof lang === 'string' && lang.trim()))
+    );
+  }
+  
+  // Ensure personal_info fields are strings
+  if (cleaned.personal_info) {
+    Object.keys(cleaned.personal_info).forEach(key => {
+      if (cleaned.personal_info[key] === null || cleaned.personal_info[key] === undefined) {
+        cleaned.personal_info[key] = '';
+      }
+    });
+    
+    if (!cleaned.personal_info.mobile || cleaned.personal_info.mobile.length < 5) {
+      cleaned.personal_info.mobile = '+0000000000';
+    }
+  }
+  
+  return cleaned;
+};
+
+const validateCVData = (cvData) => {
+  const errors = [];
+  
+  if (!cvData.personal_info?.full_name) {
+    errors.push('Full name is required');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+
 const useSessionStore = create(
   persist(
     (set, get) => ({
@@ -459,145 +558,39 @@ const useSessionStore = create(
 
       // ================== HELPER METHODS ==================
       
-      cleanCVDataForAPI: (cvData) => {
+
+      // Add this function in sessionStore.js before the cleanCVDataForAPI function
+  
+
+  cleanCVDataForAPI: (cvData) => {
         console.log('🧹 Cleaning CV data for API...');
-        const cleaned = JSON.parse(JSON.stringify(cvData)); // Deep clone
         
-        // Check for large image data and warn
-        const dataSize = JSON.stringify(cleaned).length;
+        // Call the external helper function
+        let cleaned = validateAndCleanCVData(cvData);
+        
+        // Remove UI-only fields
+        const {
+          _autoSave,
+          _prepared_for_ai,
+          lastModified,
+          createdAt,
+          storageType,
+          localOnly,
+          ...apiData
+        } = cleaned;
+        
+        const dataSize = JSON.stringify(apiData).length;
         console.log(`📊 CV data size: ${(dataSize / 1024).toFixed(1)}KB`);
         
-        if (dataSize > 500000) { // 500KB
-          console.warn('⚠️ Large CV data detected. This may cause timeout issues.');
-        }
-        
-        // Helper function to validate and fix email
-        const validateEmail = (email) => {
-          if (!email || email.trim() === '') return null;
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          return emailRegex.test(email.trim()) ? email.trim() : null;
-        };
-        
-        // Helper function to convert partial dates to full dates
-        const formatDateForAPI = (dateStr) => {
-          if (!dateStr || dateStr.trim() === '') return null;
-          
-          // If it's already a full date (YYYY-MM-DD), return as is
-          if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-            return dateStr;
-          }
-          
-          // If it's a partial date (YYYY-MM), convert to YYYY-MM-01
-          if (/^\d{4}-\d{2}$/.test(dateStr)) {
-            return `${dateStr}-01`;
-          }
-          
-          // If it's just a year (YYYY), convert to YYYY-01-01
-          if (/^\d{4}$/.test(dateStr)) {
-            return `${dateStr}-01-01`;
-          }
-          
-          console.warn(`⚠️ Invalid date format: ${dateStr}, setting to null`);
-          return null;
-        };
-        
-        // Clean personal_info fields
-        if (cleaned.personal_info) {
-          // Handle date of birth
-          cleaned.personal_info.date_of_birth = formatDateForAPI(cleaned.personal_info.date_of_birth);
-          
-          // Validate email
-          if (cleaned.personal_info.email) {
-            const validEmail = validateEmail(cleaned.personal_info.email);
-            if (!validEmail) {
-              console.warn(`⚠️ Invalid email format: ${cleaned.personal_info.email}, setting to null`);
-            }
-            cleaned.personal_info.email = validEmail;
-          }
-          
-          // Clean other potentially problematic fields
-          const fieldsToClean = [
-            'full_name', 'title', 'mobile', 'city', 'address', 
-            'postal_code', 'driving_license', 'nationality', 'place_of_birth',
-            'linkedin', 'website', 'summary'
-          ];
-          
-          fieldsToClean.forEach(field => {
-            if (cleaned.personal_info[field] === '') {
-              cleaned.personal_info[field] = null;
-            }
-          });
-        }
-        
-        // Clean array sections with enhanced validation
-        const sectionsToClean = [
-          'educations', 'experiences', 'skills', 'languages', 'referrals',
-          'custom_sections', 'extracurriculars', 'hobbies', 'courses', 'internships'
-        ];
-        
-        sectionsToClean.forEach(section => {
-          if (Array.isArray(cleaned[section])) {
-            cleaned[section] = cleaned[section].map(item => {
-              const cleanedItem = { ...item };
-              
-              // Clean and format date fields in array items
-              if ('start_date' in cleanedItem) {
-                cleanedItem.start_date = formatDateForAPI(cleanedItem.start_date);
-              }
-              if ('end_date' in cleanedItem) {
-                cleanedItem.end_date = formatDateForAPI(cleanedItem.end_date);
-              }
-              if ('date_of_birth' in cleanedItem) {
-                cleanedItem.date_of_birth = formatDateForAPI(cleanedItem.date_of_birth);
-              }
-              
-              // Validate email fields in array items (like referrals)
-              if ('email' in cleanedItem && cleanedItem.email) {
-                const validEmail = validateEmail(cleanedItem.email);
-                if (!validEmail) {
-                  console.warn(`⚠️ Invalid email in ${section}: ${cleanedItem.email}, setting to null`);
-                }
-                cleanedItem.email = validEmail;
-              }
-              
-              // Clean other empty string fields to null
-              Object.keys(cleanedItem).forEach(key => {
-                if (cleanedItem[key] === '') {
-                  cleanedItem[key] = null;
-                }
-              });
-              
-              return cleanedItem;
-            });
-            
-            // Remove any items that are completely empty or invalid
-            cleaned[section] = cleaned[section].filter(item => {
-              // Keep item if it has at least one non-null, meaningful value
-              return Object.values(item).some(value => 
-                value !== null && value !== '' && value !== undefined
-              );
-            });
-          }
-        });
-        
-        // Clean photo field - handle both 'photo' and 'photos' for backward compatibility
-        if (cleaned.photo && cleaned.photo.photolink === '') {
-          cleaned.photo.photolink = null;
-        }
-        if (cleaned.photos && cleaned.photos.photolink === '') {
-          cleaned.photos.photolink = null;
-        }
-        
-        // Check if photo data is very large
-        if (cleaned.photo && cleaned.photo.photolink && typeof cleaned.photo.photolink === 'string') {
-          const photoSize = cleaned.photo.photolink.length;
-          if (photoSize > 100000) { // 100KB base64
-            console.warn(`⚠️ Large photo detected: ${(photoSize / 1024).toFixed(1)}KB. Consider compressing.`);
-          }
+        // Validate
+        const validation = validateCVData(apiData);
+        if (!validation.isValid) {
+          console.error('❌ CV data validation failed:', validation.errors);
+          throw new Error(`Invalid CV data: ${validation.errors.join(', ')}`);
         }
         
         console.log('✅ CV data cleaned and validated successfully');
-        return cleaned;
+        return apiData;
       },
 
       // ================== SESSION MANAGEMENT ==================

@@ -23,8 +23,7 @@ import API_BASE_URL, { CV_AI_ENDPOINTS } from '../../../config';
 const CVAIEnhancement = ({ darkMode }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { sessionToken, canSaveToCloud, saveLocally, saveToConnectedCloud } = useSessionStore();
-  
+  const { sessionToken, canSaveToCloud, saveLocally, saveToConnectedCloud , updateConnectedCloudCV } = useSessionStore();
   const [formData, setFormData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingSections, setLoadingSections] = useState({});
@@ -33,66 +32,137 @@ const CVAIEnhancement = ({ darkMode }) => {
   const [expandedSections, setExpandedSections] = useState({ summary: true });
   const [usageInfo, setUsageInfo] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
+  const [cvSource, setCvSource] = useState(null);
   const sections = [
     { id: 'summary', name: t('resume.personal_info.summary'), key: 'personal_info.summary' },
     { id: 'experiences', name: t('resume.experience.title'), key: 'experiences', items: true },
     { id: 'skills', name: t('resume.skills.title'), key: 'skills', items: true },
   ];
-  
   const [suggestions, setSuggestions] = useState({
     summary: {},
     experiences: {},
     skills: {}
   });
+   
 
-  useEffect(() => {
-    const loadCVData = () => {
-      try {
-        setIsLoading(true);
+useEffect(() => {
+  const loadCVData = () => {
+    try {
+      setIsLoading(true);
+      
+      let cvData = null;
+      let source = null;
+      
+      const aiDraft = localStorage.getItem('cv_draft_for_ai');
+      if (aiDraft) {
+        cvData = JSON.parse(aiDraft);
         
-        let cvData = null;
+        // Find the correct file ID
+        const fileId = cvData._cloud_file_id || cvData.file_id || cvData.id;
         
-        const aiDraft = localStorage.getItem('cv_draft_for_ai');
-        if (aiDraft) {
-          cvData = JSON.parse(aiDraft);
-          console.log('📖 Loaded CV from AI draft');
+        // Detect if it's from cloud by checking if ID looks like a Google Drive ID
+        const isGoogleDriveId = fileId && fileId.length > 20 && !fileId.startsWith('local_');
+        
+        source = {
+          type: isGoogleDriveId ? 'google_drive' : 'local',
+          fileId: fileId,
+          provider: cvData.provider || (isGoogleDriveId ? 'google_drive' : 'local')
+        };
+        
+        console.log('📍 Detected CV source:', source);
+      }
+      
+      if (!cvData) {
+        const regularDraft = localStorage.getItem('cv_draft');
+        if (regularDraft) {
+          cvData = JSON.parse(regularDraft);
+          const fileId = cvData._cloud_file_id || cvData.file_id || cvData.id;
+          const isGoogleDriveId = fileId && fileId.length > 20 && !fileId.startsWith('local_');
+          
+          source = {
+            type: isGoogleDriveId ? 'google_drive' : 'local',
+            fileId: fileId,
+            provider: cvData.provider || (isGoogleDriveId ? 'google_drive' : 'local')
+          };
         }
-        
-        if (!cvData) {
-          const regularDraft = localStorage.getItem('cv_draft');
-          if (regularDraft) {
-            cvData = JSON.parse(regularDraft);
-            console.log('📖 Loaded CV from regular draft');
-          }
-        }
-        
-        if (!cvData) {
-          const customizerDraft = localStorage.getItem('cv_draft_for_customization');
-          if (customizerDraft) {
-            cvData = JSON.parse(customizerDraft);
-            console.log('📖 Loaded CV from customizer draft');
-          }
-        }
-        
-        if (!cvData || !cvData.personal_info?.full_name) {
-          setError(t('ai_enhancement.create_resume_first'));
-          return;
-        }
-        
-        setFormData(cvData);
-        console.log('✅ CV loaded for AI enhancement:', cvData.title);
-        
-      } catch (error) {
-        console.error('❌ Error loading CV data:', error);
-        setError(t('common.error'));
-      } finally {
-        setIsLoading(false);
+      }
+      
+      if (!cvData || !cvData.personal_info?.full_name) {
+        setError(t('ai_enhancement.create_resume_first'));
+        return;
+      }
+      
+      setFormData(cvData);
+      setCvSource(source);
+      console.log('✅ CV loaded, source:', source);
+      
+    } catch (error) {
+      console.error('❌ Error loading CV data:', error);
+      setError(t('common.error'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  loadCVData();
+}, [t]);
+
+
+// Update your saveEnhancedCV to accept a parameter
+const saveEnhancedCV = async (action = 'update') => {
+  if (!formData) return;
+  
+  try {
+    console.log(`💾 Saving CV (${action})...`);
+    setIsLoading(true);
+    
+    const enhancedData = {
+      ...formData,
+      _ai_enhanced: {
+        timestamp: Date.now(),
+        sections_enhanced: Object.keys(suggestions).filter(key => Object.keys(suggestions[key]).length > 0)
       }
     };
     
-    loadCVData();
-  }, [t]);
+    let result;
+    
+    if (action === 'update' && cvSource?.fileId) {
+      // Update existing CV in cloud
+      console.log('🔄 Updating CV:', cvSource.fileId);
+      result = await updateConnectedCloudCV(
+        enhancedData, 
+        cvSource.fileId,
+        cvSource.provider || 'google_drive'
+      );
+    } else if (action === 'new' && canSaveToCloud()) {
+      // Save as new CV in cloud
+      console.log('☁️ Saving as new CV in cloud...');
+      result = await saveToConnectedCloud(enhancedData, 'google_drive');
+    } else {
+      // Save locally
+      console.log('💾 Saving locally...');
+      result = await saveLocally(enhancedData);
+    }
+    
+    if (result.success) {
+      localStorage.setItem('cv_draft', JSON.stringify(enhancedData));
+      localStorage.setItem('cv_draft_for_customization', JSON.stringify(enhancedData));
+      localStorage.removeItem('cv_draft_for_ai');
+      
+      setHasUnsavedChanges(false);
+      alert(result.message || t('resume.actions.save_success'));
+      navigate('/my-resumes');
+    } else {
+      throw new Error(result.error || t('common.error'));
+    }
+    
+  } catch (err) {
+    console.error('❌ Error saving enhanced CV:', err);
+    setError(`${t('common.error')}: ${err.message}`);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const checkUsageLimit = async () => {
     if (!sessionToken) return;
@@ -119,54 +189,7 @@ const CVAIEnhancement = ({ darkMode }) => {
     }
   }, [sessionToken]);
 
-  const saveEnhancedCV = async (saveToCloud = false) => {
-    if (!formData) return;
-    
-    try {
-      console.log('💾 Saving enhanced CV...');
-      setIsLoading(true);
-      
-      const enhancedData = {
-        ...formData,
-        _ai_enhanced: {
-          timestamp: Date.now(),
-          sections_enhanced: Object.keys(suggestions).filter(key => Object.keys(suggestions[key]).length > 0)
-        }
-      };
-      
-      let result;
-      
-      if (saveToCloud && canSaveToCloud()) {
-        result = await saveToConnectedCloud(enhancedData, 'google_drive');
-      } else {
-        result = await saveLocally(enhancedData);
-      }
-      
-      if (result.success) {
-        localStorage.setItem('cv_draft', JSON.stringify(enhancedData));
-        localStorage.setItem('cv_draft_for_customization', JSON.stringify(enhancedData));
-        localStorage.removeItem('cv_draft_for_ai');
-        
-        setHasUnsavedChanges(false);
-        
-        const successMessage = result.message || 
-          (saveToCloud ? t('resume.actions.update_success') : t('resume.actions.save_success'));
-        
-        alert(successMessage);
-        
-        navigate('/my-resumes');
-      } else {
-        throw new Error(result.error || t('common.error'));
-      }
-      
-    } catch (err) {
-      console.error('❌ Error saving enhanced CV:', err);
-      setError(`${t('common.error')}: ${err.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+ 
   const requestSectionEnhancement = async (sectionId) => {
     if (!formData) return;
 
@@ -318,13 +341,19 @@ const CVAIEnhancement = ({ darkMode }) => {
         throw new Error(t('settings.not_authenticated'));
       }
 
-      const response = await fetch(CV_AI_ENDPOINTS.IMPROVE_FULL_CV, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionToken}`
-        }
-      });
+        // Add the required query parameters
+    const cvFileId = formData.id || formData._cloud_file_id || 'local';
+    const provider = formData.provider || 'google_drive'; // or get from session
+    
+    const url = `${CV_AI_ENDPOINTS.IMPROVE_FULL_CV}?cv_file_id=${encodeURIComponent(cvFileId)}&provider=${provider}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`
+      }
+    });
 
       if (!response.ok) {
         if (response.status === 429) {
@@ -590,7 +619,7 @@ const CVAIEnhancement = ({ darkMode }) => {
   const handleBackToBuilder = () => {
     if (hasUnsavedChanges) {
       const confirmLeave = window.confirm(
-        t('cloud.unsaved_changes_save_before_leaving', 'You have unsaved changes. Do you want to save before leaving?')
+        t('cloud3.unsaved_changes_save_before_leaving', 'You have unsaved changes. Do you want to save before leaving?')
       );
       if (confirmLeave) {
         saveEnhancedCV(false);
@@ -678,47 +707,61 @@ const CVAIEnhancement = ({ darkMode }) => {
           </div>
           
           <div className="flex gap-2">
-            {hasUnsavedChanges && (
-              <div className={`flex items-center text-xs px-2 py-1 rounded ${
-                darkMode ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-700'
-              }`}>
-                <AlertCircle className="w-3 h-3 mr-1" />
-                {t('cloud.unsaved_changes', 'Unsaved changes')}
-              </div>
-            )}
-            
-            <button
-              onClick={() => saveEnhancedCV(false)}
-              disabled={!formData}
-              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
-                !formData
-                  ? 'bg-gray-400 cursor-not-allowed text-gray-600'
-                  : darkMode
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg text-white'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 text-white'
-              }`}
-            >
-              <HardDrive className="w-4 h-4 mr-2" />
-              {t('cloud.save_locally', 'Save Locally')}
-            </button>
-            
-            {canSaveToCloud() && (
-              <button
-                onClick={() => saveEnhancedCV(true)}
-                disabled={!formData}
-                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
-                  !formData
-                    ? 'bg-gray-400 cursor-not-allowed text-gray-600'
-                    : darkMode
-                    ? 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg text-white'
-                    : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg hover:shadow-green-500/20 text-white'
-                }`}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {t('cloud.save_to_drive', 'Save to Drive')}
-              </button>
-            )}
-          </div>
+  {hasUnsavedChanges && (
+    <div className={`flex items-center text-xs px-2 py-1 rounded ${
+      darkMode ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-700'
+    }`}>
+      <AlertCircle className="w-3 h-3 mr-1" />
+      {t('cloud3.unsaved_changes', 'Unsaved changes')}
+    </div>
+  )}
+  
+  {/* Update existing CV button - only show if CV came from cloud */}
+  {cvSource?.fileId && cvSource.type !== 'local' && (
+    <button
+      onClick={() => saveEnhancedCV('update')}
+      disabled={!formData}
+      className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
+        !formData
+          ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+          : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg text-white'
+      }`}
+    >
+      <RefreshCw className="w-4 h-4 mr-2" />
+      {t('cloud3.update_existing', 'Update Existing CV')}
+    </button>
+  )}
+  
+  {/* Save as new CV button */}
+  {canSaveToCloud() && (
+    <button
+      onClick={() => saveEnhancedCV('new')}
+      disabled={!formData}
+      className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
+        !formData
+          ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+          : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg text-white'
+      }`}
+    >
+      <Save className="w-4 h-4 mr-2" />
+      {t('cloud3.save_as_new', 'Save as New CV')}
+    </button>
+  )}
+  
+  {/* Local save button */}
+  <button
+    onClick={() => saveEnhancedCV('local')}
+    disabled={!formData}
+    className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
+      !formData
+        ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+        : 'bg-gray-600 hover:bg-gray-700 text-white'
+    }`}
+  >
+    <HardDrive className="w-4 h-4 mr-2" />
+    {t('cloud.save_locally', 'Save Locally')}
+  </button>
+</div>
         </div>
 
         {usageInfo && (
@@ -990,37 +1033,86 @@ const CVAIEnhancement = ({ darkMode }) => {
           ))}
         </div>
 
-        <div className="mt-8 flex justify-between items-center">
-          <button
-            onClick={handleBackToBuilder}
-            className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 ${
-              darkMode 
-                ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:shadow-lg' 
-                : 'bg-gray-200 hover:bg-gray-300 text-gray-800 hover:shadow-md'
-            }`}
-          >
-            {t('common.back_to_editor')}
-          </button>
-          
-          <div className="flex gap-3">
-            {hasUnsavedChanges && (
-              <button
-                onClick={() => saveEnhancedCV(false)}
-                className="px-4 py-2 text-sm rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 flex items-center"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {t('resume.actions.save_changes')}
-              </button>
-            )}
-            
-            <button
-              onClick={handleContinueToCustomizer}
-              className="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
-            >
-              {t('common.choose_your_templates')}
-            </button>
-          </div>
-        </div>
+       <div className="mt-8 flex justify-between items-center">
+  <button
+    onClick={handleBackToBuilder}
+    className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 ${
+      darkMode 
+        ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:shadow-lg' 
+        : 'bg-gray-200 hover:bg-gray-300 text-gray-800 hover:shadow-md'
+    }`}
+  >
+    {t('common.back_to_editor')}
+  </button>
+  
+  <div className="flex gap-3 items-center">
+    {hasUnsavedChanges && (
+      <div className={`flex items-center text-xs px-2 py-1 rounded ${
+        darkMode ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-700'
+      }`}>
+        <AlertCircle className="w-3 h-3 mr-1" />
+        {t('cloud.unsaved_changes', 'Unsaved changes')}
+      </div>
+    )}
+    
+    {/* Update existing CV button - shows when CV is from cloud */}
+    {cvSource?.fileId && cvSource.provider !== 'local' && (
+      <button
+        onClick={() => saveEnhancedCV('update')}
+        disabled={!formData}
+        className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
+          !formData
+            ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+            : 'bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg text-white'
+        }`}
+      >
+        <RefreshCw className="w-4 h-4 mr-2" />
+        {t('cloud3.update_existing', 'Update in Drive')}
+      </button>
+    )}
+    
+    {/* Save as new CV button - shows when cloud is connected */}
+    {canSaveToCloud() && (
+      <button
+        onClick={() => saveEnhancedCV('new')}
+        disabled={!formData}
+        className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
+          !formData
+            ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+            : darkMode
+            ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg text-white'
+            : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 text-white'
+        }`}
+      >
+        <Save className="w-4 h-4 mr-2" />
+        {t('cloud3.save_as_new', 'Save as New')}
+      </button>
+    )}
+    
+    {/* Local save button - always available as fallback */}
+    {!canSaveToCloud() && (
+      <button
+        onClick={() => saveEnhancedCV('local')}
+        disabled={!formData}
+        className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all duration-300 ${
+          !formData
+            ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+            : 'bg-gray-600 hover:bg-gray-700 text-white'
+        }`}
+      >
+        <HardDrive className="w-4 h-4 mr-2" />
+        {t('cloud.save_locally', 'Save Locally')}
+      </button>
+    )}
+    
+    <button
+      onClick={handleContinueToCustomizer}
+      className="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
+    >
+      {t('common.choose_your_templates')}
+    </button>
+  </div>
+</div>
       </div>
     </div>
   );

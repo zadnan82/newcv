@@ -47,7 +47,7 @@ const StorageChoiceModal = ({
       default:
         return {
           name: provider,
-          icon: '☁️',
+          icon: '📦',
           color: 'from-gray-500 to-gray-600',
           bgColor: 'bg-gray-50',
           textColor: 'text-gray-700',
@@ -70,7 +70,7 @@ const StorageChoiceModal = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            {t('cloud.choose_save_location')}
+            {t('cloud3.choose_save_location')}
           </h3>
           <button 
             onClick={onClose}
@@ -109,7 +109,7 @@ const StorageChoiceModal = ({
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    {t('cloud.save_locally_description')}
+                    {t('cloud3.save_locally_description')}
                   </p>
                 </div>
               </div>
@@ -144,7 +144,7 @@ const StorageChoiceModal = ({
               <h4 className={`font-medium ${
                 darkMode ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                {t('cloud.connected_providers')}
+                {t('cloud3.connected_providers')}
               </h4>
               
               {connectedDetails.map(({ provider, name, status }) => {
@@ -207,7 +207,7 @@ const StorageChoiceModal = ({
                         ) : (
                           <>
                             <Cloud size={16} className="mr-2" />
-                            {t('cloud.save_to_provider', { provider: providerInfo.name })}
+                            {t('cloud3.save_to_provider', { provider: providerInfo.name })}
                           </>
                         )}
                       </button>
@@ -259,9 +259,7 @@ const StorageChoiceModal = ({
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
           <div className="flex justify-between items-center">
-            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('cloud.privacy_note')}
-            </p>
+           
             
             <button
               onClick={onClose}

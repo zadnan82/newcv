@@ -259,7 +259,7 @@ function App() {
                 {/* Resume Customization - Always available */}
                 <Route path="/resume-customizer" element={<ResumeCustomizer darkMode={darkMode} />} />
                 <Route path="/resume-preview" element={<ResumePreview darkMode={darkMode} />} />
-                
+                <Route path="/job-matching" element={<JobMatching darkMode={darkMode} />} />
                 <Route path="/cv-ai-enhancement" element={<CVAIEnhancement darkMode={darkMode} />} />
 
                 {/* Cover Letter - Available locally, enhanced with cloud */}

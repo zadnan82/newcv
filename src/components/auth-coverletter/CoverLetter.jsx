@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCoverLetterStore from '../../stores/coverLetterStore';
 import useSessionStore from '../../stores/sessionStore';
+import { extractTextFromFile, validateFile, getTextStats } from '../../services/fileConverterService';
 
 const CoverLetter = ({ darkMode }) => {
   const { t } = useTranslation();
@@ -35,16 +36,18 @@ const CoverLetter = ({ darkMode }) => {
   } = useCoverLetterStore();
   
   const [cvFile, setCvFile] = useState(null);
-  const [cloudCVs, setCloudCVs] = useState([]); // All cloud CVs from all providers
+  const [cloudCVs, setCloudCVs] = useState([]);
   const [localStorageCVs, setLocalStorageCVs] = useState([]);
   const [selectedCV, setSelectedCV] = useState(null);
-  const [selectedCVSource, setSelectedCVSource] = useState(''); // 'local', provider name, or 'upload'
+  const [selectedCVSource, setSelectedCVSource] = useState('');
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [generatedCoverLetterData, setGeneratedCoverLetterData] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [alertType, setAlertType] = useState('error');
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [progressStatus, setProgressStatus] = useState('');
+  const [fileProcessing, setFileProcessing] = useState(false);
+  const [extractedCVText, setExtractedCVText] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -55,45 +58,6 @@ const CoverLetter = ({ darkMode }) => {
     jobDescription: '',
   });
 
-  // Debug function to validate CV data
-  const validateCVForGeneration = (cvData) => {
-    console.log('🔍 Validating CV data for generation:', {
-      hasCVData: !!cvData,
-      hasPersonalInfo: !!(cvData?.personal_info),
-      hasFullName: !!(cvData?.personal_info?.full_name),
-      hasExperiences: !!(cvData?.experiences?.length),
-      hasEducations: !!(cvData?.educations?.length),
-      hasSkills: !!(cvData?.skills?.length),
-      source: cvData?.source_provider || cvData?.provider || 'unknown'
-    });
-    
-    if (!cvData) {
-      return { valid: false, error: 'No CV data provided' };
-    }
-    
-    if (!cvData.personal_info) {
-      return { valid: false, error: 'CV missing personal information' };
-    }
-    
-    if (!cvData.personal_info.full_name) {
-      return { valid: false, error: 'CV missing full name' };
-    }
-    
-    // Check if CV has some meaningful content
-    const hasContent = (
-      (cvData.experiences && cvData.experiences.length > 0) ||
-      (cvData.educations && cvData.educations.length > 0) ||
-      (cvData.skills && cvData.skills.length > 0) ||
-      (cvData.personal_info.summary && cvData.personal_info.summary.trim().length > 0)
-    );
-    
-    if (!hasContent) {
-      console.warn('⚠️ CV appears to have minimal content');
-    }
-    
-    return { valid: true };
-  };
-
   const isLoading = coverLetterLoading;
 
   // Load both local and cloud CVs on component mount
@@ -102,7 +66,7 @@ const CoverLetter = ({ darkMode }) => {
       // Load local CVs
       try {
         const localCVsData = loadLocalCVs();
-        console.log('📱 Loaded local CVs:', localCVsData);
+        console.log('📱 Loaded local CVs:', localCVsData?.length || 0);
         setLocalStorageCVs(localCVsData || []);
       } catch (error) {
         console.error('❌ Failed to load local CVs:', error);
@@ -111,9 +75,9 @@ const CoverLetter = ({ darkMode }) => {
       // Load cloud CVs from all connected providers
       if (connectedProviders.length > 0 && sessionToken) {
         try {
-          console.log('📋 Loading CVs from all connected providers...', connectedProviders);
+          console.log('📋 Loading CVs from connected providers:', connectedProviders);
           const allCloudCVs = await listAllCloudCVs();
-          console.log('✅ Loaded cloud CVs:', allCloudCVs);
+          console.log('✅ Loaded cloud CVs:', allCloudCVs?.length || 0);
           setCloudCVs(allCloudCVs || []);
         } catch (error) {
           console.error('❌ Failed to load cloud CVs:', error);
@@ -135,88 +99,55 @@ const CoverLetter = ({ darkMode }) => {
   }, {});
 
   // Handle CV selection from any source
-  const handleCVSelection = async (source, cvId, provider = null) => {
+  const handleCVSelection = async (source, cvId) => {
     try {
-      console.log(`📥 Loading selected CV from ${source}:`, cvId, provider);
+      console.log(`🔥 Loading CV from ${source}:`, cvId);
       setSelectedResumeId(cvId);
       setSelectedCVSource(source);
       
       let cvData = null;
       
       if (source === 'local') {
-        // Find the CV in local storage
         const localCV = localStorageCVs.find(cv => cv.id === cvId);
         if (localCV) {
           cvData = localCV;
-          console.log('✅ Local CV found:', cvData.title || cvData.id);
+          console.log('✅ Local CV loaded:', cvData.title || cvData.id);
         } else {
-          throw new Error('Local CV not found');
+          throw new Error(t('cloud3.cv_not_found', 'Local CV not found'));
         }
       } else if (connectedProviders.includes(source)) {
-        // Load from cloud provider - fetch fresh data
-        console.log(`☁️ Loading CV from ${source}...`);
+        console.log(`☁️ Loading CV from ${source} cloud...`);
+        cvData = await loadCVFromProvider(source, cvId);
         
-        try {
-          cvData = await loadCVFromProvider(source, cvId);
-          if (cvData) {
-            console.log('✅ Cloud CV loaded successfully:', cvData.title || 'Untitled');
-            // Ensure provider metadata is included
-            cvData.source_provider = source;
-            cvData.cloud_provider = source;
-            cvData.cloud_file_id = cvId;
-          } else {
-            throw new Error(`No data returned from ${source}`);
-          }
-        } catch (cloudError) {
-          console.error(`❌ Failed to load CV from ${source}:`, cloudError);
-          
-          // Try to find the CV in our cached cloud CVs as fallback
-          const cachedCV = cloudCVs.find(cv => 
-            (cv.file_id === cvId || cv.id === cvId) && cv.provider === source
-          );
-          
-          if (cachedCV) {
-            console.log(`📋 Using cached CV data as fallback...`);
-            cvData = {
-              ...cachedCV,
-              source_provider: source,
-              cloud_provider: source,
-              cloud_file_id: cvId
-            };
-          } else {
-            // If we can't load the CV, show error and clear selection
-            toast.error(`Failed to load CV from ${source}. Please try selecting it again.`);
-            setSelectedResumeId('');
-            setSelectedCVSource('');
-            setSelectedCV(null);
-            return;
-          }
+        if (cvData) {
+          console.log('✅ Cloud CV loaded successfully');
+          cvData.source_provider = source;
+          cvData.cloud_provider = source;
+          cvData.cloud_file_id = cvId;
+        } else {
+          throw new Error(t('cloud3.failed_load_cv', `Failed to load CV from ${source}`));
         }
       } else {
-        throw new Error(`Unsupported CV source: ${source}`);
+        throw new Error(t('cloud3.unsupported_source', `Unsupported CV source: ${source}`));
       }
       
       if (!cvData) {
-        throw new Error('No CV data available');
+        throw new Error(t('cloud3.no_cv_data', 'No CV data available'));
       }
       
-      // Validate CV data
       if (!cvData.personal_info) {
-        console.warn('⚠️ CV missing personal_info, adding empty object');
         cvData.personal_info = {};
       }
       
-      console.log('✅ CV loaded successfully:', {
+      console.log('✅ CV ready for use:', {
         source,
         title: cvData.title || 'Untitled',
-        hasPersonalInfo: !!cvData.personal_info?.full_name,
-        experienceCount: (cvData.experiences || []).length,
-        educationCount: (cvData.educations || []).length
+        hasPersonalInfo: !!cvData.personal_info?.full_name
       });
       
       setSelectedCV(cvData);
       
-      // Auto-fill form with CV data
+      // Auto-fill form
       if (cvData.personal_info) {
         setFormData(prev => ({
           ...prev,
@@ -224,34 +155,62 @@ const CoverLetter = ({ darkMode }) => {
           email: cvData.personal_info.email || '',
           phone: cvData.personal_info.mobile || cvData.personal_info.phone || ''
         }));
-        console.log('📝 Form auto-filled with CV personal info');
       }
       
-      // Show success feedback
-      const providerName = source === 'local' ? 'Local Storage' : getProviderDisplayInfo(source).name;
-      toast.success(`CV loaded from ${providerName}: ${cvData.title || 'Untitled'}`);
+      const providerName = source === 'local' ? t('cloud.local_storage', 'Local Storage') : getProviderDisplayInfo(source).name;
+      toast.success(t('cloud3.cv_loaded_from', `CV loaded from ${providerName}`));
       
     } catch (error) {
       console.error('❌ Failed to load CV:', error);
       setSelectedResumeId('');
       setSelectedCVSource('');
       setSelectedCV(null);
-      
-      let errorMessage = 'Failed to load selected CV. Please try again.';
-      if (error.message.includes('not found')) {
-        errorMessage = 'CV not found. It may have been moved or deleted.';
-      }
-      toast.error(errorMessage);
+      toast.error(t('cloud3.failed_load_cv_retry', 'Failed to load CV. Please try again.'));
     }
   };
 
-  // Handle file upload
-  const handleFileUpload = (e) => {
-    if (e.target.files[0]) {
-      setCvFile(e.target.files[0]);
-      setSelectedResumeId('');
-      setSelectedCVSource('upload');
-      setSelectedCV(null);
+  // Handle file upload with text extraction
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validation = validateFile(file, {
+      allowedExtensions: ['.pdf', '.doc', '.docx', '.txt'],
+      maxSizeMB: 10
+    });
+    
+    if (!validation.valid) {
+      toast.error(validation.error);
+      e.target.value = '';
+      return;
+    }
+
+    setFileProcessing(true);
+    setCvFile(null);
+    setSelectedResumeId('');
+    setSelectedCVSource('upload');
+    setSelectedCV(null);
+
+    try {
+      const extractedText = await extractTextFromFile(file);
+      
+      if (!extractedText || extractedText.trim().length < 50) {
+        throw new Error(t('cloud3.text_too_short', 'Extracted text is too short. Please ensure the file contains meaningful content.'));
+      }
+
+      setExtractedCVText(extractedText);
+      
+      const stats = getTextStats(extractedText);
+      console.log('📝 Text extracted from file:', stats);
+      
+      toast.success(t('cloud3.file_processed', `File processed: "${file.name}". ${stats.wordCount} words extracted.`));
+    } catch (error) {
+      console.error('File processing failed:', error);
+      toast.error(error.message || t('cloud3.file_process_failed', 'Failed to process file. Please try again or paste text directly.'));
+      e.target.value = '';
+      setExtractedCVText('');
+    } finally {
+      setFileProcessing(false);
     }
   };
 
@@ -267,196 +226,125 @@ const CoverLetter = ({ darkMode }) => {
     }));
   };
 
-  // Handle cover letter generation with proper data
+  // Handle cover letter generation
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearCoverLetterError();
     setProgressStatus('');
     
-    // Validate inputs
-    if (!selectedResumeId && !cvFile) {
-      toast.error(t('CoverLetter.alerts.selectResume', 'Please select a CV or upload a file'));
+    if (!selectedResumeId && !extractedCVText) {
+      toast.error(t('cloud3.select_cv_or_upload', 'Please select a CV or upload a file'));
       return;
     }
 
-    if (!formData.jobDescription.trim()) {
-      toast.error(t('CoverLetter.alerts.requiredFields', 'Please provide a job description'));
+    if (!formData.jobDescription.trim() || !formData.jobTitle.trim() || !formData.companyName.trim()) {
+      toast.error(t('cloud3.fill_required_fields', 'Please fill in all required fields'));
       return;
     }
 
-    if (!formData.jobTitle.trim()) {
-      toast.error(t('CoverLetter.alerts.requiredFields', 'Please provide a job title'));
-      return;
-    }
-
-    if (!formData.companyName.trim()) {
-      toast.error(t('CoverLetter.alerts.requiredFields', 'Please provide a company name'));
-      return;
-    }
-
-    // Validate that we have the selected CV data
     if (selectedResumeId && !selectedCV && selectedCVSource !== 'upload') {
-      toast.error('CV data not loaded. Please select the CV again.');
+      toast.error(t('cloud3.cv_not_loaded', 'CV data not loaded. Please select the CV again.'));
       return;
-    }
-
-    // Validate CV data if we have it
-    if (selectedCV) {
-      const validation = validateCVForGeneration(selectedCV);
-      if (!validation.valid) {
-        toast.error(`CV validation failed: ${validation.error}`);
-        return;
-      }
     }
 
     try {
       console.log('🚀 Starting cover letter generation...');
-      console.log('📊 Generation context:', {
-        selectedCVSource,
-        selectedResumeId,
-        hasSelectedCV: !!selectedCV,
-        hasUploadedFile: !!cvFile,
-        cvTitle: selectedCV?.title || 'N/A'
-      });
+      setProgressStatus(t('cloud3.generating_letter', 'Generating your cover letter...'));
       
-      setProgressStatus(t('CoverLetter.form.generating', 'Generating your cover letter...'));
-      
-      // Create FormData for the API request
       const formDataToSend = new FormData();
       
-      // Add job details
       formDataToSend.append('job_description', formData.jobDescription.trim());
       formDataToSend.append('job_title', formData.jobTitle.trim());
       formDataToSend.append('company_name', formData.companyName.trim());
       formDataToSend.append('recipient_name', formData.hiringManager.trim());
       formDataToSend.append('recipient_title', '');
       
-      // Enhanced CV source handling - FORCE backend to use provided data ONLY
-      if (selectedCVSource === 'upload' && cvFile) {
-        // Handle file upload
-        console.log('📎 Using uploaded file:', cvFile.name);
-        formDataToSend.append('resume_file', cvFile);
-        // DO NOT send any other CV-related parameters
+      if (selectedCVSource === 'upload' && extractedCVText) {
+        console.log('📎 Using extracted text from uploaded file');
         
+        const basicCVData = {
+          title: t('cloud3.uploaded_resume', 'Uploaded Resume'),
+          personal_info: {
+            full_name: formData.fullName || t('cloud3.resume_holder', 'Resume Holder'),
+            email: formData.email || 'user@example.com',
+            mobile: formData.phone || '+1234567890',
+            summary: extractedCVText.substring(0, 500)
+          },
+          experiences: [],
+          educations: [],
+          skills: [],
+          languages: [],
+          referrals: [],
+          custom_sections: [],
+          extracurriculars: [],
+          hobbies: [],
+          courses: [],
+          internships: [],
+          photo: { photolink: null }
+        };
+        
+        formDataToSend.append('resume_data', JSON.stringify(basicCVData));
+        formDataToSend.append('data_source', 'upload');
       } else if (selectedCV) {
-        // Handle selected CV (both local and cloud) - FORCE backend to use provided data
-        console.log(`📄 Using ${selectedCVSource} CV:`, selectedCV.title || 'Untitled');
-        console.log('🚨 CRITICAL: Forcing backend to use provided CV data only');
+        console.log(`📄 Using ${selectedCVSource} CV`);
         
-        // Clean and prepare CV data
         const cvDataForAPI = {
-          // Core CV structure
-          title: selectedCV.title || 'My Resume',
+          title: selectedCV.title || t('cloud3.my_resume', 'My Resume'),
           personal_info: selectedCV.personal_info || {},
           experiences: selectedCV.experiences || [],
           educations: selectedCV.educations || [],
           skills: selectedCV.skills || [],
           languages: selectedCV.languages || [],
-          
-          // Optional sections
           referrals: selectedCV.referrals || [],
           custom_sections: selectedCV.custom_sections || [],
           extracurriculars: selectedCV.extracurriculars || [],
           hobbies: selectedCV.hobbies || [],
           courses: selectedCV.courses || [],
           internships: selectedCV.internships || [],
-          
-          // Photo handling
           photo: selectedCV.photo || selectedCV.photos || { photolink: null },
-          
-          // Metadata for reference only (not for backend processing)
-          source_provider: selectedCVSource,
-          cv_source_type: selectedCVSource === 'local' ? 'local' : 'cloud'
         };
         
-        // CRITICAL: Only send resume_data to force backend to use provided data
-        // Do NOT send resume_id or provider parameters that would trigger cloud loading
         formDataToSend.append('resume_data', JSON.stringify(cvDataForAPI));
         
-        // Add a special flag to indicate this is pre-loaded data
-        formDataToSend.append('data_source', 'frontend_provided');
-        formDataToSend.append('skip_cloud_loading', 'true');
-        
-        console.log('✅ CV data prepared for API (FORCED DATA-ONLY MODE):', {
+        console.log('✅ CV data prepared:', {
           hasPersonalInfo: !!cvDataForAPI.personal_info.full_name,
           experienceCount: cvDataForAPI.experiences.length,
-          educationCount: cvDataForAPI.educations.length,
-          skillCount: cvDataForAPI.skills.length,
-          sourceProvider: cvDataForAPI.source_provider,
-          dataSize: JSON.stringify(cvDataForAPI).length,
-          mode: 'FORCED_DATA_ONLY'
+          educationCount: cvDataForAPI.educations.length
         });
-        
-        console.log('🚨 NOT SENDING: resume_id, provider, or any cloud-loading parameters');
-        
-      } else {
-        // This should not happen with proper validation, but handle it
-        throw new Error('No valid CV data available. Please select a CV or upload a file.');
       }
 
-      // Optional fields
       formDataToSend.append('save_to_database', 'false');
-      formDataToSend.append('title', `Cover Letter - ${formData.jobTitle} at ${formData.companyName}`);
+      formDataToSend.append('title', t('cloud3.cover_letter_title', `Cover Letter - ${formData.jobTitle} at ${formData.companyName}`));
       
-      // Debug information for backend
-      formDataToSend.append('debug_cv_source', selectedCVSource);
-      formDataToSend.append('debug_has_cv_data', selectedCV ? 'true' : 'false');
-      formDataToSend.append('debug_frontend_version', '2.0');
-      
-      console.log('📤 Sending cover letter generation request...');
-      
-      // Log what we're sending (without sensitive data)
-      const debugInfo = {
-        hasResumeData: formDataToSend.has('resume_data'),
-        hasResumeFile: formDataToSend.has('resume_file'),
-        hasResumeId: formDataToSend.has('resume_id'),
-        cvSource: formDataToSend.get('cv_source'),
-        provider: formDataToSend.get('provider'),
-        jobTitle: formDataToSend.get('job_title'),
-        companyName: formDataToSend.get('company_name')
-      };
-      console.log('📋 Request payload summary:', debugInfo);
+      console.log('📤 Sending generation request...');
       
       const response = await generateCoverLetter(formDataToSend);
       
       if (response.success && response.cover_letter) {
-        console.log('✅ Cover letter generated successfully');
+        console.log('✅ Cover letter generated');
         handleCoverLetterResult(response);
       } else if (response.task_id) {
-        console.log('⏳ Cover letter generation started (async):', response.task_id);
-        setProgressStatus(t('CoverLetter.form.generating', 'Cover letter generation started. Please wait...'));
+        console.log('⏳ Async generation started');
+        setProgressStatus(t('cloud3.generation_started', 'Cover letter generation started...'));
       } else {
-        throw new Error('No cover letter content received');
+        throw new Error(t('cloud3.no_content_received', 'No cover letter content received'));
       }
     } catch (error) {
-      console.error('❌ Cover letter generation failed:', error);
+      console.error('❌ Generation failed:', error);
       setAlertType('error');
       setGeneratedLetter('');
       setProgressStatus('');
-      
-      // Enhanced error handling
-      let errorMessage = error.message || 'Failed to generate cover letter';
-      
-      if (errorMessage.includes('No CV data available')) {
-        errorMessage = 'CV data not found. Please ensure the selected CV is properly loaded.';
-      } else if (errorMessage.includes('HTTP 400')) {
-        errorMessage = 'Invalid request. Please check your CV selection and try again.';
-      } else if (errorMessage.includes('File not found')) {
-        errorMessage = 'CV file not found. Please select a different CV.';
-      }
-      
-      toast.error(t('CoverLetter.errors.generation', errorMessage));
+      toast.error(error.message || t('cloud3.generation_failed', 'Failed to generate cover letter'));
     }
   };
 
-  // Handle cover letter result and format for display
+  // Handle cover letter result
   const handleCoverLetterResult = (result) => {
     try {
-      console.log("📝 Processing cover letter result:", result);
+      console.log("📝 Processing cover letter result");
       
-      // Store the full AI response data for saving later
       setGeneratedCoverLetterData({
-        title: `Cover Letter - ${formData.jobTitle} at ${formData.companyName}`,
+        title: t('cloud3.cover_letter_title', `Cover Letter - ${formData.jobTitle} at ${formData.companyName}`),
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription,
@@ -478,45 +366,23 @@ const CoverLetter = ({ darkMode }) => {
       if (result.cover_letter) {
         const coverLetter = result.cover_letter;
         
-        // Add header with personal info
         if (formData.fullName) letterContent += `${formData.fullName}\n`;
         if (formData.email) letterContent += `${formData.email}\n`;
         if (formData.phone) letterContent += `${formData.phone}\n\n`;
         
-        // Add date
         letterContent += `${new Date().toLocaleDateString()}\n\n`;
         
-        // Add company info
         letterContent += `${formData.companyName}\n`;
         if (formData.hiringManager) letterContent += `${formData.hiringManager}\n`;
         letterContent += '\n';
         
-        // Add greeting
-        if (coverLetter.greeting) {
-          letterContent += `${coverLetter.greeting}\n\n`;
-        }
-        
-        // Add introduction
-        if (coverLetter.introduction) {
-          letterContent += `${coverLetter.introduction}\n\n`;
-        }
-        
-        // Add body paragraphs
+        if (coverLetter.greeting) letterContent += `${coverLetter.greeting}\n\n`;
+        if (coverLetter.introduction) letterContent += `${coverLetter.introduction}\n\n`;
         if (Array.isArray(coverLetter.body_paragraphs)) {
-          coverLetter.body_paragraphs.forEach(paragraph => {
-            letterContent += `${paragraph}\n\n`;
-          });
+          coverLetter.body_paragraphs.forEach(p => letterContent += `${p}\n\n`);
         }
-        
-        // Add closing
-        if (coverLetter.closing) {
-          letterContent += `${coverLetter.closing}\n\n`;
-        }
-        
-        // Add signature
-        if (coverLetter.signature) {
-          letterContent += coverLetter.signature.replace(/\\n/g, '\n');
-        }
+        if (coverLetter.closing) letterContent += `${coverLetter.closing}\n\n`;
+        if (coverLetter.signature) letterContent += coverLetter.signature.replace(/\\n/g, '\n');
       }
       
       setGeneratedLetter(letterContent);
@@ -524,19 +390,19 @@ const CoverLetter = ({ darkMode }) => {
       setProgressStatus('');
       clearCurrentTask();
       
-      console.log('✅ Cover letter processed and displayed');
+      toast.success(t('cloud3.letter_generated', 'Cover letter generated successfully!'));
     } catch (error) {
-      console.error('❌ Error processing cover letter:', error);
+      console.error('❌ Error processing result:', error);
       setAlertType('error');
       setGeneratedLetter('');
       setProgressStatus('');
     }
   };
 
-  // Handle saving cover letter (local-first with optional cloud sync)
+  // Save cover letter
   const handleSaveCoverLetter = async (saveToCloud = false, preferredProvider = null) => {
     if (!generatedCoverLetterData) {
-      toast.error(t('CoverLetter.errors.generation', 'No cover letter to save. Please generate one first.'));
+      toast.error(t('cloud3.no_letter_to_save', 'No cover letter to save'));
       return;
     }
 
@@ -546,53 +412,44 @@ const CoverLetter = ({ darkMode }) => {
       const result = await saveCoverLetter(generatedCoverLetterData, saveToCloud, preferredProvider);
       
       if (result.success) {
-        if (saveToCloud) {
-          if (result.cloudResult?.success) {
-            toast.success(t('CoverLetter.success.letter_generated', `Cover letter saved locally and to ${result.cloudResult.provider}!`));
-          } else {
-            toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally! (Cloud sync failed)'));
-          }
+        if (saveToCloud && result.cloudResult?.success) {
+          toast.success(t('cloud3.saved_local_and_cloud', `Saved locally and to ${result.cloudResult.provider}!`));
         } else {
-          toast.success(t('CoverLetter.success.letter_generated', 'Cover letter saved locally!'));
+          toast.success(t('cloud3.saved_locally', 'Cover letter saved locally!'));
         }
       } else {
-        throw new Error(result.error || 'Save failed');
+        throw new Error(result.error || t('cloud3.save_failed', 'Save failed'));
       }
     } catch (error) {
       console.error('Save failed:', error);
-      toast.error(t('CoverLetter.errors.generation', 'Failed to save') + `: ${error.message}`);
+      toast.error(t('cloud3.failed_to_save', `Failed to save: ${error.message}`));
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Handle task polling for async generation
+  // Task polling
   useEffect(() => {
     let interval;
     
     if (currentTask && currentTask.status === 'processing') {
-      console.log('⏳ Starting task polling for:', currentTask.id);
-      
       interval = setInterval(async () => {
         try {
           const result = await checkTaskStatus();
           
           if (result && result.status === 'completed') {
-            console.log('✅ Task completed:', result);
             clearInterval(interval);
-            
             if (result.result && result.result.cover_letter) {
               handleCoverLetterResult(result.result);
             }
           } else if (result && result.status === 'failed') {
-            console.log('❌ Task failed:', result);
             clearInterval(interval);
             setProgressStatus('');
             setAlertType('error');
-            toast.error(result.error || t('CoverLetter.errors.generation', 'Cover letter generation failed'));
+            toast.error(result.error || t('cloud3.generation_failed', 'Generation failed'));
           }
         } catch (error) {
-          console.error('❌ Task polling error:', error);
+          console.error('Polling error:', error);
         }
       }, 2000);
     }
@@ -602,45 +459,36 @@ const CoverLetter = ({ darkMode }) => {
     };
   }, [currentTask, checkTaskStatus]);
 
-  // Get provider display info
+  // Provider display info
   const getProviderDisplayInfo = (provider) => {
     const providerDetails = getConnectedProviderDetails().find(p => p.provider === provider);
     if (providerDetails) {
       return {
         name: providerDetails.name,
-        icon: provider === 'google_drive' ? '📄' : provider === 'onedrive' ? '☁️' : '🗃️'
+        icon: provider === 'google_drive' ? '📄' : provider === 'onedrive' ? '☁️' : '📦'
       };
     }
     return { name: provider, icon: '🗃️' };
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
-      {/* Background Elements */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-purple-600/20 mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute top-0 -right-24 w-48 h-48 rounded-full bg-pink-600/20 mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute -bottom-24 left-24 w-48 h-48 rounded-full bg-blue-600/20 mix-blend-multiply filter blur-3xl"></div>
-      </div>
- 
-      <div className="container mx-auto p-4 relative z-10">
+    <div className={`min-h-screen pt-16 ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20'}`}>
+      <div className="container mx-auto p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Form Section */}
           <div className={`${darkMode ? 'bg-gray-800 text-white' : 'bg-white/80 backdrop-blur-sm'} rounded-lg shadow-lg p-4`}>
-            <h2 className="text-base font-bold mb-4">{t('CoverLetter.title', 'AI Cover Letter Generator')}</h2>
+            <h2 className="text-base font-bold mb-4">{t('cloud3.ai_cover_letter_generator', 'AI Cover Letter Generator')}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* CV Selection Section */}
+              {/* CV Selection */}
               <div className="mb-4">
-                <h3 className="text-sm font-semibold mb-2">
-                  {t('common.select_file', 'Select Your CV')}
-                </h3>
+                <h3 className="text-sm font-semibold mb-2">{t('cloud3.select_your_cv', 'Select Your CV')}</h3>
                 
-                {/* Local Storage CVs */}
+                {/* Local CVs */}
                 {localStorageCVs.length > 0 && (
                   <div className="mb-3">
                     <label className="block text-xs font-medium mb-1">
-                      💾 {t('cloud.from_local_storage', 'From Local Storage')}
+                      💾 {t('cloud3.from_local_storage', 'From Local Storage')}
                     </label>
                     <select
                       value={selectedCVSource === 'local' ? selectedResumeId : ''}
@@ -649,19 +497,19 @@ const CoverLetter = ({ darkMode }) => {
                           handleCVSelection('local', e.target.value);
                         }
                       }}
-                      className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                      className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'}`}
                     >
-                      <option value="">{t('cloud.select_local_cv', '-- Select a CV from Local Storage --')}</option>
+                      <option value="">{t('cloud3.select_local_storage', '-- Select from Local Storage --')}</option>
                       {localStorageCVs.map(cv => (
                         <option key={cv.id} value={cv.id}>
-                          {cv.title || cv.personal_info?.full_name || 'Untitled CV'} 
+                          {cv.title || cv.personal_info?.full_name || t('common.untitled', 'Untitled')}
                           {cv.lastModified && ` (${new Date(cv.lastModified).toLocaleDateString()})`}
                         </option>
                       ))}
                     </select>
                     {selectedCVSource === 'local' && selectedCV && (
                       <p className="text-xs text-green-600 mt-1">
-                        ✓ {t('common.selected', 'Selected')}: {selectedCV.title || 'Local CV'}
+                        ✓ {t('cloud3.selected', 'Selected')}: {selectedCV.title || t('cloud3.local_cv', 'Local CV')}
                       </p>
                     )}
                   </div>
@@ -675,55 +523,69 @@ const CoverLetter = ({ darkMode }) => {
                   return (
                     <div key={provider} className="mb-3">
                       <label className="block text-xs font-medium mb-1">
-                        {providerInfo.icon} {t('cloud.from_provider', `From ${providerInfo.name}`)}
+                        {providerInfo.icon} {t('cloud3.from_provider', `From ${providerInfo.name}`)}
                       </label>
                       <select
                         value={selectedCVSource === provider ? selectedResumeId : ''}
                         onChange={(e) => {
                           if (e.target.value) {
-                            handleCVSelection(provider, e.target.value, provider);
+                            handleCVSelection(provider, e.target.value);
                           }
                         }}
-                        className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                        className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'}`}
                       >
-                        <option value="">{t('CoverLetter.form.select_resume', `-- Select a CV from ${providerInfo.name} --`)}</option>
+                        <option value="">{t('cloud3.select_from_provider', `-- Select from ${providerInfo.name} --`)}</option>
                         {cvs.map(cv => (
                           <option key={cv.file_id || cv.id} value={cv.file_id || cv.id}>
-                            {cv.name || cv.title || 'Untitled CV'}
+                            {cv.name || cv.title || t('common.untitled', 'Untitled')}
                           </option>
                         ))}
                       </select>
                       {selectedCVSource === provider && selectedCV && (
                         <p className="text-xs text-green-600 mt-1">
-                          ✓ {t('common.selected', 'Selected')}: {selectedCV.title || selectedCV.name || 'Cloud CV'}
+                          ✓ {t('cloud3.selected', 'Selected')}: {selectedCV.title || selectedCV.name || t('cloud3.cloud_cv', 'Cloud CV')}
                         </p>
                       )}
                     </div>
                   );
                 })}
                 
-                {/* Upload Option */}
+                {/* Upload */}
                 <div className="mb-3">
                   <label className="block text-xs font-medium mb-1">
-                    📎 {t('CoverLetter.form.upload_cv', 'Or upload a CV file')}
+                    📎 {t('cloud3.or_upload_file', 'Or upload a file')}
                   </label>
                   <input
                     ref={fileInputRef}
                     type="file"
                     onChange={handleFileUpload}
-                    accept=".txt,.doc,.docx,.pdf"
+                    accept=".pdf,.doc,.docx,.txt"
                     className="hidden"
+                    disabled={fileProcessing}
                   />
                   <button
                     type="button"
                     onClick={triggerFileUpload}
+                    disabled={fileProcessing}
                     className={`px-3 py-1.5 text-xs rounded-lg border ${
-                      cvFile 
+                      extractedCVText
                         ? 'bg-green-100 text-green-700 border-green-300' 
                         : `${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
-                    } hover:bg-gray-100 transition-colors`}
+                    } hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    {cvFile ? `✓ ${cvFile.name}` : t('cloud.choose_file', 'Choose File')}
+                    {fileProcessing ? (
+                      <span className="flex items-center gap-1">
+                        <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                        {t('cloud3.processing', 'Processing...')}
+                      </span>
+                    ) : extractedCVText ? (
+                      t('cloud3.file_processed_words', `✓ File processed (${getTextStats(extractedCVText).wordCount} words)`)
+                    ) : (
+                      t('cloud3.choose_file_types', 'Choose File (PDF, Word, TXT)')
+                    )}
                   </button>
                 </div>
                 
@@ -731,50 +593,50 @@ const CoverLetter = ({ darkMode }) => {
                 <div className="text-xs space-y-1">
                   {localStorageCVs.length > 0 && (
                     <p className="text-blue-600">
-                      💡 {localStorageCVs.length} CV{localStorageCVs.length !== 1 ? 's' : ''} available locally
+                      💡 {t('cloud3.cvs_available_locally', `${localStorageCVs.length} CV${localStorageCVs.length !== 1 ? 's' : ''} available locally`)}
                     </p>
                   )}
                   {Object.keys(groupedCloudCVs).length > 0 && (
                     <p className="text-green-600">
-                      💡 {Object.values(groupedCloudCVs).flat().length} CV{Object.values(groupedCloudCVs).flat().length !== 1 ? 's' : ''} available in cloud
+                      💡 {t('cloud3.cvs_in_cloud', `${Object.values(groupedCloudCVs).flat().length} CV${Object.values(groupedCloudCVs).flat().length !== 1 ? 's' : ''} in cloud`)}
                     </p>
                   )}
                   {connectedProviders.length === 0 && (
                     <p className="text-amber-600">
-                      💡 <a href="/cloud-setup" className="underline">{t('cloud.connect_providers', 'Connect cloud storage')}</a> {t('cloud.access_saved_cvs', 'to access your cloud CVs')}
+                      💡 <a href="/cloud-setup" className="underline">{t('cloud3.connect_cloud_access', 'Connect cloud storage')}</a> {t('cloud3.to_access_cloud_cvs', 'to access cloud CVs')}
                     </p>
                   )}
                 </div>
               </div>
 
               {/* Personal Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.full_name', 'Full Name')}</label>
+                  <label className="block text-xs font-medium mb-1">{t('resume.personal_info.full_name', 'Full Name')} *</label>
                   <input
                     type="text"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
+                    className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.email', 'Email')}</label>
+                  <label className="block text-xs font-medium mb-1">{t('resume.personal_info.email', 'Email')} *</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
+                    className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'}`}
                   />
                 </div>
               </div>
               
               {/* Job Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.company_name', 'Company Name')} *</label>
                   <input
@@ -783,7 +645,7 @@ const CoverLetter = ({ darkMode }) => {
                     value={formData.companyName}
                     onChange={handleInputChange}
                     required
-                    className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
+                    className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'}`}
                   />
                 </div>
                 <div>
@@ -794,19 +656,19 @@ const CoverLetter = ({ darkMode }) => {
                     value={formData.jobTitle}
                     onChange={handleInputChange}
                     required
-                    className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
+                    className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'}`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.hiring_manager', 'Hiring Manager')} ({t('cloud.optional', 'optional')})</label>
+                <label className="block text-xs font-medium mb-1">{t('CoverLetter.form.hiring_manager', 'Hiring Manager')} ({t('cloud3.optional', 'optional')})</label>
                 <input
                   type="text"
                   name="hiringManager"
                   value={formData.hiringManager}
                   onChange={handleInputChange}
-                  className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
+                  className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'}`}
                 />
               </div>
               
@@ -818,16 +680,16 @@ const CoverLetter = ({ darkMode }) => {
                   onChange={handleInputChange}
                   required
                   rows={4}
-                  className={`w-full p-1.5 text-xs rounded border border-gray-300 ${darkMode ? 'bg-gray-700 text-white' : 'bg-transparent'}`}
-                  placeholder={t('CoverLetter.form.jobDescription_placeholder', 'Paste the job description here...')}
+                  className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'}`}
+                  placeholder={t('CoverLetter.form.jobDescription_placeholder', 'Paste the job description...')}
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2 px-3 text-xs bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-2 px-3 text-xs bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center">
@@ -835,14 +697,13 @@ const CoverLetter = ({ darkMode }) => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                     </svg>
-                    {progressStatus || t('CoverLetter.form.generating', 'Generating...')}
+                    {progressStatus || t('cloud3.generating', 'Generating...')}
                   </span>
                 ) : (
                   t('CoverLetter.form.generate_button', 'Generate Cover Letter with AI')
                 )}
               </button>
 
-              {/* Error Display */}
               {coverLetterError && (
                 <Alert type="error">{coverLetterError}</Alert>
               )}
@@ -872,32 +733,20 @@ const CoverLetter = ({ darkMode }) => {
                       a.click();
                       URL.revokeObjectURL(url);
                     }}
-                    className="px-2 py-1 text-xs bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded hover:shadow-lg"
+                    className="px-2 py-1 text-xs bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded hover:shadow-lg"
                   >
                     {t('common.download', 'Download')}
                   </button>
-                  {/* Save buttons */}
                   {generatedCoverLetterData && (
                     <>
                       <button 
                         onClick={() => handleSaveCoverLetter(false)}
                         disabled={isSaving}
-                        className="px-2 py-1 text-xs bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:shadow-lg disabled:opacity-50"
                       >
-                        {isSaving ? (
-                          <span className="flex items-center">
-                            <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                            </svg>
-                            {t('common.saving', 'Saving...')}
-                          </span>
-                        ) : (
-                          t('cloud.save_locally', '💾 Save Locally')
-                        )}
+                        {isSaving ? t('cloud3.saving', 'Saving...') : t('cloud3.save_locally_btn', '💾 Save Locally')}
                       </button>
                       
-                      {/* Cloud save buttons for each connected provider */}
                       {connectedProviders.map(provider => {
                         const providerInfo = getProviderDisplayInfo(provider);
                         return (
@@ -905,31 +754,20 @@ const CoverLetter = ({ darkMode }) => {
                             key={provider}
                             onClick={() => handleSaveCoverLetter(true, provider)}
                             disabled={isSaving}
-                            className="px-2 py-1 text-xs bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded hover:shadow-lg hover:shadow-green-500/20 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:shadow-lg disabled:opacity-50"
                           >
-                            {isSaving ? (
-                              <span className="flex items-center">
-                                <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                                </svg>
-                                {t('common.saving', 'Saving...')}
-                              </span>
-                            ) : (
-                              t('cloud.save_to_provider', `${providerInfo.icon} Save to ${providerInfo.name}`)
-                            )}
+                            {isSaving ? t('cloud3.saving', 'Saving...') : t('cloud3.save_to_provider_btn', `${providerInfo.icon} Save to ${providerInfo.name}`)}
                           </button>
                         );
                       })}
                     </>
                   )}
                   
-                  {/* Show dashboard link */}
                   <Link
                     to="/cover-letters"
                     className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700"
                   >
-                    {t('coverLetters.title', '📋 View All')}
+                    {t('cloud3.view_all', '📋 View All')}
                   </Link>
                 </div>
               )}
@@ -946,7 +784,7 @@ const CoverLetter = ({ darkMode }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <p className="text-xs">
-                    {progressStatus || t('CoverLetter.preview.empty_state', 'Your AI-generated cover letter will appear here')}
+                    {progressStatus || t('cloud3.cover_letter_preview', 'Your AI-generated cover letter will appear here')}
                   </p>
                 </div>
               </div>
