@@ -1295,6 +1295,7 @@
       "levelUp": "💪 Time to level up! We'll show you exactly how."
     },
 
+
     "results": {
       "intelligenceReport": "📊 Your Application Intelligence Report",
       "readyToDiscover": "Ready to discover your real chances?",
@@ -1581,28 +1582,7 @@
     "create_cv_to_customize": "We couldn't find any CVs to customize. Create one first!",
     "create_new_cv": "Create New CV",
     "select_cv_to_customize": "Select CV to Customize",
-    "choose_cv_to_customize": "Choose which CV you'd like to customize",
-
-
-
-
-
- 
-    "dropbox_description": "Store your CVs in Dropbox",
-    "dropbox_connected": "Dropbox Connected",
-    "connect_dropbox": "Connect Dropbox",
-    "save_cvs_securely_dropbox": "Save your CVs securely to Dropbox",
-    "dropbox_benefits": "Trusted cloud storage with excellent reliability and sync",
-     
-    "2gb_free_storage": "2GB free storage",
-    "reliable_sync": "Reliable file synchronization",
-    "cross_platform": "Works on all platforms",
-      
-    "can_save_cvs_to_provider": "You can now save your CVs to {{provider}}",
-    "data_stays_in_your_provider": "Your data stays in your {{provider}} account",
-    "why_provider": "Why {{provider}}?",
-     
-    "fully_supported": "Fully Supported"
+    "choose_cv_to_customize": "Choose which CV you'd like to customize"
   }, 
   "terms": {
     "title": "Terms and Conditions",
@@ -2016,7 +1996,6 @@
         "time": "We respond within 48 hours"
       }
     },
-    
     "updates": {
       "title": "Cookie Policy Updates",
       "description": "We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new policy on this page.",
@@ -2026,7 +2005,7 @@
   "cloud3": {
     "save_cvs_securely_google": "Save your CVs securely to Google drive",
     "google_drive_connected": "Google drive connected",
-    "connect_google_drive": "connect to Google drive",
+    "connect_google_drive": "Connet Google drive",
     "save_cvs_securely_dropbox": "Save your CVs securely to Dropbox",
     "dropbox_connected": "Dropbox Connected",
     "connect_dropbox": "Connect Dropbox",
@@ -2069,13 +2048,13 @@
     "uploaded_resume": "Uploaded Resume",
     "resume_holder": "Resume Holder",
     "my_resume": "My Resume",
-    "cover_letter_title": "Cover Letter - {jobTitle} at {companyName}",
+    "cover_letter_title": "Cover Letter - {{jobTitle}} at {{companyName}}",
     "generation_started": "Cover letter generation started...",
     "no_content_received": "No cover letter content received",
     "generation_failed": "Failed to generate cover letter",
     "letter_generated": "Cover letter generated successfully!",
     "no_letter_to_save": "No cover letter to save",
-    "saved_local_and_cloud": "Saved locally and to {provider}!",
+    "saved_local_and_cloud": "Saved locally and to {{provider}}!",
     "saved_locally": "Cover letter saved locally!",
     "save_failed": "Save failed",
     "failed_to_save": "Failed to save",
@@ -2085,26 +2064,26 @@
     "select_local_storage": "-- Select from Local Storage --",
     "selected": "Selected",
     "local_cv": "Local CV",
-    "from_provider": "From {provider}",
-    "select_from_provider": "-- Select from {provider} --",
+    "from_provider": "From {{provider}}",
+    "select_from_provider": "-- Select from {{provider}} --",
     "cloud_cv": "Cloud CV",
     "or_upload_file": "Or upload a file",
     "processing": "Processing...",
-    "file_processed_words": "✓ File processed ({wordCount} words)",
+    "file_processed_words": "✓ File processed ({{wordCount}} words)",
     "choose_file_types": "Choose File (PDF, Word, TXT)",
-    "cvs_available_locally": "{count} CV(s) available locally",
-    "cvs_in_cloud": "{count} CV(s) in cloud",
+    "cvs_available_locally": "{{count}} CV(s) available locally",
+    "cvs_in_cloud": "{{count}} CV(s) in cloud",
     "connect_cloud_access": "Connect cloud storage",
     "to_access_cloud_cvs": "to access cloud CVs",
     "optional": "optional",
     "generating": "Generating...",
     "saving": "Saving...",
     "save_locally_btn": "💾 Save Locally",
-    "save_to_provider_btn": "{icon} Save to {name}",
+    "save_to_provider_btn": "Save to {{name}}",
     "view_all": "📋 View All",
     "cover_letter_preview": "Your AI-generated cover letter will appear here",
     "show_less": "Show Less",
-    "show_all_count": "Show All ({count})",
+    "show_all_count": "Show All ({{count}})",
     "industry_intelligence": "Industry Intelligence",
     "primary_industry": "Primary Industry",
     "detected_role": "Detected Role",
@@ -2171,7 +2150,7 @@
     "your_action_plan": "Your Action Plan",
     "strategic_moves": "Strategic Moves",
     "less": "Less",
-    "all_count": "All ({count})",
+    "all_count": "All ({{count}})",
     "application_hacks": "Application Hacks",
     "market_intelligence": "Market Intelligence",
     "quick_actions": "Quick Actions",
@@ -2183,6 +2162,21 @@
     "update_existing": "Update Existing CV",
     "save_as_new":  "Save as New CV",
     "unsaved_changes": "Unsaved changes",
-    "unsaved_changes_save_before_leaving": "You have unsaved changes. Do you want to save before leaving?"
+    "unsaved_changes_save_before_leaving": "You have unsaved changes. Do you want to save before leaving?",
+    "save_to_cloud": "Save to cloud",
+    "cloud": "Cloud",
+    "dropbox_description": "Store your CVs in Dropbox", 
+    "dropbox_benefits": "Trusted cloud storage with excellent reliability and sync",
+    "2gb_free_storage": "2GB free storage",
+    "reliable_sync": "Reliable file synchronization",
+    "cross_platform": "Works on all platforms", 
+    "can_save_cvs_to_provider": "You can now save your CVs to {{provider}}",
+    "data_stays_in_your_provider": "Your data stays in your {{provider}} account",
+    "why_provider": "Why {{provider}}?",
+    "fully_supported": "Fully Supported",
+    "access_cvs_any_device": "Access your CVs from any device with your {{provider}}",
+    "cvs_automatically_saved": "Your CVs are automatically saved to your {{provider}}",
+    "no_cloud": "No cloud providers",
+    "connect_to_save": "Connect to you provider to save you CV"
   }
 }

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import TemplateRenderer from '../template-selector/TemplateRenderer'; 
 import logoImg from '../../../assets/logo.png';
-import logo2 from '../../../assets/logo2.png';
-import useResumeStore from '../../../stores/resumeStore';
+import logo2 from '../../../assets/logo2.png'; 
 import { decompressCV, hasEncodedCV } from '../../../utils/cvEncoder';
+import useSessionStore from '../../../stores/sessionStore';
 
 const PublicResumeViewer = () => {
   const [resumeData, setResumeData] = useState(null);
@@ -12,7 +12,7 @@ const PublicResumeViewer = () => {
   const [error, setError] = useState(null);
   const [isPublicView, setIsPublicView] = useState(false);
   const { userName, userId, resumeId } = useParams(); 
-  const { fetchResume, currentResume, loading: storeLoading, error: storeError } = useResumeStore(); 
+  const { fetchResume, currentResume, loading: storeLoading, error: storeError } = useSessionStore(); 
   const dataFetchedRef = useRef(false); 
   const location = useLocation();
   
@@ -66,7 +66,7 @@ const PublicResumeViewer = () => {
           throw new Error(storeError);
         }
         
-        const storeResume = useResumeStore.getState().currentResume;
+        const storeResume = useSessionStore.getState().currentResume;
         
         if (!storeResume) {
           throw new Error('Resume not found');

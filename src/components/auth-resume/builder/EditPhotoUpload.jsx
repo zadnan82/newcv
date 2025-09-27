@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import useResumeStore from '../../../stores/resumeStore';
+import { useTranslation } from 'react-i18next'; 
+import useSessionStore from '../../../stores/sessionStore';
 
 const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
   const { t } = useTranslation();
@@ -9,10 +9,8 @@ const EditPhotoUpload = ({ darkMode, data = [], onChange }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentPhotoUrl, setCurrentPhotoUrl] = useState('');
   
-  // Resume store methods (keep for compatibility but won't use Cloudinary anymore)
-  const updatePhoto = useResumeStore(state => state.updatePhoto);
-  const deletePhoto = useResumeStore(state => state.deletePhoto);
-  const currentResume = useResumeStore(state => state.currentResume);
+  
+  const currentResume = useSessionStore(state => state.currentResume);
 
   useEffect(() => {
     console.log('EditPhotoUpload - Data received:', data);

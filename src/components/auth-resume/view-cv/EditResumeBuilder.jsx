@@ -947,7 +947,7 @@ const updateOneDriveCV = async (fileId, cvData) => {
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105'
         }`}
-        title={originalProvider ? getProviderDisplayName(originalProvider) : t('cloud.save_to_cloud')}
+        title={originalProvider ? getProviderDisplayName(originalProvider) : t('cloud3.save_to_cloud')}
       >
         <Cloud size={14} />
         <span>
@@ -955,7 +955,7 @@ const updateOneDriveCV = async (fileId, cvData) => {
             ? t('resume.actions.saving') 
             : originalProvider 
               ? getProviderDisplayName(originalProvider).split(' ')[0] // Show just "OneDrive" or "Google"
-              : t('cloud.cloud')
+              : t('cloud3.cloud')
           }
         </span>
       </button>

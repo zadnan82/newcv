@@ -49,15 +49,15 @@ const CloudSetup = ({ darkMode }) => {
       id: 'dropbox',
       name: 'Dropbox',
       icon: '📦',
-      description: t('cloud.dropbox_description', 'Store your CVs in Dropbox'),
+      description: t('cloud3.dropbox_description', 'Store your CVs in Dropbox'),
       color: 'from-blue-500 to-blue-700',
       bgColor: 'bg-blue-50',
       textColor: 'text-blue-700',
       status: 'available',
       benefits: [
-        t('cloud.2gb_free_storage', '2GB free storage'),
-        t('cloud.reliable_sync', 'Reliable file synchronization'),
-        t('cloud.cross_platform', 'Works on all platforms')
+        t('cloud3.2gb_free_storage', '2GB free storage'),
+        t('cloud3.reliable_sync', 'Reliable file synchronization'),
+        t('cloud3.cross_platform', 'Works on all platforms')
       ]
     }
   ];
@@ -70,7 +70,7 @@ const CloudSetup = ({ darkMode }) => {
         return (
           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <CheckCircle className="w-3 h-3 mr-1" />
-            {t('cloud.fully_supported', 'Fully Supported')}
+            {t('cloud3.fully_supported', 'Fully Supported')}
           </span>
         );
       case 'available':
@@ -198,8 +198,8 @@ const CloudSetup = ({ darkMode }) => {
                   </h3>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
-                    {t('cloud.cvs_automatically_saved')}
+                  }`}> 
+                    {t('cloud3.cvs_automatically_saved', { provider: selectedProviderData?.name || 'Cloud Storage' })}
                   </p>
                 </div>
               </div>
@@ -217,11 +217,12 @@ const CloudSetup = ({ darkMode }) => {
                     darkMode ? 'text-white' : 'text-gray-800'
                   }`}>
                     {t('cloud.access_anywhere')}
+                     
                   </h3>
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    {t('cloud.access_cvs_any_device')}
+                     {t('cloud3.access_cvs_any_device', { provider: selectedProviderData?.name || 'Cloud Storage' })}
                   </p>
                 </div>
               </div>
@@ -243,7 +244,7 @@ const CloudSetup = ({ darkMode }) => {
                   <p className={`text-sm ${
                     darkMode ? 'text-gray-300' : 'text-gray-600'
                   }`}>
-                    {t('cloud.data_stays_in_your_provider', { provider: selectedProviderData?.name })}
+                    {t('cloud3.data_stays_in_your_provider', { provider: selectedProviderData?.name })}
                   </p>
                 </div>
               </div>
@@ -266,7 +267,7 @@ const CloudSetup = ({ darkMode }) => {
                       ? `text-${selectedProvider === 'onedrive' ? 'purple' : 'blue'}-300` 
                       : selectedProviderData?.textColor
                   }`}>
-                    {t('cloud.why_provider', { provider: selectedProviderData?.name })}
+                    {t('cloud3.why_provider', { provider: selectedProviderData?.name })}
                   </p>
                   <p className={`text-sm mt-1 ${
                     darkMode 
@@ -276,7 +277,7 @@ const CloudSetup = ({ darkMode }) => {
                     {selectedProvider === 'onedrive' 
                       ? t('cloud3.onedrive_benefits', 'Reliable Microsoft cloud storage with Office integration')
                       : selectedProvider === 'dropbox'
-                      ? t('cloud.dropbox_benefits', 'Trusted cloud storage with excellent reliability and sync')
+                      ? t('cloud3.dropbox_benefits', 'Trusted cloud storage with excellent reliability and sync')
                       : t('cloud.google_drive_benefits', 'Reliable cloud storage with excellent integration')
                     }
                   </p>

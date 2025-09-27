@@ -33,7 +33,7 @@ const StorageChoiceModal = ({
           color: 'from-blue-500 to-blue-600',
           bgColor: 'bg-blue-50',
           textColor: 'text-blue-700',
-          description: 'Save to Google Drive (15GB free)'
+          description: t('cloud3.save_cvs_securely_google', 'Store your CVs in Google Drive'),
         };
       case 'onedrive':
         return {
@@ -42,16 +42,25 @@ const StorageChoiceModal = ({
           color: 'from-purple-500 to-purple-600',
           bgColor: 'bg-purple-50',
           textColor: 'text-purple-700',
-          description: 'Save to Microsoft OneDrive (5GB free)'
+          description: t('cloud3.save_cvs_securely_onedrive', 'Store your CVs in Google Drive'),
+        };
+           case 'dropbox':
+        return {
+          name: 'Dropbox',
+          icon: '📦',
+          color: 'from-purple-500 to-purple-600',
+          bgColor: 'bg-purple-50',
+          textColor: 'text-purple-700',
+          description: t('cloud3.save_cvs_securely_dropbox', 'Store your CVs in Google Drive'),
         };
       default:
         return {
           name: provider,
-          icon: '📦',
+          icon: '☁️',
           color: 'from-gray-500 to-gray-600',
           bgColor: 'bg-gray-50',
           textColor: 'text-gray-700',
-          description: `Save to ${provider}`
+          description:    t('cloud3.save_to', { provider }) 
         };
     }
   };
@@ -229,12 +238,12 @@ const StorageChoiceModal = ({
               <h4 className={`font-medium mb-2 ${
                 darkMode ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                {t('cloud.no_cloud_providers')}
+                {t('cloud3.no_cloud')}
               </h4>
               <p className={`text-sm mb-4 ${
                 darkMode ? 'text-gray-400' : 'text-gray-600'
               }`}>
-                {t('cloud.connect_provider_to_save')}
+                {t('cloud3.connect_to_save')}
               </p>
               
               <div className="space-y-2">
@@ -242,14 +251,21 @@ const StorageChoiceModal = ({
                   onClick={() => onConnectCloud('google_drive')}
                   className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
                 >
-                  📄 Connect Google Drive
+                  📄  {t('cloud3.connect_google_drive')}
                 </button>
                 
                 <button
                   onClick={() => onConnectCloud('onedrive')}
                   className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
                 >
-                  ☁️ Connect OneDrive
+                  ☁️  {t('cloud3.connect_onedrive')}
+                </button>
+
+                  <button
+                  onClick={() => onConnectCloud('dropbox')}
+                  className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
+                >
+                  📦 {t('cloud3.connect_dropbox')}
                 </button>
               </div>
             </div>

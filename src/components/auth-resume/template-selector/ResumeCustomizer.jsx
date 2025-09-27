@@ -9,8 +9,7 @@ import TemplateRenderer from './TemplateRenderer';
 import ColorSelector from './ColorSelector';
 import FontSelector from './FontSelector';
 import HeadersStyleSelector from './HeadersStyleSelector';
-import SkillLevelToggle from './SkillLevelToggle';  
-import useResumeStore from '../../../stores/resumeStore';
+import SkillLevelToggle from './SkillLevelToggle';   
 import useSessionStore from '../../../stores/sessionStore';  
 import { exportToDocx } from '../view-cv/js/Exportdocx';
 import SaveConfirmationModal from './SaveConfirmationModal';
@@ -541,7 +540,7 @@ export const ResumeCustomizer = ({ darkMode = false, formData: propFormData }) =
   const resumeId = location.state?.resumeId; 
   
   // Stores 
-  const { currentResume, loading, fetchResume } = useResumeStore();  
+  const { currentResume, loading, fetchResume } = useSessionStore();  
   const { 
   listGoogleDriveCVs,
   loadGoogleDriveCV,
@@ -1146,7 +1145,7 @@ const handleSelectCV = (cv) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (loading) { 
-        useResumeStore.setState(state => ({
+        useSessionStore.setState(state => ({
           ...state,
           loading: false
         }));

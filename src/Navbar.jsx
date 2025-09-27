@@ -196,7 +196,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
       const hasOneDrive = connectedProviders?.includes('onedrive');
        const hasDropbox = connectedProviders?.includes('dropbox');
 
-      if (hasGoogleDrive && hasOneDrive && hasOneDropbox) {
+      if (hasGoogleDrive && hasOneDrive && hasDropbox) {
         return t('cloud3.multiple_providers', 'Multiple providers');
       } else if (hasGoogleDrive) {
         return t('cloud.google_drive', 'Google Drive');

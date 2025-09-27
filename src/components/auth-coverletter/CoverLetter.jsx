@@ -465,7 +465,7 @@ const CoverLetter = ({ darkMode }) => {
     if (providerDetails) {
       return {
         name: providerDetails.name,
-        icon: provider === 'google_drive' ? '📄' : provider === 'onedrive' ? '☁️' : '📦'
+        icon: provider === 'google_drive' ? '📄' : provider === 'onedrive' ? '☁️' :  provider === 'dropbox' ? '📦' :   '☁️'
       };
     }
     return { name: provider, icon: '🗃️' };
@@ -516,39 +516,41 @@ const CoverLetter = ({ darkMode }) => {
                 )}
 
                 {/* Cloud CVs by Provider */}
-                {Object.keys(groupedCloudCVs).map(provider => {
-                  const providerInfo = getProviderDisplayInfo(provider);
-                  const cvs = groupedCloudCVs[provider];
-                  
-                  return (
-                    <div key={provider} className="mb-3">
-                      <label className="block text-xs font-medium mb-1">
-                        {providerInfo.icon} {t('cloud3.from_provider', `From ${providerInfo.name}`)}
-                      </label>
-                      <select
-                        value={selectedCVSource === provider ? selectedResumeId : ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleCVSelection(provider, e.target.value);
-                          }
-                        }}
-                        className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'}`}
-                      >
-                        <option value="">{t('cloud3.select_from_provider', `-- Select from ${providerInfo.name} --`)}</option>
-                        {cvs.map(cv => (
-                          <option key={cv.file_id || cv.id} value={cv.file_id || cv.id}>
-                            {cv.name || cv.title || t('common.untitled', 'Untitled')}
-                          </option>
-                        ))}
-                      </select>
-                      {selectedCVSource === provider && selectedCV && (
-                        <p className="text-xs text-green-600 mt-1">
-                          ✓ {t('cloud3.selected', 'Selected')}: {selectedCV.title || selectedCV.name || t('cloud3.cloud_cv', 'Cloud CV')}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
+               {Object.keys(groupedCloudCVs).map(provider => {
+  const providerInfo = getProviderDisplayInfo(provider);
+  const cvs = groupedCloudCVs[provider];
+  
+  return (
+    <div key={provider} className="mb-3">
+      <label className="block text-xs font-medium mb-1">
+        {providerInfo.icon} {t('cloud3.from_provider', { provider: providerInfo.name })}
+      </label>
+      <select
+        value={selectedCVSource === provider ? selectedResumeId : ''}
+        onChange={(e) => {
+          if (e.target.value) {
+            handleCVSelection(provider, e.target.value);
+          }
+        }}
+        className={`w-full p-1.5 text-xs rounded border ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'}`}
+      >
+        <option value="">
+          {t('cloud3.select_from_provider', { provider: providerInfo.name })}
+        </option>
+        {cvs.map(cv => (
+          <option key={cv.file_id || cv.id} value={cv.file_id || cv.id}>
+            {cv.name || cv.title || t('common.untitled', 'Untitled')}
+          </option>
+        ))}
+      </select>
+      {selectedCVSource === provider && selectedCV && (
+        <p className="text-xs text-green-600 mt-1">
+          ✓ {t('cloud3.selected', 'Selected')}: {selectedCV.title || selectedCV.name || t('cloud3.cloud_cv', 'Cloud CV')}
+        </p>
+      )}
+    </div>
+  );
+})}
                 
                 {/* Upload */}
                 <div className="mb-3">
@@ -590,23 +592,23 @@ const CoverLetter = ({ darkMode }) => {
                 </div>
                 
                 {/* Help text */}
-                <div className="text-xs space-y-1">
-                  {localStorageCVs.length > 0 && (
-                    <p className="text-blue-600">
-                      💡 {t('cloud3.cvs_available_locally', `${localStorageCVs.length} CV${localStorageCVs.length !== 1 ? 's' : ''} available locally`)}
-                    </p>
-                  )}
-                  {Object.keys(groupedCloudCVs).length > 0 && (
-                    <p className="text-green-600">
-                      💡 {t('cloud3.cvs_in_cloud', `${Object.values(groupedCloudCVs).flat().length} CV${Object.values(groupedCloudCVs).flat().length !== 1 ? 's' : ''} in cloud`)}
-                    </p>
-                  )}
-                  {connectedProviders.length === 0 && (
-                    <p className="text-amber-600">
-                      💡 <a href="/cloud-setup" className="underline">{t('cloud3.connect_cloud_access', 'Connect cloud storage')}</a> {t('cloud3.to_access_cloud_cvs', 'to access cloud CVs')}
-                    </p>
-                  )}
-                </div>
+             <div className="text-xs space-y-1">
+  {localStorageCVs.length > 0 && (
+    <p className="text-blue-600">
+      💡 {t('cloud3.cvs_available_locally', { count: localStorageCVs.length })}
+    </p>
+  )}
+  {Object.keys(groupedCloudCVs).length > 0 && (
+    <p className="text-green-600">
+      💡 {t('cloud3.cvs_in_cloud', { count: Object.values(groupedCloudCVs).flat().length })}
+    </p>
+  )}
+  {connectedProviders.length === 0 && (
+    <p className="text-amber-600">
+      💡 <a href="/cloud-setup" className="underline">{t('cloud3.connect_cloud_access', 'Connect cloud storage')}</a> {t('cloud3.to_access_cloud_cvs', 'to access cloud CVs')}
+    </p>
+  )}
+</div>
               </div>
 
               {/* Personal Info */}
@@ -747,19 +749,23 @@ const CoverLetter = ({ darkMode }) => {
                         {isSaving ? t('cloud3.saving', 'Saving...') : t('cloud3.save_locally_btn', '💾 Save Locally')}
                       </button>
                       
-                      {connectedProviders.map(provider => {
-                        const providerInfo = getProviderDisplayInfo(provider);
-                        return (
-                          <button 
-                            key={provider}
-                            onClick={() => handleSaveCoverLetter(true, provider)}
-                            disabled={isSaving}
-                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:shadow-lg disabled:opacity-50"
-                          >
-                            {isSaving ? t('cloud3.saving', 'Saving...') : t('cloud3.save_to_provider_btn', `${providerInfo.icon} Save to ${providerInfo.name}`)}
-                          </button>
-                        );
-                      })}
+                    {connectedProviders.map(provider => {
+  const providerInfo = getProviderDisplayInfo(provider);
+  return (
+    <button 
+      key={provider}
+      onClick={() => handleSaveCoverLetter(true, provider)}
+      disabled={isSaving}
+      className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:shadow-lg disabled:opacity-50"
+    >
+      {isSaving ? t('cloud3.saving', 'Saving...') : (
+        <>
+          {providerInfo.icon} {t('cloud3.save_to_provider_btn', { name: providerInfo.name })}
+        </>
+      )}
+    </button>
+  );
+})}
                     </>
                   )}
                   
